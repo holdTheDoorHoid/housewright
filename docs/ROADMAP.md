@@ -6,7 +6,7 @@ assumption early. Status as of 2026-11-27.
 | # | Phase | Delivers | Status |
 |---|---|---|---|
 | 0 | Foundations | Interview, decision log, research, architecture | done |
-| 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | done (on branch `phase-1-core`, awaiting review); see below |
+| 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | done (merged 2026-11-27, PR #1); see below |
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | |
 | 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | |
