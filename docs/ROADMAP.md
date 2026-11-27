@@ -6,7 +6,7 @@ assumption early. Status as of 2026-11-27.
 | # | Phase | Delivers | Status |
 |---|---|---|---|
 | 0 | Foundations | Interview, decision log, research, architecture | done |
-| 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | in progress |
+| 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | done (on branch `phase-1-core`, awaiting review); see below |
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | |
 | 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | |
@@ -21,3 +21,17 @@ assumption early. Status as of 2026-11-27.
 
 Label scanning on the device (D-29) lands with Phase 4 on Android and the web.
 Opt-in research data (D-32) lands with Phase 6, when there is a server to send to.
+
+## Phase 1 notes
+
+Built: the `housewright-core` crate (domain model with sensitivity flags,
+pure schedule engine for every D-20 kind, prioritisation with start-small and
+welcome-back, SQLite storage with migrations, operation log with hybrid logical
+clocks and convergent merge, audit view, JSON export/import documented in
+[FILE-FORMAT.md](FILE-FORMAT.md), TOML template format with ten generic starter
+templates), and the `hw` command-line tool.
+
+Not in Phase 1, by design: networking, encryption, file storage for
+attachments (hash references only), contractor and fact commands in the CLI.
+Design choices made along the way are recorded as *Proposed* D-50 to D-58.
+

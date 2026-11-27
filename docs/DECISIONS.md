@@ -190,6 +190,74 @@ and offline on every platform. Loose-leaf layout: each section starts on its own
 page, and pages are numbered by section (e.g. "Water 3") so single sections can be
 reprinted.
 
+## Phase 1 core (proposed by the Phase 1 build, 2026-11-27)
+
+**D-50 Date and time library (Proposed).** The core uses `jiff` for dates, time
+zones and date arithmetic. All schedule arithmetic is on calendar dates in the
+property's time zone, never on instants, so clock changes cannot move a due date.
+Month arithmetic clamps (Jan 31 + 1 month = Feb 28 or 29), and repeating dates
+are always counted from the anchor so they do not drift to the 28th.
+
+**D-51 Storage layout (Proposed).** One SQLite table per kind of thing, each row
+holding the entity as a JSON object, plus a table of every operation and a table
+recording which operation last set each field. The tables are rebuilt purely from
+operations, so local edits and synced edits go through the same code. Typed
+columns and indexes can be added later by migration if queries need them.
+
+**D-52 Merge details (Proposed).** Refines D-13. "Last writer" is decided by the
+hybrid logical clock, then the author's member id, then the operation id (the
+same member on two devices can, rarely, produce the same clock). A delete is
+final: a later edit does not bring a deleted thing back. Completions and snoozes
+cannot be deleted at all; a completion logged by mistake is cancelled by a later
+"void" record, so the history is never rewritten. Snoozes are stored as
+append-only records rather than a counter, so two people snoozing on two phones
+both count. The author of an operation is the member; devices get their own
+identity with encryption in Phase 6.
+
+**D-53 Due windows (Proposed).** Every due date is a window: from *earliest* (the
+task shows as "due soon" and doing it counts) through *due* to *overdue after*.
+By default the lead and grace are each a sixth of the interval, capped at 14 days
+of lead and 30 days of grace (monthly: 5 and 5 days; yearly: 14 and 30). A task
+can override this. For a fixed-calendar task, doing it on or after a window's
+earliest day satisfies that occurrence and any missed earlier ones; missed
+occurrences are shown as one overdue task, never a pile. A task created while an
+occurrence's window is still open owes that occurrence.
+
+**D-54 States and first due dates (Proposed).** Adds a *completed* state for a
+one-off task that has been done. A floating or usage task never done counts from
+the item's install (or purchase) date when known; otherwise it is due when it is
+added, because nobody knows when it was last done. A usage task is "due soon" at
+90% of its threshold and cannot be "due" until the meter actually reaches it.
+After three snoozes since the last completion the task is flagged for review
+(P7). Snoozing to a date before the current due date changes nothing but still
+counts.
+
+**D-55 Seasons (Proposed).** Seasons are meteorological (whole months: spring is
+March to May in the north, September to November in the south). A seasonal task
+is due from the start of its season and overdue after the end, and is "due soon"
+two weeks before. "Before first frost" is the six weeks before the property's
+average first-frost date; "after last frost" the six weeks after the last-frost
+date. Without frost dates: September-October and April-May in the north, shifted
+six months in the south. Frost dates are stored as days of a non-leap year, so
+the same day number is the same calendar date every year.
+
+**D-56 Template rules (Proposed).** Template files are TOML, one per file, named
+by id, format version 1 (see `templates/README.md`). Every task has 3 to 7 steps,
+a one-line why (at most 200 characters) and the kind of source; no URLs or
+statistics. Tasks may apply only when an item field has a value (gas vs electric).
+Tasks created from a template start switched off as suggestions; "start small"
+switches on the top five (P3). A copy of the template is stored in the household
+so the data stands alone.
+
+**D-57 Export format (Proposed).** A full export holds both the current state
+(readable) and the complete operation log (so history and the audit trail
+survive). Import needs an empty database and checks that the log reproduces the
+state; a file with state only imports as new history. See `docs/FILE-FORMAT.md`.
+
+**D-58 Audit wording (Proposed).** The audit view says who did what and when
+("Alex marked 'Test the smoke alarm' done on 2026-11-27") and names the fields
+changed, but never shows values, so sensitive values (D-41) cannot leak through it.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
