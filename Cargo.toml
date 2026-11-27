@@ -1,0 +1,23 @@
+[workspace]
+resolver = "3"
+members = ["crates/core", "crates/cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/holdTheDoorHoid/housewright"
+rust-version = "1.89"
+
+[workspace.dependencies]
+housewright-core = { path = "crates/core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v7", "serde"] }
+# Date/time: see the comment at the top of crates/core/src/schedule.rs for why jiff.
+jiff = { version = "1", features = ["serde"] }
+rusqlite = { version = "0.43", features = ["bundled"] }
+toml = "1"
+clap = { version = "4", features = ["derive", "env"] }
+proptest = "1"

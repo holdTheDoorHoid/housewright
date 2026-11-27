@@ -1,0 +1,65 @@
+format = 1
+id = "sump-pump"
+name = "Sump pump"
+kind = "generic"
+category = "plumbing"
+description = "A sump pump in a basement or crawl-space pit."
+
+[[fields]]
+key = "battery_backup"
+label = "Has a battery backup pump"
+type = "yes_no"
+
+[[fields]]
+key = "installed_on"
+label = "Pump installed on"
+type = "date"
+
+[[tasks]]
+key = "test"
+title = "Test the sump pump"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 10
+steps = [
+  "Check the pump is plugged in and the outlet has power.",
+  "Slowly pour a bucket of water into the pit.",
+  "Watch the float rise and the pump switch on and empty the pit.",
+  "Check the pump switches off and that water discharges outside.",
+]
+why = "A pump that fails in a storm can flood the basement within hours."
+source = "common manufacturer guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["pass", "fail"] },
+]
+
+[[tasks]]
+key = "spring_check"
+title = "Clean the sump pit before the wet season"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Unplug the pump.",
+  "Remove debris and silt from the pit and the pump's inlet screen.",
+  "Check the discharge line outside is clear and not frozen or crushed.",
+  "Plug the pump back in and test it with a bucket of water.",
+]
+why = "Debris jams the float or clogs the inlet, which stops the pump when you need it."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "backup_battery"
+title = "Test the sump pump backup battery"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+when = { field = "battery_backup", equals = "yes" }
+steps = [
+  "Unplug the main pump.",
+  "Pour water into the pit and check the backup pump runs.",
+  "Check the battery charge indicator and the terminals for corrosion.",
+  "Plug the main pump back in.",
+]
+why = "Storms that flood basements often knock out power too, which is when the backup matters."
+source = "common manufacturer guidance"

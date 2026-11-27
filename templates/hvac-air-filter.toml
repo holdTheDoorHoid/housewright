@@ -1,0 +1,41 @@
+format = 1
+id = "hvac-air-filter"
+name = "Furnace / HVAC air filter"
+kind = "generic"
+category = "heating_cooling"
+description = "The air filter in a forced-air furnace, heat pump or air handler."
+
+[[fields]]
+key = "filter_size"
+label = "Filter size (e.g. 16x25x1)"
+type = "text"
+
+[[fields]]
+key = "rating"
+label = "Filter rating (MERV)"
+type = "number"
+
+[[fields]]
+key = "location"
+label = "Where the filter slot is"
+type = "text"
+
+[[tasks]]
+key = "check_replace"
+title = "Check and replace the furnace filter"
+priority = "efficiency"
+schedule = { kind = "floating", every = "3 months" }
+minutes = 10
+steps = [
+  "Switch the system off at the thermostat.",
+  "Slide the old filter out and note the size printed on its edge.",
+  "Hold it up to a light: if little light passes through, it is due.",
+  "Fit the new filter with the airflow arrow pointing toward the furnace.",
+  "Switch the system back on.",
+]
+why = "A clogged filter makes the system work harder, costs more to run and shortens its life."
+source = "US DOE and common manufacturer guidance"
+completion_fields = [
+  { key = "size_used", label = "Size used", type = "text" },
+]
+

@@ -1,0 +1,18 @@
+[package]
+name = "housewright-cli"
+description = "Command-line front end over the Housewright core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "hw"
+path = "src/main.rs"
+
+[dependencies]
+housewright-core.workspace = true
+clap.workspace = true
+jiff.workspace = true
+serde_json.workspace = true

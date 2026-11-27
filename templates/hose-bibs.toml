@@ -1,0 +1,46 @@
+format = 1
+id = "hose-bibs"
+name = "Outdoor hose taps"
+kind = "generic"
+category = "exterior"
+description = "Exterior hose taps (hose bibs, sillcocks)."
+
+[[fields]]
+key = "frost_free"
+label = "Frost-free type"
+type = "yes_no"
+
+[[fields]]
+key = "shutoff_location"
+label = "Where the indoor shutoff valve is"
+type = "text"
+
+[[tasks]]
+key = "winterise"
+title = "Winterise the outdoor hose taps"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 20
+steps = [
+  "Disconnect and drain every garden hose.",
+  "Close the indoor shutoff valve for each outdoor tap.",
+  "Open the outdoor tap to let the pipe drain, and leave it open.",
+  "Fit an insulated cover over each tap if you have them.",
+]
+why = "Water left in the pipe can freeze, split it, and leak inside the wall when it thaws."
+source = "common plumber guidance"
+
+[[tasks]]
+key = "spring_on"
+title = "Turn the outdoor hose taps back on"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "after_last_frost" }
+minutes = 15
+steps = [
+  "Close the outdoor tap.",
+  "Open the indoor shutoff valve slowly.",
+  "Run the outdoor tap and check inside for drips near the pipe.",
+  "If you see a leak inside, shut the valve again and call a plumber.",
+]
+why = "A pipe that split over winter often only shows itself when the water comes back on."
+source = "common plumber guidance"

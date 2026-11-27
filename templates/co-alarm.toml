@@ -1,0 +1,62 @@
+format = 1
+id = "co-alarm"
+name = "Carbon monoxide alarm"
+kind = "generic"
+category = "safety"
+description = "A carbon monoxide (CO) alarm, alone or combined with a smoke alarm."
+
+[[fields]]
+key = "power"
+label = "Power"
+type = "choice"
+options = ["battery", "sealed_battery", "plug_in", "hardwired"]
+
+[[fields]]
+key = "end_of_life"
+label = "End-of-life date (printed on the alarm)"
+type = "date"
+
+[[tasks]]
+key = "test"
+title = "Test the CO alarm"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 2
+steps = [
+  "Press and hold the test button until the alarm sounds.",
+  "Check that the power or status light is on.",
+  "If it does not sound, replace the battery (or the alarm) right away.",
+]
+why = "Carbon monoxide has no smell or colour; an alarm is the only warning you get."
+source = "CPSC and NFPA guidance"
+
+[[tasks]]
+key = "battery"
+title = "Replace the CO alarm battery"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 5
+when = { field = "power", equals = "battery" }
+steps = [
+  "Have the right replacement battery ready.",
+  "Remove the alarm from its mount.",
+  "Swap the battery, matching the + and - marks.",
+  "Refit the alarm and press the test button.",
+]
+why = "A dead battery silences the alarm without any obvious sign."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "replace"
+title = "Replace the CO alarm at end of life"
+priority = "life_safety"
+schedule = { kind = "floating", every = "7 years" }
+minutes = 15
+steps = [
+  "Check the end-of-life date printed on the alarm.",
+  "Buy a replacement; many models last 7 to 10 years, so follow the label.",
+  "Mount it where the old one was, or as the new alarm's instructions say.",
+  "Press the test button.",
+]
+why = "CO sensors lose sensitivity with age, and an expired alarm may not warn you."
+source = "common manufacturer guidance"

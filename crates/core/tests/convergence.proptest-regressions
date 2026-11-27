@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 930eca2ec8a5c44b92f98ae37cc20939aa019ac2bc4648f97a80065042e33324 # shrinks to actions = [SetFloor { r: 0, room: 0, floor: None }, Rename { r: 0, room: 0, name: 0 }], seed_a = 9894564578502650804, seed_b = 0, chunk_a = 1, chunk_b = 1

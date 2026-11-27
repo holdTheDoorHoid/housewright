@@ -1,0 +1,89 @@
+format = 1
+id = "water-heater"
+name = "Tank water heater"
+kind = "generic"
+category = "plumbing"
+description = "A storage-tank water heater, gas or electric."
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "choice"
+options = ["gas", "electric"]
+
+[[fields]]
+key = "capacity"
+label = "Capacity"
+type = "number"
+unit = "gal"
+
+[[fields]]
+key = "anode_checked"
+label = "Anode rod last inspected"
+type = "date"
+
+[[tasks]]
+key = "flush"
+title = "Drain and flush the water heater"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 60
+steps = [
+  "Turn the heater to its vacation or pilot setting (gas) or switch off its breaker (electric).",
+  "Close the cold-water supply valve to the tank.",
+  "Attach a hose to the drain valve and run it to a floor drain or outside.",
+  "Open a hot tap in the house, then open the drain valve and let the tank drain.",
+  "Briefly open the cold supply to stir up sediment, and repeat until the water runs clear.",
+  "Close the drain, refill the tank until the hot tap runs steadily, then restore power or gas.",
+]
+why = "Sediment buildup wastes energy, causes rumbling, and shortens the tank's life."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "relief_valve"
+title = "Test the temperature and pressure relief valve"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Put a bucket under the discharge pipe.",
+  "Stand clear: the water will be scalding.",
+  "Lift the valve lever briefly and let it snap back.",
+  "Water should rush out and stop when released; if it drips afterwards or nothing comes out, call a plumber.",
+]
+why = "This valve stops the tank from building dangerous pressure if the thermostat fails."
+source = "common manufacturer guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["works", "drips", "no_flow"] },
+]
+
+[[tasks]]
+key = "anode"
+title = "Inspect the anode rod"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "3 years" }
+minutes = 45
+steps = [
+  "Switch off power or gas and the cold supply, and drain a few gallons.",
+  "Unscrew the anode rod from the top of the tank.",
+  "Replace it if it is worn down to the core wire or heavily coated.",
+  "Wrap the threads with plumber's tape, refit, refill and restore power.",
+]
+why = "The anode rod corrodes so the tank does not; once it is gone, the tank starts to rust."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "flue"
+title = "Check the gas water heater's flue and burner"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+when = { field = "fuel", equals = "gas" }
+steps = [
+  "Check the flue pipe on top is firmly attached and not rusted through.",
+  "Look through the burner window: the flame should be mostly blue.",
+  "Keep flammable things (paint, gasoline, rags) well away from the heater.",
+  "If you see soot, a yellow flame or a loose flue, call a qualified technician.",
+]
+why = "A blocked or loose flue can let carbon monoxide into the house."
+source = "common manufacturer guidance"

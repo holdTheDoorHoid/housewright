@@ -1,0 +1,111 @@
+# Maintenance templates
+
+Templates describe a kind of thing in a house (a smoke alarm, a water heater)
+and the maintenance it needs. The app ships a copy of this folder and turns a
+template into suggested tasks when you add an item (D-21).
+
+Every file here is written in our own words from widely published public
+guidance. **Do not copy manufacturer manuals or other people's text** into a
+template, and do not invent statistics. If you want to cite something, name the
+*kind* of source in `source` (for example "NFPA guidance" or "common
+manufacturer guidance"); a manual can be attached to an item by its owner but is
+never redistributed here.
+
+The test `crates/core/tests/templates.rs` loads and validates every file in this
+folder, so `cargo test` tells you if a template is wrong.
+
+## File format (version 1)
+
+One template per file, in [TOML](https://toml.io). The file name is the
+template id plus `.toml`.
+
+```toml
+format = 1                    # always 1 for now
+id = "water-heater"           # lowercase letters, digits, hyphens; = file name
+name = "Tank water heater"    # what people see
+kind = "generic"              # "generic" or "model"
+category = "plumbing"         # optional; inherited if missing
+description = "..."           # optional
+
+# For a specific make and model:
+# kind = "model"
+# extends = "water-heater"    # required for models: the parent template id
+# make = "Acme"
+# model = "WH50"
+
+[[fields]]                    # facts recorded about the item (D-22)
+key = "fuel"                  # lowercase letters, digits, underscores
+label = "Fuel"
+type = "choice"               # text | number | date | yes_no | choice | photo
+options = ["gas", "electric"] # choice only
+# unit = "gal"                # number only, optional
+# sensitivity = "sensitive"   # "normal" (default) or "sensitive": sealed binder (D-41)
+# help = "..."                # optional
+
+[[meters]]                    # usage counters, for usage schedules
+key = "loads"
+name = "Loads washed"
+unit = "loads"
+
+[[tasks]]
+key = "flush"                 # unique within the template
+title = "Drain and flush the water heater"
+priority = "efficiency"       # life_safety | property_loss | efficiency | cosmetic
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 60                  # optional: how long it takes
+steps = ["...", "...", "..."] # 3 to 7 short steps
+why = "One line: why it matters."   # at most 200 characters
+source = "common manufacturer guidance"
+when = { field = "fuel", equals = "gas" }   # optional: only for matching items
+window = { lead_days = 14, grace_days = 30 } # optional: override the due window
+completion_fields = [         # optional: offered after "Done", never required
+  { key = "result", label = "Result", type = "choice", options = ["pass", "fail"] },
+]
+```
+
+### Schedules
+
+| `kind` | Other keys | Meaning |
+|---|---|---|
+| `fixed` | `every = "3 months"` | Every N days/weeks/months/years, counted from when the task starts, whenever it was last done. |
+| `nth_weekday` | `nth = 2`, `weekday = "saturday"`, `months = [3, 10]` (optional) | The nth (1-4, or -1 for last) weekday of the month, in the listed months or every month. |
+| `months_of_year` | `months = [4, 10]`, `day = 1` (optional) | Specific months, on a day of the month (clamped to the month's length). |
+| `floating` | `every = "90 days"` | N after it was last done. |
+| `seasonal` | `season = "before_first_frost"` | Once a year in a window: `spring`, `summer`, `autumn` (or `fall`), `winter`, `before_first_frost`, `after_last_frost`. Resolved from the property's hemisphere and frost dates. |
+| `usage` | `meter = "loads"`, `threshold = 40.0`, `or_every = "2 months"` (optional) | When the item's meter has advanced by the threshold since it was last done, or after `or_every`, whichever is first. The meter must be declared in `[[meters]]`. |
+
+Intervals are written as a whole number and a unit: `"1 day"`, `"2 weeks"`,
+`"3 months"`, `"10 years"`. Templates cannot contain one-off tasks or fixed
+anchor dates; those belong to a particular house.
+
+### Conditions
+
+`when = { field = "...", equals = "..." }` includes a task only for items whose
+field has that value. For a `choice` field, `equals` must be one of its options;
+for a `yes_no` field, `"yes"` or `"no"`. An item with the field unset does not
+get the task.
+
+### Inheritance
+
+A model template `extends` a generic one. The resolved template has the parent's
+fields, meters and tasks, with the child's entries replacing any with the same
+`key` and adding new ones. Chains (model -> generic -> category) are allowed;
+cycles are an error.
+
+## The starter set
+
+| File | Covers |
+|---|---|
+| `smoke-alarm.toml` | Monthly test, battery, cleaning, ten-year replacement |
+| `co-alarm.toml` | Monthly test, battery, end-of-life replacement |
+| `hvac-air-filter.toml` | Furnace / HVAC filter |
+| `water-heater.toml` | Flush, relief valve, anode, gas flue (gas only) |
+| `washing-machine.toml` | Supply hoses, cleaning cycle (usage-based) |
+| `clothes-dryer.toml` | Lint screen, vent duct, outside flap |
+| `refrigerator.toml` | Coils, water filter (if fitted), door seals |
+| `gutters.toml` | Autumn clean, spring check |
+| `sump-pump.toml` | Test, spring pit clean, backup battery (if fitted) |
+| `hose-bibs.toml` | Winterise before first frost, turn on after last frost |
+
+Template text licensing is an open question for the owner (Q-02; proposed
+CC BY 4.0).
