@@ -1,0 +1,67 @@
+format = 1
+id = "washing-machine"
+name = "Washing machine"
+kind = "generic"
+category = "appliances"
+description = "A clothes washer connected to hot and cold supply hoses."
+
+[[fields]]
+key = "hose_type"
+label = "Supply hose type"
+type = "choice"
+options = ["rubber", "braided_steel"]
+
+[[fields]]
+key = "hoses_installed"
+label = "Hoses installed on"
+type = "date"
+
+[[meters]]
+key = "loads"
+name = "Loads washed"
+unit = "loads"
+
+[[tasks]]
+key = "hoses_inspect"
+title = "Inspect the washer supply hoses"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 5
+steps = [
+  "Pull the washer out far enough to see both hoses.",
+  "Look for bulges, cracks, kinks or rust at the fittings.",
+  "Feel the fittings for dampness while the washer fills.",
+  "Replace any hose that shows wear.",
+]
+why = "A burst supply hose can release a large amount of water quickly, often while no one is home."
+source = "insurance industry guidance"
+
+[[tasks]]
+key = "hoses_replace"
+title = "Replace the washer supply hoses"
+priority = "property_loss"
+schedule = { kind = "floating", every = "5 years" }
+minutes = 20
+steps = [
+  "Turn off both supply valves behind the washer.",
+  "Put a towel down and unscrew the old hoses.",
+  "Fit new hoses (braided steel lasts longer) hand-tight plus a quarter turn.",
+  "Open the valves slowly and check for drips.",
+]
+why = "Hoses age from the inside, so they can fail without looking worn."
+source = "insurance industry and common manufacturer guidance"
+
+[[tasks]]
+key = "clean_drum"
+title = "Run a washer cleaning cycle"
+priority = "efficiency"
+schedule = { kind = "usage", meter = "loads", threshold = 40.0, or_every = "2 months" }
+minutes = 5
+steps = [
+  "Remove any clothes from the drum.",
+  "Wipe the door seal and the detergent drawer.",
+  "Run the cleaning cycle, or the hottest cycle empty, with a washer cleaner.",
+  "Leave the door open afterwards so it dries.",
+]
+why = "Residue and damp cause odours and mould in the drum and seal."
+source = "common manufacturer guidance"

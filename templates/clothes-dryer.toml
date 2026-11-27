@@ -1,0 +1,62 @@
+format = 1
+id = "clothes-dryer"
+name = "Clothes dryer"
+kind = "generic"
+category = "appliances"
+description = "A vented clothes dryer, gas or electric."
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "choice"
+options = ["gas", "electric"]
+
+[[fields]]
+key = "vent_length"
+label = "Vent duct length"
+type = "number"
+unit = "ft"
+
+[[tasks]]
+key = "lint_screen"
+title = "Wash the dryer lint screen"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 5
+steps = [
+  "Pull out the lint screen.",
+  "Wash it in warm soapy water with a soft brush to remove fabric-softener film.",
+  "Let it dry completely before refitting.",
+]
+why = "A clogged screen blocks airflow, which makes lint build up where it can catch fire."
+source = "US Fire Administration guidance"
+
+[[tasks]]
+key = "vent_clean"
+title = "Clean the dryer vent duct"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 45
+steps = [
+  "Unplug the dryer (and turn off its gas valve if it is gas).",
+  "Disconnect the duct from the back of the dryer.",
+  "Brush or vacuum out the duct with a dryer-vent brush kit.",
+  "Clean the outside vent hood and check its flap opens freely.",
+  "Reconnect the duct with as few bends as possible, using rigid or semi-rigid metal duct.",
+]
+why = "Lint in the vent is a leading cause of dryer fires and makes drying slower."
+source = "US Fire Administration guidance"
+
+[[tasks]]
+key = "vent_hood"
+title = "Check the outside dryer vent flap"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 5
+steps = [
+  "Run the dryer and go outside to the vent hood.",
+  "Check that air is flowing strongly and the flap opens.",
+  "Clear lint, nests or leaves from the hood.",
+]
+why = "A blocked or stuck flap traps lint and moisture, and lets pests in over winter."
+source = "common manufacturer guidance"

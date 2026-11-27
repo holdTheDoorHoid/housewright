@@ -17,6 +17,7 @@ struct Case {
     schedule: Schedule,
     window: Option<WindowPolicy>,
     start: Date,
+    assumed: Option<Date>,
     done: Vec<Date>,
     snoozes: Vec<(Date, Date)>,
     readings: Vec<(Date, f64)>,
@@ -31,6 +32,7 @@ impl Case {
             schedule,
             window: None,
             start,
+            assumed: None,
             done: vec![],
             snoozes: vec![],
             readings: vec![],
@@ -78,6 +80,7 @@ impl Case {
             schedule: &self.schedule,
             window: self.window,
             start: self.start,
+            assumed_last_done: self.assumed,
             completions: &completions,
             snoozes: &snoozes,
             readings: &readings,
@@ -383,6 +386,24 @@ fn floating() {
 }
 
 #[test]
+fn floating_never_done_counts_from_assumed_date() {
+    // A smoke alarm installed in 2022 with a ten-year replacement.
+    let mut c = Case::new(
+        Schedule::Floating {
+            every: Interval::years(10),
+        },
+        date(2026, 11, 27),
+    );
+    c.assumed = Some(date(2022, 5, 1));
+    let e = c.eval(date(2026, 11, 27));
+    assert_eq!(due(&e), date(2032, 5, 1));
+    assert_eq!(e.state, TaskState::Scheduled);
+    // A real completion takes over from the assumption.
+    let c = c.done(date(2030, 1, 1));
+    assert_eq!(due(&c.eval(date(2030, 1, 2))), date(2040, 1, 1));
+}
+
+#[test]
 fn floating_months_from_month_end() {
     let c = Case::new(
         Schedule::Floating {
@@ -412,6 +433,7 @@ fn dst_does_not_shift_dates() {
         schedule: &s,
         window: None,
         start: date(2026, 1, 1),
+        assumed_last_done: None,
         completions: &[late],
         snoozes: &[],
         readings: &[],
@@ -462,6 +484,7 @@ fn same_instant_differs_by_time_zone() {
             grace_days: 0,
         }),
         start: date(2026, 1, 1),
+        assumed_last_done: None,
         completions: &[],
         snoozes: &[],
         readings: &[],

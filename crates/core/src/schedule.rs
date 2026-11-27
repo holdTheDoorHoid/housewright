@@ -597,6 +597,10 @@ pub struct ScheduleInput<'a> {
     pub schedule: &'a Schedule,
     pub window: Option<WindowPolicy>,
     pub start: Date,
+    /// For a task never done: when it is assumed to have last been done (an
+    /// item's install or purchase date). Floating and usage schedules count
+    /// from it; without it they count from `start`.
+    pub assumed_last_done: Option<Date>,
     /// Times of (non-voided) completions, any order.
     pub completions: &'a [Timestamp],
     pub snoozes: &'a [SnoozeInput],
@@ -678,7 +682,8 @@ pub fn evaluate(input: &ScheduleInput<'_>, now: Timestamp, tz: &TimeZone) -> Eva
             by_date(policy.around(*due), today)
         }
         Schedule::Floating { every } => {
-            let due = match last_done {
+            // Never done and nothing known: due at the start (check it now).
+            let due = match last_done.or(input.assumed_last_done) {
                 Some(l) => every.add_to(l),
                 None => Some(input.start),
             };
@@ -689,7 +694,7 @@ pub fn evaluate(input: &ScheduleInput<'_>, now: Timestamp, tz: &TimeZone) -> Eva
             or_every,
             ..
         } => {
-            let reference = last_done.unwrap_or(input.start);
+            let reference = last_done.or(input.assumed_last_done).unwrap_or(input.start);
             let (u_state, u_window, progress) =
                 usage_eval(input.readings, *threshold, reference, policy, today, tz);
             eval.usage = progress;
@@ -781,7 +786,7 @@ fn usage_eval(
         .filter(|r| r.value.is_finite())
         .map(|r| (civil_date(r.at, tz), r.at, r.value))
         .collect();
-    rs.sort_by(|a, b| a.1.cmp(&b.1));
+    rs.sort_by_key(|r| r.1);
     if rs.is_empty() {
         return (TaskState::Scheduled, None, None);
     }

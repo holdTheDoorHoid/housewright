@@ -1,0 +1,87 @@
+format = 1
+id = "smoke-alarm"
+name = "Smoke alarm"
+kind = "generic"
+category = "safety"
+description = "A battery or hardwired smoke alarm."
+
+[[fields]]
+key = "power"
+label = "Power"
+type = "choice"
+options = ["battery", "sealed_10_year", "hardwired_battery_backup"]
+
+[[fields]]
+key = "manufactured"
+label = "Date of manufacture (on the back)"
+type = "date"
+
+[[fields]]
+key = "battery_type"
+label = "Battery type"
+type = "text"
+
+[[tasks]]
+key = "test"
+title = "Test the smoke alarm"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 2
+steps = [
+  "Tell everyone at home you are about to test the alarm.",
+  "Press and hold the test button until the alarm sounds.",
+  "If it stays silent or sounds weak, replace the battery and test again.",
+  "If it still fails, replace the alarm.",
+]
+why = "A working alarm gives you the minutes you need to get out in a fire."
+source = "NFPA guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["pass", "fail"] },
+]
+
+[[tasks]]
+key = "battery"
+title = "Replace the smoke alarm battery"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 5
+when = { field = "power", equals = "battery" }
+steps = [
+  "Have the right replacement battery ready.",
+  "Twist or slide the alarm off its base.",
+  "Swap the battery, matching the + and - marks.",
+  "Refit the alarm and press the test button.",
+]
+why = "A low battery is the most common reason an alarm fails when it is needed."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "replace"
+title = "Replace the smoke alarm (ten-year life)"
+priority = "life_safety"
+schedule = { kind = "floating", every = "10 years" }
+minutes = 20
+steps = [
+  "Check the date of manufacture on the back of the alarm.",
+  "Buy a replacement of the same type (and the same connector if hardwired).",
+  "For a hardwired alarm, switch off its circuit at the breaker first.",
+  "Fit the new alarm, restore power and press the test button.",
+  "Write the install date on the new alarm.",
+]
+why = "Smoke sensors wear out; alarms are meant to be replaced about every ten years."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "clean"
+title = "Vacuum the smoke alarm vents"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 5
+steps = [
+  "Use the soft brush attachment of a vacuum.",
+  "Gently vacuum the vents around the alarm cover.",
+  "Do not paint over or cover the alarm.",
+  "Press the test button afterwards.",
+]
+why = "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
+source = "common manufacturer guidance"

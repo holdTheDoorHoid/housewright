@@ -1,0 +1,46 @@
+format = 1
+id = "gutters"
+name = "Gutters and downspouts"
+kind = "generic"
+category = "exterior"
+description = "Roof gutters and the downspouts that carry water away from the house."
+
+[[fields]]
+key = "has_guards"
+label = "Has gutter guards"
+type = "yes_no"
+
+[[fields]]
+key = "storeys"
+label = "Storeys (for ladder safety)"
+type = "number"
+
+[[tasks]]
+key = "clean_autumn"
+title = "Clean the gutters after the leaves fall"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 120
+steps = [
+  "Set the ladder on firm, level ground and have someone hold it; never lean out sideways.",
+  "Scoop out leaves and debris, starting near a downspout.",
+  "Flush each run with a hose and check the water drains freely.",
+  "Clear any blocked downspout from the bottom with the hose or a plumber's snake.",
+  "Check that downspouts discharge well away from the foundation.",
+]
+why = "Overflowing gutters dump water against the foundation and can cause leaks and rot."
+source = "common home-inspector guidance"
+
+[[tasks]]
+key = "check_spring"
+title = "Check the gutters in spring"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "From the ground, look for sagging runs or gaps at the joints.",
+  "During rain, watch for water spilling over the edge.",
+  "Clear any debris from winter storms.",
+]
+why = "Winter ice and storms loosen gutters, and small problems are cheapest to fix early."
+source = "common home-inspector guidance"

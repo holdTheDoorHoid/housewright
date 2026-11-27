@@ -1,0 +1,68 @@
+format = 1
+id = "refrigerator"
+name = "Refrigerator"
+kind = "generic"
+category = "appliances"
+description = "A refrigerator, with or without an ice maker or water dispenser."
+
+[[fields]]
+key = "water_filter"
+label = "Has a water filter"
+type = "yes_no"
+
+[[fields]]
+key = "filter_part"
+label = "Water filter part number"
+type = "text"
+
+[[fields]]
+key = "coil_location"
+label = "Condenser coils"
+type = "choice"
+options = ["back", "bottom"]
+
+[[tasks]]
+key = "coils"
+title = "Clean the refrigerator condenser coils"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 20
+steps = [
+  "Unplug the refrigerator or switch it off.",
+  "Find the coils: behind a front grille at the bottom, or on the back.",
+  "Brush and vacuum the dust off the coils with a coil brush.",
+  "Refit the grille and plug it back in.",
+]
+why = "Dusty coils make the compressor run longer, which uses more power and shortens its life."
+source = "US DOE and common manufacturer guidance"
+
+[[tasks]]
+key = "water_filter"
+title = "Replace the refrigerator water filter"
+priority = "efficiency"
+schedule = { kind = "floating", every = "6 months" }
+minutes = 10
+when = { field = "water_filter", equals = "yes" }
+steps = [
+  "Have the correct replacement filter ready.",
+  "Remove the old filter (twist or push, depending on the model).",
+  "Fit the new filter until it seats firmly.",
+  "Run a few litres of water through the dispenser to flush it, and reset the filter light.",
+]
+why = "An old filter stops filtering well and can slow the water flow."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "door_seals"
+title = "Check the refrigerator door seals"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 5
+steps = [
+  "Close the door on a sheet of paper and try to pull it out.",
+  "If it slides out easily, the seal is not tight at that spot.",
+  "Clean the seal with warm soapy water and dry it.",
+  "Replace the gasket if it is torn or still loose.",
+]
+why = "Leaky seals let cold air out, wasting power and spoiling food sooner."
+source = "common manufacturer guidance"
