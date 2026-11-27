@@ -1,0 +1,518 @@
+//! The domain model (ARCHITECTURE.md, "Data model").
+//!
+//! Every struct here is stored as a JSON object in SQLite and changed only
+//! through operations (see [`crate::oplog`]). Ordinary entities merge field by
+//! field ("last writer wins"); the append-only records ([`Completion`],
+//! [`Snooze`], [`MeterReading`], [`Attachment`], [`Note`]) are written once and
+//! never edited.
+//!
+//! Sensitivity (D-41): anything that could be a code, an account detail or the
+//! whereabouts of valuables carries a [`Sensitivity`] flag, either directly or
+//! through a [`Flagged`] wrapper, so the binder can file it into the sealed volume.
+
+use jiff::Timestamp;
+use jiff::civil::Date;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+
+use crate::fields::{CustomValues, FieldDef};
+use crate::ids::*;
+use crate::priority::PriorityClass;
+use crate::schedule::{Climate, Schedule, WindowPolicy};
+
+/// Normal (main binder) or sensitive (sealed volume), per D-41.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Sensitivity {
+    #[default]
+    Normal,
+    Sensitive,
+}
+
+/// A value with its own sensitivity flag.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Flagged<T> {
+    pub value: T,
+    #[serde(default)]
+    pub sensitivity: Sensitivity,
+}
+
+impl<T> Flagged<T> {
+    pub fn normal(value: T) -> Self {
+        Self {
+            value,
+            sensitivity: Sensitivity::Normal,
+        }
+    }
+    pub fn sensitive(value: T) -> Self {
+        Self {
+            value,
+            sensitivity: Sensitivity::Sensitive,
+        }
+    }
+}
+
+/// The kinds of entity the operation log knows about. The string form is also
+/// the SQLite table name and the key in the export format.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EntityKind {
+    Household,
+    Member,
+    Property,
+    Floor,
+    Room,
+    Item,
+    Template,
+    Task,
+    Completion,
+    Snooze,
+    Meter,
+    MeterReading,
+    Contractor,
+    Attachment,
+    Note,
+    Fact,
+}
+
+impl EntityKind {
+    pub const ALL: [EntityKind; 16] = [
+        EntityKind::Household,
+        EntityKind::Member,
+        EntityKind::Property,
+        EntityKind::Floor,
+        EntityKind::Room,
+        EntityKind::Item,
+        EntityKind::Template,
+        EntityKind::Task,
+        EntityKind::Completion,
+        EntityKind::Snooze,
+        EntityKind::Meter,
+        EntityKind::MeterReading,
+        EntityKind::Contractor,
+        EntityKind::Attachment,
+        EntityKind::Note,
+        EntityKind::Fact,
+    ];
+
+    /// Table name / wire name.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            EntityKind::Household => "household",
+            EntityKind::Member => "member",
+            EntityKind::Property => "property",
+            EntityKind::Floor => "floor",
+            EntityKind::Room => "room",
+            EntityKind::Item => "item",
+            EntityKind::Template => "template",
+            EntityKind::Task => "task",
+            EntityKind::Completion => "completion",
+            EntityKind::Snooze => "snooze",
+            EntityKind::Meter => "meter",
+            EntityKind::MeterReading => "meter_reading",
+            EntityKind::Contractor => "contractor",
+            EntityKind::Attachment => "attachment",
+            EntityKind::Note => "note",
+            EntityKind::Fact => "fact",
+        }
+    }
+
+    pub fn parse(s: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|k| k.as_str() == s)
+    }
+
+    /// Append-only kinds are written once as a whole record and never edited.
+    pub fn append_only(self) -> bool {
+        matches!(
+            self,
+            EntityKind::Completion
+                | EntityKind::Snooze
+                | EntityKind::MeterReading
+                | EntityKind::Attachment
+                | EntityKind::Note
+        )
+    }
+
+    /// Whether a tombstone may hide this kind. Completions are never deleted;
+    /// a mistaken one is voided by a later completion record instead.
+    pub fn deletable(self) -> bool {
+        !matches!(self, EntityKind::Completion | EntityKind::Snooze)
+    }
+}
+
+/// Implemented by every stored struct.
+pub trait Entity: Serialize + DeserializeOwned {
+    const KIND: EntityKind;
+    fn entity_id(&self) -> String;
+}
+
+macro_rules! entity {
+    ($t:ty, $kind:ident) => {
+        impl Entity for $t {
+            const KIND: EntityKind = EntityKind::$kind;
+            fn entity_id(&self) -> String {
+                self.id.to_string()
+            }
+        }
+    };
+}
+
+/// A reference to any entity, used by notes and attachments.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EntityRef {
+    pub kind: EntityKind,
+    pub id: String,
+}
+
+/// The household: sharing and encryption boundary (one per database).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Household {
+    pub id: HouseholdId,
+    pub name: String,
+    /// Default IANA time zone for new properties.
+    pub time_zone: String,
+}
+entity!(Household, Household);
+
+/// Roles (D-23). Contractor/tenant links are not members; they arrive with
+/// share links in Phase 11.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Role {
+    /// Owner/admin: everything, including members and the sealed volume.
+    Owner,
+    /// Household member: sees and edits the whole plan.
+    Member,
+    /// Limited: sees only tasks assigned to them.
+    Limited,
+}
+
+impl Role {
+    pub fn can_edit_plan(self) -> bool {
+        matches!(self, Role::Owner | Role::Member)
+    }
+    pub fn can_manage_members(self) -> bool {
+        matches!(self, Role::Owner)
+    }
+    pub fn can_see_sensitive(self) -> bool {
+        matches!(self, Role::Owner)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Member {
+    pub id: MemberId,
+    pub name: String,
+    pub role: Role,
+    /// Phone or email; flagged because it is personal.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contact: Option<Flagged<String>>,
+}
+entity!(Member, Member);
+
+/// A house.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Property {
+    pub id: PropertyId,
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<Flagged<String>>,
+    /// IANA time zone; all due dates for this property are civil dates here.
+    pub time_zone: String,
+    pub climate: Climate,
+}
+entity!(Property, Property);
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Floor {
+    pub id: FloorId,
+    pub property: PropertyId,
+    pub name: String,
+    /// 0 = ground, negative = basement.
+    #[serde(default)]
+    pub level: i32,
+}
+entity!(Floor, Floor);
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Room {
+    pub id: RoomId,
+    pub property: PropertyId,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub floor: Option<FloorId>,
+    pub name: String,
+}
+entity!(Room, Room);
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Warranty {
+    pub expires: Date,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider: Option<String>,
+    #[serde(default)]
+    pub transferable: bool,
+    /// Policy or claim numbers can be account details: flagged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<Flagged<String>>,
+}
+
+/// Something in the house.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Item {
+    pub id: ItemId,
+    pub property: PropertyId,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub room: Option<RoomId>,
+    /// A filter inside a furnace has the furnace as its parent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent: Option<ItemId>,
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub make: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub serial: Option<Flagged<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub purchased: Option<Date>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub installed: Option<Date>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warranty: Option<Warranty>,
+    /// Where exactly it is ("behind the panel in the hall closet"). A safe's
+    /// location is the classic sensitive value.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_note: Option<Flagged<String>>,
+    /// Template id this item came from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<String>,
+    /// Extra fields added to this single item (D-22), on top of the template's.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub extra_fields: Vec<FieldDef>,
+    #[serde(default)]
+    pub custom: CustomValues,
+    /// Whole-item sensitivity (e.g. a safe, jewellery).
+    #[serde(default)]
+    pub sensitivity: Sensitivity,
+}
+entity!(Item, Item);
+
+/// Why a task matters, and where that advice comes from (P2, P9).
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Why {
+    pub text: String,
+    pub source: String,
+}
+
+/// Recurring (or one-off) work on an item or a place.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Task {
+    pub id: TaskId,
+    pub property: PropertyId,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub item: Option<ItemId>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub room: Option<RoomId>,
+    pub title: String,
+    /// Exactly one named owner (P8).
+    pub owner: MemberId,
+    pub priority: PriorityClass,
+    pub schedule: Schedule,
+    /// Overrides the default due window for this schedule.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub window: Option<WindowPolicy>,
+    /// The date the task begins. A floating task never done is first due here;
+    /// a fixed task with no anchor counts from here.
+    pub start: Date,
+    #[serde(default)]
+    pub steps: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub why: Option<Why>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub minutes: Option<u32>,
+    /// Fields offered after completion (never required, P1).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub completion_fields: Vec<FieldDef>,
+    /// Template id and task key this came from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<TemplateTaskRef>,
+    /// Switched on in the plan (P3: start small). Inactive tasks are suggestions.
+    #[serde(default)]
+    pub active: bool,
+    #[serde(default)]
+    pub paused: bool,
+    #[serde(default)]
+    pub not_applicable: bool,
+}
+entity!(Task, Task);
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TemplateTaskRef {
+    pub template: String,
+    pub task: String,
+}
+
+/// Money in minor units (cents), to avoid floating point.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Money {
+    pub minor: i64,
+    /// ISO 4217, e.g. "USD".
+    pub currency: String,
+}
+
+/// Append-only record of a task done. Never edited or deleted: a mistake is
+/// corrected by a later completion with `voids` set.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Completion {
+    pub id: CompletionId,
+    pub task: TaskId,
+    pub by: MemberId,
+    pub at: Timestamp,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Flagged<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost: Option<Money>,
+    #[serde(default)]
+    pub values: CustomValues,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contractor: Option<ContractorId>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub attachments: Vec<AttachmentId>,
+    /// If set, this record cancels an earlier completion (logged in error).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub voids: Option<CompletionId>,
+}
+entity!(Completion, Completion);
+
+/// Append-only record of a snooze ("reschedule to a moment", P7).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Snooze {
+    pub id: SnoozeId,
+    pub task: TaskId,
+    pub by: MemberId,
+    pub at: Timestamp,
+    pub until: Date,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+entity!(Snooze, Snooze);
+
+/// A usage counter: runtime hours, loads, gallons.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Meter {
+    pub id: MeterId,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub item: Option<ItemId>,
+    /// Machine key, matched by usage schedules (`runtime_hours`).
+    pub key: String,
+    pub name: String,
+    pub unit: String,
+}
+entity!(Meter, Meter);
+
+/// Append-only meter reading (by hand, or from Home Assistant later).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct MeterReading {
+    pub id: MeterReadingId,
+    pub meter: MeterId,
+    pub at: Timestamp,
+    pub value: f64,
+    pub by: MemberId,
+}
+entity!(MeterReading, MeterReading);
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Credential {
+    pub number: Flagged<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expires: Option<Date>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Contractor {
+    pub id: ContractorId,
+    pub name: String,
+    #[serde(default)]
+    pub trades: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub licence: Option<Credential>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub insurance: Option<Credential>,
+    /// Private rating 1-5, never shared (D-28). Always treated as sensitive.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub private_rating: Option<u8>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<Flagged<String>>,
+}
+entity!(Contractor, Contractor);
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AttachmentKind {
+    Manual,
+    Receipt,
+    Warranty,
+    Photo,
+    Other,
+}
+
+/// A file, by content hash only. Phase 1 stores no file bytes (D-17: files
+/// will live encrypted beside the database).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Attachment {
+    pub id: AttachmentId,
+    /// Lowercase hex SHA-256 of the plaintext file.
+    pub sha256: String,
+    pub name: String,
+    pub media_type: String,
+    pub size: u64,
+    pub kind: AttachmentKind,
+    pub about: EntityRef,
+    #[serde(default)]
+    pub sensitivity: Sensitivity,
+}
+entity!(Attachment, Attachment);
+
+impl Attachment {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.sha256.len() != 64
+            || !self
+                .sha256
+                .chars()
+                .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c))
+        {
+            return Err("sha256 must be 64 lowercase hex characters".into());
+        }
+        Ok(())
+    }
+}
+
+/// Append-only free-text note on anything.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Note {
+    pub id: NoteId,
+    pub about: EntityRef,
+    pub by: MemberId,
+    pub at: Timestamp,
+    pub text: Flagged<String>,
+}
+entity!(Note, Note);
+
+/// A home facts sheet entry (D-27): filter sizes, paint colours, shutoffs,
+/// breakers, codes. Codes are sensitive.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Fact {
+    pub id: FactId,
+    pub property: PropertyId,
+    pub category: String,
+    pub label: String,
+    pub value: String,
+    pub sensitivity: Sensitivity,
+}
+entity!(Fact, Fact);
