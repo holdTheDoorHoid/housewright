@@ -143,6 +143,11 @@ impl Store {
         Self::with_connection(Connection::open(path)?, Box::new(SystemClock))
     }
 
+    /// Open (or create) a database file with a given clock.
+    pub fn open_with_clock(path: impl AsRef<Path>, clock: Box<dyn WallClock>) -> Result<Self> {
+        Self::with_connection(Connection::open(path)?, clock)
+    }
+
     /// A fresh in-memory database.
     pub fn open_in_memory(clock: Box<dyn WallClock>) -> Result<Self> {
         Self::with_connection(Connection::open_in_memory()?, clock)

@@ -19,5 +19,5 @@ uuid = { version = "1", features = ["v7", "serde"] }
 jiff = { version = "1", features = ["serde"] }
 rusqlite = { version = "0.43", features = ["bundled"] }
 toml = "1"
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
 proptest = "1"
