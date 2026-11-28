@@ -133,8 +133,8 @@
     <h3>Official manual and support</h3>
     <ul class="list stack" data-testid="maker-links">
       {#each f.manuals as man (man.url)}
-        <li class="row">
-          <button type="button" class="quiet link grow" onclick={() => open(man.url)}>{PAGE[man.kind] ?? 'Page'}: {man.title}</button>
+        <li class="manual">
+          <button type="button" class="quiet link" onclick={() => open(man.url)}>{PAGE[man.kind] ?? 'Page'}: {man.title}</button>
           {#if man.pdf}
             <button type="button" onclick={() => save(man)} disabled={saving !== null} data-testid="save-manual">
               {saving === man.url ? 'Saving…' : canSaveManual() ? 'Save the official manual to this thing' : 'Open the official manual'}
@@ -251,9 +251,11 @@
     padding: 0;
     margin: 0;
   }
-  .grow {
-    flex: 1;
-    text-align: left;
+  .manual {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
   .link {
     min-height: 0;

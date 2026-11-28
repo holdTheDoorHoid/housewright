@@ -325,7 +325,7 @@ pub fn find(lib: &Library, make: &str, model: &str, template: Option<&str>) -> M
         for (fid, exact, spelled) in &brand_only {
             let mut reasons = vec![brand_reason(*exact, spelled, &brand_name(fid))];
             reasons.push(if model_ok {
-                "The model number does not fit a model pattern the library knows for this brand."
+                "The library does not know this model number (many families do not list model numbers yet); pick yours by name."
                     .into()
             } else {
                 "No model number to compare yet.".into()
