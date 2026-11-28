@@ -61,7 +61,9 @@
           {#if placeText(t.card)}<span class="muted small block">{placeText(t.card)}</span>{/if}
           {#if t.why}<p class="small why">{t.why}</p>{/if}
           <p class="muted small">
-            {#if t.source}Source: {t.source}. {/if}{dueText(t.card)}{t.card.minutes ? `. About ${t.card.minutes} min.` : ''}
+            {[t.source ? `Source: ${t.source}.` : '', `${dueText(t.card)}.`, t.card.minutes ? `About ${t.card.minutes} min.` : '']
+              .filter(Boolean)
+              .join(' ')}
           </p>
         </li>
       {/each}

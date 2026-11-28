@@ -8,7 +8,7 @@ assumption early. Status as of 2026-11-27.
 | 0 | Foundations | Interview, decision log, research, architecture | done |
 | 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | done (merged 2026-11-27, PR #1); see below |
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | done on branch `phase-2-app-shell` (PR #2): web verified in a browser; Android reminder proof passed on the emulator 2026-11-27 (see below) |
-| 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web and Android emulator checks pass; see below |
+| 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web (Playwright) and Android emulator walk-through pass; see below |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | |
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | |
@@ -94,7 +94,15 @@ Built (decisions D-64 to D-69):
 - **Templates**: 45 generic templates in eight fixed categories, with a
   quality test.
 - Storage schema 2 and export version 2; Phase 2 exports still import
-  (tested with a fixture written by the Phase 2 code).
+  (tested with a fixture written by the Phase 2 code). `Store::batch` writes
+  onboarding in one transaction (D-70).
+
+Verified: Rust format, clippy (native and wasm), tests; svelte-check;
+vitest; Playwright on the production web build (first run, all ten
+questions, starting plan, Today with only the switched-on tasks and one
+suggestion, the full suggested list, Done, add a thing, redo the questions,
+second tab, reload); and a walk-through on the Android 15 emulator with
+screenshots in [phase-3-evidence/README.md](phase-3-evidence/README.md).
 
 Not built in Phase 3: room-by-room walks with label photos (D-24's second
 half; Phase 4 with attachments), editing a thing's template fields after
