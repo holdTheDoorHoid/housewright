@@ -917,6 +917,34 @@ device accepts it only if it matches its own view. A middleman's keys make
 the two views differ, so the owner's device cannot finish even if both
 people tap "they match".
 
+## Second verification-pass fixes (proposed 2026-11-28)
+
+**D-112 A newer roster claim must link to the device's own chain
+(Proposed).** Fixes P1; revises D-106. Batches carry the author's last
+eight signed roster versions. A device believes a newer version only if
+those link to its own verified chain, each step checked exactly as a roster
+update (owner signature, the recovery key's co-signature for removing
+owners). A claim not signed by an owner device is counted as tampering; one
+that cannot be linked (far behind) is ignored. A verified version the
+server lacks pauses sending, with a notice naming the device that claimed
+it; the person can press OK to send anyway. So a stolen owner phone can at
+worst cause a pause the person clears.
+
+**D-113 One copy of a file per uploading device (Proposed).** Fixes P2;
+revises D-108. The server keeps each device's upload of a file separately
+and never overwrites one device's copy with another's. Receivers try every
+copy against the hash in the signed record and keep the first that
+matches. A "bad" report only marks the name, so a device holding the real
+file adds its own copy. Copies are bounded by the number of devices and
+are not collected (the server cannot tell good from bad).
+
+**D-114 Repairing a server restored from before a removal (Proposed).**
+Fixes P3; refines D-107. Roster versions sent again after a restore skip
+the "removal is stale" check (the signed last batch number and hash already
+bind what devices accept) and re-apply revocations. A device whose batches
+use a key the restored server does not know yet waits (keeping everything)
+until an owner's device has repaired the server, and says so.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

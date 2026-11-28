@@ -83,6 +83,14 @@ pub struct SyncStatus {
     /// The newest roster version another device's batch named (D-103).
     #[serde(default)]
     pub newest_roster_seen: u64,
+    /// The newest claimed version the person said OK to (they keep
+    /// sending despite it; D-112).
+    #[serde(default)]
+    pub roster_acknowledged: u64,
+    /// Waiting for an owner's device to give a restored server back the
+    /// household's newer keys (D-114).
+    #[serde(default)]
+    pub waiting_for_repair: bool,
     /// Two devices were shown different histories by the server.
     #[serde(default)]
     pub fork: bool,

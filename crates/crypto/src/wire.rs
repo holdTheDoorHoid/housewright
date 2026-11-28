@@ -64,6 +64,10 @@ pub struct UpdateRoster {
     /// Close this invitation (pairing finished).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub invitation: Option<String>,
+    /// A version the server lost (it was restored from a backup), sent
+    /// again by an owner's device (D-107, D-114).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub restore: bool,
 }
 
 /// `GET /v1/s/{space}/keys`: the caller's envelopes, every epoch.
@@ -243,11 +247,11 @@ pub struct Offer {
 /// operations.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BatchBody {
-    /// The author's newest signed roster version (D-103, revised D-106):
-    /// verifiable by every receiver, so a member cannot make up a version.
-    /// Absent in the founding device's history batches.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub roster: Option<SignedRoster>,
+    /// The author's newest signed roster versions, oldest first (at most
+    /// eight; D-106, revised D-112). A receiver believes a newer version
+    /// only if these link to its own verified chain.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub rosters: Vec<SignedRoster>,
     pub ops: serde_json::Value,
 }
 

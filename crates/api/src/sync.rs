@@ -241,9 +241,12 @@ impl Api {
                 }
                 if !st.missing_from.is_empty() {
                     w.push(format!(
-                        "Some changes from {} are missing on the sync server. Later changes from that device wait on this one until they arrive; that device sends them again when it next syncs.",
+                        "Some changes from {} are missing on the sync server. Later changes from that device wait here until they arrive. Open Housewright on that device so it syncs and sends them again. If this does not clear within a day, the server may be hiding changes (for example a device removal): check who runs it, and look at the device list on an owner's device.",
                         st.missing_from.join(", ")
                     ));
+                }
+                if st.waiting_for_repair {
+                    w.push("The sync server was restored from an older copy. Changes made here are kept on this device until an owner's device syncs and repairs it: open Housewright on an owner's device.".to_string());
                 }
                 if st.bad_claims > 0 {
                     w.push(format!(

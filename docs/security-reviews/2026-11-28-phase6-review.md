@@ -445,3 +445,81 @@ These need either a code fix or an honest rewrite.
 2. N2: hold and refetch on chain gaps; re-push own history after a server restore.
 3. N3: no delete on "no key", refresh first; replace instead of delete; owners only.
 4. Then N4, N5, N6, and binding the L6 confirmation to the safety number (seal `H(safety number inputs)` rather than a constant, so it at least proves the joiner computed the same number).
+
+---
+
+## Second verification pass (commit 3d058c3)
+
+**Verdict: ship after fixes.** Three new Medium problems, all demonstrated. None of them exposes content; H1 still holds.
+
+**How I checked.** I read the diff from `94fb0dd` to `3d058c3`. I ran three new attack tests in `scratchpad/verify/tests/v.rs`, which reuses the project's test harness and changes nothing in the worktree. I did not re-run the builder's own suite (claimed 264 passing).
+
+### Status of each item
+
+| Item | Status | Notes |
+|---|---|---|
+| **N1** fake roster claims from members | **Fixed for members; still open for owner devices** (P1) | A member can no longer invent a version: a claim counts only if signed by a manager device. But a claim newer than what the device has is accepted on the signature alone, without checking it links to the chain. |
+| **N2** one missing batch | **Fixed** | See N2 notes below. Leftover: P3. |
+| **N3** stale keys deleting files | **Partly fixed** | DELETE is gone, and a device with stale keys now refreshes and retries. But "mark bad, then upload" lets a member replace the only copy of a file (P2). |
+| **N4** global rate limit drained | **Fixed** | The per-address check now runs first. |
+| **N5** held-batch flood | **Fixed** | The signature is checked before holding, with at most 4 per number and `(last_seq - head) × 4` in total. Leftover: L-a. |
+| **N6** founder exception | **Fixed for new households** | `history_batches` and `history_head` are recorded in genesis and checked. Restore and pairing read the same genesis, so they behave consistently. No migration: see L-b. |
+| **L6** pairing confirmation | **Improved, not closed** | It is now bound to the safety-number inputs. But an attacker who joined first with a leaked code can compute it for its own keys, so it is accepted. Protection still rests only on the person comparing the two screens; that is fine as long as the docs say so. |
+| Unbounded storage | **Documented** (SECURITY.md:505, D-107) | Every sealed batch is kept (`sent:*`), plus one `seen:` key per batch received. No pruning. |
+
+**N2: gap filling.**
+- A gap is held, and missing batches are fetched with `/chain/{dev}/{seq}`.
+- A fetched batch is checked for device, number, `prev` link and signature, so this new endpoint cannot inject or replace a batch, and H1 holds.
+- Each device re-sends its own batches from its local copies.
+
+### New findings
+
+#### P1 (Medium). A stolen owner phone, or anyone with the recovery paper, can freeze every device's sending. **Confirmed** (demonstrated)
+
+- Where: `crates/sync/src/client.rs`, the "newer than anything the server gives us" branch of `check_claim` (around line 1175), and `push()` at line 535.
+- **What is wrong.** A claim with a higher version than the device has is believed on the owner's signature alone. It is never checked to link to the chain. `newest_roster_seen` is never cleared (`dismiss_notices` clears only `fork`).
+- **Attack.** The owner tablet, with no paper, signs a copy of the roster body with `version = 999999` and puts it in one batch.
+  - `p1_*`: Ana's phone returns `RosterHidden` on every sync, including after "dismiss".
+  - This undoes M3's promise that a stolen owner phone can't do lasting harm without the paper.
+- **Fix:**
+  - Only believe a newer claim that can be verified: carry the versions between, check them with `verify_next` from the device's newest roster, and require each to be newer.
+  - Otherwise count it as tampering by that device.
+  - Also cap `newest_roster_seen` to versions that were verified, and let the person clear it.
+
+#### P2 (Medium). A member can replace the only copy of a file on the server with garbage. **Confirmed** (demonstrated)
+
+- Where: `crates/server/src/handlers.rs`, `report_bad_blob` and `put_blob_sync` (`if !path.exists() || bad`, then rename over the old copy).
+- **What is wrong.**
+  - Any member can mark any file bad, then upload garbage, which overwrites the server's copy (`p2_*`).
+  - Honest devices that still hold the file will heal it. But a file that exists only on the server is lost: files over 4 MB aren't prefetched, and the uploading device may be gone. That includes recovery.
+  - The doc comment "the old one is kept until then" is true only until the *attacker's* upload, which comes straight after the mark.
+- **Fix:**
+  - Keep several copies under each file name and never overwrite. Serve all of them, or the newest valid-looking one plus a list; the client tries each against the hash and reports which one was good.
+  - Or accept a replacement only from the device that uploaded the original.
+
+#### P3 (Medium). A server restored from a backup taken before a removal wedges every device, and the removed device is un-revoked. **Confirmed** (demonstrated)
+
+- Where:
+  - `client.rs` `restore_rosters` (re-posting the removal version fails with `removal_stale`, because the restored server lacks the removed device's later batches, which only that device holds);
+  - `handlers.rs` `update_roster_sync`, the `removal_stale` check;
+  - `push_ops`, which refuses member batches under the new epoch (`h.epoch > epoch`).
+- **Observed** (`p3_*`):
+  - The owner gets `removal_stale` on every sync, and the member gets "a batch uses a key epoch the household does not have" on every sync.
+  - Ben's post-removal change never reached Ana.
+  - The server's `devices.revoked` for the removed tablet is 0 again. The tablet can push, and pull ciphertext it cannot read. Clients still refuse its new batches (H1 holds).
+- **Fix:**
+  - When re-posting lost versions after a restore, skip the `removal_stale` check, or apply it only to new removals. The removal's signed `last_seq`/`last_hash` already bind what clients accept.
+  - Re-apply revocations from the re-posted versions before accepting any other request.
+  - Let members' batches wait (instead of failing) until an owner has repaired the roster.
+
+### Low
+
+- **L-a. A removed device working with the server can block its own real batches.** **Plausible.**
+  - Where: `client.rs` `receive()`, the `Author::Removed` branch (the 4-candidates-per-number cap).
+  - The removed device signs 4 forks per number, and the server delivers them before the real batch. The real one is then refused as "full", so its chain never completes on that receiver.
+  - Its pre-removal changes are lost there: divergence. No content leaks.
+  - Fix: when the slots for a number are full, fetch the batch whose hash is the `want` hash while walking back from `last_hash`, rather than refusing it.
+- **L-b. Households created before 3d058c3 have no history commitment.** **Confirmed** (traced).
+  - Their founding device's pre-sync batches, which carry other members' names, are now refused by newly joined devices, while older devices already applied them.
+  - Phase 6 is unreleased, so this only matters for test households. Fix: a one-off migration, or document that pre-3d058c3 households must be set up again.
+- **L-c. A server can hide a removal from one device if it also hides the remover's later batches from that device.** That device then only shows "missing changes from …" and keeps sealing under the old epoch. This residual is known; SECURITY.md should say "missing changes" is a warning to act on.

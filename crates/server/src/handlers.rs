@@ -369,7 +369,10 @@ fn update_roster_sync(
     }
     // A removal must name the device's real last batch (L3a): if it has
     // sent more since the remover last synced, the remover must catch up.
-    for r in &next.removed {
+    // Not for versions sent again after a restore (D-114): the server lost
+    // what it would compare against, and the signed last_seq/last_hash
+    // already bind what every device accepts.
+    for r in next.removed.iter().filter(|_| !req.restore) {
         if prev.find_removed(r.entry.device.id).is_some() {
             continue;
         }
@@ -514,8 +517,12 @@ fn push_ops_sync(
             ));
         }
         if h.epoch > epoch {
-            return Err(ApiErr::bad(
-                "a batch uses a key epoch the household does not have",
+            // Usually a server restored from a backup that has not yet been
+            // given back its newer roster: the device waits (D-114).
+            return Err(ApiErr::new(
+                StatusCode::CONFLICT,
+                "epoch_ahead",
+                "the server has not caught up with the household's newest keys yet",
             ));
         }
         if b.ct.len() > MAX_BATCH_CT {
@@ -818,7 +825,7 @@ fn usage(conn: &Connection, space: SpaceId) -> R<u64> {
         |r| r.get(0),
     )?;
     let f: i64 = conn.query_row(
-        "SELECT COALESCE(SUM(size), 0) FROM blobs WHERE space = ?1",
+        "SELECT COALESCE(SUM(size), 0) FROM blob_copies WHERE space = ?1",
         [space.to_string()],
         |r| r.get(0),
     )?;
@@ -900,21 +907,15 @@ fn put_blob_sync(
     if !blob_name_ok(&name) || body.len() < 32 {
         return Err(ApiErr::bad("bad file"));
     }
-    let path = s.blob_path(space, &name);
+    // One copy per uploading device, never overwritten by anyone else
+    // (D-113): a member cannot replace another device's copy, and a
+    // receiver tries every copy against the hash in the signed record.
+    let path = s.blob_copy_path(space, &name, me.id);
     let dir = path.parent().expect("has a parent");
     let io = |e: std::io::Error| {
         eprintln!("housewright-server: file storage error: {}", e.kind());
         internal()
     };
-    let bad: bool = s
-        .db()
-        .query_row(
-            "SELECT bad FROM blobs WHERE space = ?1 AND name = ?2",
-            params![space.to_string(), name],
-            |r| r.get::<_, i64>(0),
-        )
-        .optional()?
-        .is_some_and(|b| b != 0);
     if !path.exists() && usage(&s.db(), space)? + body.len() as u64 > s.cfg().quota_bytes {
         return Err(ApiErr::new(
             StatusCode::INSUFFICIENT_STORAGE,
@@ -923,29 +924,39 @@ fn put_blob_sync(
         ));
     }
     std::fs::create_dir_all(dir).map_err(io)?;
-    // The first copy stays; a copy reported bad is replaced by the next
-    // upload (the old one is kept until then, so nothing is lost; D-108).
-    if !path.exists() || bad {
-        // A unique temporary name: two uploads at once never mix (L2).
-        let rnd = housewright_crypto::encoding::hex(
-            &housewright_crypto::primitives::random::<8>().map_err(|_| internal())?,
-        );
-        let tmp = dir.join(format!(".{name}.{rnd}.tmp"));
-        std::fs::write(&tmp, &body).map_err(io)?;
-        std::fs::rename(&tmp, &path).map_err(io)?;
-    }
-    s.db().execute(
-        "INSERT INTO blobs (space, name, size, created_ms) VALUES (?1, ?2, ?3, ?4)
-         ON CONFLICT(space, name) DO UPDATE SET bad = 0, size = excluded.size
-         WHERE blobs.bad != 0",
-        params![space.to_string(), name, body.len() as i64, s.now() as i64],
+    // A unique temporary name: two uploads at once never mix (L2).
+    let rnd = housewright_crypto::encoding::hex(
+        &housewright_crypto::primitives::random::<8>().map_err(|_| internal())?,
+    );
+    let tmp = dir.join(format!(".{name}.{rnd}.tmp"));
+    std::fs::write(&tmp, &body).map_err(io)?;
+    std::fs::rename(&tmp, &path).map_err(io)?;
+    let conn = s.db();
+    conn.execute(
+        "INSERT INTO blob_copies (space, name, device, size, created_ms) VALUES (?1, ?2, ?3, ?4, ?5)
+         ON CONFLICT(space, name, device) DO UPDATE SET size = excluded.size",
+        params![space.to_string(), name, me.id.to_string(), body.len() as i64, s.now() as i64],
+    )?;
+    conn.execute(
+        "INSERT INTO blobs (space, name, size, created_ms) VALUES (?1, ?2, 0, ?3)
+         ON CONFLICT(space, name) DO UPDATE SET bad = 0",
+        params![space.to_string(), name, s.now() as i64],
     )?;
     Ok(StatusCode::OK)
 }
 
+#[derive(Deserialize)]
+pub struct From {
+    #[serde(default)]
+    from: Option<String>,
+}
+
+/// `GET /v1/s/{space}/blobs/{name}[?from=<device>]`: one copy (the oldest
+/// by default), with `hw-copies` listing every uploader's copy.
 pub async fn get_blob(
     State(s): State<AppState>,
     Path((space, name)): Path<(String, String)>,
+    Query(q): Query<From>,
     method: Method,
     uri: Uri,
     headers: HeaderMap,
@@ -956,20 +967,40 @@ pub async fn get_blob(
     if !blob_name_ok(&name) {
         return Err(ApiErr::not_found());
     }
+    let copies: Vec<String> = {
+        let conn = s.db();
+        let mut stmt = conn.prepare(
+            "SELECT device FROM blob_copies WHERE space = ?1 AND name = ?2 ORDER BY created_ms, device",
+        )?;
+        let rows = stmt.query_map(params![space.to_string(), name], |r| r.get::<_, String>(0))?;
+        rows.collect::<rusqlite::Result<_>>()?
+    };
+    let pick = match &q.from {
+        Some(d) if copies.contains(d) => d.clone(),
+        Some(_) => return Err(ApiErr::not_found()),
+        None => copies.first().cloned().ok_or_else(ApiErr::not_found)?,
+    };
+    let device: DeviceId = pick.parse().map_err(|_| internal())?;
     // Streamed from the file, not read into memory (L5).
-    match tokio::fs::File::open(s.blob_path(space, &name)).await {
+    match tokio::fs::File::open(s.blob_copy_path(space, &name, device)).await {
         Ok(f) => {
             let body = axum::body::Body::from_stream(tokio_util::io::ReaderStream::new(f));
-            Ok(([("content-type", "application/octet-stream")], body).into_response())
+            Ok((
+                [
+                    ("content-type", "application/octet-stream".to_string()),
+                    ("hw-copies", copies.join(",")),
+                ],
+                body,
+            )
+                .into_response())
         }
         Err(_) => Err(ApiErr::not_found()),
     }
 }
 
-/// `POST /v1/s/{space}/blobs/{name}/bad`: a device decrypted this file
-/// and it did not match its hash. Nothing is deleted: the file is only
-/// marked, so a device holding the real one sends it again, and the next
-/// upload replaces it (D-108).
+/// `POST /v1/s/{space}/blobs/{name}/bad`: no copy of this file decrypted
+/// to its hash. Nothing is deleted or replaced: the name is marked, so a
+/// device holding the real file adds its own copy (D-108, D-113).
 pub async fn report_bad_blob(
     State(s): State<AppState>,
     Path((space, name)): Path<(String, String)>,

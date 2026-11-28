@@ -214,6 +214,7 @@ impl SyncClient {
         // The person has seen the warning about a fork: sending resumes
         // (D-106). A new fork sets it again.
         s.fork = false;
+        s.roster_acknowledged = s.roster_acknowledged.max(s.newest_roster_seen);
         state::save_status(store, &s)
     }
 
@@ -316,7 +317,7 @@ impl SyncClient {
                 &secret,
                 &chain,
                 space,
-                None,
+                Vec::new(),
                 history.len() as u64 + 1,
                 &prev,
                 cursor,
@@ -532,7 +533,12 @@ impl SyncClient {
         // A verified newer roster that the server will not give this
         // device, or a verified fork: seal nothing new until resolved
         // (D-103, D-106). Unverifiable claims never get here.
-        if st.status.fork || st.status.newest_roster_seen > st.latest().version {
+        if st.status.newest_roster_seen <= st.latest().version {
+            st.status.newest_roster_seen = 0;
+        }
+        if st.status.fork
+            || st.status.newest_roster_seen > st.latest().version.max(st.status.roster_acknowledged)
+        {
             return Err(SyncError::RosterHidden);
         }
         let path = format!("/v1/s/{}/ops", st.config.space);
@@ -639,13 +645,22 @@ impl SyncClient {
                         report.resent += (seq - head.seq - 1) as usize;
                         continue;
                     }
+                    // A server restored from an old backup, not yet given back
+                    // the household's newer keys by an owner's device: wait,
+                    // keep everything here, try again next sync (D-114).
+                    Err(SyncError::Server { code, .. }) if code == "epoch_ahead" => {
+                        st.status.waiting_for_repair = true;
+                        return Ok(());
+                    }
                     Err(e) => return Err(e),
                 }
+                st.status.waiting_for_repair = false;
                 st.acked_seq = seq;
                 st.acked_upto = p.upto;
                 st.save(store)?;
             }
-            let roster = st.rosters.last().cloned();
+            let n = st.rosters.len();
+            let roster: Vec<SignedRoster> = st.rosters[n.saturating_sub(8)..].to_vec();
             match seal_next(
                 store,
                 &st.secret,
@@ -784,6 +799,7 @@ impl SyncClient {
                 envelopes,
                 anchor: None,
                 invitation: None,
+                restore: true,
             };
             let path = format!("/v1/s/{}/roster", body.space);
             self.call(
@@ -881,15 +897,17 @@ impl SyncClient {
                     >= HELD_PER_NUMBER
                     || store.sync_keys(&format!("held:{dev}:"))?.len() as u64 >= room
                 {
-                    report.rejected_batches += 1;
+                    // Full (forks of its own chain): not kept, counted. The
+                    // walk back from the recorded hash fetches the batch it
+                    // needs by number instead (L-a).
                     report.tampered += 1;
-                    return Ok(());
+                } else {
+                    store.sync_set(
+                        &key,
+                        &serde_json::to_string(p).map_err(|e| SyncError::Invalid(e.to_string()))?,
+                    )?;
+                    report.held += 1;
                 }
-                store.sync_set(
-                    &key,
-                    &serde_json::to_string(p).map_err(|e| SyncError::Invalid(e.to_string()))?,
-                )?;
-                report.held += 1;
                 self.resolve_held(store, st, &r, report)?;
             }
         }
@@ -1031,8 +1049,31 @@ impl SyncClient {
         let mut chain: Vec<(Pulled, SealedBatch)> = Vec::new();
         let mut want = r.last_hash.clone();
         for n in (head.seq + 1..=r.last_seq).rev() {
-            let Some(v) = store.sync_get(&format!("{prefix}{n:020}:{want}"))? else {
-                return Ok(()); // not complete yet
+            let v = match store.sync_get(&format!("{prefix}{n:020}:{want}"))? {
+                Some(v) => v,
+                None => {
+                    // Ask the server for that number; use it only if it is
+                    // exactly the batch the chain needs.
+                    let path = format!("/v1/s/{}/chain/{dev}/{n}", st.config.space);
+                    let server = st.config.server.clone();
+                    let Ok(one) = self
+                        .call(store, &server, Some(&st.secret), "GET", &path, vec![])
+                        .and_then(|r| from_json::<OneBatch>(&r))
+                    else {
+                        return Ok(()); // not complete yet
+                    };
+                    let ok = one.batch.batch.as_ref().is_some_and(|b| {
+                        b.header.device == dev
+                            && b.header.device_seq == n
+                            && batch_hash(b).ok().as_deref() == Some(want.as_str())
+                            && verify_batch(b, &r.entry.device).is_ok()
+                    });
+                    if !ok {
+                        return Ok(());
+                    }
+                    serde_json::to_string(&one.batch)
+                        .map_err(|e| SyncError::Invalid(e.to_string()))?
+                }
             };
             let p: Pulled =
                 serde_json::from_str(&v).map_err(|e| SyncError::Invalid(e.to_string()))?;
@@ -1138,18 +1179,20 @@ impl SyncClient {
     /// Check a batch's roster claim (D-106). Only a version signed by one
     /// of the household's owner devices counts; anything else is the
     /// author's tampering, counted and otherwise ignored.
-    fn check_claim(&mut self, store: &Store, st: &mut State, claim: &SignedRoster) -> bool {
-        let Ok(body) = claim.parse() else {
+    fn check_claim(
+        &mut self,
+        store: &Store,
+        st: &mut State,
+        claims: &[SignedRoster],
+        author: DeviceId,
+    ) -> bool {
+        let Some(newest) = claims.last() else {
+            return true;
+        };
+        let Ok(body) = newest.parse() else {
             return false;
         };
         if body.space != st.config.space || body.version == 0 {
-            return false;
-        }
-        let genesis = st.rosters[0].hash();
-        if body.version == 1 {
-            return claim.hash() == genesis;
-        }
-        if body.genesis != genesis {
             return false;
         }
         if body.version > st.latest().version {
@@ -1157,32 +1200,80 @@ impl SyncClient {
         }
         if body.version <= st.latest().version {
             let ours = &st.rosters[(body.version - 1) as usize];
-            if ours.hash() == claim.hash() {
+            if ours.hash() == newest.hash() {
                 return true;
+            }
+            if body.version < 2 {
+                return false;
             }
             // A different version with the same number: real only if an
             // owner of the version before signed it; then it is a fork.
             let prev = &st.bodies[(body.version - 2) as usize];
             let genuine = prev
-                .find(claim.signer)
+                .find(newest.signer)
                 .filter(|e| e.role.can_manage())
-                .is_some_and(|e| claim.check_sig(&e.device).is_ok());
+                .is_some_and(|e| newest.check_sig(&e.device).is_ok());
             if genuine {
                 st.status.fork = true;
             }
             return genuine;
         }
-        // Newer than anything the server gives us: credible only if one of
-        // our current owner devices signed it.
-        let genuine = st
+        // Not even signed by one of our owner devices: the author's
+        // tampering.
+        let signed_by_owner = st
             .latest()
-            .find(claim.signer)
+            .find(newest.signer)
             .filter(|e| e.role.can_manage())
-            .is_some_and(|e| claim.check_sig(&e.device).is_ok());
-        if genuine {
-            st.status.newest_roster_seen = st.status.newest_roster_seen.max(body.version);
+            .is_some_and(|e| newest.check_sig(&e.device).is_ok());
+        if !signed_by_owner {
+            return false;
         }
-        genuine
+        // Newer than anything the server gives us (D-112): believed only if
+        // the versions in the claim link to this device's own verified
+        // chain, each checked exactly as a roster update is (owner
+        // signatures, the recovery key's co-signature for removing owners).
+        let ours = st.latest().version;
+        let mut prev_signed = st.rosters.last().expect("non-empty").clone();
+        let mut prev_body = st.latest().clone();
+        let mut linked = false;
+        for c in claims {
+            let Ok(b) = c.parse() else { return false };
+            if b.version <= ours {
+                continue;
+            }
+            if b.version != prev_body.version + 1 {
+                // Not connected to what this device has (too far behind
+                // to check): ignored, not counted against the author.
+                return true;
+            }
+            match verify_next(&prev_signed, &prev_body, c) {
+                Ok(next) => {
+                    prev_signed = c.clone();
+                    prev_body = next;
+                    linked = true;
+                }
+                Err(_) => return false,
+            }
+        }
+        if !linked {
+            return true;
+        }
+        if body.version
+            > st.status
+                .newest_roster_seen
+                .max(st.status.roster_acknowledged)
+        {
+            st.status.newest_roster_seen = body.version;
+            let who = device_name(st, author);
+            st.status.notices.push(Notice {
+                at_ms: body.made_ms,
+                text: format!(
+                    "“{who}” says the household's device list changed (version {}), but the sync server has not given that change to this device. Changes made here are kept on this device until it arrives. If you did not make such a change, remove “{who}” and make a new recovery key, then press OK.",
+                    body.version
+                ),
+            });
+        }
+        true
     }
 
     /// Every content check a batch must pass. Uses only data every device
@@ -1214,9 +1305,7 @@ impl SyncClient {
         let Ok(ops) = serde_json::from_value::<Vec<Op>>(body.ops) else {
             return Ok(Opened::Unreadable);
         };
-        if let Some(claim) = &body.roster
-            && !self.check_claim(store, st, claim)
-        {
+        if !self.check_claim(store, st, &body.rosters, author.device.id) {
             report.bad_claims += 1;
             st.status.bad_claims += 1;
         }
@@ -1361,27 +1450,55 @@ impl SyncClient {
             Err(SyncError::Server { status: 404, .. }) => return Ok(None),
             Err(e) => return Err(e),
         };
-        let bytes = match open_blob(&st.chain, st.config.space, &name, &r.body, hash) {
-            Ok(b) => b,
-            // Sealed under a key this device has not got yet: never a
-            // reason to doubt the file (N3). The caller refreshes keys.
-            // (An epoch beyond the household's own is not stale keys: the
-            // file is bad.)
-            Err(CryptoError::Rejected(m))
-                if m.starts_with("no key for epoch")
-                    && (!refreshed
-                        || r.body
-                            .get(4..8)
-                            .map(|e| u32::from_be_bytes(e.try_into().expect("4 bytes")))
-                            <= Some(st.latest().epoch)) =>
-            {
-                return Err(SyncError::StaleKeys);
+        // Every uploader's copy is kept (D-113): try them in turn, keep the
+        // first that decrypts to the hash in the signed record.
+        let copies: Vec<String> = r
+            .header("hw-copies")
+            .map(|h| {
+                h.split(',')
+                    .filter(|c| !c.is_empty())
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default();
+        let latest_epoch = st.latest().epoch;
+        let mut stale = false;
+        let mut attempt = |body: &[u8]| -> Option<Vec<u8>> {
+            match open_blob(&st.chain, st.config.space, &name, body, hash) {
+                Ok(b) => Some(b),
+                // Sealed under a key this device has not got yet: never a
+                // reason to doubt the file (N3). (An epoch beyond the
+                // household's own is not stale keys: that copy is bad.)
+                Err(CryptoError::Rejected(m))
+                    if m.starts_with("no key for epoch")
+                        && (!refreshed
+                            || body
+                                .get(4..8)
+                                .map(|e| u32::from_be_bytes(e.try_into().expect("4 bytes")))
+                                <= Some(latest_epoch)) =>
+                {
+                    stale = true;
+                    None
+                }
+                Err(_) => None,
             }
-            Err(e) => {
-                // Decrypted with the right key and still wrong (damaged, or
-                // garbage uploaded under this name first). Nothing is
-                // deleted: the server marks it, so a device holding the
-                // real file sends it again and that copy replaces it (D-108).
+        };
+        let mut found = attempt(&r.body);
+        for c in copies.iter().skip(1) {
+            if found.is_some() {
+                break;
+            }
+            let p = format!("{path}?from={c}");
+            if let Ok(rc) = self.call(store, &server, Some(&st.secret), "GET", &p, vec![]) {
+                found = attempt(&rc.body);
+            }
+        }
+        let bytes = match found {
+            Some(b) => b,
+            None if stale => return Err(SyncError::StaleKeys),
+            None => {
+                // No copy matches: mark the name so a device holding the
+                // real file adds its own copy (nothing is replaced, D-113).
                 let _ = self.call(
                     store,
                     &server,
@@ -1390,7 +1507,9 @@ impl SyncClient {
                     &format!("{path}/bad"),
                     vec![],
                 );
-                return Err(e.into());
+                return Err(SyncError::Crypto(CryptoError::Rejected(
+                    "no copy of the file matches its hash".into(),
+                )));
             }
         };
         let got = blobs.put(&bytes)?;
@@ -1575,6 +1694,7 @@ impl SyncClient {
             envelopes,
             anchor,
             invitation,
+            restore: false,
         };
         let path = format!("/v1/s/{}/roster", body.space);
         let server = st.config.server.clone();
@@ -1845,7 +1965,7 @@ fn seal_next(
     secret: &DeviceSecret,
     chain: &KeyChain,
     space: SpaceId,
-    roster: Option<SignedRoster>,
+    rosters: Vec<SignedRoster>,
     seq: u64,
     prev: &str,
     cursor: i64,
@@ -1882,7 +2002,7 @@ fn seal_next(
     }
     let max_wall = chosen.iter().map(|o| o.hlc.wall_ms).max().unwrap_or(0);
     let body = BatchBody {
-        roster,
+        rosters,
         ops: serde_json::to_value(&chosen).map_err(|e| SyncError::Invalid(e.to_string()))?,
     };
     let plaintext = Zeroizing::new(to_json(&body));

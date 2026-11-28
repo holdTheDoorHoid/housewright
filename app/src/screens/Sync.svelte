@@ -400,7 +400,8 @@
             <p class="safety" data-testid="safety-number">{pair.safety_number}</p>
             <p class="small">
               Only say yes if the new device shows this same number. If it shows an error or a different number,
-              say no: nothing is shared.
+              say no: nothing is shared. This check is what protects your household if someone else got hold of the
+              code, so look at both screens.
             </p>
             {#if !pair.other_confirmed}
               <p class="muted small" data-testid="waiting-new-device">Waiting for the new device to say the numbers match…</p>

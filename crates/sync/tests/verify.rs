@@ -148,7 +148,7 @@ fn n1_a_members_false_roster_claim_freezes_nobody() {
             &lab,
             &mut b,
             &BatchBody {
-                roster: Some(fake_high),
+                rosters: vec![fake_high],
                 ops: serde_json::json!([])
             }
         ),
@@ -163,7 +163,7 @@ fn n1_a_members_false_roster_claim_freezes_nobody() {
             &lab,
             &mut b,
             &BatchBody {
-                roster: Some(fake_fork),
+                rosters: vec![fake_fork],
                 ops: serde_json::json!([])
             }
         ),
@@ -463,7 +463,7 @@ fn n6_the_founder_cannot_backdate_ops_in_someone_elses_name() {
             &lab,
             &mut a,
             &BatchBody {
-                roster: None,
+                rosters: vec![],
                 ops: serde_json::to_value([op]).unwrap()
             }
         ),

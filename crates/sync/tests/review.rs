@@ -65,7 +65,7 @@ fn op(
 }
 fn body(ops: &[Op]) -> Vec<u8> {
     serde_json::to_vec(&BatchBody {
-        roster: None,
+        rosters: vec![],
         ops: serde_json::to_value(ops).unwrap(),
     })
     .unwrap()

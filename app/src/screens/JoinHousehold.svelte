@@ -111,7 +111,10 @@
     {:else if pair.state === 'compare'}
       <p>Check that the other device shows the same number:</p>
       <p class="safety" data-testid="safety-number">{pair.safety_number}</p>
-      <p class="muted small">If the numbers are different, choose “They don't match”: nothing is shared.</p>
+      <p class="muted small">
+        If the numbers are different, choose “They don't match”: nothing is shared. Comparing the two screens is what
+        keeps someone else from joining in your place, so look at both.
+      </p>
       <p class="row">
         <button class="primary" onclick={() => answer(true)} disabled={busy}>They match</button>
         <button onclick={() => answer(false)} disabled={busy}>They don't match</button>

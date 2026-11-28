@@ -113,8 +113,12 @@ impl AppState {
         &self.0.cfg
     }
 
-    pub(crate) fn blob_path(&self, space: SpaceId, name: &str) -> PathBuf {
-        self.0.blob_dir.join(space.to_string()).join(name)
+    /// One uploader's copy of a file (D-113).
+    pub(crate) fn blob_copy_path(&self, space: SpaceId, name: &str, device: DeviceId) -> PathBuf {
+        self.0
+            .blob_dir
+            .join(space.to_string())
+            .join(format!("{name}.{device}"))
     }
 
     pub fn purge_nonces(&self) {
@@ -179,6 +183,13 @@ fn init_db(conn: &Connection) -> rusqlite::Result<()> {
         "ALTER TABLE blobs ADD COLUMN bad INTEGER NOT NULL DEFAULT 0",
         [],
     );
+    // One copy per uploading device (D-113).
+    conn.execute_batch(
+        "CREATE TABLE IF NOT EXISTS blob_copies (
+             space TEXT NOT NULL, name TEXT NOT NULL, device TEXT NOT NULL,
+             size INTEGER NOT NULL, created_ms INTEGER NOT NULL,
+             PRIMARY KEY (space, name, device));",
+    )?;
     Ok(())
 }
 
@@ -426,7 +437,10 @@ pub fn router(state: AppState) -> Router {
         .allow_origin(tower_http::cors::Any)
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_headers(tower_http::cors::Any)
-        .expose_headers([axum::http::HeaderName::from_static(H_SERVER_TIME)]);
+        .expose_headers([
+            axum::http::HeaderName::from_static(H_SERVER_TIME),
+            axum::http::HeaderName::from_static("hw-copies"),
+        ]);
     let blobs = Router::new()
         .route("/v1/s/{space}/blobs/{name}", put(put_blob).get(get_blob))
         .layer(DefaultBodyLimit::max(MAX_BLOB));
