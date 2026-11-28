@@ -191,7 +191,11 @@ mod tests {
     fn stored_date_when_no_length_or_no_start() {
         let i = item(None, None, Some(w(date(2027, 5, 1), Some(12))));
         assert_eq!(end(&i), Some(date(2027, 5, 1)));
-        let i = item(Some(date(2020, 1, 1)), None, Some(w(date(2027, 5, 1), None)));
+        let i = item(
+            Some(date(2020, 1, 1)),
+            None,
+            Some(w(date(2027, 5, 1), None)),
+        );
         assert_eq!(end(&i), Some(date(2027, 5, 1)));
         assert_eq!(end(&item(None, None, None)), None);
     }

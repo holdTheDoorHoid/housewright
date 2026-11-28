@@ -587,7 +587,10 @@ source = "template author"
             template: Some("water-heater".into()),
             extra_fields: vec![],
             custom: Default::default(),
-            sensitivity: Sensitivity::Normal, price: Default::default(), value: Default::default(), };
+            sensitivity: Sensitivity::Normal,
+            price: Default::default(),
+            value: Default::default(),
+        };
         let owner = MemberId::new();
         let (_, tasks) = r.plan_for_item(&item, owner, date(2026, 1, 1));
         assert_eq!(tasks.len(), 1);

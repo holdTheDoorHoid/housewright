@@ -41,6 +41,10 @@ pub enum Edition {
     /// For someone inheriting the house: the full binder plus accounts and
     /// utilities to transfer (in the sealed volume).
     Succession,
+    /// The insurance inventory (D-27, Phase 9). Not a binder edition: it is
+    /// not in [`Edition::ALL`], is never tracked for reprints, and is made
+    /// by `crate::insurance`.
+    Insurance,
 }
 
 impl Edition {
@@ -57,6 +61,7 @@ impl Edition {
             Edition::Full => "full",
             Edition::Handover => "handover",
             Edition::Succession => "succession",
+            Edition::Insurance => "insurance",
         }
     }
 
@@ -70,6 +75,7 @@ impl Edition {
             Edition::Full => "Household binder",
             Edition::Handover => "Handover binder",
             Edition::Succession => "Succession binder",
+            Edition::Insurance => "Home inventory for insurance",
         }
     }
 
@@ -209,12 +215,25 @@ pub enum Block {
     Plan {
         drawing: Drawing,
     },
+    /// The insurance inventory: one entry per thing, with a small photo.
+    Inventory {
+        entries: Vec<InventoryEntry>,
+    },
     /// A big title for a volume's cover.
     Cover {
         title: String,
         subtitle: String,
         lines: Vec<String>,
     },
+}
+
+/// One thing in the insurance inventory.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct InventoryEntry {
+    pub name: String,
+    /// A small photo (`img/<sha256>.jpg`), if the thing has one.
+    pub photo: Option<String>,
+    pub rows: Vec<(String, String)>,
 }
 
 /// Printed in place of the key on every print but the one made at setup.
@@ -264,6 +283,12 @@ impl Block {
                     out.extend(a.steps.iter().cloned());
                 }
             }
+            Block::Inventory { entries } => {
+                for e in entries {
+                    out.push(e.name.clone());
+                    pairs(out, &e.rows);
+                }
+            }
             Block::Plan { drawing } => {
                 for r in &drawing.rooms {
                     out.push(r.name.clone());
@@ -291,6 +316,16 @@ impl Block {
         match self {
             Block::Photos { photos } | Block::Emergency { photos, .. } => photos.iter().collect(),
             _ => vec![],
+        }
+    }
+
+    /// Every image file the block uses.
+    pub fn files(&self) -> Vec<String> {
+        match self {
+            Block::Inventory { entries } => {
+                entries.iter().filter_map(|e| e.photo.clone()).collect()
+            }
+            b => b.photos().into_iter().map(|p| p.file.clone()).collect(),
         }
     }
 }
@@ -378,8 +413,7 @@ impl Document {
         let mut v: Vec<String> = self
             .sections
             .iter()
-            .flat_map(|s| s.blocks.iter().flat_map(|b| b.photos()))
-            .map(|p| p.file.clone())
+            .flat_map(|s| s.blocks.iter().flat_map(|b| b.files()))
             .collect();
         v.sort();
         v.dedup();

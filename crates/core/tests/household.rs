@@ -77,7 +77,10 @@ fn item(h: &Home, name: &str, template: &str) -> Item {
         template: Some(template.into()),
         extra_fields: vec![],
         custom: Default::default(),
-        sensitivity: Sensitivity::Normal, price: Default::default(), value: Default::default(), }
+        sensitivity: Sensitivity::Normal,
+        price: Default::default(),
+        value: Default::default(),
+    }
 }
 
 fn populated() -> Home {

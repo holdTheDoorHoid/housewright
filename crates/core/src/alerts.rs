@@ -210,7 +210,10 @@ mod tests {
         assert_eq!(n[1].date, date(2027, 2, 22));
         assert_eq!(n[0].title, "Furnace: warranty ends in 60 days");
         assert_eq!(n[1].title, "Furnace: warranty ends in a week");
-        assert!(n[0].body.starts_with("Furnace, Basement. Covered until Mar 1, 2027."));
+        assert!(
+            n[0].body
+                .starts_with("Furnace, Basement. Covered until Mar 1, 2027.")
+        );
         assert!(n[0].body.contains("Book a check-up"));
         assert!(n[0].body.contains("registered"));
     }
@@ -230,7 +233,10 @@ mod tests {
         let mut i = item("Wall safe", date(2027, 3, 1));
         i.sensitivity = Sensitivity::Sensitive;
         let n = warranty_notices(&[i], &|_| Some("Bedroom".into()), date(2026, 11, 28));
-        assert!(n.iter().all(|x| !x.title.contains("safe") && !x.body.contains("safe")));
+        assert!(
+            n.iter()
+                .all(|x| !x.title.contains("safe") && !x.body.contains("safe"))
+        );
         assert!(n.iter().all(|x| !x.body.contains("Bedroom")));
     }
 

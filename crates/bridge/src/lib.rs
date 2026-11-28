@@ -835,6 +835,8 @@ impl Bridge {
             extra_fields: vec![],
             custom: Default::default(),
             sensitivity: Sensitivity::Sensitive,
+            price: Default::default(),
+            value: Default::default(),
         };
         store.put(&safe)?;
         store.put(&Task {

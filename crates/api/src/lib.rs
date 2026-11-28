@@ -9,8 +9,11 @@
 //!
 //! Licensed AGPL-3.0-only.
 
+mod alerts;
 mod binder;
+mod contractors;
 mod dto;
+mod insurance;
 mod plan;
 mod records;
 mod sync;
@@ -107,6 +110,14 @@ pub const COMMANDS: &[&str] = &[
     "contractors",
     "save_contractor",
     "delete_contractor",
+    "contractor",
+    "warranties",
+    "recalls",
+    "set_recalls",
+    "recall_import",
+    "dismiss_recall",
+    "undismiss_recall",
+    "insurance",
     "floors",
     "save_floor",
     "delete_floor",
@@ -357,7 +368,13 @@ impl Api {
                 Some(r) => r,
                 None => match self.binder_call(other, a.clone()) {
                     Some(r) => r,
-                    None => self.records_call(other, a),
+                    None => match self.contractor_call(other, a.clone()) {
+                        Some(r) => r,
+                        None => match self.alerts_call(other, a.clone()) {
+                            Some(r) => r,
+                            None => self.records_call(other, a),
+                        },
+                    },
                 },
             },
         }
@@ -632,7 +649,9 @@ impl Api {
         let p = self.first_property()?;
         let suggestion = self.store.weekly_suggestion(p.id, now)?;
         let has_profile = self.store.profile(p.id)?.is_some();
+        let recall_matches = self.recall_alert_count()?;
         Ok(TodayOut {
+            recall_matches,
             suggestion,
             has_profile,
             tasks,
@@ -671,7 +690,23 @@ impl Api {
         let voided: Vec<CompletionId> = all.iter().filter_map(|c| c.voids).collect();
         let mut out = Vec::new();
         let all_notes: Vec<Note> = self.store.list()?;
+        let contractors: BTreeMap<ContractorId, String> = self
+            .store
+            .list::<Contractor>()?
+            .into_iter()
+            .map(|k| {
+                (
+                    k.id,
+                    k.company
+                        .clone()
+                        .map(|co| format!("{}, {co}", k.name))
+                        .unwrap_or(k.name),
+                )
+            })
+            .collect();
         for c in all.iter().filter(|c| c.voids.is_none()) {
+            let details = self.store.completion_details(c.id)?;
+            let who = housewright_core::contractors::effective_contractor(c, &details);
             let cid = c.id.to_string();
             let notes = all_notes
                 .iter()
@@ -693,6 +728,8 @@ impl Api {
                 by_name: self.done_by_name(c, names),
                 notes: texts,
                 voided: voided.contains(&c.id),
+                contractor_id: who.map(|k| k.to_string()),
+                contractor_name: who.and_then(|k| contractors.get(&k).cloned()),
             });
         }
         out.sort_by_key(|a| std::cmp::Reverse(a.at));
@@ -858,6 +895,7 @@ impl Api {
     fn item_detail(&self, id: &str) -> Result<ItemDetail, ApiError> {
         let id: ItemId = parse_id(id, "item")?;
         let item: Item = self.store.fetch(&id.to_string())?;
+        let warranty = alerts::warranty_out(&item, self.item_today(&item)?);
         let names = self.names()?;
         let now = self.store.now();
         let row = self
@@ -960,7 +998,20 @@ impl Api {
             attachments,
             edit,
             serial_sensitive,
+            warranty,
+            price: item.price,
+            value: item.value,
         })
+    }
+
+    /// Today in the time zone of the item's home.
+    pub(crate) fn item_today(&self, item: &Item) -> Result<Date, ApiError> {
+        let tz = self
+            .store
+            .get::<Property>(&item.property.to_string())?
+            .map(|p| p.time_zone)
+            .unwrap_or_else(|| "UTC".into());
+        self.today_in(&tz)
     }
 
     fn rooms(&self) -> Result<Vec<RoomDto>, ApiError> {
@@ -1098,6 +1149,8 @@ impl Api {
             extra_fields: vec![],
             custom,
             sensitivity: Sensitivity::Normal,
+            price: Default::default(),
+            value: Default::default(),
         };
         let me = self.store.author()?;
         let start = self.today_in(&p.time_zone)?;
@@ -1221,9 +1274,11 @@ impl Api {
                 horizon_days: horizon_days.unwrap_or(reminders::DEFAULT_HORIZON_DAYS),
             }));
         }
-        all.sort_by_key(|a| a.at);
-        all.truncate(reminders::MAX_PLANNED);
-        Ok(all.into_iter().map(ReminderOut::from).collect())
+        let mut out: Vec<ReminderOut> = all.into_iter().map(ReminderOut::from).collect();
+        out.extend(self.notice_plan(&me, &prefs, horizon_days)?);
+        out.sort_by_key(|a| a.at_ms);
+        out.truncate(reminders::MAX_PLANNED);
+        Ok(out)
     }
 
     /// A reminder for a real task a few seconds from now, so people (and the
@@ -1260,6 +1315,7 @@ impl Api {
             at_ms: now.as_millisecond() + secs * 1000,
             title: task.title.clone(),
             body,
+            open: None,
         })
     }
 }

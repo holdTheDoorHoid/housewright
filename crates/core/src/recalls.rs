@@ -166,7 +166,11 @@ pub fn parse_cpsc(json: &str) -> Result<Vec<Recall>, String> {
         else {
             continue;
         };
-        if number.len() > 20 || !number.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+        if number.len() > 20
+            || !number
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '-')
+        {
             continue;
         }
         let mut companies: Vec<String> = ["Manufacturers", "Importers", "Distributors"]
@@ -199,11 +203,17 @@ pub fn parse_cpsc(json: &str) -> Result<Vec<Recall>, String> {
                 .unwrap_or_default(),
             description: cut(&text(&r["Description"]), MAX_DESCRIPTION),
             hazard: cut(
-                &names(r, "Hazards", "Name").first().cloned().unwrap_or_default(),
+                &names(r, "Hazards", "Name")
+                    .first()
+                    .cloned()
+                    .unwrap_or_default(),
                 MAX_SHORT,
             ),
             remedy: cut(
-                &names(r, "Remedies", "Name").first().cloned().unwrap_or_default(),
+                &names(r, "Remedies", "Name")
+                    .first()
+                    .cloned()
+                    .unwrap_or_default(),
                 MAX_SHORT,
             ),
         });
@@ -256,10 +266,40 @@ fn singular(w: &str) -> String {
 
 /// Words that say nothing about the kind of product.
 const GENERIC: &[&str] = &[
-    "THE", "AND", "FOR", "WITH", "SET", "KIT", "UNIT", "UNITS", "MODEL", "PRODUCT", "SYSTEM",
-    "ELECTRIC", "PORTABLE", "OLD", "NEW", "MAIN", "SMALL", "LARGE", "BIG", "HOME", "HOUSE",
-    "KITCHEN", "BASEMENT", "GARAGE", "BATHROOM", "OUTSIDE", "INSIDE", "UPSTAIRS", "DOWNSTAIRS",
-    "WATER", "GAS", "BATTERY", "POWER", "LIGHT",
+    "THE",
+    "AND",
+    "FOR",
+    "WITH",
+    "SET",
+    "KIT",
+    "UNIT",
+    "UNITS",
+    "MODEL",
+    "PRODUCT",
+    "SYSTEM",
+    "ELECTRIC",
+    "PORTABLE",
+    "OLD",
+    "NEW",
+    "MAIN",
+    "SMALL",
+    "LARGE",
+    "BIG",
+    "HOME",
+    "HOUSE",
+    "KITCHEN",
+    "BASEMENT",
+    "GARAGE",
+    "BATHROOM",
+    "OUTSIDE",
+    "INSIDE",
+    "UPSTAIRS",
+    "DOWNSTAIRS",
+    "WATER",
+    "GAS",
+    "BATTERY",
+    "POWER",
+    "LIGHT",
 ];
 
 /// The strength of a match.
@@ -309,15 +349,15 @@ fn brand_found(make: &str, r: &Recall) -> Option<String> {
     if mw.len() > 1 && mw[0].len() >= 3 && !GENERIC.contains(&mw[0].as_str()) {
         keys.push(vec![mw[0].clone()]);
     }
-    let title_brand = r
-        .title
-        .find(" Recall")
-        .map(|i| &r.title[..i])
-        .unwrap_or("");
+    let title_brand = r.title.find(" Recall").map(|i| &r.title[..i]).unwrap_or("");
     let places: Vec<(&str, &str)> = [("the recall's title", title_brand)]
         .into_iter()
         .chain(r.products.iter().map(|p| ("the product name", p.as_str())))
-        .chain(r.companies.iter().map(|c| ("the company named", c.as_str())))
+        .chain(
+            r.companies
+                .iter()
+                .map(|c| ("the company named", c.as_str())),
+        )
         .collect();
     for (where_, text) in places {
         let tw: Vec<String> = words(text).into_iter().map(|(_, n)| n).collect();
@@ -356,7 +396,11 @@ fn model_found(model: &str, r: &Recall, need: usize) -> Option<(MatchLevel, Stri
             for (i, w) in ws.windows(n).enumerate() {
                 let joined: String = w.iter().map(|(_, x)| x.as_str()).collect();
                 if joined == m {
-                    let original = w.iter().map(|(o, _)| o.as_str()).collect::<Vec<_>>().join(" ");
+                    let original = w
+                        .iter()
+                        .map(|(o, _)| o.as_str())
+                        .collect::<Vec<_>>()
+                        .join(" ");
                     let q = if where_ == "the recall's description" {
                         format!(": “{}”", quote(t, n, word_index(t, i)))
                     } else {
@@ -364,7 +408,10 @@ fn model_found(model: &str, r: &Recall, need: usize) -> Option<(MatchLevel, Stri
                     };
                     return Some((
                         MatchLevel::Model,
-                        format!("Your model “{}” is named in {where_} as “{original}”{q}.", model.trim()),
+                        format!(
+                            "Your model “{}” is named in {where_} as “{original}”{q}.",
+                            model.trim()
+                        ),
                     ));
                 }
             }
@@ -396,8 +443,8 @@ fn series_found(model: &str, r: &Recall) -> Option<String> {
         for (orig, n) in words(t) {
             // A series is written in capitals or carries a digit, so an
             // ordinary word ("Space") is never taken for one.
-            let looks_like_code = has_digit(&n)
-                || (orig.chars().all(|c| !c.is_ascii_lowercase()) && n.len() >= 3);
+            let looks_like_code =
+                has_digit(&n) || (orig.chars().all(|c| !c.is_ascii_lowercase()) && n.len() >= 3);
             if n.len() >= 3
                 && n.len() < m.len()
                 && m.starts_with(&n)
@@ -483,7 +530,10 @@ pub fn match_one(i: &Item, r: &Recall) -> Option<RecallMatch> {
     if let Some(b) = brand {
         evidence.insert(0, b);
     } else if let Some(m) = i.make.as_deref().filter(|m| !m.trim().is_empty()) {
-        evidence.push(format!("The brand “{}” is not named in the recall.", m.trim()));
+        evidence.push(format!(
+            "The brand “{}” is not named in the recall.",
+            m.trim()
+        ));
     }
     Some(RecallMatch {
         item: i.id,
@@ -517,11 +567,16 @@ pub fn matches(
             }
         }
     }
-    let dates: BTreeMap<&str, Date> = recalls.iter().map(|r| (r.number.as_str(), r.date)).collect();
+    let dates: BTreeMap<&str, Date> = recalls
+        .iter()
+        .map(|r| (r.number.as_str(), r.date))
+        .collect();
     out.sort_by(|a, b| {
-        a.level
-            .cmp(&b.level)
-            .then(dates.get(b.number.as_str()).cmp(&dates.get(a.number.as_str())))
+        a.level.cmp(&b.level).then(
+            dates
+                .get(b.number.as_str())
+                .cmp(&dates.get(a.number.as_str())),
+        )
     });
     out
 }

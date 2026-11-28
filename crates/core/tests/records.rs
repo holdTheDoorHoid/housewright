@@ -55,7 +55,10 @@ fn home() -> Home {
             template: None,
             extra_fields: vec![],
             custom: Default::default(),
-            sensitivity: Sensitivity::Normal, price: Default::default(), value: Default::default(), })
+            sensitivity: Sensitivity::Normal,
+            price: Default::default(),
+            value: Default::default(),
+        })
         .unwrap();
     let task = TaskId::new();
     store

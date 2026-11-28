@@ -401,5 +401,8 @@ fn item_from_plan(
         template: Some(template.id.clone()),
         extra_fields: vec![],
         custom,
-        sensitivity: Sensitivity::Normal, price: Default::default(), value: Default::default(), })
+        sensitivity: Sensitivity::Normal,
+        price: Default::default(),
+        value: Default::default(),
+    })
 }

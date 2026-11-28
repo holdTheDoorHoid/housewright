@@ -74,7 +74,11 @@ fn exact_model_with_brand() {
     assert_eq!(m[0].number, "27054");
     assert_eq!(m[0].level, MatchLevel::Model);
     assert!(m[0].evidence[0].contains("brand"));
-    assert!(m[0].evidence[1].contains("DR-HSH015"), "{:?}", m[0].evidence);
+    assert!(
+        m[0].evidence[1].contains("DR-HSH015"),
+        "{:?}",
+        m[0].evidence
+    );
 }
 
 #[test]
@@ -85,7 +89,11 @@ fn model_in_two_words_and_in_the_description() {
     let m = one(&item("Pressure washer", None, Some("HWT12P")));
     assert_eq!(m.len(), 1);
     assert_eq!(m[0].level, MatchLevel::Model);
-    assert!(m[0].evidence.iter().any(|e| e.contains("description")), "{:?}", m[0].evidence);
+    assert!(
+        m[0].evidence.iter().any(|e| e.contains("description")),
+        "{:?}",
+        m[0].evidence
+    );
 }
 
 #[test]
@@ -120,7 +128,10 @@ fn conservative_without_a_brand() {
 fn not_mine_is_respected() {
     let i = item("Generator", Some("Cummins"), Some("P5000iDF"));
     let r = parse_cpsc(FIXTURE).unwrap();
-    assert_eq!(matches(std::slice::from_ref(&i), &r, &BTreeSet::new()).len(), 1);
+    assert_eq!(
+        matches(std::slice::from_ref(&i), &r, &BTreeSet::new()).len(),
+        1
+    );
     let gone: BTreeSet<_> = [(i.id, "27087".to_string())].into();
     assert!(matches(std::slice::from_ref(&i), &r, &gone).is_empty());
 }

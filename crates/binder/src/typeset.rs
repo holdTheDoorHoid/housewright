@@ -234,6 +234,19 @@ pub const PRELUDE: &str = r##"
     align(center, text(size: 9pt, fill: hw-muted, p.at(1)))
   }))
 )
+#let hw-inventory(entries) = for e in entries {
+  block(breakable: false, above: 0.5em, below: 0.5em, inset: (bottom: 6pt), stroke: (bottom: 0.5pt + hw-rule), grid(
+    columns: (30mm, 1fr), column-gutter: 10pt,
+    if e.at(1) == none { box(width: 30mm, height: 22mm, fill: hw-tint, align(center + horizon, text(size: 8pt, fill: hw-muted, "No photo"))) }
+    else { image(e.at(1), width: 30mm, height: 30mm, fit: "contain") },
+    {
+      text(size: 12pt, weight: "bold", e.at(0))
+      v(-0.3em)
+      grid(columns: (34%, 1fr), column-gutter: 8pt, row-gutter: 4pt,
+        ..e.at(2).map(r => (text(size: 9.5pt, fill: hw-muted, r.at(0)), text(size: 9.5pt, r.at(1)))).flatten())
+    }
+  ))
+}
 #let hw-write(label) = block(above: 1em, below: 1.2em, grid(
   columns: (auto, 1fr), gutter: 6pt,
   text(weight: "bold", label), align(bottom, line(length: 100%, stroke: 0.6pt + hw-ink))
@@ -411,6 +424,18 @@ fn block(out: &mut String, b: &Block) {
         }
         Block::Plan { drawing } => {
             let _ = writeln!(out, "#hw-plan({})", plan(drawing));
+        }
+        Block::Inventory { entries } => {
+            let mut e = String::from("(");
+            for x in entries {
+                let photo = match &x.photo {
+                    Some(f) => lit(&format!("/{f}")),
+                    None => "none".into(),
+                };
+                let _ = write!(e, "({}, {}, {}), ", lit(&x.name), photo, pairs(&x.rows));
+            }
+            e.push(')');
+            let _ = writeln!(out, "#hw-inventory({e})");
         }
         Block::Cover {
             title,

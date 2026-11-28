@@ -92,7 +92,7 @@ pub fn jobs(store: &Store) -> Result<BTreeMap<ContractorId, Vec<Job>>> {
         });
     }
     for v in out.values_mut() {
-        v.sort_by(|a, b| b.at.cmp(&a.at));
+        v.sort_by_key(|j| std::cmp::Reverse(j.at));
     }
     Ok(out)
 }

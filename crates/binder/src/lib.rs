@@ -14,6 +14,7 @@ pub mod build;
 pub mod bundle;
 pub mod data;
 pub mod doc;
+pub mod insurance;
 pub mod plans;
 pub mod redact;
 #[cfg(feature = "typeset")]
@@ -185,6 +186,13 @@ pub fn prepare(
             match b {
                 doc::Block::Photos { photos } | doc::Block::Emergency { photos, .. } => {
                     photos.retain(|p| images.contains_key(&p.file));
+                }
+                doc::Block::Inventory { entries } => {
+                    for e in entries {
+                        if e.photo.as_ref().is_some_and(|f| !images.contains_key(f)) {
+                            e.photo = None;
+                        }
+                    }
                 }
                 _ => {}
             }

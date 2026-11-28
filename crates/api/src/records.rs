@@ -26,6 +26,9 @@ pub const DOWNLOAD_COMMANDS: &[&str] = &[
     "label_sheet_pdf",
     "binder_pdf",
     "binder_bundle",
+    "insurance_pdf",
+    "insurance_bundle",
+    "insurance_csv",
 ];
 
 pub(crate) fn attachment_out(a: &Attachment) -> AttachmentOut {
@@ -208,6 +211,9 @@ impl Api {
             });
         }
         if let Some(r) = self.binder_download(cmd, a.clone()) {
+            return r;
+        }
+        if let Some(r) = self.insurance_download(cmd, a.clone()) {
             return r;
         }
         match cmd {
@@ -395,6 +401,65 @@ impl Api {
         if let Some(v) = blank_to_none(a.purchased) {
             it.purchased = v.map(date).transpose()?;
         }
+        let currency = self.household()?.currency().to_string();
+        let amount = |raw: String| -> Result<Option<Money>, ApiError> {
+            let raw = raw.trim().to_string();
+            if raw.is_empty() {
+                return Ok(None);
+            }
+            let minor = costs::parse_amount(&raw).ok_or_else(|| {
+                ApiError::invalid(format!("'{raw}' is not an amount, like 1299.99"))
+            })?;
+            Ok(Some(costs::money(minor, &currency)))
+        };
+        if let Some(v) = a.price {
+            it.price = amount(v)?;
+        }
+        if let Some(v) = a.value {
+            it.value = amount(v)?;
+        }
+        match a.warranty {
+            Some(w) if w.remove => it.warranty = None,
+            Some(w) => {
+                let ends = match w.ends.as_deref().map(str::trim) {
+                    None | Some("") => None,
+                    Some(e) => Some(date(e.to_string())?),
+                };
+                let mut nw = housewright_core::warranty::from_input(&it, w.months, ends)
+                    .map_err(ApiError::invalid)?;
+                if let Some(nw) = nw.as_mut() {
+                    if let Some(p) = w.provider {
+                        nw.provider = Some(p.trim().to_string()).filter(|p| !p.is_empty());
+                    }
+                    if let Some(t) = w.transferable {
+                        nw.transferable = t;
+                    }
+                    if let Some(u) = w.register_url {
+                        let u = u.trim();
+                        nw.register_url = if u.is_empty() {
+                            None
+                        } else {
+                            let full = if u.contains("://") {
+                                u.to_string()
+                            } else {
+                                format!("https://{u}")
+                            };
+                            if !housewright_core::warranty::is_safe_link(&full) {
+                                return Err(ApiError::invalid(
+                                    "the registration link must be an https web address"
+                                        .to_string(),
+                                ));
+                            }
+                            Some(full)
+                        };
+                    }
+                }
+                it.warranty = nw;
+            }
+            None => {}
+        }
+        // A warranty given as a length follows the install and purchase dates.
+        housewright_core::warranty::refresh(&mut it);
         if let Some(v) = blank_to_none(a.room_id) {
             it.room = match v {
                 Some(r) => {
@@ -572,11 +637,28 @@ impl Api {
             );
         }
         let note = a.note.filter(|n| !n.trim().is_empty());
+        let who: Option<Option<ContractorId>> = match a.contractor_id.as_deref().map(str::trim) {
+            None => None,
+            Some("") => Some(None),
+            Some(k) => Some(Some(parse_id(k, "contractor")?)),
+        };
+        // Only a change is recorded, so saving the form again adds nothing.
+        let who = match who {
+            Some(k) => {
+                let details = self.store.completion_details(cid)?;
+                let now_who = housewright_core::contractors::effective_contractor(&c, &details);
+                (now_who != k).then_some(k)
+            }
+            None => None,
+        };
         let me = self.store.author()?;
         let now = self.store.now();
         self.store.batch(|s| {
             if costs.is_some() || !values.is_empty() {
                 s.add_completion_detail(cid, costs, values)?;
+            }
+            if let Some(k) = who {
+                s.link_contractor(cid, k)?;
             }
             if let Some(n) = note {
                 s.append(&Note {
