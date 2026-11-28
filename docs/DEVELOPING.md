@@ -160,6 +160,19 @@ npm test               # vitest: Today flow, reschedule/review, formatting, comm
 npm run build:web && npx playwright test   # drives the real web build in Chrome
 ```
 
+`app/tests/phase9.spec.ts` (contractors, warranties, recalls, the
+insurance inventory) never reaches the real CPSC service: it answers every
+request to `https://www.saferproducts.gov/` with the recorded response in
+`crates/core/tests/fixtures/cpsc/` and checks that only dates were asked
+for. It also writes screenshots and the inventory PDF to
+`docs/phase-9-evidence/`. To try recall checks against the live service,
+turn them on in the app (Home, Recalls); the first check downloads about
+13 MB in yearly parts.
+
+`HW_BINDER_OUT=dir cargo test -p housewright-api --test binder` writes every
+binder PDF and the insurance inventory (`insurance.pdf`,
+`insurance-sensitive.pdf`) to `dir`, to look at.
+
 Playwright uses the installed Google Chrome (`channel: 'chrome'`). On a machine
 without it, run `npx playwright install chromium` and `PW_CHANNEL=chromium`.
 

@@ -77,8 +77,8 @@ function run(m: ToWorker) {
       return;
     }
     post({ type: 'result', id: m.id, text: call_upload(m.cmd, m.args, m.bytes) });
-  } else if (m.kind === 'download' && m.cmd === 'binder_pdf') {
-    void binderPdf(m.args).then(
+  } else if (m.kind === 'download' && (m.cmd === 'binder_pdf' || m.cmd === 'insurance_pdf')) {
+    void (m.cmd === 'binder_pdf' ? binderPdf(m.args) : insurancePdf(m.args)).then(
       (bytes) => self.postMessage({ type: 'bytes', id: m.id, bytes } satisfies FromWorker, [bytes.buffer]),
       (e) => {
         const text = String(e?.message ?? e);
@@ -129,6 +129,14 @@ async function binderPdf(argsJson: string): Promise<Uint8Array<ArrayBuffer>> {
     if (out.error) throw new Error(JSON.stringify(out));
   }
   return pdf as Uint8Array<ArrayBuffer>;
+}
+
+// The insurance inventory is typeset by the same module; it is not a
+// binder print, so nothing is recorded.
+async function insurancePdf(argsJson: string): Promise<Uint8Array<ArrayBuffer>> {
+  const bundle = call_download('insurance_bundle', argsJson);
+  const mod = await binderModule();
+  return mod.render(bundle) as Uint8Array<ArrayBuffer>;
 }
 
 let ocrLoading: Promise<void> | null = null;

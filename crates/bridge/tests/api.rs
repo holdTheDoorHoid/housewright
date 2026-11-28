@@ -573,3 +573,56 @@ async fn schema_fixture_is_current() {
         "run UPDATE_FIXTURES=1 cargo test -p housewright-bridge"
     );
 }
+
+/// Contractors (D-28) never reach Home Assistant: not their names, not the
+/// household's private rating or notes, not what a job cost (Phase 9).
+#[tokio::test]
+async fn contractors_and_their_private_fields_never_come_out() {
+    let clock = ManualClock::new(1_795_867_200_000);
+    let mut b = Bridge::in_memory(Some(Box::new(clock.clone()))).unwrap();
+    b.seed_demo().unwrap();
+    let api = b.api();
+    api.call(
+        "save_contractor",
+        json!({"name": "PRIVATE-CONTRACTOR Ruiz", "company": "PRIVATE-COMPANY",
+               "phone": "555-0199", "private_rating": 1, "would_hire_again": "no",
+               "private_notes": "PRIVATE-NOTE never again", "licence_number": "PRIVATE-LIC-1"}),
+    )
+    .unwrap();
+    let k = api.call("contractors", Value::Null).unwrap()[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let t = api.call("today", Value::Null).unwrap();
+    let task = t["tasks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .chain(t["coming_up"].as_array().unwrap())
+        .next()
+        .unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let done = api.call("complete", json!({"id": task})).unwrap();
+    api.call(
+        "add_details",
+        json!({"completion_id": done["completion_id"], "contractor_id": k,
+               "costs": {"contractor": "987.65"}}),
+    )
+    .unwrap();
+    let s = Shared::new(b, TOKEN);
+    for p in [
+        "/api/v1/status",
+        "/api/v1/snapshot",
+        "/api/v1/tasks",
+        "/api/v1/items",
+        "/api/v1/members",
+    ] {
+        let v = ok(&s, "GET", p, Value::Null).await;
+        let text = v.to_string();
+        for bad in ["PRIVATE", "Ruiz", "555-0199", "987", "never again"] {
+            assert!(!text.contains(bad), "{p} shows {bad}: {text}");
+        }
+    }
+}

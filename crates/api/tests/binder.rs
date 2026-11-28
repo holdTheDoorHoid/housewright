@@ -39,6 +39,9 @@ const SECRETS: &[&str] = &[
     "Heirloom silver",
 ];
 
+/// A contractor's private notes: never printed, never in an export for others.
+const PRIVATE_NOTE: &str = "PRIVATE-NOTE: slow to call back, fair prices";
+
 struct Demo {
     api: Api,
     owner: String,
@@ -152,6 +155,8 @@ fn demo() -> Demo {
             provider: Some("Carrier".into()),
             transferable: true,
             reference: Some(Flagged::sensitive("POL-99-1234-X".into())),
+            months: Default::default(),
+            register_url: Default::default(),
         });
         f.location_note = Some(Flagged::normal("Basement, by the stairs".into()));
         s.put(&f).unwrap();
@@ -161,6 +166,8 @@ fn demo() -> Demo {
             provider: Some("Rheem".into()),
             transferable: false,
             reference: None,
+            months: Default::default(),
+            register_url: Default::default(),
         });
         s.put(&w).unwrap();
         // A whole thing that is sensitive: a safe.
@@ -185,6 +192,8 @@ fn demo() -> Demo {
             extra_fields: vec![],
             custom: Default::default(),
             sensitivity: Sensitivity::Sensitive,
+            price: Default::default(),
+            value: Default::default(),
         })
         .unwrap();
     }
@@ -336,6 +345,26 @@ fn demo() -> Demo {
         "save_contractor",
         json!({"name": "Cool Air Heating", "trades": ["heating", "cooling"], "phone": "555-0103",
                "email": "office@coolair.example"}),
+    );
+    // The household's private opinion (D-28), saved the way the app does.
+    let ace = call(&mut api, "contractors", Value::Null)[0]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    call(
+        &mut api,
+        "save_contractor",
+        json!({"id": ace, "name": "Ace Plumbing", "trades": ["plumbing"], "phone": "555-0101",
+               "emergency": true, "notes": SECRETS[9], "notes_private": true,
+               "private_rating": 2, "would_hire_again": "no",
+               "private_notes": PRIVATE_NOTE}),
+    );
+    // Values for the insurance inventory.
+    let furnace_id = item_id(&mut api, "furnace");
+    call(
+        &mut api,
+        "update_item",
+        json!({"id": furnace_id, "price": "4,200", "value": "2500.00"}),
     );
     let mut cool = None;
     {
@@ -549,9 +578,28 @@ fn the_private_rating_is_never_printed() {
             assert!(!r.page_text.join(" ").to_lowercase().contains("rating"));
         }
     }
-    // And the gathered data does not even carry it.
+    // And the gathered data does not even carry it, or the other private
+    // fields.
     let data = binder::gather(d.api.store(), None, d.api.store().now()).unwrap();
-    assert!(data.contractors.iter().all(|c| c.private_rating.is_none()));
+    assert!(data.contractors.iter().all(|c| c.private_rating.is_none()
+        && c.would_hire_again.is_none()
+        && c.private_notes.is_none()));
+    for e in Edition::ALL {
+        let b = build(&d, e);
+        for doc in std::iter::once(b.main).chain(b.sealed) {
+            assert!(!doc.texts().join("\n").contains("PRIVATE-NOTE"), "{e:?}");
+        }
+    }
+    // The app itself still shows them to the household.
+    let list = call(&mut d.api, "contractors", Value::Null);
+    let ace = list
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["name"] == "Ace Plumbing")
+        .unwrap();
+    assert_eq!(ace["private"]["notes"], PRIVATE_NOTE);
+    assert_eq!(ace["private"]["would_hire_again"], false);
 }
 
 #[test]
@@ -1004,4 +1052,99 @@ fn handover_change_markers_follow_the_chosen_options() {
         .map(|s| s["key"].as_str().unwrap())
         .collect();
     assert_eq!(changed, vec!["history"]);
+}
+
+// -- the insurance inventory (Phase 9) ---------------------------------------
+
+fn insurance(d: &mut Demo, include_sensitive: bool) -> (Vec<u8>, String) {
+    let pdf = d
+        .api
+        .call_download(
+            "insurance_pdf",
+            json!({"include_sensitive": include_sensitive}),
+        )
+        .unwrap();
+    let csv = d
+        .api
+        .call_download(
+            "insurance_csv",
+            json!({"include_sensitive": include_sensitive}),
+        )
+        .unwrap();
+    (pdf, String::from_utf8(csv).unwrap())
+}
+
+#[test]
+fn the_insurance_inventory_leaves_sensitive_things_out_by_default() {
+    let mut d = demo();
+    let sum = call(&mut d.api, "insurance", Value::Null);
+    assert!(sum["sensitive_things"].as_u64().unwrap() >= 1, "{sum}");
+    assert_eq!(sum["can_include_sensitive"], true);
+    let (pdf, csv) = insurance(&mut d, false);
+    save("insurance.pdf", &pdf);
+    // The document model and the laid-out pages.
+    let data = binder::gather(d.api.store(), None, d.api.store().now()).unwrap();
+    let opts = binder::insurance::InsuranceOptions::default();
+    let inv = binder::insurance::inventory(&data, opts);
+    let doc = binder::insurance::document(&data, &inv, opts);
+    let texts = doc.texts().join("\n");
+    let r = render(&mut d, &doc);
+    let laid = r.page_text.join("\n");
+    let reader = pdftotext(&pdf).map(|t| squash(&t));
+    for secret in SECRETS {
+        assert!(!texts.contains(secret), "document model: {secret}");
+        assert!(!laid.contains(secret), "laid out: {secret}");
+        assert!(!csv.contains(secret), "CSV: {secret}");
+        if let Some(t) = &reader {
+            assert!(!t.contains(&squash(secret)), "PDF text: {secret}");
+        }
+    }
+    assert!(!texts.contains("PRIVATE-NOTE") && !csv.contains("PRIVATE-NOTE"));
+    // Normal things are there, with their values, and the cover says what
+    // was left out.
+    assert!(texts.contains("Furnace"));
+    assert!(texts.contains("$2,500.00") && texts.contains("$4,200.00"));
+    assert!(texts.contains("Left out because they are marked sensitive"));
+    assert!(csv.starts_with("\u{feff}Room,Thing,Make,Model,Serial"));
+    assert!(csv.contains("4200.00,2500.00,USD"));
+    assert!(csv.lines().last().unwrap().starts_with("Total,"));
+    if let Some(t) = &reader {
+        assert!(t.contains("Home inventory"));
+    }
+}
+
+#[test]
+fn the_insurance_inventory_includes_sensitive_things_when_asked_by_the_owner() {
+    let mut d = demo();
+    let (pdf, csv) = insurance(&mut d, true);
+    save("insurance-sensitive.pdf", &pdf);
+    assert!(csv.contains("SAFE-SN-00912"), "the safe's serial is there");
+    assert!(
+        csv.contains("POL-99-1234-X"),
+        "the warranty reference is there"
+    );
+    if let Some(t) = pdftotext(&pdf).map(|t| squash(&t)) {
+        assert!(t.contains("SAFE-SN-00912"));
+        assert!(t.contains("Keep it somewhere safe"));
+    }
+    // Contractor details and private notes are never part of it.
+    assert!(!csv.contains("PRIVATE-NOTE") && !csv.contains("HVAC-LIC-778812"));
+    // A member may export, but not include sensitive items.
+    d.api.store_mut().set_author(d.member).unwrap();
+    assert!(
+        d.api
+            .call_download("insurance_csv", json!({"include_sensitive": true}))
+            .is_err()
+    );
+    let csv = String::from_utf8(d.api.call_download("insurance_csv", json!({})).unwrap()).unwrap();
+    assert!(!csv.contains("SAFE-SN-00912"));
+}
+
+#[test]
+fn the_insurance_bundle_renders_like_the_native_pdf() {
+    let mut d = demo();
+    let zip = d.api.call_download("insurance_bundle", json!({})).unwrap();
+    let r = binder::render::render_bundle(&zip).unwrap();
+    assert!(r.pages >= 3);
+    assert!(r.page_text.join(" ").contains("Totals and receipts"));
 }

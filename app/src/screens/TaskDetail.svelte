@@ -121,6 +121,7 @@
         {#each t.completions as h (h.id)}
           <li class="card" class:voided={h.voided}>
             <div>{when(h.at)} · {h.by_name}{h.voided ? ' · undone' : ''}</div>
+            {#if h.contractor_id}<div class="small">Done by <a href={`#/contractor/${h.contractor_id}`}>{h.contractor_name ?? 'a contractor'}</a></div>{/if}
             {#each h.notes as n, i (i)}<div class="muted">{n}</div>{/each}
             {#if h.cost_total !== null || h.values.length || h.attachments.length}
               <div class="extras small">

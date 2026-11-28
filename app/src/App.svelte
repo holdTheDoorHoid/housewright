@@ -4,7 +4,7 @@
   import { changed, startSync } from './lib/sync';
   import Sync from './screens/Sync.svelte';
   import HomeAssistant from './screens/HomeAssistant.svelte';
-  import { app, go, refresh } from './lib/state.svelte';
+  import { app, go, refresh, noticeHash } from './lib/state.svelte';
   import { reminders, resync } from './lib/reminders';
   import { errorText } from './lib/actions';
   import Today from './screens/Today.svelte';
@@ -24,6 +24,11 @@
   import Scan from './screens/Scan.svelte';
   import Binder from './screens/Binder.svelte';
   import Plans from './screens/Plans.svelte';
+  import Contractors from './screens/Contractors.svelte';
+  import Contractor from './screens/Contractor.svelte';
+  import Warranties from './screens/Warranties.svelte';
+  import Recalls from './screens/Recalls.svelte';
+  import Insurance from './screens/Insurance.svelte';
 
   let fatal = $state<{ text: string; locked: boolean } | null>(null);
 
@@ -32,6 +37,7 @@
     if (p?.action === 'reschedule') go(`#/task/${p.taskId}/reschedule`);
     else if (p?.action === 'open') go(`#/task/${p.taskId}`);
     else if (p?.action === 'open_item') go(`#/thing/${p.taskId}`);
+    else if (p?.action === 'open_notice') go(noticeHash(p.taskId));
   }
 
   function started(s: Status, fresh = false) {
@@ -77,7 +83,7 @@
       ? 'today'
       : app.route.name === 'thing' || app.route.name === 'add' || app.route.name === 'scan'
         ? 'things'
-        : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder' || app.route.name === 'plans'
+        : ['costs', 'labels', 'binder', 'plans', 'contractors', 'contractor', 'warranties', 'recalls', 'insurance'].includes(app.route.name)
           ? 'home'
           : app.route.name === 'sync' || app.route.name === 'home-assistant'
             ? 'settings'
@@ -120,6 +126,11 @@
     {:else if app.route.name === 'labels'}<Labels />
     {:else if app.route.name === 'scan'}<Scan />
     {:else if app.route.name === 'binder'}<Binder />
+    {:else if app.route.name === 'contractors'}<Contractors />
+    {:else if app.route.name === 'contractor'}{#key app.route.id}<Contractor id={app.route.id} />{/key}
+    {:else if app.route.name === 'warranties'}<Warranties />
+    {:else if app.route.name === 'recalls'}<Recalls />
+    {:else if app.route.name === 'insurance'}<Insurance />
     {:else if app.route.name === 'plans'}{#key `${app.route.floor}/${app.route.place}`}<Plans floorId={app.route.floor} pinId={app.route.pin} placeItem={app.route.place} />{/key}
     {/if}
   </main>

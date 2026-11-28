@@ -35,7 +35,7 @@ lets the server stay unable to read anything (D-14).
 | `models/ocr` | The bundled OCR models (CC BY-SA 4.0, D-74). |
 | `crates/crypto` | Device keys, the household key chain, HPKE key envelopes, encrypted signed batches and files, the roster, signed requests, pairing, the recovery key (D-15, D-89 to D-94). |
 | `crates/sync` | The sync client: push, pull, files, pairing, removal, recovery (D-97). Hybrid logical clocks and merge stay in the core. |
-| `crates/binder` | The house binder (D-40 to D-43, D-80 to D-88): gathers one property's data, redacts it for the main volume, builds the editions as a document model, typesets them with an embedded Typst (fonts compiled in, no file system or network), fingerprints sections for reprints. |
+| `crates/binder` | The house binder (D-40 to D-43, D-80 to D-88): gathers one property's data, redacts it for the main volume, builds the editions as a document model, typesets them with an embedded Typst (fonts compiled in, no file system or network), fingerprints sections for reprints. Also the insurance inventory PDF and CSV (D-143). |
 | `crates/server` | The sync relay: stores and relays ciphertext only (Phase 6); later share links and paid extras. |
 | `crates/cli` | A command-line front end over the core, for testing and for power users. |
 | `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
@@ -268,6 +268,39 @@ binder::plans ── one section per drawn floor (Typst draws from numbers only)
   page draws a small copy of its floor with the pin.
 - Merge granularity and what a merge can leave behind: D-130 and
   [FILE-FORMAT.md](FILE-FORMAT.md#floor-plans-version-6).
+
+## Contractors and alerts (Phase 9)
+
+```
+core::contractors (effective "who did it", jobs and spend)
+core::warranty    (end from length + earlier of install/purchase; states)
+core::alerts      (warranty 60/7-day and licence/insurance 30-day notices; pure)
+core::recalls     (CPSC JSON -> compact Recall; windows; conservative matching)
+        │
+api::contractors (contractors, contractor, save/delete)
+api::alerts      (warranties, notice_plan -> reminder_plan, recalls, recall_import,
+                  dismiss/undismiss_recall)
+api::insurance   (insurance summary; insurance_pdf / _bundle / _csv)
+        │
+binder::insurance (Inventory -> Document with Block::Inventory -> Typst; CSV)
+```
+
+- **Recall download happens in the interface**, not the core: the core
+  says which date windows to fetch (`recalls().next`, URLs with dates
+  only), `Recalls.svelte` fetches them (the CPSC API allows any origin)
+  and hands each response to `recall_import`, which keeps a compact copy
+  in the device-only `recall_cache` table. Matching runs in the core on
+  every `recalls` call; the count for Today is cached in device meta.
+- **Notices** (D-140) join each person's reminder plan with
+  `kind: "notice"` and an `open` link; the Android plugin shows them
+  without Done/Reschedule and opens `item/<id>` or `contractor/<id>`.
+- **The insurance inventory** reuses the binder's pipeline (gather,
+  document model, `prepare`, Typst, the web's separate binder module) but
+  is never recorded as a binder print. Without "include sensitive items"
+  the binder's last check (D-83) also runs over it.
+- **Private contractor fields** stay inside the core and the app's own
+  screens: the binder's `gather` drops them (`Contractor::without_private`),
+  and the bridge never reads contractors.
 
 ## Reminders
 

@@ -402,5 +402,7 @@ fn item_from_plan(
         extra_fields: vec![],
         custom,
         sensitivity: Sensitivity::Normal,
+        price: Default::default(),
+        value: Default::default(),
     })
 }

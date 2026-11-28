@@ -481,6 +481,8 @@ fn run(cli: Cli) -> Result<()> {
                 extra_fields: vec![],
                 custom: Default::default(),
                 sensitivity: Sensitivity::Normal,
+                price: Default::default(),
+                value: Default::default(),
             };
             for kv in set {
                 let (k, v) = kv

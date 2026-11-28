@@ -1,5 +1,5 @@
 //! Phase 5 commands: the house binder (D-40 to D-43, D-80 to D-86),
-//! "quirks only you know" notes, and the contractors the binder lists.
+//! and "quirks only you know" notes. Contractors are in `contractors.rs`.
 
 use std::collections::BTreeMap;
 
@@ -130,26 +130,6 @@ pub struct NoteOut {
     pub at: jiff::Timestamp,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ContractorIo {
-    #[serde(default)]
-    pub id: Option<String>,
-    pub name: String,
-    #[serde(default)]
-    pub trades: Vec<String>,
-    #[serde(default)]
-    pub phone: Option<String>,
-    #[serde(default)]
-    pub email: Option<String>,
-    #[serde(default)]
-    pub notes: Option<String>,
-    /// Notes go in the sealed volume only.
-    #[serde(default)]
-    pub notes_private: bool,
-    #[serde(default)]
-    pub emergency: bool,
-}
-
 fn note_kind(s: &str) -> Result<EntityKind, ApiError> {
     match s {
         "property" => Ok(EntityKind::Property),
@@ -163,6 +143,7 @@ fn note_kind(s: &str) -> Result<EntityKind, ApiError> {
 
 fn edition_text(e: Edition) -> &'static str {
     match e {
+        Edition::Insurance => "A list of the things in this home for an insurer.",
         Edition::Emergency => {
             "One page: shutoffs, who to call, and what to do for a leak, a gas smell, no power or a carbon monoxide alarm. Also page 1 of every binder."
         }
@@ -176,10 +157,6 @@ fn edition_text(e: Edition) -> &'static str {
             "For someone inheriting the house: the household binder plus accounts and utilities to transfer (in the sealed volume)."
         }
     }
-}
-
-fn blank(s: Option<String>) -> Option<String> {
-    s.map(|x| x.trim().to_string()).filter(|x| !x.is_empty())
 }
 
 impl Api {
@@ -222,14 +199,6 @@ impl Api {
             "record_binder_print" => args(a).and_then(|r: binder::bundle::Receipt| {
                 self.record_print(&r)?;
                 ok(self.binder_status(None)?)
-            }),
-            "contractors" => ok(self.contractors()),
-            "save_contractor" => args(a).and_then(|a: ContractorIo| ok(self.save_contractor(a)?)),
-            "delete_contractor" => args(a).and_then(|a: IdArgs| {
-                let id: ContractorId = parse_id(&a.id, "contractor")?;
-                let _: Contractor = self.store.fetch(&id.to_string())?;
-                self.store.delete(EntityKind::Contractor, &id.to_string())?;
-                ok(())
             }),
             _ => return None,
         })
@@ -527,6 +496,15 @@ impl Api {
 
     /// Photos for a document, shrunk for print (D-85).
     fn print_images(&self, doc: &binder::Document) -> Result<BTreeMap<String, Vec<u8>>, ApiError> {
+        self.print_images_at(doc, PRINT_EDGE)
+    }
+
+    /// Photos for a document, shrunk so the long edge is at most `edge`.
+    pub(crate) fn print_images_at(
+        &self,
+        doc: &binder::Document,
+        edge: u32,
+    ) -> Result<BTreeMap<String, Vec<u8>>, ApiError> {
         let mut out = BTreeMap::new();
         for file in doc.photo_files() {
             let Some(sha) = file
@@ -541,7 +519,7 @@ impl Api {
             let Ok(img) = photo::decode(&bytes) else {
                 continue;
             };
-            let small = photo::fit(&img, PRINT_EDGE);
+            let small = photo::fit(&img, edge);
             if let Ok(jpg) = photo::encode_jpeg(&small, PRINT_QUALITY) {
                 out.insert(file, jpg);
             }
@@ -615,80 +593,6 @@ impl Api {
             about_kind: a.about_kind,
             about_id: a.about_id,
         })
-    }
-
-    fn contractors(&self) -> Vec<ContractorIo> {
-        let see = self
-            .me()
-            .map(|m| m.role.can_see_sensitive())
-            .unwrap_or(false);
-        let mut v: Vec<Contractor> = self.store.list().unwrap_or_default();
-        v.sort_by_key(|c| c.name.to_lowercase());
-        v.into_iter()
-            .map(|c| {
-                let private = c
-                    .notes
-                    .as_ref()
-                    .is_some_and(|n| n.sensitivity == Sensitivity::Sensitive);
-                ContractorIo {
-                    id: Some(c.id.to_string()),
-                    name: c.name,
-                    trades: c.trades,
-                    phone: c.phone,
-                    email: c.email,
-                    notes: c.notes.filter(|_| !private || see).map(|n| n.value),
-                    notes_private: private,
-                    emergency: c.emergency,
-                }
-            })
-            .collect()
-    }
-
-    fn save_contractor(&mut self, a: ContractorIo) -> Result<Vec<ContractorIo>, ApiError> {
-        if !self.me()?.role.can_edit_plan() {
-            return Err(ApiError::invalid(
-                "only household members can do this".to_string(),
-            ));
-        }
-        let name = a.name.trim().to_string();
-        if name.is_empty() {
-            return Err(ApiError::invalid("give it a name".to_string()));
-        }
-        let existing: Option<Contractor> = match &a.id {
-            Some(id) => Some(
-                self.store
-                    .fetch(&parse_id::<ContractorId>(id, "contractor")?.to_string())?,
-            ),
-            None => None,
-        };
-        let notes = blank(a.notes).map(|n| Flagged {
-            value: n,
-            sensitivity: if a.notes_private {
-                Sensitivity::Sensitive
-            } else {
-                Sensitivity::Normal
-            },
-        });
-        let c = Contractor {
-            id: existing.as_ref().map(|c| c.id).unwrap_or_default(),
-            name,
-            trades: a
-                .trades
-                .into_iter()
-                .map(|t| t.trim().to_string())
-                .filter(|t| !t.is_empty())
-                .collect(),
-            phone: blank(a.phone),
-            email: blank(a.email),
-            licence: existing.as_ref().and_then(|c| c.licence.clone()),
-            insurance: existing.as_ref().and_then(|c| c.insurance.clone()),
-            // Kept as it was: the rating is private and not edited here (D-28).
-            private_rating: existing.as_ref().and_then(|c| c.private_rating),
-            notes,
-            emergency: a.emergency,
-        };
-        self.store.put(&c)?;
-        Ok(self.contractors())
     }
 
     pub(crate) fn binder_download(

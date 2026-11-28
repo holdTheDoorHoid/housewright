@@ -2,8 +2,9 @@
   // Edit a thing's details and fields (D-22). Sensitive values are never
   // sent to this screen; they show as "set, hidden" with a Reveal button,
   // and leaving the box empty keeps them as they are.
-  import { call, upload, type ItemDetail, type Card, type Room, type FieldDef } from '../lib/api';
-  import { toast } from '../lib/state.svelte';
+  import { call, upload, type ItemDetail, type Card, type Room, type FieldDef, type WarrantyIn } from '../lib/api';
+  import { app, toast } from '../lib/state.svelte';
+  import { resync } from '../lib/reminders';
   import { errorText } from '../lib/actions';
   import { readFile } from '../lib/files';
   import LabelReader, { type LabelChoice } from './LabelReader.svelte';
@@ -27,6 +28,21 @@
   let installed = $state(start.installed ?? '');
   let purchased = $state(start.purchased ?? '');
   let roomId = $state(start.row.room_id ?? '');
+  const amount = (m: { minor: number } | null) => (m ? (m.minor / 100).toFixed(2) : '');
+  let price = $state(amount(start.price));
+  let value = $state(amount(start.value));
+  // The warranty: a length in years or months, or an end date.
+  const w0 = start.warranty;
+  let wHow = $state<'none' | 'length' | 'date'>(w0 ? (w0.months ? 'length' : 'date') : 'none');
+  let wYears = $state(w0?.months ? String(w0.months % 12 === 0 ? w0.months / 12 : w0.months) : '');
+  let wUnit = $state<'years' | 'months'>(w0?.months && w0.months % 12 !== 0 ? 'months' : 'years');
+  let wEnds = $state(w0?.ends ?? '');
+  let wProvider = $state(w0?.provider ?? '');
+  let wLink = $state(w0?.register_url ?? '');
+  let wTransfers = $state(w0?.transferable ?? false);
+  const owner = $derived(app.status?.me?.role === 'owner');
+  let wholePrivate = $state(start.sensitive);
+  let serialPrivate = $state(start.serial_sensitive);
   let values = $state<Record<string, string>>(
     Object.fromEntries(start.edit.map((f) => [f.def.key, f.value ?? ''])),
   );
@@ -97,13 +113,29 @@
         purchased,
         room_id: roomId,
         values: changed,
+        price,
+        value,
+        warranty: warrantyArgs(),
+        ...(owner && wholePrivate !== start.sensitive ? { sensitive: wholePrivate } : {}),
+        ...(owner && serialPrivate !== start.serial_sensitive ? { serial_sensitive: serialPrivate } : {}),
       });
+      // A warranty's dates decide its notices (D-140).
+      resync();
       ondone(r);
     } catch (err) {
       toast({ text: errorText(err) });
     } finally {
       busy = false;
     }
+  }
+
+  function warrantyArgs(): WarrantyIn | undefined {
+    if (wHow === 'none') return w0 ? { remove: true } : undefined;
+    const common = { provider: wProvider, register_url: wLink, transferable: wTransfers };
+    if (wHow === 'date') return wEnds ? { ends: wEnds, ...common } : undefined;
+    const n = Number(wYears);
+    if (!wYears.trim() || !Number.isFinite(n) || n <= 0) return undefined;
+    return { months: Math.round(wUnit === 'years' ? n * 12 : n), ...common };
   }
 
   async function addField() {
@@ -187,6 +219,57 @@
       <input id="e-purch" type="date" bind:value={purchased} />
     </div>
   </div>
+
+  {#if owner}
+    <label class="check"><input type="checkbox" bind:checked={serialPrivate} /> Keep the serial number private</label>
+    <label class="check">
+      <input type="checkbox" bind:checked={wholePrivate} data-testid="thing-private" />
+      Private thing (a safe, jewellery): keep it out of the main binder and the insurance inventory unless you ask
+    </label>
+  {/if}
+  <div class="row two">
+    <div>
+      <label for="e-price">Price paid</label>
+      <input id="e-price" inputmode="decimal" bind:value={price} placeholder="0.00" />
+    </div>
+    <div>
+      <label for="e-value">Worth now (your guess)</label>
+      <input id="e-value" inputmode="decimal" bind:value={value} placeholder="0.00" />
+    </div>
+  </div>
+  <p class="small muted">For the insurance inventory. In your household's currency.</p>
+
+  <fieldset class="warranty">
+    <legend>Warranty</legend>
+    <label for="e-w-how" class="visually-hidden">Warranty</label>
+    <select id="e-w-how" bind:value={wHow}>
+      <option value="none">None recorded</option>
+      <option value="length">It lasts a number of years or months</option>
+      <option value="date">It ends on a date</option>
+    </select>
+    {#if wHow === 'length'}
+      <div class="row">
+        <label for="e-w-len" class="visually-hidden">How long</label>
+        <input id="e-w-len" inputmode="numeric" bind:value={wYears} placeholder="5" />
+        <select bind:value={wUnit} aria-label="Years or months">
+          <option value="years">years</option>
+          <option value="months">months</option>
+        </select>
+      </div>
+      <p class="small muted">Counted from the earlier of the bought and installed dates{installed || purchased ? '' : ': add one above'}.</p>
+    {:else if wHow === 'date'}
+      <label for="e-w-ends">Ends on</label>
+      <input id="e-w-ends" type="date" bind:value={wEnds} />
+    {/if}
+    {#if wHow !== 'none'}
+      <label for="e-w-prov">Who gives it (optional)</label>
+      <input id="e-w-prov" bind:value={wProvider} placeholder="The maker, the installer, the shop" />
+      <label for="e-w-link">Registration page (optional)</label>
+      <input id="e-w-link" bind:value={wLink} placeholder="https://…" autocomplete="off" />
+      <label class="check"><input type="checkbox" bind:checked={wTransfers} /> It transfers to a new owner</label>
+      <p class="small muted">You get one reminder about two months before it ends and one a week before.</p>
+    {/if}
+  </fieldset>
 
   {#each edit as f (f.def.key)}
     {@const k = f.def.key}
@@ -300,5 +383,23 @@
   }
   label .pill {
     margin-left: 0.4rem;
+  }
+  .warranty {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem 0.75rem;
+    margin: 1rem 0 0;
+  }
+  .warranty legend {
+    font-weight: 600;
+  }
+  .check {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .check input {
+    width: 1.4rem;
+    min-height: 1.4rem;
   }
 </style>

@@ -73,6 +73,7 @@ const MIGRATIONS: &[(i64, Migration)] = &[
     (4, migration_4),
     (5, migration_5),
     (6, migration_6),
+    (7, migration_7),
 ];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
@@ -156,6 +157,22 @@ fn migration_6(conn: &Connection) -> rusqlite::Result<()> {
     for kind in EntityKind::PLAN {
         sql.push_str(&entity_table(kind));
     }
+    conn.execute_batch(&sql)
+}
+
+/// Phase 9: "not mine" answers to recall matches (synced like any record),
+/// and this device's copy of the public US recall list (`recall_cache`:
+/// public data, re-downloadable, never exported or synced; see
+/// [`crate::recalls`]).
+fn migration_7(conn: &Connection) -> rusqlite::Result<()> {
+    let mut sql = entity_table(EntityKind::RecallDismissal);
+    sql.push_str(
+        "CREATE TABLE recall_cache (
+             number TEXT PRIMARY KEY,
+             date TEXT NOT NULL,
+             data TEXT NOT NULL
+         );",
+    );
     conn.execute_batch(&sql)
 }
 
@@ -667,6 +684,46 @@ impl Store {
     // -- reading ----------------------------------------------------------
 
     /// A raw row, including tombstoned ones.
+    /// Store public recall records on this device (by recall number;
+    /// a newer copy replaces an older one). One transaction.
+    pub fn recall_cache_put(&mut self, rows: &[(String, String, String)]) -> Result<()> {
+        const SQL: &str = "INSERT INTO recall_cache (number, date, data) VALUES (?1, ?2, ?3)
+             ON CONFLICT(number) DO UPDATE SET date = excluded.date, data = excluded.data";
+        if self.in_batch {
+            let mut st = self.conn.prepare(SQL)?;
+            for (n, d, data) in rows {
+                st.execute(params![n, d, data])?;
+            }
+            return Ok(());
+        }
+        let tx = self.conn.unchecked_transaction()?;
+        {
+            let mut st = tx.prepare(SQL)?;
+            for (n, d, data) in rows {
+                st.execute(params![n, d, data])?;
+            }
+        }
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Every stored recall record as (number, date, JSON).
+    pub fn recall_cache_all(&self) -> Result<Vec<(String, String, String)>> {
+        let mut st = self
+            .conn
+            .prepare("SELECT number, date, data FROM recall_cache ORDER BY date DESC, number")?;
+        let rows = st
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        Ok(rows)
+    }
+
+    /// Forget the downloaded recall list (when recall checks are turned off).
+    pub fn recall_cache_clear(&mut self) -> Result<()> {
+        self.conn.execute("DELETE FROM recall_cache", [])?;
+        Ok(())
+    }
+
     pub fn raw(&self, kind: EntityKind, id: &str) -> Result<Option<RawEntity>> {
         let row: Option<(String, i64)> = self
             .conn

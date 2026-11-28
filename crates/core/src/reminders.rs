@@ -85,6 +85,10 @@ pub enum ReminderKind {
     FollowUp,
     /// The date the person rescheduled it to.
     Rescheduled,
+    /// A dated notice that is not a task (a warranty ending, a
+    /// contractor's licence lapsing; see [`crate::alerts`]). It has no
+    /// Done button; tapping it opens what it is about.
+    Notice,
 }
 
 /// The words of a reminder, supplied by the caller for each task.
@@ -197,6 +201,7 @@ fn compose(
         ReminderKind::Due => "Due now.",
         ReminderKind::FollowUp => "Still to do when you get a moment.",
         ReminderKind::Rescheduled => "You picked today for this.",
+        ReminderKind::Notice => "",
     };
     parts.insert(0, lead.to_string());
     (title, parts.join(" "))

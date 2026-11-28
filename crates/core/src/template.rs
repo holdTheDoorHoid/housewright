@@ -588,6 +588,8 @@ source = "template author"
             extra_fields: vec![],
             custom: Default::default(),
             sensitivity: Sensitivity::Normal,
+            price: Default::default(),
+            value: Default::default(),
         };
         let owner = MemberId::new();
         let (_, tasks) = r.plan_for_item(&item, owner, date(2026, 1, 1));

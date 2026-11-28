@@ -107,6 +107,8 @@ export interface Today {
   welcome_back: { focus: Card[]; others_overdue: number } | null;
   active_count: number;
   suggested_count: number;
+  /** Possible product recalls not yet looked at (0 when recall checks are off). */
+  recall_matches: number;
 }
 
 export interface CompletionInfo {
@@ -121,6 +123,9 @@ export interface CompletionInfo {
   costs: { kind: CostKind; minor: number; currency: string }[];
   cost_total: number | null;
   values: FieldInfo[];
+  /** Who did it, when a contractor did (D-28). */
+  contractor_id: string | null;
+  contractor_name: string | null;
 }
 
 export type CostKind = 'parts' | 'labour' | 'contractor' | 'other';
@@ -192,8 +197,106 @@ export interface ItemDetail {
   attachments: AttachmentInfo[];
   edit: FieldEdit[];
   serial_sensitive: boolean;
+  /** The whole thing is marked private (D-41). */
+  sensitive: boolean;
   /** Where it is on a floor plan (D-25). */
   pin: { pin_id: string; floor_id: string; floor_name: string; at: Point } | null;
+  price: Money | null;
+  value: Money | null;
+  warranty: WarrantyInfo | null;
+}
+
+export interface Money {
+  minor: number;
+  currency: string;
+}
+
+export type WarrantyState = 'active' | 'ending_soon' | 'ended';
+
+export interface WarrantyInfo {
+  ends: DateStr;
+  months: number | null;
+  state: WarrantyState;
+  days_left: number;
+  provider: string | null;
+  transferable: boolean;
+  register_url: string | null;
+  has_reference: boolean;
+}
+
+export interface WarrantyRow extends WarrantyInfo {
+  item_id: string;
+  name: string;
+  room_name: string | null;
+}
+
+export interface Warranties {
+  today: DateStr;
+  ending_soon: WarrantyRow[];
+  active: WarrantyRow[];
+  ended: WarrantyRow[];
+  without: number;
+}
+
+export interface WarrantyIn {
+  remove?: boolean;
+  months?: number;
+  ends?: DateStr;
+  provider?: string;
+  register_url?: string;
+  transferable?: boolean;
+}
+
+export type MatchLevel = 'model' | 'model_series' | 'brand_and_kind';
+
+export interface RecallMatch {
+  item_id: string;
+  item_name: string;
+  room_name: string | null;
+  level: MatchLevel;
+  evidence: string[];
+  recall: {
+    number: string;
+    date: DateStr;
+    title: string;
+    url: string;
+    hazard: string;
+    remedy: string;
+    products: string[];
+  };
+  dismissal_id: string | null;
+}
+
+export interface Recalls {
+  enabled: boolean;
+  synced_to: DateStr | null;
+  checked_at: string | null;
+  stored: number;
+  matches: RecallMatch[];
+  dismissed: RecallMatch[];
+  /** What to download next: dates only. */
+  next: { start: DateStr; end: DateStr; url: string }[];
+  pause_ms: number;
+}
+
+export interface InsuranceInfo {
+  property_name: string;
+  things: number;
+  with_photo: number;
+  with_value: number;
+  with_receipt: number;
+  total_value: number;
+  total_price: number;
+  currency: string;
+  sensitive_things: number;
+  sensitive_details: number;
+  can_include_sensitive: boolean;
+  filename: string;
+}
+
+export interface InsuranceArgs {
+  include_sensitive?: boolean;
+  paper?: Paper;
 }
 
 export interface FieldEdit {
@@ -240,11 +343,14 @@ export interface HistoryEntry {
 }
 
 export interface Reminder {
+  /** The task, or for a notice its stable key. */
   task_id: string;
-  kind: 'due' | 'follow_up' | 'rescheduled';
+  kind: 'due' | 'follow_up' | 'rescheduled' | 'notice';
   at_ms: number;
   title: string;
   body: string;
+  /** A notice opens this (`item/<id>`, `contractor/<id>`). */
+  open?: string;
 }
 
 /** Answers to the home questions (core `Profile` without its id). Absent = not sure. */
@@ -478,6 +584,13 @@ export interface Commands {
       purchased?: string;
       room_id?: string;
       values?: Record<string, string | null>;
+      /** Amounts as typed; "" clears. */
+      price?: string;
+      value?: string;
+      warranty?: WarrantyIn;
+      /** Owner only. */
+      sensitive?: boolean;
+      serial_sensitive?: boolean;
     },
     { detail: ItemDetail; offered: Card[]; no_longer_apply: Card[] },
   ];
@@ -501,6 +614,8 @@ export interface Commands {
       note?: string;
       costs?: Partial<Record<CostKind, string>>;
       values?: Record<string, string>;
+      /** A contractor's id, or "" for "not a contractor". */
+      contractor_id?: string;
     },
     TaskDetail,
   ];
@@ -535,8 +650,16 @@ export interface Commands {
   add_note: [{ about_kind: NoteAbout; about_id: string; text: string; sensitive?: boolean }, NoteInfo[]];
   delete_note: [{ id: string }, null];
   contractors: [None, ContractorInfo[]];
-  save_contractor: [ContractorInfo, ContractorInfo[]];
+  save_contractor: [ContractorIn, ContractorInfo[]];
   delete_contractor: [{ id: string }, null];
+  contractor: [{ id: string }, ContractorPage];
+  warranties: [None, Warranties];
+  recalls: [None, Recalls];
+  set_recalls: [{ on: boolean }, Recalls];
+  recall_import: [{ json: string; start: DateStr; end: DateStr }, { received: number; stored: number }];
+  dismiss_recall: [{ item_id: string; number: string }, Recalls];
+  undismiss_recall: [{ id: string }, Recalls];
+  insurance: [None, InsuranceInfo];
   // -- floor plans (Phase 8) --
   floors: [None, FloorInfo[]];
   save_floor: [{ id?: string; name: string; level?: number }, FloorInfo[]];
@@ -807,6 +930,13 @@ export interface NoteInfo {
   at: string;
 }
 
+export interface CredentialInfo {
+  /** Null when marked sensitive and only the owner may see it. */
+  number: string | null;
+  expires: DateStr | null;
+  state: 'ok' | 'ending_soon' | 'ended' | 'no_date';
+}
+
 export interface ContractorInfo {
   id?: string;
   name: string;
@@ -816,6 +946,58 @@ export interface ContractorInfo {
   notes?: string | null;
   notes_private: boolean;
   emergency: boolean;
+  company?: string | null;
+  website?: string | null;
+  service_area?: string | null;
+  licence?: CredentialInfo | null;
+  insurance?: CredentialInfo | null;
+  /** The household's own opinion: never printed or shared. Null for limited members. */
+  private?: { rating: number | null; would_hire_again: boolean | null; notes: string | null } | null;
+  jobs?: number;
+  /** Minor units in the household's currency. */
+  spent?: number;
+}
+
+/** What `save_contractor` takes. Absent new fields stay as they were; "" clears. */
+export interface ContractorIn {
+  id?: string;
+  name: string;
+  trades: string[];
+  phone?: string | null;
+  email?: string | null;
+  notes?: string | null;
+  notes_private: boolean;
+  emergency: boolean;
+  company?: string;
+  website?: string;
+  service_area?: string;
+  licence_number?: string;
+  licence_expires?: string;
+  insurance_number?: string;
+  insurance_expires?: string;
+  /** 1 to 5, 0 clears. */
+  private_rating?: number;
+  would_hire_again?: 'yes' | 'no' | '';
+  private_notes?: string;
+}
+
+export interface ContractorJob {
+  completion_id: string;
+  task_id: string;
+  task_title: string;
+  at: string;
+  item_id: string | null;
+  item_name: string | null;
+  room_name: string | null;
+  costs: { kind: CostKind; minor: number; currency: string }[];
+  total: number;
+}
+
+export interface ContractorPage {
+  contractor: ContractorInfo;
+  jobs: ContractorJob[];
+  currency: string;
+  attachments: AttachmentInfo[];
 }
 
 export interface BinderReceipt {
@@ -860,6 +1042,10 @@ export interface DownloadCommands {
   binder_pdf: BinderPdfArgs;
   /** The Typst source, photos and receipt for one PDF (the web typesets it in a separate module). */
   binder_bundle: BinderPdfArgs;
+  /** The insurance inventory (Phase 9). */
+  insurance_pdf: InsuranceArgs;
+  insurance_bundle: InsuranceArgs;
+  insurance_csv: InsuranceArgs;
 }
 
 export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = ['attach', 'scan_label', 'read_label', 'restore_backup'];
@@ -869,6 +1055,9 @@ export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = [
   'label_sheet_pdf',
   'binder_pdf',
   'binder_bundle',
+  'insurance_pdf',
+  'insurance_bundle',
+  'insurance_csv',
 ];
 
 export type Command = keyof Commands;
@@ -932,6 +1121,14 @@ export const COMMANDS: Command[] = [
   'contractors',
   'save_contractor',
   'delete_contractor',
+  'contractor',
+  'warranties',
+  'recalls',
+  'set_recalls',
+  'recall_import',
+  'dismiss_recall',
+  'undismiss_recall',
+  'insurance',
   'floors',
   'save_floor',
   'delete_floor',

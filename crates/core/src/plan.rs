@@ -336,6 +336,8 @@ mod tests {
             extra_fields: vec![],
             custom: Default::default(),
             sensitivity: Sensitivity::Normal,
+            price: Default::default(),
+            value: Default::default(),
         };
         s.put(&item).unwrap();
         let pin = PlanPin {

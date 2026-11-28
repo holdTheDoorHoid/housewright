@@ -332,11 +332,13 @@ pub fn gather(store: &Store, property: Option<PropertyId>, now: Timestamp) -> Re
             .cmp(&b.fact.label.to_lowercase())
     });
 
-    let mut contractors: Vec<Contractor> = store.list()?;
-    for c in &mut contractors {
-        // Never printed, in either volume (D-28).
-        c.private_rating = None;
-    }
+    // The private rating, "would hire again" and private notes are never
+    // printed, in either volume (D-28).
+    let mut contractors: Vec<Contractor> = store
+        .list::<Contractor>()?
+        .into_iter()
+        .map(Contractor::without_private)
+        .collect();
     contractors.sort_by_key(|c| c.name.to_lowercase());
 
     let details: Vec<CompletionDetail> = store.list()?;
@@ -349,7 +351,7 @@ pub fn gather(store: &Store, property: Option<PropertyId>, now: Timestamp) -> Re
                 by: c.by,
                 task_title: by_task[&c.task].title.clone(),
                 item: t.item,
-                contractor: c.contractor,
+                contractor: housewright_core::contractors::effective_contractor(&c, &details),
                 costs: effective_costs(&c, &details),
                 notes: c.notes,
             });

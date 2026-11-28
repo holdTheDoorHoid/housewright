@@ -428,7 +428,7 @@ fn plans_survive_export_and_import() {
         json!({"floor_id": h.ground, "at": p(1000, 1000), "item_id": fridge}),
     );
     let e = export::export(h.api.store()).unwrap();
-    assert_eq!(e.version, 6);
+    assert_eq!(e.version, export::EXPORT_VERSION);
     let text = export::to_json(&e).unwrap();
     let store = Store::open_in_memory(Box::new(ManualClock::new(NOW_MS))).unwrap();
     let mut b = Api::new(store).unwrap();

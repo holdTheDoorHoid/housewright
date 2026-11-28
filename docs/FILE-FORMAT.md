@@ -1,4 +1,4 @@
-# Housewright export format (version 6)
+# Housewright export format (version 7)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -70,25 +70,26 @@ Required fields are in **bold**.
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy, hard_freeze}`, address (wrapped) |
 | `floor` | **id**, **property**, **name**, level, background (version 6: `{attachment, at: {x, y}, width, opacity}`, a picture of an existing plan to trace over; `at` is its top-left corner and `width` its real-life width, in plan millimetres; `opacity` 0 to 100) |
 | `room` | **id**, **property**, **name**, floor, outline (version 6: the room's shape on its floor's plan, a list of `{x, y}` corners in plan millimetres; a simple polygon) |
-| `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, provider, transferable, reference (wrapped)}`, location_note (wrapped), template, extra_fields, custom, sensitivity |
+| `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, months, register_url, provider, transferable, reference (wrapped)}` (version 7: `months` is the warranty's length when given as one, counted from the earlier of `installed` and `purchased`, and `expires` is then worked out from it; `register_url` is an https link), location_note (wrapped), template, extra_fields, custom, sensitivity, price, value (version 7: Money, what it cost and the household's own estimate of what it is worth now) |
 | `template` | the template, exactly as in `templates/README.md` |
 | `task` | **id**, **property**, **title**, **owner** (member id), **priority**, **schedule**, **start** (date), item, room, window, steps, why `{text, source}`, minutes, completion_fields, template `{template, task}`, active, paused, not_applicable |
 | `completion` | **id**, **task**, **by**, **at**, notes (wrapped), cost, values, contractor, attachments, voids, done_by (version 5: the member it was done for, when `by` is the Home Assistant bridge) |
 | `snooze` | **id**, **task**, **by**, **at**, **until** (date), reason |
 | `meter` | **id**, **key**, **name**, **unit**, item |
 | `meter_reading` | **id**, **meter**, **at**, **value**, **by** |
-| `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5, never shared or printed), notes (wrapped), emergency (version 4: `true` puts them on the binder's emergency page) |
+| `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5), notes (wrapped), emergency (version 4: `true` puts them on the binder's emergency page), company, website, service_area, would_hire_again (`true`/`false`), private_notes (version 7). `private_rating`, `would_hire_again` and `private_notes` are the household's private opinion (D-136): never printed, never sent to Home Assistant or a server extra. They are in a full export, which is the household's own data. |
 | `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant) |
 | `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped). A note about a `property`, `room` or `item` is a "quirk only you know", printed in the house binder (main volume, or the sealed volume when sensitive). |
 | `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`; `sealed_volume_location` is where the binder's sealed volume is kept, always normal so the main binder can print it), room, pin (version 6: the `plan_pin` showing where it is) |
 | `profile` | (version 2) the answers to the home questions, one per property: **id** (the property's id), home_type, built, zip (wrapped), heating `[...]`, cooling `[...]`, water_heater, water_supply, sewer, features `{basement: true, ...}`, smoke_alarms, smoke_power, co_alarms, **people** `{adults, children, older_adults, pets}`. A missing answer means "not sure". Values are the snake_case names in `crates/core/src/profile.rs`. |
 | `suggestion_answer` | (version 2) **id**, **property**, **key** (`ask:<template id>` or `task:<task id>`), **answer** (`added`, `not_for_us`, `later`), **by**, **at** |
-| `completion_detail` | (version 3) **id**, **completion**, **by**, **at**, costs `[{kind: parts/labour/contractor/other, amount: Money}]`, values (as completion `values`). Added after Done. For one completion, the latest detail that has `costs` gives its costs (an empty list clears them); values are overlaid in order. |
+| `completion_detail` | (version 3) **id**, **completion**, **by**, **at**, costs `[{kind: parts/labour/contractor/other, amount: Money}]`, values (as completion `values`), contractor and contractor_cleared (version 7: who did the job; the latest detail that has either decides, `contractor_cleared: true` meaning "not a contractor"; otherwise the completion's own `contractor`). Added after Done. For one completion, the latest detail that has `costs` gives its costs (an empty list clears them); values are overlaid in order. |
 | `binder_print` | (version 4) **id**, **property**, **edition** (`emergency`, `full`, `handover`, `succession`), **volume** (`main`, `sealed`), **by**, **at**, **printed_on** (date), **sections** `{section key: fingerprint}`. A record that a binder PDF was made, holding a hash of what each section printed, so the app can say which sections changed since. The latest record that includes a section counts for it. |
 | `wall` | (version 6) **id**, **floor**, **a**, **b** (its two ends, `{x, y}` in plan millimetres), thickness (millimetres; absent means 115) |
 | `opening` | (version 6) **id**, **floor**, **wall**, **kind** (`door`, `window`, `gap`), **offset** (millimetres from the wall's `a` end to its near edge), **width**, swing (doors: `{hinge: a/b, side: left/right}`, the side seen looking from `a` to `b`) |
 | `plan_pin` | (version 6) **id**, **floor**, **at** (`{x, y}`), item (a thing), label, wall (when it sits on one), sensitivity. A pin holds a thing, a label, or both. |
 | `plan_label` | (version 6) **id**, **floor**, **at**, **text**, sensitivity |
+| `recall_dismissal` | (version 7) **id**, **item**, **recall** (the CPSC recall number), **by**, **at**. "Not mine": this recall does not apply to this thing. A record; deleting it (a tombstone) shows the match again. |
 | `template_fields` | (version 3) **id** (a template id), **fields** (field definitions the household added to every thing made from that template) |
 
 `schedule` uses the same shapes as templates, plus two that only a real house
@@ -107,7 +108,7 @@ where `type` is `text`, `number`, `date`, `yes_no`, `choice` or `photo` (an
 attachment id).
 
 Completions, snoozes, meter readings, attachments, notes, suggestion
-answers, completion details and binder prints are records: they are never edited. A completion logged by mistake is cancelled by a later
+answers, completion details, binder prints and recall dismissals are records: they are never edited. A completion logged by mistake is cancelled by a later
 completion whose `voids` is the mistaken one's id.
 
 Attachments hold only a content hash (and, for photos, the hash of a small
@@ -224,6 +225,10 @@ device as far as sync is concerned: its operations are pushed as that
 device's own when sync is set up on it. Restoring a backup into the same
 synced household (merging it back) is not supported.
 
+The downloaded US recall list (`recall_cache`, D-141) is public data kept
+on one device only: it is not in an export or a backup, is not synced, and
+is downloaded again when needed.
+
 ## Compatibility
 
 New optional fields may appear in any version; readers should ignore fields
@@ -256,3 +261,16 @@ removes one, or adds a new kind bumps `version`.
   in the core's tests). A version 5 program refuses a version 6 file, and
   it cannot apply plan operations arriving by sync, so every device in a
   household should run the Phase 8 version before anyone draws a plan.
+- **Version 7** (Phase 9) added the `recall_dismissal` kind and optional
+  fields: `item.price`, `item.value`, `warranty.months`,
+  `warranty.register_url`, `contractor.company`, `.website`,
+  `.service_area`, `.would_hire_again`, `.private_notes`, and
+  `completion_detail.contractor` and `.contractor_cleared` (D-146).
+  Version 1 to 6 files import unchanged (the Phase 2 and Phase 3 fixtures
+  still import in the core's tests, and a version 6 export of a Phase 8
+  household imports in the API's tests). A version 6 program refuses a
+  version 7 file. Over sync it cannot apply a `recall_dismissal`, and when
+  it saves a thing or a contractor it does not know the new fields, so its
+  save clears them (a store writes only the fields it knows): every device
+  in a household should run the Phase 9 version.
+

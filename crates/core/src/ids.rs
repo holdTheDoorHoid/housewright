@@ -91,6 +91,8 @@ define_id!(
     PlanPinId,
     /// A free text label on a floor plan.
     PlanLabelId,
+    /// A "not mine" answer to a product recall match.
+    RecallDismissalId,
     /// An operation in the operation log.
     OpId,
 );

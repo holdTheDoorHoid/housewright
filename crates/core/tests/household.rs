@@ -78,6 +78,8 @@ fn item(h: &Home, name: &str, template: &str) -> Item {
         extra_fields: vec![],
         custom: Default::default(),
         sensitivity: Sensitivity::Normal,
+        price: Default::default(),
+        value: Default::default(),
     }
 }
 

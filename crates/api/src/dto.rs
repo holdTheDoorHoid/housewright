@@ -251,6 +251,9 @@ pub struct TodayOut {
     pub welcome_back: Option<WelcomeBackOut>,
     pub active_count: usize,
     pub suggested_count: usize,
+    /// Possible product recalls not yet looked at (Phase 9; 0 when recall
+    /// checks are off on this device).
+    pub recall_matches: usize,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -269,6 +272,9 @@ pub struct CompletionOut {
     pub cost_total: Option<i64>,
     /// Completion field values (sensitive ones hidden).
     pub values: Vec<FieldOut>,
+    /// Who did it, when a contractor did (D-28).
+    pub contractor_id: Option<String>,
+    pub contractor_name: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -346,8 +352,14 @@ pub struct ItemDetail {
     /// Every field it can have, with the current value for editing.
     pub edit: Vec<FieldEdit>,
     pub serial_sensitive: bool,
+    /// The whole thing is marked private (D-41).
+    pub sensitive: bool,
     /// Where it is on a floor plan, if it has a pin.
     pub pin: Option<ItemPinOut>,
+    /// What it cost and what it is worth now (Phase 9).
+    pub price: Option<housewright_core::model::Money>,
+    pub value: Option<housewright_core::model::Money>,
+    pub warranty: Option<crate::alerts::WarrantyOut>,
 }
 
 /// A thing's place on a floor plan, for the thumbnail on its page.
@@ -425,11 +437,15 @@ pub struct HistoryEntry {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct ReminderOut {
+    /// The task, or for a notice its stable key.
     pub task_id: String,
     pub kind: ReminderKind,
     pub at_ms: i64,
     pub title: String,
     pub body: String,
+    /// For a notice: what tapping it opens (`item/<id>`, `contractor/<id>`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open: Option<String>,
 }
 
 impl From<PlannedReminder> for ReminderOut {
@@ -440,6 +456,7 @@ impl From<PlannedReminder> for ReminderOut {
             at_ms: r.at.as_millisecond(),
             title: r.title,
             body: r.body,
+            open: None,
         }
     }
 }
@@ -551,6 +568,22 @@ pub struct UpdateItemArgs {
     /// Field values as typed; `null` or "" clears one.
     #[serde(default)]
     pub values: BTreeMap<String, Option<String>>,
+    /// Amounts as typed ("1,299.99"); absent = unchanged, "" = cleared.
+    #[serde(default)]
+    pub price: Option<String>,
+    #[serde(default)]
+    pub value: Option<String>,
+    /// The warranty; absent = unchanged.
+    #[serde(default)]
+    pub warranty: Option<crate::alerts::WarrantyIn>,
+    /// Mark the whole thing private (a safe, jewellery): kept out of the
+    /// main binder, the insurance inventory unless asked, Home Assistant,
+    /// and limited members' screens. Owner only. Absent = unchanged.
+    #[serde(default)]
+    pub sensitive: Option<bool>,
+    /// Mark the serial number private. Owner only. Absent = unchanged.
+    #[serde(default)]
+    pub serial_sensitive: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -613,6 +646,10 @@ pub struct AddDetailsArgs {
     pub costs: Option<CostsIn>,
     #[serde(default)]
     pub values: BTreeMap<String, String>,
+    /// Who did the work: a contractor's id, or "" for "not a contractor".
+    /// Absent leaves it as it was.
+    #[serde(default)]
+    pub contractor_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]

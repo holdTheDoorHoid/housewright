@@ -117,10 +117,18 @@
     e.preventDefault();
     if (!form) return;
     try {
-      const { tradesText, ...rest } = form;
+      // Only the fields this short form shows; the rest (licence, the
+      // private rating) stay as they are.
+      const f = form;
       contractors = await call('save_contractor', {
-        ...rest,
-        trades: tradesText.split(',').map((t) => t.trim()).filter(Boolean),
+        id: f.id,
+        name: f.name,
+        phone: f.phone,
+        email: f.email,
+        notes: f.notes,
+        notes_private: f.notes_private,
+        emergency: f.emergency,
+        trades: f.tradesText.split(',').map((t) => t.trim()).filter(Boolean),
       });
       form = null;
       tick++;
@@ -260,7 +268,8 @@
     <h2>Who to call</h2>
     <p class="muted small">
       Contacts marked for emergencies go on the emergency page. Private notes are printed only in the
-      sealed volume.
+      sealed volume. Licences, insurance, jobs and your own rating are on the
+      <a href="#/contractors">Contractors</a> page.
     </p>
     <ul class="sections">
       {#each contractors as c (c.id)}

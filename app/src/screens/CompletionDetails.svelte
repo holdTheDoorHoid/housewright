@@ -2,7 +2,7 @@
   // After Done (P1): a note, a photo, what it cost, and the task's own
   // readings (pressure, pass/fail). Every part is optional, and the job is
   // already recorded whether or not any of this is filled in.
-  import { call, type CompletionInfo, type FieldDef, type TaskDetail, type CostKind } from '../lib/api';
+  import { call, type CompletionInfo, type FieldDef, type TaskDetail, type CostKind, type ContractorInfo } from '../lib/api';
   import { app, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import { COST_KINDS, money } from '../lib/money';
@@ -24,6 +24,17 @@
   let costs = $state<Record<CostKind, string>>({ parts: '', labour: '', contractor: '', other: '' });
   let values = $state<Record<string, string>>({});
   let busy = $state(false);
+  // Who did it (D-28): the household, or a contractor. Asked only here,
+  // after Done (P1).
+  let contractors = $state<ContractorInfo[]>([]);
+  // svelte-ignore state_referenced_locally
+  let who = $state(completion.contractor_id ?? '');
+  let newName = $state('');
+  $effect(() => {
+    call('contractors')
+      .then((l) => (contractors = l))
+      .catch(() => (contractors = []));
+  });
   const currency = $derived(app.status?.currency ?? 'USD');
   const prefix = $derived(`cd-${completion.id}`);
 
@@ -32,11 +43,22 @@
     busy = true;
     try {
       const anyCost = Object.values(costs).some((v) => v.trim());
+      let contractorId: string | undefined = who === 'new' ? undefined : who;
+      if (who === 'new' && newName.trim()) {
+        const list = await call('save_contractor', {
+          name: newName.trim(),
+          trades: [],
+          notes_private: false,
+          emergency: false,
+        });
+        contractorId = list.find((c) => c.name === newName.trim())?.id;
+      }
       const t = await call('add_details', {
         completion_id: completion.id,
         note: note.trim() || undefined,
         costs: anyCost ? costs : undefined,
         values,
+        contractor_id: contractorId === (completion.contractor_id ?? '') ? undefined : contractorId,
       });
       toast({ text: 'Saved with the record.' }, 3000);
       onsaved(t);
@@ -67,6 +89,21 @@
       onsaved(await call('task', { id: completion.task_id }));
     }}
   />
+
+  <h3>Who did it</h3>
+  <label for={`${prefix}-who`} class="visually-hidden">Who did it</label>
+  <select id={`${prefix}-who`} bind:value={who}>
+    <option value="">We did (or not a contractor)</option>
+    {#each contractors as c (c.id)}
+      <option value={c.id}>{c.name}{c.company ? `, ${c.company}` : ''}</option>
+    {/each}
+    <option value="new">A contractor not listed yet…</option>
+  </select>
+  {#if who === 'new'}
+    <label for={`${prefix}-who-new`}>Their name</label>
+    <input id={`${prefix}-who-new`} bind:value={newName} autocomplete="off" />
+    <p class="small muted">Add their phone, licence and insurance later on the Contractors page.</p>
+  {/if}
 
   {#if fields.length}
     <h3>Readings</h3>
