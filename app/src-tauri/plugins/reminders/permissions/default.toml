@@ -1,11 +1,13 @@
 "$schema" = "schemas/schema.json"
 
 [default]
-description = "Schedule reminders, send a test reminder, read a tapped notification action, and ask for notification permission."
+description = "Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, and open or share a file with the phone's own apps."
 permissions = [
   "allow-sync",
   "allow-test",
   "allow-pending",
+  "allow-view-file",
+  "allow-share-file",
   "allow-check-permissions",
   "allow-request-permissions",
 ]
