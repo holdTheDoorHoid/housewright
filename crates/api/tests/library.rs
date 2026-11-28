@@ -716,3 +716,48 @@ fn a_kept_update_is_used_after_a_restart() {
     assert_eq!(call(&mut a, "library", json!({}))["version"], "2099.1.1");
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+/// Optional fields the library added after snapshot d623c10: they parse, and an
+/// unconfirmed pattern is only ever a suggestion to check.
+#[test]
+fn unconfirmed_patterns_only_ever_suggest() {
+    let mut l = lib();
+    // A family whose recorded example matches strongly today.
+    let (fid, example, brand) = l
+        .families
+        .iter()
+        .find_map(|(id, f)| {
+            let ex = f.model_examples.first()?.clone();
+            let b = l.brands.get(&f.brand)?.name.clone();
+            let m = first(&l, &b, &ex, None)?;
+            (m.family == *id && m.confidence == matching::Confidence::Model)
+                .then(|| (id.clone(), ex, b))
+        })
+        .expect("a family with a strong example");
+    let f = l.families.get_mut(&fid).unwrap();
+    f.unconfirmed_patterns = std::mem::take(&mut f.model_patterns);
+    let m = first(&l, &brand, &example, None).expect("still suggested");
+    assert_eq!(m.family, fid);
+    assert_eq!(
+        m.confidence,
+        matching::Confidence::Possible,
+        "{:?}",
+        m.reasons
+    );
+
+    // The new optional fields are accepted by the parser.
+    let fam: housewright_core::appliances::model::Family = toml::from_str(
+        r#"
+format = 1
+id = "x"
+brand = "acme"
+name = "Acme X"
+category = "water-heater"
+status = "current"
+unconfirmed_patterns = ["AX##"]
+pattern_sources = ["https://acme.example/models"]
+"#,
+    )
+    .unwrap();
+    assert_eq!(fam.unconfirmed_patterns, vec!["AX##"]);
+}

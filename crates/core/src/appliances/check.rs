@@ -266,9 +266,17 @@ pub(super) fn check_family(
             }
         },
     };
-    for pat in &f.model_patterns {
+    for pat in f.model_patterns.iter().chain(&f.unconfirmed_patterns) {
         if let Some(why) = super::pattern_problem(pat) {
             p.add(file, format!("model pattern '{pat}' {why}"));
+        }
+    }
+    for u in &f.pattern_sources {
+        if !f.sources.iter().any(|s| &s.url == u) {
+            p.add(
+                file,
+                format!("pattern source '{u}' is not listed in [[sources]]"),
+            );
         }
     }
 

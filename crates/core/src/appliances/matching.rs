@@ -220,23 +220,37 @@ pub fn find(lib: &Library, make: &str, model: &str, template: Option<&str>) -> M
             {
                 continue;
             }
-            let mut best: Option<(usize, usize, String, String)> = None;
+            // (swaps, literals, pattern, corrected reading, from an unconfirmed pattern)
+            let mut best: Option<(usize, usize, String, String, bool)> = None;
             if model_ok {
-                for pat in &f.model_patterns {
+                let pats = f
+                    .model_patterns
+                    .iter()
+                    .map(|p| (p, false))
+                    .chain(f.unconfirmed_patterns.iter().map(|p| (p, true)));
+                for (pat, unconfirmed) in pats {
                     let p: Vec<char> = normalise_model(pat).chars().collect();
                     if let Some((swaps, read)) = fit(&p, &model_n, MAX_SWAPS) {
                         let lits = literals(pat);
-                        let better = best.as_ref().is_none_or(|(s, l, _, _)| {
-                            (swaps, std::cmp::Reverse(lits)) < (*s, std::cmp::Reverse(*l))
-                        });
+                        // Confirmed patterns win ties over unconfirmed ones.
+                        let key = (swaps, unconfirmed, std::cmp::Reverse(lits));
+                        let better = best
+                            .as_ref()
+                            .is_none_or(|(s, l, _, _, u)| key < (*s, *u, std::cmp::Reverse(*l)));
                         if better {
-                            best = Some((swaps, lits, pat.clone(), read.into_iter().collect()));
+                            best = Some((
+                                swaps,
+                                lits,
+                                pat.clone(),
+                                read.into_iter().collect(),
+                                unconfirmed,
+                            ));
                         }
                     }
                 }
             }
             match best {
-                Some((swaps, lits, pattern, corrected)) => cands.push(Cand {
+                Some((swaps, lits, pattern, corrected, unconfirmed)) => cands.push(Cand {
                     id: fid.clone(),
                     swaps,
                     lits,
@@ -244,7 +258,7 @@ pub fn find(lib: &Library, make: &str, model: &str, template: Option<&str>) -> M
                     corrected,
                     brand_exact: *exact,
                     brand_text: spelled.clone(),
-                    unverified: f.unverified,
+                    unverified: f.unverified || unconfirmed,
                 }),
                 None => brand_only.push((fid.clone(), *exact, spelled.clone())),
             }

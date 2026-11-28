@@ -69,6 +69,9 @@ pub struct TemplateRef {
     pub fields: Vec<String>,
     #[serde(default)]
     pub schedules: BTreeMap<String, String>,
+    /// The template's meter keys, so usage overrides can be checked.
+    #[serde(default)]
+    pub meters: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -117,6 +120,11 @@ pub struct Brand {
     pub note: Option<String>,
     #[serde(default)]
     pub unverified: bool,
+    /// Brand ids of a different company printed with the same name on labels
+    /// (e.g. Bosch appliances vs. Bosch Thermotechnology). Matching keeps both
+    /// and relies on the kind of thing to tell them apart.
+    #[serde(default)]
+    pub same_label_as: Vec<String>,
     #[serde(default)]
     pub sources: Vec<Source>,
 }
@@ -152,6 +160,13 @@ pub struct Family {
     pub years: Option<String>,
     #[serde(default)]
     pub model_patterns: Vec<String>,
+    /// Same syntax as `model_patterns`, but not confirmed by the maker: a
+    /// match is only ever a suggestion to check, never "matches".
+    #[serde(default)]
+    pub unconfirmed_patterns: Vec<String>,
+    /// Official pages documenting the model-number patterns (each also in `sources`).
+    #[serde(default)]
+    pub pattern_sources: Vec<String>,
     #[serde(default)]
     pub model_examples: Vec<String>,
     #[serde(default)]
