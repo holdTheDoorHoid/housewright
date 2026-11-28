@@ -62,7 +62,11 @@
     call('rooms').then((r) => (rooms = r));
   });
 
+  // A family accepted while reading the label is linked when saving.
+  let labelFamily: string | null = null;
+
   function fromLabel(c: LabelChoice) {
+    labelFamily = c.family?.id ?? null;
     if (c.make) make = c.make;
     if (c.model) model = c.model;
     if (c.serial) serial = c.serial;
@@ -119,6 +123,13 @@
         ...(owner && wholePrivate !== start.sensitive ? { sensitive: wholePrivate } : {}),
         ...(owner && serialPrivate !== start.serial_sensitive ? { serial_sensitive: serialPrivate } : {}),
       });
+      if (labelFamily) {
+        try {
+          r.detail = await call('set_family', { item_id: start.row.id, family: labelFamily });
+        } catch (err) {
+          toast({ text: errorText(err) });
+        }
+      }
       // A warranty's dates decide its notices (D-140).
       resync();
       ondone(r);

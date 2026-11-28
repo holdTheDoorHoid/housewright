@@ -108,6 +108,73 @@ async fn save_for_viewer(
     .await
 }
 
+/// Downloads straight from the manufacturer, one hop at a time, so the core
+/// can check every redirect (D-151). No cookies are kept, no referrer is
+/// sent, and the user agent names only the app.
+struct ManualFetch(ureq::Agent);
+
+impl ManualFetch {
+    fn new() -> Self {
+        let agent = ureq::Agent::config_builder()
+            .timeout_global(Some(std::time::Duration::from_secs(120)))
+            .max_redirects(0)
+            .http_status_as_error(false)
+            .user_agent("Housewright (saving an appliance manual)")
+            .build()
+            .into();
+        Self(agent)
+    }
+}
+
+impl housewright_api::library::Fetch for ManualFetch {
+    fn get(&mut self, url: &str, limit: usize) -> Result<housewright_api::library::Fetched, String> {
+        let mut res = self
+            .0
+            .get(url)
+            .header("Accept", "application/pdf")
+            .call()
+            .map_err(|e| e.to_string())?;
+        let status = res.status().as_u16();
+        let headers = res
+            .headers()
+            .iter()
+            .filter_map(|(k, v)| v.to_str().ok().map(|v| (k.to_string(), v.to_string())))
+            .collect();
+        let body = if status == 200 {
+            res.body_mut()
+                .with_config()
+                .limit(limit as u64 + 1)
+                .read_to_vec()
+                .map_err(|e| format!("the download stopped ({e})"))?
+        } else {
+            Vec::new()
+        };
+        Ok((status, headers, body))
+    }
+}
+
+/// "Save the official manual to this thing" (D-151): check the link
+/// against the thing's model family, download it from the manufacturer
+/// onto this device, and keep it as the thing's manual. The download runs
+/// outside the database lock so the app stays responsive.
+#[tauri::command]
+async fn save_manual(
+    app: tauri::AppHandle,
+    item_id: String,
+    url: String,
+) -> Result<Value, ApiError> {
+    let path = db_path(&app)?;
+    blocking(move || {
+        let args = serde_json::json!({ "item_id": item_id, "url": url });
+        let src: housewright_api::library::ManualSource =
+            serde_json::from_value(core::call(&path, "manual_source", args.clone())?)
+                .map_err(|e| ApiError::internal(e.to_string()))?;
+        let bytes = housewright_api::library::download_manual(&mut ManualFetch::new(), &src)?;
+        core::with_api(&path, |api| api.call_upload("attach_manual", args, &bytes))
+    })
+    .await
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(target_os = "android")]
@@ -122,7 +189,8 @@ pub fn run() {
             api,
             api_upload,
             api_download,
-            save_for_viewer
+            save_for_viewer,
+            save_manual
         ])
         .run(tauri::generate_context!())
         .expect("error while running Housewright");

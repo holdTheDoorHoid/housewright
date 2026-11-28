@@ -6,7 +6,50 @@
   import { saveFile } from '../lib/files';
   import { CURRENCIES } from '../lib/money';
   import type { SyncStatus } from '../lib/api';
-  import { when } from '../lib/format';
+  import { when, shortDate } from '../lib/format';
+  import type { LibraryStatus } from '../lib/api';
+  import { checkLibrary } from '../lib/library';
+
+  // The appliance library (D-147, D-148).
+  let lib = $state<LibraryStatus | null>(null);
+  let libBusy = $state(false);
+  let libMessage = $state('');
+  $effect(() => {
+    call('library').then(
+      (s) => (lib = s),
+      () => (lib = null),
+    );
+  });
+
+  async function setLibAuto(auto: boolean) {
+    try {
+      lib = await call('library_set_updates', { auto });
+    } catch (err) {
+      toast({ text: errorText(err) });
+    }
+  }
+
+  async function checkLib() {
+    libBusy = true;
+    libMessage = '';
+    try {
+      const r = await checkLibrary();
+      lib = r.status;
+      libMessage = r.message;
+    } catch (err) {
+      const msg = errorText(err);
+      libMessage = /fetch|network|load/i.test(msg)
+        ? 'Could not reach the library site. Check the connection and try again.'
+        : msg;
+    } finally {
+      libBusy = false;
+    }
+  }
+
+  async function resetLib() {
+    lib = await call('library_reset');
+    libMessage = 'Using the library that came with the app.';
+  }
 
   let sync = $state<SyncStatus | null>(null);
   $effect(() => {
@@ -197,6 +240,32 @@
     To restore, start on a fresh install and choose “I have a backup or export to restore”.
   </p>
 
+  <h2>Appliance library</h2>
+  {#if lib}
+    <p class="small" data-testid="library-version">
+      Version {lib.version}, published {shortDate(lib.published)}: {lib.brands} brands, {lib.families} model families.
+      {lib.from_update ? 'Downloaded update.' : 'Came with the app.'}
+    </p>
+    <p class="muted small">
+      Links to manufacturers’ official manuals and maintenance facts in our own words, used to suggest what a
+      thing is from its make and model. It is on this device and works offline.
+    </p>
+    <label class="check">
+      <input type="checkbox" checked={lib.auto} onchange={(e) => setLibAuto((e.target as HTMLInputElement).checked)} data-testid="library-auto" />
+      Get appliance library updates (checks once a week when the app is open)
+    </label>
+    <p class="muted small">
+      A check downloads the public library file from GitHub. Nothing about your home is sent: the request is the
+      same for everyone. A new version is used only if it passes every check.
+    </p>
+    <p class="row">
+      <button onclick={checkLib} disabled={libBusy} data-testid="library-check">{libBusy ? 'Checking…' : 'Check now'}</button>
+      {#if lib.from_update}<button class="quiet" onclick={resetLib}>Go back to the version that came with the app</button>{/if}
+    </p>
+    {#if libMessage}<p class="small" role="status" data-testid="library-message">{libMessage}</p>{/if}
+    {#if lib.checked_at}<p class="muted small">Last checked {when(lib.checked_at)}.</p>{/if}
+  {/if}
+
   <h2>Costs</h2>
   <div class="row">
     <label for="currency" class="inline">Currency</label>
@@ -211,6 +280,14 @@
     Label reading uses the ocrs models (github.com/robertknight/ocrs-models), trained on the HierText
     dataset by Google Research, licensed under CC BY-SA 4.0.
   </p>
+  {#if lib}
+    <p class="muted small" data-testid="library-credit">
+      The Housewright appliance library is by Housewright appliance library contributors,
+      github.com/holdTheDoorHoid/housewright-library, licensed under CC BY 4.0
+      (creativecommons.org/licenses/by/4.0); version {lib.version}, commit {lib.commit.slice(0, 7)}. Manuals and pages it links
+      to belong to their manufacturers; brand names are their owners’ trademarks.
+    </p>
+  {/if}
 </section>
 
 <style>

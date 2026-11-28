@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { openExternal } from '../lib/links';
   import { call, type TaskDetail } from '../lib/api';
   import { app, refresh, toast } from '../lib/state.svelte';
   import { dueText, placeText, when } from '../lib/format';
@@ -103,7 +104,8 @@
     {#if t.why}
       <h2>Why it matters</h2>
       <p>{t.why}</p>
-      {#if t.source}<p class="muted small">Source: {t.source}</p>{/if}
+      {#if t.source}<p class="muted small" data-testid="task-source">Source: {t.source}{#if t.source_link}
+          · <button type="button" class="quiet srclink" onclick={() => t?.source_link && openExternal(t.source_link)}>the manufacturer’s page</button>{/if}</p>{/if}
     {/if}
 
     {#if t.steps.length}
@@ -194,5 +196,9 @@
     height: 64px;
     object-fit: cover;
     border-radius: 8px;
+  }
+  .srclink {
+    min-height: 0;
+    padding: 0;
   }
 </style>

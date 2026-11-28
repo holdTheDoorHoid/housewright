@@ -291,7 +291,7 @@ pub fn find(lib: &Library, make: &str, model: &str, template: Option<&str>) -> M
         let model_shown: String = model.trim().to_string();
         if c.swaps == 0 {
             reasons.push(format!(
-                "Model {model_shown} fits this family’s model numbers ({}).",
+                "Model {model_shown} fits this family’s model numbers ({}; # is a digit, @ a letter).",
                 c.pattern
             ));
         } else {

@@ -142,6 +142,8 @@ export interface AttachmentInfo {
   height: number | null;
   at: string | null;
   sensitive: boolean;
+  /** Where a saved manual was downloaded from (D-151). */
+  source: string | null;
 }
 
 /** A field value for display; sensitive values come back empty. */
@@ -157,6 +159,8 @@ export interface TaskDetail {
   steps: string[];
   why: string | null;
   source: string | null;
+  /** The page the advice comes from (manufacturer guidance, D-150). */
+  source_link: string | null;
   interval: string | null;
   paused: boolean;
   not_applicable: boolean;
@@ -204,6 +208,151 @@ export interface ItemDetail {
   price: Money | null;
   value: Money | null;
   warranty: WarrantyInfo | null;
+  /** The confirmed model family's links, facts and parts (D-149). */
+  maker: MakerInfo | null;
+  /** Families that fit the make and model, while none is confirmed. */
+  family_suggestion: LibraryMatch | null;
+}
+
+// -- the appliance library (D-147 to D-152) --------------------------------
+
+export type MatchConfidence = 'model' | 'possible' | 'brand';
+
+export interface FamilyHit {
+  id: string;
+  name: string;
+  brand_name: string;
+  template: { id: string; name: string } | null;
+  confidence: MatchConfidence;
+  reasons: string[];
+  pattern: string | null;
+  corrected_model: string | null;
+  unverified: boolean;
+}
+
+export interface LibraryMatch {
+  brands: { id: string; name: string }[];
+  families: FamilyHit[];
+}
+
+export interface MakerManual {
+  kind: 'manual-search' | 'product-page' | 'support-page' | 'manual-pdf' | 'parts-page' | string;
+  title: string;
+  url: string;
+  pdf: boolean;
+  unverified: boolean;
+}
+
+export interface MakerFact {
+  topic: string;
+  text: string;
+  source: string;
+  checked: DateStr | null;
+  unverified: boolean;
+}
+
+/** A filter, anode or other part (for "tools and supplies"). */
+export interface Consumable {
+  name: string;
+  part: string | null;
+  alternates: string[];
+  size: string | null;
+  replace_every: string | null;
+  for_task: string | null;
+  task_title: string | null;
+  source: string;
+  checked: DateStr | null;
+  unverified: boolean;
+}
+
+export interface FamilyInfo {
+  id: string;
+  name: string;
+  brand_id: string;
+  brand_name: string;
+  category: string;
+  template: { id: string; name: string } | null;
+  status: string;
+  years: string | null;
+  description: string | null;
+  model_patterns: string[];
+  model_examples: string[];
+  unverified: boolean;
+  note: string | null;
+  website: string;
+  support_url: string;
+  manual_search_url: string | null;
+  phone: string | null;
+  manuals: MakerManual[];
+  facts: MakerFact[];
+  consumables: Consumable[];
+  warranty: { summary: string; length: string | null; source: string; checked: DateStr | null; unverified: boolean } | null;
+  recalls: { title: string; date: DateStr | null; url: string }[];
+  credit: string;
+}
+
+export type Follows = 'maker' | 'generic';
+
+export interface Guidance {
+  task_id: string;
+  task_title: string;
+  key: string;
+  generic: string;
+  generic_source: string;
+  maker: string;
+  maker_title: string | null;
+  maker_steps: string[] | null;
+  note: string | null;
+  source: string;
+  checked: DateStr | null;
+  unverified: boolean;
+  following: Follows | null;
+}
+
+export interface MakerInfo {
+  family_id: string;
+  in_library: boolean;
+  family: FamilyInfo | null;
+  guidance: Guidance[];
+  other_kind: boolean;
+}
+
+export interface LibraryStatus {
+  version: string;
+  commit: string;
+  published: DateStr;
+  source: string;
+  licence: string;
+  credit: string;
+  brands: number;
+  families: number;
+  from_update: boolean;
+  shipped_version: string;
+  auto: boolean;
+  checked_at: string | null;
+  manifest_url: string;
+  problems: number;
+}
+
+export interface LibraryCheck {
+  newer: boolean;
+  version: string;
+  size: number;
+  bundle_url: string | null;
+  message: string;
+}
+
+export interface ManualSource {
+  url: string;
+  name: string;
+  domains: string[];
+}
+
+export interface Supply {
+  item_id: string;
+  item_name: string;
+  family_id: string;
+  consumable: Consumable;
 }
 
 export interface Money {
@@ -509,6 +658,8 @@ export interface LabelRead {
   model_alternatives: string[];
   serial_alternatives: string[];
   template: { id: string; name: string } | null;
+  /** Library families that fit the brand and model read (D-148). */
+  family: LibraryMatch;
 }
 
 type None = Record<string, never> | undefined;
@@ -555,6 +706,8 @@ export interface Commands {
       serial?: string;
       installed?: DateStr;
       values?: Record<string, string>;
+      /** An appliance library family the person accepted (D-149). */
+      family?: string;
     },
     { item_id: string; tasks: Card[] },
   ];
@@ -706,6 +859,18 @@ export interface Commands {
   sync_new_recovery_key: [{ recovery_key: string }, RecoveryKeyOut];
   sync_stop: [None, SyncStatus];
   sync_dismiss_notices: [None, SyncStatus];
+  library: [None, LibraryStatus];
+  library_set_updates: [{ auto: boolean }, LibraryStatus];
+  library_check: [{ manifest: string }, LibraryCheck];
+  library_reset: [None, LibraryStatus];
+  library_match: [{ make: string; model: string; template?: string | null }, LibraryMatch];
+  library_families: [{ template?: string | null; brand?: string | null }, FamilyHit[]];
+  library_family: [{ id: string }, FamilyInfo];
+  /** A family id, 'none' (none of the suggestions fit), or null to clear. */
+  set_family: [{ item_id: string; family: string | null }, ItemDetail];
+  choose_guidance: [{ task_id: string; follow: Follows }, ItemDetail];
+  manual_source: [{ item_id: string; url: string }, ManualSource];
+  supplies: [None, Supply[]];
 }
 
 // -- floor plans (Phase 8, D-25) ---------------------------------------------
@@ -1032,6 +1197,10 @@ export interface UploadCommands {
   scan_label: [None, { texts: string[]; items: ItemRow[] }];
   read_label: [None, LabelRead];
   restore_backup: [None, Status];
+  /** A downloaded library bundle, checked against its release note. */
+  library_import: [{ manifest: string }, LibraryStatus];
+  /** A manual PDF downloaded from one of the thing's family's links. */
+  attach_manual: [{ item_id: string; url: string }, AttachmentInfo];
 }
 
 /** Commands that return bytes: their arguments. */
@@ -1048,7 +1217,14 @@ export interface DownloadCommands {
   insurance_csv: InsuranceArgs;
 }
 
-export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = ['attach', 'scan_label', 'read_label', 'restore_backup'];
+export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = [
+  'attach',
+  'scan_label',
+  'read_label',
+  'restore_backup',
+  'library_import',
+  'attach_manual',
+];
 export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = [
   'attachment_file',
   'full_backup',
@@ -1164,4 +1340,15 @@ export const COMMANDS: Command[] = [
   'sync_new_recovery_key',
   'sync_stop',
   'sync_dismiss_notices',
+  'library',
+  'library_set_updates',
+  'library_check',
+  'library_reset',
+  'library_match',
+  'library_families',
+  'library_family',
+  'set_family',
+  'choose_guidance',
+  'manual_source',
+  'supplies',
 ];

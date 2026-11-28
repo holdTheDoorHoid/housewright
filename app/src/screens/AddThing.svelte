@@ -1,6 +1,7 @@
 <script lang="ts">
   import { categoryLabel } from '../lib/labels';
-  import { call, type Room, type TemplateSummary, type Card } from '../lib/api';
+  import { call, type Room, type TemplateSummary, type Card, type FamilyHit, type LibraryMatch } from '../lib/api';
+  import FamilySuggestion from './FamilySuggestion.svelte';
   import { go, refresh, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import { resync } from '../lib/reminders';
@@ -21,6 +22,36 @@
   let added = $state<{ item_id: string; tasks: Card[] } | null>(null);
   let busy = $state(false);
   let filter = $state('');
+  // The appliance library's suggestion for the make and model typed (D-148).
+  let family = $state<FamilyHit | null>(null);
+  let declined = $state(false);
+  let suggestion = $state<LibraryMatch | null>(null);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  $effect(() => {
+    const mk = make.trim();
+    const md = model.trim();
+    const tpl = chosen?.id ?? null;
+    clearTimeout(timer);
+    if (family || declined || !mk) {
+      suggestion = null;
+      return;
+    }
+    timer = setTimeout(() => {
+      call('library_match', { make: mk, model: md, template: tpl })
+        .then((m) => (suggestion = m.families.length ? m : null))
+        .catch(() => (suggestion = null));
+    }, 300);
+  });
+
+  function useFamily(h: FamilyHit) {
+    family = h;
+    suggestion = null;
+    if (!chosen && h.template) {
+      const t = templates.find((x) => x.id === h.template?.id);
+      if (t) pick(t);
+    }
+  }
 
   $effect(() => {
     call('templates').then((t) => (templates = t));
@@ -40,6 +71,7 @@
     chosen = t;
     name = t.name;
     values = {};
+    if (family?.template && family.template.id !== t.id) family = null;
   }
 
   /** A read label fills in make, model and serial, and picks the kind of
@@ -49,6 +81,7 @@
     fromLabel = false;
     const t = c.template ? templates.find((x) => x.id === c.template?.id) : undefined;
     if (t && !chosen) pick(t);
+    if (c.family) useFamily(c.family);
     make = c.make;
     model = c.model;
     serial = c.serial;
@@ -70,6 +103,7 @@
         serial: serial || undefined,
         installed: installed || undefined,
         values,
+        family: family?.id ?? (declined ? 'none' : undefined),
       });
       refresh();
     } catch (err) {
@@ -141,12 +175,21 @@
         <label for="newroom">New room name</label>
         <input id="newroom" bind:value={newRoom} placeholder="Basement" />
       {/if}
-      <details open={!!(make || model || serial)}>
+      <details open={!!(make || model || serial || family)}>
         <summary>More details (optional)</summary>
         <label for="make">Make</label>
         <input id="make" bind:value={make} />
         <label for="model">Model</label>
         <input id="model" bind:value={model} />
+        {#if family}
+          <p class="small" data-testid="family-chosen">
+            Linked to <strong>{family.name}</strong> from the appliance library: its official manual links and facts
+            will be on this thing’s page.
+            <button type="button" class="quiet" onclick={() => (family = null)}>Remove</button>
+          </p>
+        {:else if suggestion}
+          <FamilySuggestion match={suggestion} onuse={useFamily} onnone={() => (declined = true)} />
+        {/if}
         <label for="serial">Serial</label>
         <input id="serial" bind:value={serial} />
         <label for="installed">Installed on</label>

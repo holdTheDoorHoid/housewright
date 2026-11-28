@@ -12,6 +12,7 @@
   import Quirks from './Quirks.svelte';
   import ThingEdit from './ThingEdit.svelte';
   import PlanThumb from './PlanThumb.svelte';
+  import Maker from './Maker.svelte';
 
   let { id }: { id: string } = $props();
   let d = $state<ItemDetail | null>(null);
@@ -181,6 +182,16 @@
         <p class="small"><button class="quiet" onclick={() => d?.warranty?.register_url && openExternal(d.warranty.register_url)}>Register the product</button></p>
       {/if}
       <p><button onclick={() => (editing = true)}>Edit details</button></p>
+    {/if}
+
+    {#if !editing}
+      <Maker
+        {d}
+        onchange={(x) => {
+          if (x) d = x;
+          refresh();
+        }}
+      />
     {/if}
 
     {#if d.pin}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { autoCheckLibrary } from './lib/library';
   import { onMount } from 'svelte';
   import { connect, call, onCommand, ApiFailure, type Status } from './lib/api';
   import { changed, startSync } from './lib/sync';
@@ -47,6 +48,8 @@
       resync();
       pending();
       void startSync();
+      // Weekly, only when switched on in Settings (D-148).
+      void autoCheckLibrary();
     }
   }
 
