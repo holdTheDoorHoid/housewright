@@ -333,6 +333,100 @@ so `cargo test --workspace` does not need Tauri's desktop system libraries.
 Each process holds exactly one open `Store` per database file, so a background
 receiver and the open app never have competing clocks.
 
+## Phase 3 onboarding (proposed by the Phase 3 build, 2026-11-27)
+
+**D-64 Climate from a ZIP code, offline (Proposed).** Refines D-06 and D-55.
+The app ships a table of every US ZIP Code Tabulation Area (33,144) with the
+average first autumn frost, the average last spring frost, whether a hard
+freeze is normal, and the hemisphere. The values come from NOAA's 1991-2020
+climate normals (the dates by which a 32 °F night has happened in half of
+years; a 28 °F night for "hard freeze"), each ZIP taking its nearest
+temperature station, located by the Census Bureau's 2020 ZCTA centroids.
+Both sources are US government works in the public domain. USDA hardiness
+and PRISM data were not used because their redistribution terms were not
+clear. The table is 199 KB (95 KB compressed), is built by a deterministic
+Rust tool (`tools/climate-build`), and is documented in
+[DATA-SOURCES.md](DATA-SOURCES.md). The lookup runs on the device; the ZIP
+code is never sent anywhere. A ZIP that is not a ZCTA takes the nearest one
+with the same first three digits and is marked approximate. `Climate` gains
+`hard_freeze`; where hard freezes are not normal (Phoenix, Miami), frost jobs
+such as winterising outdoor taps are not suggested. Known limit: the nearest
+station ignores elevation.
+
+**D-65 The home profile (Proposed).** The answers to the home questions are
+a `Profile` entity, one per property, whose id is the property's id, stored
+and merged through the operation log like any other entity (each answer is
+its own last-writer-wins field). A missing answer means "Not sure" and
+creates nothing; on the checklist, an unticked box also means "not sure", so
+a just-in-time question can come back to it. Only counts are kept about the
+people at home. The ZIP code carries a sensitivity flag, set to normal. The
+answers create things from templates (in a room where it is obvious:
+kitchen, laundry, basement, bathroom, living room), with every task switched
+off. Answering again ("Redo the home questions" in Settings) only adds:
+things already recorded (by template) are never changed or removed, and
+nothing is switched on or off. The brief's "electric/heat pump" heating
+answer is split into "heat pump" and "electric baseboard", because only one
+of them needs servicing. Database schema 2 adds the `profile` and
+`suggestion_answer` tables; export format version 2 adds the two kinds, and
+version 1 files import unchanged.
+
+**D-66 The starting plan (Proposed).** Refines D-56 and P3. After the first
+answers, four tasks are switched on, or five when children or older adults
+live there (the extra place goes to the next safety task). The chooser
+(`priority::starting_plan`) ranks by priority class (life safety first);
+within a class, the smoke and CO alarm tests first, then things where water,
+fire or gas do the damage, then the outside of the house; then routine tasks
+(yearly or more often) before once-a-decade replacements; then urgency, due
+date and the more frequent task. It picks at most one task per thing until
+every thing has had a turn, and keeps one place for the most important
+property-loss task (the human factors review's "then the riskiest water
+item") when safety tasks would fill them all. A floating task that has never
+been done is "due" only because nobody knows when it was last done (D-54),
+so for this choice it ranks as scheduled. For a typical gas-heated house with
+a sump pump the plan is: test the CO alarm, test the smoke alarm, book the
+furnace service, test the sump pump. The older `start_small` (Add a thing)
+is unchanged.
+
+**D-67 One suggestion a week (Proposed).** Just-in-time growth (P3) is a
+pure function (`suggest::propose`). It proposes at most one thing: nothing
+if any suggestion was answered in the last seven days. Order: a missing
+smoke alarm, then a missing CO alarm where something burns fuel; then
+whatever the season makes relevant (a seasonal task or question whose window
+opens within 30 days or is open), with direct questions and suggested tasks
+before re-asking checklist items answered "Not sure"; then everything else;
+within each, by priority class, questions about new things before more
+tasks for things already covered. Answers are append-only records: "Add"
+adds the thing and switches on its most relevant task (the seasonal one the
+question was about) or switches the task on; "Not for us" is permanent,
+and a later "Later" cannot undo it; "Later" hides that suggestion for four
+weeks and uses up the week. The card sits on Today with Add, Not for us
+and Later.
+
+**D-68 Template library and categories (Proposed).** Refines D-56. The
+bundled library grows to 45 generic templates. Categories are a fixed list
+with labels the interface shows: safety, heating and cooling, plumbing and
+water, appliances, electrical and power, outside the house, roof, attic and
+structure, yard, garden and pool. A quality test checks every task: 3 to 7
+steps of real length, a one-sentence why, a source, an interval between a
+week and ten years, minutes, no URLs and no percentages. A job that is risky
+for someone who is not a professional (gas appliances, panel internals,
+roofs, chimneys, garage door springs, septic pumping) is a reminder to book:
+its title starts "Book" and its first step says whom to hire. Intervals that
+are our judgement rather than a named guideline are listed in
+`templates/README.md` for review.
+
+**D-69 The questionnaire screens (Proposed).** Your name and the home's name
+come first, on a screen that says "about 10 questions, about 3 minutes, every
+question can be skipped". Then one question per screen with "Question 3 of
+10", a progress bar, Back, Not sure and Next; a single-choice question moves
+on when you tap an answer. Order, highest value first: kind of home; smoke
+and CO alarms; heating; water heater; ZIP code; water and sewer; the
+checklist; cooling; when built; who lives here. The main tabs are hidden
+while answering. It ends on "Your starting plan", which shows each switched-on
+task with its why, its source and when it is due, the line "Your home, so
+far: N things recorded", the frost dates used, and a link to "See everything
+we suggested" (never the landing page).
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

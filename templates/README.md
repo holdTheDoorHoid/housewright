@@ -150,5 +150,39 @@ cycles are an error.
 | `irrigation.toml` | Spring start-up, winterise, book backflow test |
 | `pool.toml` | Weekly water test, filter, fence and gate, open or close for the season |
 
+### Categories
+
+`category` must be one of: `safety`, `heating_cooling`, `plumbing`,
+`appliances`, `electrical`, `exterior`, `structure`, `yard` (D-68). The test
+`template_quality` in `crates/core/tests/templates.rs` holds the list and the
+labels people see; `app/src/lib/labels.ts` must match it.
+
+### Quality rules (checked by the test)
+
+- 3 to 7 steps, each a real sentence; the critical safety step first
+  ("Switch off power at the breaker", "Unplug it").
+- `why` is one sentence of at most 200 characters; `source` names the kind
+  of source. No URLs, no percentages, no invented statistics or part numbers.
+- An interval between a week and ten years, and `minutes`.
+- A job that is risky for a non-professional (gas appliances, panel
+  internals, roofs, chimneys, garage door springs, septic pumping) is a
+  reminder to book: the title starts with "Book" and the first step says whom
+  to hire.
+
+### Intervals that are judgement, not a named guideline
+
+These were set by the template author from general practice and are worth a
+second look by someone with trade experience: electric furnace and boiler
+check-up (2 years), garage door spring check (2 years), professional roof
+inspection (3 years), recaulking (3 years), solar inspection (5 years), well
+inspection (5 years), exterior repaint (7 years), deck reseal (2 years),
+electrical inspection (10 years), fire extinguisher replacement (10 years,
+steps defer to the label), fireplace ash clear-out (monthly) and wood stove
+ash clear-out (2 weeks) which depend on use, furnace vent checks (6 months),
+whole-house filter cartridge (6 months; steps defer to the maker). The window
+AC filter uses fixed northern-hemisphere months (June to September), and pool
+water testing is weekly all year with a first step to skip it while the pool
+is closed, because the format has no "weekly in season" schedule yet.
+
 Template text licensing is an open question for the owner (Q-02; proposed
 CC BY 4.0).

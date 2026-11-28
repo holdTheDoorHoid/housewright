@@ -39,6 +39,7 @@ lets the server stay unable to read anything (D-14).
 | `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
 | `integrations/home-assistant` | Custom integration and add-on (D-26). |
 | `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
+| `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
 
 ## Data model (core entities)
 
@@ -67,6 +68,11 @@ lets the server stay unable to read anything (D-14).
   by content hash.
 - **Fact**: home facts sheet entries (D-27), each marked normal or sensitive for
   the binder (D-41).
+- **Profile**: the answers to the home questions, one per property (its id
+  is the property's id). Every answer is optional ("Not sure"). Only counts
+  are kept about the people at home (D-65).
+- **Suggestion answer**: append-only record of Add / Not for us / Later on a
+  weekly suggestion, so "Not for us" is permanent and merges cleanly (D-67).
 - **Audit entry**: every operation is already attributed and timestamped in the
   operation log; the audit view is a readable projection of it.
 
@@ -82,12 +88,37 @@ gives identical answers on every device. Kinds:
 - **Floating**: N units after the last completion.
 - **Seasonal**: a named window ("before first frost", "spring") resolved against
   the property's climate data and hemisphere, with a fallback month range.
+  Climate comes from the ZIP code (D-64) or is entered directly.
 - **Usage**: due when a meter passes a threshold since the last completion,
   optionally with a calendar cap ("every 300 hours or 6 months, whichever first").
 - **One-off**: a single due date.
 
 Due dates are *windows* (earliest, due, overdue-after), not instants, because
 "sometime in October" is how home maintenance really works.
+
+## Onboarding and growth (Phase 3)
+
+```
+answers ─► Profile (op log) ─► profile::plan_home ─► items + tasks (all off)
+   │                                                     │
+   └─ ZIP ─► climate::lookup_us_zip ─► Property.climate  ▼
+                                      priority::starting_plan ─► 4-5 tasks on
+weekly: Profile + items + switched-off tasks + answers + climate + today
+        ─► suggest::propose ─► at most one card on Today
+```
+
+- `crates/core/src/profile.rs`: the `Profile` entity and `plan_home`, the
+  pure mapping from answers to things (one per template) and obvious rooms.
+- `crates/core/src/priority.rs`: `starting_plan`, the pure chooser of the
+  first tasks (D-66).
+- `crates/core/src/suggest.rs`: the pure just-in-time proposer (D-67); it uses
+  the schedule engine's seasonal windows to decide what is in season.
+- `crates/core/src/climate.rs`: the bundled ZIP climate table
+  (`crates/core/data/us-zip-climate.bin`, D-64), built by `tools/climate-build`
+  from public domain data ([DATA-SOURCES.md](DATA-SOURCES.md)).
+- `crates/core/src/onboard.rs`: the store-level glue: save the profile, add
+  missing things (never change existing ones), switch on the plan, answer a
+  suggestion.
 
 ## Sync and encryption (summary)
 
