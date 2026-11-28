@@ -66,7 +66,12 @@ impl WallClock for ManualClock {
 type Migration = fn(&Connection) -> rusqlite::Result<()>;
 
 /// Versioned schema migrations, applied in order, each exactly once.
-const MIGRATIONS: &[(i64, Migration)] = &[(1, migration_1), (2, migration_2), (3, migration_3)];
+const MIGRATIONS: &[(i64, Migration)] = &[
+    (1, migration_1),
+    (2, migration_2),
+    (3, migration_3),
+    (4, migration_4),
+];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
     let mut sql = String::from(
@@ -125,6 +130,11 @@ fn migration_3(conn: &Connection) -> rusqlite::Result<()> {
         sql.push_str(&entity_table(kind));
     }
     conn.execute_batch(&sql)
+}
+
+/// Phase 5: house binder prints.
+fn migration_4(conn: &Connection) -> rusqlite::Result<()> {
+    conn.execute_batch(&entity_table(EntityKind::BinderPrint))
 }
 
 /// What [`Store::apply_remote_ops`] did.

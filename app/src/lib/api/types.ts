@@ -517,6 +517,81 @@ export interface Commands {
   set_currency: [{ currency: string }, Status];
   label_sheet: [{ item_ids?: string[] }, { presets: { key: string; label: string; layout: SheetLayout }[]; stickers: Sticker[] }];
   find_label: [{ text: string }, ItemRow[]];
+  binder: [{ property_id?: string } | None, BinderInfo];
+  set_sealed_location: [{ text: string }, BinderInfo];
+  set_binder_reminder: [{ on: boolean }, BinderInfo];
+  set_paper: [{ paper: Paper }, BinderInfo];
+  notes: [{ about_kind: NoteAbout; about_id: string }, NoteInfo[]];
+  add_note: [{ about_kind: NoteAbout; about_id: string; text: string; sensitive?: boolean }, NoteInfo[]];
+  delete_note: [{ id: string }, null];
+  contractors: [None, ContractorInfo[]];
+  save_contractor: [ContractorInfo, ContractorInfo[]];
+  delete_contractor: [{ id: string }, null];
+}
+
+// -- the house binder (Phase 5) -------------------------------------------
+
+export type Edition = 'emergency' | 'full' | 'handover' | 'succession';
+export type Paper = 'letter' | 'a4';
+export type NoteAbout = 'property' | 'room' | 'item';
+
+export interface BinderSection {
+  key: string;
+  volume: 'main' | 'sealed';
+  short: string;
+  title: string;
+  changed: boolean;
+  last_printed: DateStr | null;
+  fingerprint: string;
+}
+
+export interface EditionInfo {
+  edition: Edition;
+  label: string;
+  description: string;
+  has_sealed: boolean;
+  last_printed: DateStr | null;
+  sections: BinderSection[];
+  changed: number;
+}
+
+export interface BinderInfo {
+  property_name: string;
+  editions: EditionInfo[];
+  sealed_location: string | null;
+  can_print_sealed: boolean;
+  reminder: { task_id: string; active: boolean } | null;
+  paper: Paper;
+}
+
+export interface NoteInfo {
+  id: string;
+  /** Null when sensitive and only the owner may see it. */
+  text: string | null;
+  sensitive: boolean;
+  at: string;
+}
+
+export interface ContractorInfo {
+  id?: string;
+  name: string;
+  trades: string[];
+  phone?: string | null;
+  email?: string | null;
+  notes?: string | null;
+  notes_private: boolean;
+  emergency: boolean;
+}
+
+export interface BinderPdfArgs {
+  edition: Edition;
+  volume?: 'main' | 'sealed';
+  sections?: string[];
+  only_changed?: boolean;
+  include_costs?: boolean;
+  include_notes?: boolean;
+  paper?: Paper;
+  record?: boolean;
 }
 
 export type AboutKind = 'item' | 'completion' | 'fact' | 'contractor';
@@ -537,10 +612,16 @@ export interface DownloadCommands {
   attachment_file: { id: string; thumb?: boolean };
   full_backup: None;
   label_sheet_pdf: { item_ids?: string[]; preset?: string; layout?: SheetLayout };
+  binder_pdf: BinderPdfArgs;
 }
 
 export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = ['attach', 'scan_label', 'read_label', 'restore_backup'];
-export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = ['attachment_file', 'full_backup', 'label_sheet_pdf'];
+export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = [
+  'attachment_file',
+  'full_backup',
+  'label_sheet_pdf',
+  'binder_pdf',
+];
 
 export type Command = keyof Commands;
 
@@ -592,4 +673,14 @@ export const COMMANDS: Command[] = [
   'set_currency',
   'label_sheet',
   'find_label',
+  'binder',
+  'set_sealed_location',
+  'set_binder_reminder',
+  'set_paper',
+  'notes',
+  'add_note',
+  'delete_note',
+  'contractors',
+  'save_contractor',
+  'delete_contractor',
 ];

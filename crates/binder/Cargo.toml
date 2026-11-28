@@ -1,0 +1,19 @@
+[package]
+name = "housewright-binder"
+description = "The house binder for Housewright: a printable house manual in two volumes, typeset with Typst"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+housewright-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+jiff.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+typst = "0.15.1"
+typst-pdf = "0.15.1"
+typst-layout = "0.15.1"

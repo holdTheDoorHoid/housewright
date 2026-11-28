@@ -8,6 +8,7 @@
   import { money } from '../lib/money';
   import TaskRow from './TaskRow.svelte';
   import Attachments from './Attachments.svelte';
+  import Quirks from './Quirks.svelte';
   import ThingEdit from './ThingEdit.svelte';
 
   let { id }: { id: string } = $props();
@@ -152,6 +153,10 @@
     <h2>Photos and documents</h2>
     <p class="muted small">The label, the manual, the receipt, the warranty. Photos are made smaller on this device before they are kept.</p>
     <Attachments aboutKind="item" aboutId={d.row.id} items={d.attachments} addLabel="Add a photo or PDF" onchange={refresh} />
+
+    <h2>Quirks only you know</h2>
+    <p class="muted small">Printed in the house binder, for whoever looks after this next.</p>
+    <Quirks aboutKind="item" aboutId={d.row.id} hint="It clicks twice before it lights. That is normal." />
 
     <h2>Tasks</h2>
     {#if on.length}
