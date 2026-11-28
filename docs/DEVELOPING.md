@@ -11,6 +11,7 @@
 | `models/ocr` | The OCR models (12.2 MB, CC BY-SA 4.0); see its README. |
 | `crates/cli` | The `hw` command-line tool. |
 | `web/` | The API compiled to WebAssembly, with SQLite on OPFS (D-61). |
+| `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, loaded only when someone prints (D-80). |
 | `app/` | The Svelte 5 interface (`src/`), vitest tests, Playwright tests (`tests/`). |
 | `app/src-tauri` | Tauri 2 shell for Android (and desktop). Outside the Cargo workspace. |
 | `app/src-tauri/plugins/reminders` | Android reminders: alarms, notification buttons, boot receiver (D-62). |
@@ -66,6 +67,11 @@ plugin in `vite.config.ts` reads them from `models/ocr/`); the worker fetches
 them only when a label is first read. The Tauri build does not include them
 in its web assets; Android compiles them into the native library instead
 (Cargo feature `ocr`; build with `--no-default-features` to leave them out).
+
+`npm run wasm` builds both WebAssembly modules (`web/pkg` and
+`web-binder/pkg`); a release build of the Typst one takes several minutes,
+mostly in `wasm-opt`. The worker imports the binder module dynamically, so
+Vite emits it as a separate chunk that is fetched on the first print.
 
 Use `localhost`: OPFS needs a secure context. Only one tab can own the
 database at a time. A second tab shows "Already open elsewhere".
