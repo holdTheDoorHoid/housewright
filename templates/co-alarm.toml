@@ -60,3 +60,18 @@ steps = [
 ]
 why = "CO sensors lose sensitivity with age, and an expired alarm may not warn you."
 source = "common manufacturer guidance"
+
+[[tasks]]
+key = "battery_alert"
+title = "Change the CO alarm battery after a low-battery alert"
+priority = "life_safety"
+schedule = { kind = "triggered", event = "battery_low" }
+minutes = 5
+steps = [
+  "Have the right replacement battery ready.",
+  "Take the alarm off its base or open the battery door.",
+  "Swap the battery, matching the + and - marks.",
+  "Refit the alarm and press the test button.",
+]
+why = "Carbon monoxide has no smell, so the alarm is the only warning you get."
+source = "CPSC guidance"

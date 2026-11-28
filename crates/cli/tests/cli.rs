@@ -58,7 +58,7 @@ fn session() {
             "power=battery",
         ],
     );
-    assert!(out.contains("4 suggested tasks"), "{out}");
+    assert!(out.contains("5 suggested tasks"), "{out}");
     assert!(hw(&db, &["task", "list"]).contains("no tasks switched on"));
     let out = hw(&db, &["start", "--n", "2"]);
     assert_eq!(out.lines().count(), 2, "{out}");

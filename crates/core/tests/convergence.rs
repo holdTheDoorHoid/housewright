@@ -143,6 +143,7 @@ fn run(w: &mut World, a: &Action) {
                 contractor: None,
                 attachments: vec![],
                 voids: None,
+                done_by: None,
             };
             w.stores[r].append(&c).unwrap();
         }

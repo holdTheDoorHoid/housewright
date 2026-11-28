@@ -122,7 +122,10 @@ fn template_quality() {
                 assert!(!text.contains('%'), "{at}: no statistics");
             }
             let days = task.schedule.period_days();
-            if !matches!(task.schedule, Schedule::Usage { .. }) {
+            if !matches!(
+                task.schedule,
+                Schedule::Usage { .. } | Schedule::Triggered { .. }
+            ) {
                 assert!((7..=3650).contains(&days), "{at}: interval of {days} days");
             }
             assert!(

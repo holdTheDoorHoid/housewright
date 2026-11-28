@@ -15,7 +15,7 @@
 
 use housewright_core::blobs::BlobStore;
 use housewright_core::ids::MemberId;
-use housewright_core::model::{Member, Role};
+use housewright_core::model::{Member, MemberKind, Role};
 use housewright_core::store::Store;
 use housewright_crypto::batch::ZERO_HASH;
 use housewright_crypto::encoding::{hex, unhex_array};
@@ -41,6 +41,9 @@ pub enum Invitee {
     MyDevice,
     /// A new person in the household.
     NewPerson { name: String, role: Role },
+    /// The Home Assistant bridge (D-117): a household member (role
+    /// Member) whose member record says it is Home Assistant.
+    HomeAssistant { name: String },
 }
 
 pub(crate) struct InviteSession {
@@ -48,7 +51,7 @@ pub(crate) struct InviteSession {
     r: Zeroizing<[u8; 32]>,
     role: DeviceRole,
     member: String,
-    new_person: Option<(String, Role)>,
+    new_person: Option<(String, Role, MemberKind)>,
     expires_ms: u64,
     joiner: Option<Joiner>,
 }
@@ -128,7 +131,18 @@ impl SyncClient {
                 (
                     crate::client::role_of(role),
                     MemberId::new().to_string(),
-                    Some((name, role)),
+                    Some((name, role, MemberKind::Person)),
+                )
+            }
+            Invitee::HomeAssistant { name } => {
+                let name = match name.trim() {
+                    "" => "Home Assistant".to_string(),
+                    n => n.to_string(),
+                };
+                (
+                    crate::client::role_of(Role::Member),
+                    MemberId::new().to_string(),
+                    Some((name, Role::Member, MemberKind::HomeAssistant)),
                 )
             }
         };
@@ -318,7 +332,7 @@ impl SyncClient {
             .joiner
             .clone()
             .ok_or_else(|| SyncError::Invalid("The other device has not answered yet.".into()))?;
-        if let Some((name, role)) = &inv.new_person {
+        if let Some((name, role, kind)) = &inv.new_person {
             let member = Member {
                 id: inv
                     .member
@@ -326,6 +340,7 @@ impl SyncClient {
                     .map_err(|_| SyncError::Invalid("bad member".into()))?,
                 name: name.clone(),
                 role: *role,
+                kind: *kind,
                 contact: None,
                 reminders: None,
             };
@@ -386,6 +401,13 @@ impl SyncClient {
     }
 
     // -- the new device ---------------------------------------------------
+
+    /// The role the invitation being joined offers (an owner's device, a
+    /// member, a limited member). The Home Assistant bridge refuses to
+    /// join as an owner's device (D-117).
+    pub fn join_offer_role(&self) -> Option<DeviceRole> {
+        self.join.as_ref().map(|j| j.offer.role)
+    }
 
     pub fn join_start(
         &mut self,

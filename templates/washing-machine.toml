@@ -65,3 +65,18 @@ steps = [
 ]
 why = "Residue and damp cause odours and mould in the drum and seal."
 source = "common manufacturer guidance"
+
+[[tasks]]
+key = "leak_alert"
+title = "Check the washing machine after a leak alert"
+priority = "property_loss"
+schedule = { kind = "triggered", event = "leak" }
+minutes = 10
+steps = [
+  "Look under and around the washing machine for standing water.",
+  "If water is spreading, turn off the water supply to it.",
+  "Find where the water comes from: a hose, a fitting, the drain or the tank.",
+  "Dry the floor and the sensor, and book a repair if a part has failed.",
+]
+why = "Catching a small leak early stops water damage to floors, walls and what is below."
+source = "insurance industry guidance"

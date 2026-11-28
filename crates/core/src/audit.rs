@@ -13,7 +13,7 @@ use serde_json::Value;
 
 use crate::error::Result;
 use crate::ids::MemberId;
-use crate::model::EntityKind;
+use crate::model::{EntityKind, Member, MemberKind};
 use crate::oplog::{DELETED_FIELD, Op, RECORD_FIELD};
 use crate::schedule::civil_date;
 use crate::store::Store;
@@ -103,9 +103,42 @@ fn date_of(v: Option<&Value>, tz: &TimeZone) -> String {
         .unwrap_or_else(|| "an unknown date".into())
 }
 
+/// Entries written by the Home Assistant bridge (D-117) say so, and name
+/// the person when the bridge marked something done for them:
+/// "Ana marked 'Replace the filter' done on 2026-11-28, via Home Assistant";
+/// "Recorded a reading of 45 on meter 'Loads washed', via Home Assistant".
 fn describe(store: &Store, group: &[Op], created: bool, tz: &TimeZone) -> String {
     let first = &group[0];
-    let who = store.member_name(first.author);
+    let via_ha = store
+        .get::<Member>(&first.author.to_string())
+        .ok()
+        .flatten()
+        .is_some_and(|m| m.kind == MemberKind::HomeAssistant);
+    if !via_ha {
+        return describe_as(store, group, created, tz, &store.member_name(first.author));
+    }
+    let done_by = (first.field == RECORD_FIELD && first.kind == EntityKind::Completion)
+        .then(|| first.value.get("done_by").and_then(Value::as_str))
+        .flatten()
+        .and_then(|m| m.parse::<MemberId>().ok());
+    let text = match done_by {
+        Some(m) => describe_as(store, group, created, tz, &store.member_name(m)),
+        None => {
+            // Without a person: drop the subject ("Recorded a reading ...").
+            let t = describe_as(store, group, created, tz, "");
+            let t = t.trim_start();
+            let mut c = t.chars();
+            match c.next() {
+                Some(f) => f.to_uppercase().chain(c).collect(),
+                None => String::new(),
+            }
+        }
+    };
+    format!("{text}, via Home Assistant")
+}
+
+fn describe_as(store: &Store, group: &[Op], created: bool, tz: &TimeZone, who: &str) -> String {
+    let first = &group[0];
     let kind = first.kind;
     match first.field.as_str() {
         DELETED_FIELD => format!("{who} deleted {}", label(store, kind, &first.entity)),

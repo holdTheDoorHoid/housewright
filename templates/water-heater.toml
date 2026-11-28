@@ -87,3 +87,18 @@ steps = [
 ]
 why = "A blocked or loose flue can let carbon monoxide into the house."
 source = "common manufacturer guidance"
+
+[[tasks]]
+key = "leak_alert"
+title = "Check the tank water heater after a leak alert"
+priority = "property_loss"
+schedule = { kind = "triggered", event = "leak" }
+minutes = 10
+steps = [
+  "Look under and around the tank water heater for standing water.",
+  "If water is spreading, turn off the water supply to it.",
+  "Find where the water comes from: a hose, a fitting, the drain or the tank.",
+  "Dry the floor and the sensor, and book a repair if a part has failed.",
+]
+why = "Catching a small leak early stops water damage to floors, walls and what is below."
+source = "insurance industry guidance"

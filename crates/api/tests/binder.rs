@@ -118,6 +118,7 @@ fn demo() -> Demo {
             id: member,
             name: "Sam Rivera".into(),
             role: Role::Member,
+            kind: Default::default(),
             contact: Some(Flagged::sensitive("sam@example.com".into())),
             reminders: None,
         })
@@ -384,6 +385,7 @@ fn demo() -> Demo {
             contractor: cool,
             attachments: vec![],
             voids: None,
+            done_by: None,
         })
         .unwrap();
     }
