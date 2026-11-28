@@ -102,6 +102,11 @@ pub struct Pulled {
     pub batch: Option<SealedBatch>,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub oversize: bool,
+    /// With `oversize`: whose batch it was, and its number.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub device: Option<crate::DeviceId>,
+    #[serde(default)]
+    pub device_seq: u64,
 }
 
 /// `GET /v1/s/{space}/ops?after=S&limit=L`
@@ -109,6 +114,32 @@ pub struct Pulled {
 pub struct PullOps {
     pub batches: Vec<Pulled>,
     pub more: bool,
+    /// The server's newest batch number for the household: a device whose
+    /// cursor is past it is talking to a server restored from a backup
+    /// (D-107).
+    #[serde(default)]
+    pub head: u64,
+    /// The server's newest roster version.
+    #[serde(default)]
+    pub roster_version: u64,
+}
+
+/// `GET /v1/s/{space}/chain/{device}/{seq}`: one batch of a device, by its
+/// own number (to fill a gap in its chain, D-107).
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct OneBatch {
+    pub batch: Pulled,
+}
+
+/// `GET /v1/s/{space}/chain/{device}`: the newest number the server holds
+/// for a device (to re-send after a restore).
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ChainHead {
+    pub seq: u64,
+    /// Numbers below `seq` the server does not hold (it lost them), at
+    /// most 1000: the device sends them again (D-107).
+    #[serde(default)]
+    pub missing: Vec<u64>,
 }
 
 /// `POST /v1/s/{space}/blobs/missing`
@@ -207,13 +238,16 @@ pub struct Offer {
     pub expires_ms: u64,
 }
 
-/// What a sealed batch holds (D-103): the author's newest known roster
-/// version and its hash (so devices notice a roster the server is hiding
-/// from them), then the operations.
+/// What a sealed batch holds: the author's newest roster version, signed
+/// (so devices notice a roster the server is hiding from them), then the
+/// operations.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BatchBody {
-    pub roster_version: u64,
-    pub roster_hash: String,
+    /// The author's newest signed roster version (D-103, revised D-106):
+    /// verifiable by every receiver, so a member cannot make up a version.
+    /// Absent in the founding device's history batches.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub roster: Option<SignedRoster>,
     pub ops: serde_json::Value,
 }
 

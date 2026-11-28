@@ -8,7 +8,7 @@ use housewright_core::model::{Attachment, Member, Role};
 use housewright_core::oplog::{Op, RECORD_FIELD};
 use housewright_core::store::{MAX_CLOCK_AHEAD_MS, Store};
 use housewright_crypto::batch::{
-    SealedBatch, ZERO_HASH, batch_hash, new_batch_id, open_batch, seal_batch,
+    SealedBatch, ZERO_HASH, batch_hash, new_batch_id, open_batch, seal_batch, verify_batch,
 };
 use housewright_crypto::blob::{blob_name, open_blob, seal_blob};
 use housewright_crypto::recovery::{Anchor, RecoveryKey};
@@ -26,6 +26,7 @@ use zeroize::Zeroizing;
 
 use crate::state::{self, Head, Notice, Pending, State, SyncConfig, SyncStatus};
 use crate::{HttpRequest, HttpResponse, Result, SyncError, Transport, check_server_url};
+use housewright_crypto::CryptoError;
 
 /// Operations per pushed batch, and a size cap for its plaintext (well
 /// under the server's ciphertext cap, D-100).
@@ -33,6 +34,8 @@ const BATCH_OPS: usize = 400;
 const BATCH_BYTES: usize = 512 * 1024;
 /// One operation bigger than this cannot be sent at all.
 const MAX_OP_BYTES: usize = 900 * 1024;
+/// Candidate batches kept per number for a removed device.
+const HELD_PER_NUMBER: u64 = 4;
 /// Files larger than this are fetched when opened, not during sync.
 const PREFETCH_MAX: u64 = 4 * 1024 * 1024;
 
@@ -50,6 +53,13 @@ pub struct SyncReport {
     pub pushed_ops: usize,
     /// Files that could not be sent or fetched this time (tried again).
     pub files_failed: usize,
+    /// Batches of this device sent again to a server restored from backup.
+    pub resent: usize,
+    pub server_restored: bool,
+    /// Missing batches fetched by number to close a gap.
+    pub gaps_filled: usize,
+    /// Batches whose roster claim could not be verified.
+    pub bad_claims: usize,
     pub pulled_ops: usize,
     pub rejected_batches: usize,
     pub refused_future_ops: usize,
@@ -191,7 +201,7 @@ impl SyncClient {
     /// Local operations still waiting to be sent.
     pub fn pending_count(store: &Store) -> Result<u64> {
         let cursor: i64 = store
-            .sync_get("push_cursor")?
+            .sync_get("acked_upto")?
             .and_then(|v| v.parse().ok())
             .unwrap_or(0);
         Ok(store.unsynced_count(cursor)?)
@@ -201,6 +211,9 @@ impl SyncClient {
     pub fn dismiss_notices(store: &Store) -> Result<()> {
         let mut s = state::load_status(store)?;
         s.notices.clear();
+        // The person has seen the warning about a fork: sending resumes
+        // (D-106). A new fork sets it again.
+        s.fork = false;
         state::save_status(store, &s)
     }
 
@@ -286,7 +299,46 @@ impl SyncClient {
             ],
             removed: vec![],
             made_ms: now_ms(store),
+            history_batches: 0,
+            history_head: String::new(),
         };
+        // The household's history so far, sealed now as the founding
+        // device's first batches; the genesis roster commits to how many
+        // and to the last one's hash, so the founder's exception to "only
+        // in your own name" covers exactly these (D-110).
+        let mut history: Vec<Pending> = Vec::new();
+        let mut prev = ZERO_HASH.to_string();
+        let mut cursor = 0i64;
+        let mut unsent = 0u64;
+        loop {
+            match seal_next(
+                store,
+                &secret,
+                &chain,
+                space,
+                None,
+                history.len() as u64 + 1,
+                &prev,
+                cursor,
+                &mut unsent,
+            )? {
+                Sealed::Done => break,
+                Sealed::Skipped(upto) => cursor = upto,
+                Sealed::Batch(batch, upto, _) => {
+                    prev = batch_hash(&batch)?;
+                    cursor = upto;
+                    history.push(Pending {
+                        batch: *batch,
+                        upto,
+                        replaces: None,
+                    });
+                }
+            }
+        }
+        body.history_batches = history.len() as u64;
+        if !history.is_empty() {
+            body.history_head = prev.clone();
+        }
         body.sort();
         let roster = SignedRoster::sign(&body, &secret)?;
         let envelopes = vec![
@@ -329,13 +381,20 @@ impl SyncClient {
             rosters: vec![roster],
             bodies: vec![body],
             cursor: 0,
-            push_cursor: 0,
-            next_device_seq: 1,
-            pending: None,
+            push_cursor: cursor,
+            next_device_seq: history.len() as u64 + 1,
+            acked_seq: 0,
+            acked_upto: 0,
             heads: Default::default(),
-            own_head: ZERO_HASH.to_string(),
-            status: SyncStatus::default(),
+            own_head: prev,
+            status: SyncStatus {
+                unsent_too_large: unsent,
+                ..Default::default()
+            },
         };
+        for (i, p) in history.iter().enumerate() {
+            save_sent(store, i as u64 + 1, p)?;
+        }
         st.save(store)?;
         Ok(recovery.display())
     }
@@ -470,20 +529,50 @@ impl SyncClient {
     }
 
     fn push(&mut self, store: &mut Store, st: &mut State, report: &mut SyncReport) -> Result<()> {
-        // A roster another device knows but this one cannot get, or a
-        // fork: seal nothing new until it is resolved (D-103).
+        // A verified newer roster that the server will not give this
+        // device, or a verified fork: seal nothing new until resolved
+        // (D-103, D-106). Unverifiable claims never get here.
         if st.status.fork || st.status.newest_roster_seen > st.latest().version {
             return Err(SyncError::RosterHidden);
         }
         let path = format!("/v1/s/{}/ops", st.config.space);
         let server = st.config.server.clone();
+        // Does the server still hold everything this device sent? After a
+        // restore from backup, or if it lost a batch, send those again
+        // from the copies kept here (D-107).
+        if st.acked_seq > 0 {
+            let hp = format!("/v1/s/{}/chain/{}", st.config.space, st.config.device);
+            let head: ChainHead =
+                from_json(&self.call(store, &server, Some(&st.secret), "GET", &hp, vec![])?)?;
+            for n in head.missing {
+                if n > st.acked_seq {
+                    break;
+                }
+                let p = load_sent(store, n)?;
+                let body = to_json(&PushOps {
+                    batches: vec![p.batch],
+                });
+                self.call(store, &server, Some(&st.secret), "POST", &path, body)?;
+                report.resent += 1;
+            }
+            if head.seq < st.acked_seq {
+                report.resent += (st.acked_seq - head.seq) as usize;
+                st.acked_seq = head.seq;
+            }
+        }
         loop {
-            if let Some(mut p) = st.pending.clone() {
-                // Sealed before this device learned of a newer epoch (for
-                // example a removal): seal it again under the new key, with
-                // the same number and link, so the removed device cannot
-                // read it (L4).
-                if p.batch.header.epoch < st.chain.current_epoch() {
+            // Send every sealed batch the server has not acknowledged, in
+            // order (after a server restore, that can be many; D-107).
+            while st.acked_seq + 1 < st.next_device_seq {
+                let seq = st.acked_seq + 1;
+                let mut p = load_sent(store, seq)?;
+                // The last one, sealed before this device learned of a newer
+                // epoch: seal it again under the new key, same number and
+                // link (L4).
+                if seq + 1 == st.next_device_seq
+                    && p.replaces.is_none()
+                    && p.batch.header.epoch < st.chain.current_epoch()
+                {
                     let me = st.secret.public();
                     let plain =
                         Zeroizing::new(open_batch(&p.batch, st.config.space, &st.chain, &me)?);
@@ -499,11 +588,11 @@ impl SyncClient {
                     )?;
                     st.own_head = batch_hash(&fresh)?;
                     p = Pending {
-                        replaces: Some(p.replaces.clone().unwrap_or(p.batch)),
+                        replaces: Some(p.batch),
                         batch: fresh,
                         upto: p.upto,
                     };
-                    st.pending = Some(p.clone());
+                    save_sent(store, seq, &p)?;
                     st.save(store)?;
                 }
                 let body = to_json(&PushOps {
@@ -516,74 +605,81 @@ impl SyncClient {
                     Err(SyncError::Server { code, .. })
                         if code == "seq_reused" && p.replaces.is_some() =>
                     {
-                        st.own_head = batch_hash(p.replaces.as_ref().expect("checked"))?;
+                        let orig = p.replaces.take().expect("checked");
+                        st.own_head = batch_hash(&orig)?;
+                        save_sent(
+                            store,
+                            seq,
+                            &Pending {
+                                batch: orig,
+                                upto: p.upto,
+                                replaces: None,
+                            },
+                        )?;
+                    }
+                    // The server lacks this device's earlier batches (it was
+                    // restored from a backup): send them again from here.
+                    Err(SyncError::Server { code, .. }) if code == "chain" => {
+                        let path = format!("/v1/s/{}/chain/{}", st.config.space, st.config.device);
+                        let head: ChainHead = from_json(&self.call(
+                            store,
+                            &server,
+                            Some(&st.secret),
+                            "GET",
+                            &path,
+                            vec![],
+                        )?)?;
+                        if head.seq + 1 >= seq {
+                            return Err(SyncError::Invalid(
+                                "The server refused this device's changes; they are kept here."
+                                    .into(),
+                            ));
+                        }
+                        st.acked_seq = head.seq;
+                        report.resent += (seq - head.seq - 1) as usize;
+                        continue;
                     }
                     Err(e) => return Err(e),
                 }
-                st.push_cursor = p.upto;
-                st.pending = None;
+                st.acked_seq = seq;
+                st.acked_upto = p.upto;
                 st.save(store)?;
             }
-            let ops = store.unsynced_ops(st.push_cursor, BATCH_OPS)?;
-            if ops.is_empty() {
-                return Ok(());
-            }
-            let mut chosen: Vec<Op> = Vec::new();
-            let mut size = 0;
-            let mut upto = st.push_cursor;
-            for (seq, op) in ops {
-                let n = serde_json::to_vec(&op).map(|v| v.len()).unwrap_or(0);
-                if n > MAX_OP_BYTES {
-                    // Cannot be sent at all (no screen makes one this big);
-                    // it stays on this device, and the person is told.
-                    if chosen.is_empty() {
-                        upto = seq;
-                        st.status.unsent_too_large += 1;
-                        continue;
-                    }
-                    break;
-                }
-                if !chosen.is_empty() && size + n > BATCH_BYTES {
-                    break;
-                }
-                size += n;
-                chosen.push(op);
-                upto = seq;
-            }
-            if chosen.is_empty() {
-                st.push_cursor = upto;
-                st.save(store)?;
-                continue;
-            }
-            let max_wall = chosen.iter().map(|o| o.hlc.wall_ms).max().unwrap_or(0);
-            let latest = st.rosters.last().expect("non-empty");
-            let body = BatchBody {
-                roster_version: st.latest().version,
-                roster_hash: latest.hash(),
-                ops: serde_json::to_value(&chosen)
-                    .map_err(|e| SyncError::Invalid(e.to_string()))?,
-            };
-            let plaintext = Zeroizing::new(to_json(&body));
-            let batch = seal_batch(
+            let roster = st.rosters.last().cloned();
+            match seal_next(
+                store,
                 &st.secret,
                 &st.chain,
                 st.config.space,
-                new_batch_id()?,
+                roster,
                 st.next_device_seq,
                 &st.own_head,
-                max_wall,
-                &plaintext,
-            )?;
-            report.pushed_ops += chosen.len();
-            st.own_head = batch_hash(&batch)?;
-            // Saved before sending: a retry sends these same bytes.
-            st.pending = Some(Pending {
-                batch,
-                upto,
-                replaces: None,
-            });
-            st.next_device_seq += 1;
-            st.save(store)?;
+                st.push_cursor,
+                &mut st.status.unsent_too_large,
+            )? {
+                Sealed::Done => return Ok(()),
+                Sealed::Skipped(upto) => {
+                    st.push_cursor = upto;
+                    st.save(store)?;
+                }
+                Sealed::Batch(batch, upto, n) => {
+                    report.pushed_ops += n;
+                    st.own_head = batch_hash(&batch)?;
+                    // Saved before sending: a retry sends these same bytes.
+                    save_sent(
+                        store,
+                        st.next_device_seq,
+                        &Pending {
+                            batch: *batch,
+                            upto,
+                            replaces: None,
+                        },
+                    )?;
+                    st.next_device_seq += 1;
+                    st.push_cursor = upto;
+                    st.save(store)?;
+                }
+            }
         }
     }
 
@@ -613,11 +709,30 @@ impl SyncClient {
                     }
                     Err(e) => return Err(e),
                 };
+            // A server restored from a backup: its numbers start again
+            // below ours. Read everything again (duplicates are ignored),
+            // and give it back what it lost (D-107).
+            if page.head < st.cursor {
+                st.cursor = 0;
+                report.server_restored = true;
+                continue;
+            }
+            if page.roster_version > 0 && page.roster_version < st.latest().version {
+                self.restore_rosters(store, st, page.roster_version)?;
+                report.server_restored = true;
+            }
             for p in &page.batches {
                 match &p.batch {
                     None => {
                         report.skipped_too_large += 1;
                         st.status.skipped_too_large += 1;
+                        // A gap in that device's chain: try to fetch it on
+                        // its own; if that fails too it is reported missing.
+                        if let Some(dev) = p.device
+                            && dev != st.config.device
+                        {
+                            self.fill_gap(store, st, dev, report)?;
+                        }
                     }
                     Some(b) if b.header.device == st.config.device => {}
                     Some(b) => self.receive(store, st, p, b, report)?,
@@ -632,8 +747,59 @@ impl SyncClient {
         self.retry_unreadable(store, st, report)
     }
 
-    /// One pulled batch from another device: the chain rules (D-99), then
-    /// the content checks, then merge.
+    /// An owner's device gives a restored server the roster versions it
+    /// lost, with fresh key envelopes (D-107).
+    fn restore_rosters(
+        &mut self,
+        store: &Store,
+        st: &mut State,
+        server_version: u64,
+    ) -> Result<()> {
+        if st.config.role != DeviceRole::Owner {
+            return Ok(());
+        }
+        let server = st.config.server.clone();
+        for v in server_version + 1..=st.latest().version {
+            let i = (v - 1) as usize;
+            let (signed, body, prev) = (&st.rosters[i], &st.bodies[i], &st.bodies[i - 1]);
+            if prev.recovery().map(|r| r.device.id) != body.recovery().map(|r| r.device.id) {
+                // A new recovery key's anchor needs the paper.
+                return Err(SyncError::Invalid(
+                    "The sync server lost a recent change of recovery key. Make a new recovery key to repair it.".into(),
+                ));
+            }
+            let chain = st
+                .chain
+                .truncated(body.epoch)
+                .ok_or_else(|| SyncError::Invalid("missing keys".into()))?;
+            let rotated = body.epoch != prev.epoch;
+            let mut envelopes = Vec::new();
+            for e in &body.devices {
+                if rotated || prev.find(e.device.id).is_none() {
+                    envelopes.push(wrap(&st.secret, body.space, &e.device, &chain)?);
+                }
+            }
+            let req = UpdateRoster {
+                roster: signed.clone(),
+                envelopes,
+                anchor: None,
+                invitation: None,
+            };
+            let path = format!("/v1/s/{}/roster", body.space);
+            self.call(
+                store,
+                &server,
+                Some(&st.secret),
+                "POST",
+                &path,
+                to_json(&req),
+            )?;
+        }
+        Ok(())
+    }
+
+    /// One pulled batch from another device: the chain rules (D-99,
+    /// D-107), then the content checks, then merge.
     fn receive(
         &mut self,
         store: &mut Store,
@@ -653,7 +819,9 @@ impl SyncClient {
         let seq = b.header.device_seq;
         let hash = batch_hash(b)?;
         if seq <= head.seq {
-            if !(seq == head.seq && hash == head.hash) {
+            if !(seq == head.seq && hash == head.hash)
+                && !self.is_known(store, st, dev, seq, &hash)?
+            {
                 // A second, different batch under a number already used:
                 // forged or forked. Refused everywhere, not only by the
                 // server.
@@ -665,25 +833,60 @@ impl SyncClient {
         match who {
             Author::Unknown => report.rejected_batches += 1,
             Author::Current(entry) => {
-                if seq != head.seq + 1 || b.header.prev != head.hash {
+                // Only the device's own signature gets a batch held.
+                if verify_batch(b, &entry.device).is_err() {
                     report.rejected_batches += 1;
                     report.tampered += 1;
                     return Ok(());
                 }
-                if self.consume(store, st, p, b, &entry, report)? {
-                    st.heads.insert(dev, Head { seq, hash });
+                if seq == head.seq + 1 {
+                    if b.header.prev != head.hash {
+                        report.rejected_batches += 1;
+                        report.tampered += 1;
+                        return Ok(());
+                    }
+                    if self.consume(store, st, p, b, &entry, report)? {
+                        st.heads.insert(dev, Head { seq, hash });
+                        self.drain_gap(store, st, dev, &entry, report)?;
+                    }
+                } else {
+                    // A gap: hold this one (one per number) and fetch the
+                    // missing ones by number (N2).
+                    if !hold(store, "gap", dev, seq, p, &hash, report)? {
+                        return Ok(());
+                    }
+                    self.fill_gap(store, st, dev, report)?;
                 }
             }
             Author::Removed(r) => {
                 // A removed device: only batches on the chain that ends at
-                // the hash recorded when it was removed. Held until that
-                // whole chain is here, then applied in order.
-                if seq > r.last_seq {
+                // the hash recorded when it was removed, signed by it, at
+                // most one per number and no more than it can have sent
+                // (N5). Applied once that whole chain is here.
+                if seq > r.last_seq || verify_batch(b, &r.entry.device).is_err() {
                     report.rejected_batches += 1;
                     return Ok(());
                 }
+                // Several candidates per number (the removed device can sign
+                // forks of its own chain); only the chain ending at the
+                // recorded hash is ever applied, so a fork shown first
+                // cannot block the real batches.
+                let key = format!("held:{dev}:{seq:020}:{hash}");
+                let head_seq = st.heads.get(&dev).map(|h| h.seq).unwrap_or(0);
+                let room = (r.last_seq - head_seq) * HELD_PER_NUMBER;
+                if store.sync_get(&key)?.is_some() {
+                    return Ok(());
+                }
+                if store.sync_keys(&format!("held:{dev}:{seq:020}:"))?.len() as u64
+                    >= HELD_PER_NUMBER
+                    || store.sync_keys(&format!("held:{dev}:"))?.len() as u64 >= room
+                {
+                    report.rejected_batches += 1;
+                    report.tampered += 1;
+                    return Ok(());
+                }
                 store.sync_set(
-                    &format!("held:{dev}:{hash}"),
+                    &key,
                     &serde_json::to_string(p).map_err(|e| SyncError::Invalid(e.to_string()))?,
                 )?;
                 report.held += 1;
@@ -691,6 +894,119 @@ impl SyncClient {
             }
         }
         Ok(())
+    }
+
+    /// Whether `hash` is the batch already applied at `seq` (a batch seen
+    /// again after a cursor reset is not tampering).
+    fn is_known(
+        &self,
+        store: &Store,
+        _st: &State,
+        dev: DeviceId,
+        seq: u64,
+        hash: &str,
+    ) -> Result<bool> {
+        Ok(store.sync_get(&format!("seen:{dev}:{seq:020}"))?.as_deref() == Some(hash))
+    }
+
+    /// Fetch the missing numbers of a device's chain one by one, then apply
+    /// what was held. What cannot be fetched is reported, plainly.
+    fn fill_gap(
+        &mut self,
+        store: &mut Store,
+        st: &mut State,
+        dev: DeviceId,
+        report: &mut SyncReport,
+    ) -> Result<()> {
+        let Author::Current(entry) = author_of(st.latest(), dev) else {
+            return Ok(());
+        };
+        let server = st.config.server.clone();
+        let prefix = format!("gap:{dev}:");
+        loop {
+            let head = st.heads.get(&dev).cloned().unwrap_or_else(Head::start);
+            let next = head.seq + 1;
+            if store.sync_get(&format!("{prefix}{next:020}"))?.is_some() {
+                self.drain_gap(store, st, dev, &entry, report)?;
+                continue;
+            }
+            if store.sync_keys(&prefix)?.is_empty() {
+                let name = device_name(st, dev);
+                st.status.missing_from.retain(|n| *n != name);
+                return Ok(());
+            }
+            let path = format!("/v1/s/{}/chain/{dev}/{next}", st.config.space);
+            let one: OneBatch =
+                match self.call(store, &server, Some(&st.secret), "GET", &path, vec![]) {
+                    Ok(r) => from_json(&r)?,
+                    Err(SyncError::Server {
+                        status: 404 | 413, ..
+                    }) => {
+                        let name = device_name(st, dev);
+                        if !st.status.missing_from.contains(&name) {
+                            st.status.missing_from.push(name);
+                        }
+                        return Ok(());
+                    }
+                    Err(e) => return Err(e),
+                };
+            let Some(b) = one.batch.batch.clone() else {
+                return Ok(());
+            };
+            let hash = batch_hash(&b)?;
+            if b.header.device != dev
+                || b.header.device_seq != next
+                || b.header.prev != head.hash
+                || verify_batch(&b, &entry.device).is_err()
+            {
+                report.tampered += 1;
+                return Ok(());
+            }
+            if !self.consume(store, st, &one.batch, &b, &entry, report)? {
+                return Ok(());
+            }
+            st.heads.insert(dev, Head { seq: next, hash });
+            report.gaps_filled += 1;
+        }
+    }
+
+    /// Apply held batches that now follow the device's head.
+    fn drain_gap(
+        &mut self,
+        store: &mut Store,
+        st: &mut State,
+        dev: DeviceId,
+        entry: &RosterEntry,
+        report: &mut SyncReport,
+    ) -> Result<()> {
+        loop {
+            let head = st.heads.get(&dev).cloned().unwrap_or_else(Head::start);
+            let key = format!("gap:{dev}:{:020}", head.seq + 1);
+            let Some(v) = store.sync_get(&key)? else {
+                if store.sync_keys(&format!("gap:{dev}:"))?.is_empty() {
+                    let name = device_name(st, dev);
+                    st.status.missing_from.retain(|n| *n != name);
+                }
+                return Ok(());
+            };
+            store.sync_remove(&key)?;
+            let p: Pulled =
+                serde_json::from_str(&v).map_err(|e| SyncError::Invalid(e.to_string()))?;
+            let Some(b) = p.batch.clone() else { continue };
+            if b.header.prev != head.hash {
+                report.tampered += 1;
+                continue;
+            }
+            if self.consume(store, st, &p, &b, entry, report)? {
+                st.heads.insert(
+                    dev,
+                    Head {
+                        seq: b.header.device_seq,
+                        hash: batch_hash(&b)?,
+                    },
+                );
+            }
+        }
     }
 
     /// Apply a removed device's held batches once the chain from our head
@@ -705,40 +1021,34 @@ impl SyncClient {
         let dev = r.entry.device.id;
         let prefix = format!("held:{dev}:");
         let head = st.heads.get(&dev).cloned().unwrap_or_else(Head::start);
-        let keys = store.sync_keys(&prefix)?;
         if head.seq >= r.last_seq {
-            for k in keys {
+            for k in store.sync_keys(&prefix)? {
                 store.sync_remove(&k)?;
             }
             return Ok(());
         }
-        let mut chain: Vec<Pulled> = Vec::new();
+        // Walk back from the recorded last hash to our head.
+        let mut chain: Vec<(Pulled, SealedBatch)> = Vec::new();
         let mut want = r.last_hash.clone();
-        while want != head.hash {
-            let Some(v) = store.sync_get(&format!("{prefix}{want}"))? else {
+        for n in (head.seq + 1..=r.last_seq).rev() {
+            let Some(v) = store.sync_get(&format!("{prefix}{n:020}:{want}"))? else {
                 return Ok(()); // not complete yet
             };
             let p: Pulled =
                 serde_json::from_str(&v).map_err(|e| SyncError::Invalid(e.to_string()))?;
-            want = p
+            let b = p
                 .batch
-                .as_ref()
-                .map(|b| b.header.prev.clone())
-                .unwrap_or_default();
-            chain.push(p);
-            if chain.len() as u64 > r.last_seq {
-                return Ok(());
-            }
+                .clone()
+                .ok_or_else(|| SyncError::Invalid("held batch".into()))?;
+            want = b.header.prev.clone();
+            chain.push((p, b));
+        }
+        if want != head.hash {
+            report.tampered += 1;
+            return Ok(());
         }
         chain.reverse();
-        for (expect, p) in (head.seq + 1..).zip(chain.iter()) {
-            let b = p.batch.as_ref().expect("held batches have one");
-            if b.header.device_seq != expect {
-                return Ok(());
-            }
-        }
-        for p in &chain {
-            let b = p.batch.as_ref().expect("held batches have one");
+        for (p, b) in &chain {
             if !self.consume(store, st, p, b, &r.entry, report)? {
                 break;
             }
@@ -767,7 +1077,7 @@ impl SyncClient {
         author: &RosterEntry,
         report: &mut SyncReport,
     ) -> Result<bool> {
-        match self.open_checked(store, st, p, b, author)? {
+        match self.open_checked(store, st, p, b, author, report)? {
             Opened::Ops(ops) => {
                 let a = store.apply_synced_ops(&ops, p.received_ms)?;
                 report.pulled_ops += a.applied;
@@ -789,6 +1099,10 @@ impl SyncClient {
                 return Ok(false);
             }
         }
+        store.sync_set(
+            &format!("seen:{}:{:020}", b.header.device, b.header.device_seq),
+            &batch_hash(b)?,
+        )?;
         Ok(true)
     }
 
@@ -808,7 +1122,7 @@ impl SyncClient {
                 store.sync_remove(&k)?;
                 continue;
             };
-            match self.open_checked(store, st, &p, &b, &author)? {
+            match self.open_checked(store, st, &p, &b, &author, report)? {
                 Opened::Unreadable => {}
                 Opened::Ops(ops) => {
                     let a = store.apply_synced_ops(&ops, p.received_ms)?;
@@ -821,6 +1135,56 @@ impl SyncClient {
         Ok(())
     }
 
+    /// Check a batch's roster claim (D-106). Only a version signed by one
+    /// of the household's owner devices counts; anything else is the
+    /// author's tampering, counted and otherwise ignored.
+    fn check_claim(&mut self, store: &Store, st: &mut State, claim: &SignedRoster) -> bool {
+        let Ok(body) = claim.parse() else {
+            return false;
+        };
+        if body.space != st.config.space || body.version == 0 {
+            return false;
+        }
+        let genesis = st.rosters[0].hash();
+        if body.version == 1 {
+            return claim.hash() == genesis;
+        }
+        if body.genesis != genesis {
+            return false;
+        }
+        if body.version > st.latest().version {
+            let _ = self.refresh(store, st);
+        }
+        if body.version <= st.latest().version {
+            let ours = &st.rosters[(body.version - 1) as usize];
+            if ours.hash() == claim.hash() {
+                return true;
+            }
+            // A different version with the same number: real only if an
+            // owner of the version before signed it; then it is a fork.
+            let prev = &st.bodies[(body.version - 2) as usize];
+            let genuine = prev
+                .find(claim.signer)
+                .filter(|e| e.role.can_manage())
+                .is_some_and(|e| claim.check_sig(&e.device).is_ok());
+            if genuine {
+                st.status.fork = true;
+            }
+            return genuine;
+        }
+        // Newer than anything the server gives us: credible only if one of
+        // our current owner devices signed it.
+        let genuine = st
+            .latest()
+            .find(claim.signer)
+            .filter(|e| e.role.can_manage())
+            .is_some_and(|e| claim.check_sig(&e.device).is_ok());
+        if genuine {
+            st.status.newest_roster_seen = st.status.newest_roster_seen.max(body.version);
+        }
+        genuine
+    }
+
     /// Every content check a batch must pass. Uses only data every device
     /// sees the same way, so every device decides the same.
     fn open_checked(
@@ -830,6 +1194,7 @@ impl SyncClient {
         p: &Pulled,
         b: &SealedBatch,
         author: &RosterEntry,
+        report: &mut SyncReport,
     ) -> Result<Opened> {
         let h = &b.header;
         if author.role == DeviceRole::Recovery {
@@ -849,19 +1214,11 @@ impl SyncClient {
         let Ok(ops) = serde_json::from_value::<Vec<Op>>(body.ops) else {
             return Ok(Opened::Unreadable);
         };
-        // Roster gossip (D-103): the author knew this roster version.
-        if body.roster_version > st.latest().version {
-            let _ = self.refresh(store, st);
-        }
-        if body.roster_version > st.latest().version {
-            st.status.newest_roster_seen = st.status.newest_roster_seen.max(body.roster_version);
-        } else if let Some(r) = st
-            .rosters
-            .get(body.roster_version.saturating_sub(1) as usize)
-            && body.roster_version > 0
-            && r.hash() != body.roster_hash
+        if let Some(claim) = &body.roster
+            && !self.check_claim(store, st, claim)
         {
-            st.status.fork = true;
+            report.bad_claims += 1;
+            st.status.bad_claims += 1;
         }
         // The clock guard, at batch level: the claimed maximum must be
         // honest and not ahead of when the server received the batch.
@@ -871,25 +1228,30 @@ impl SyncClient {
             return Ok(Opened::Refused);
         }
         // Authorship (D-104): every operation, and the `by` of every
-        // record, names the member the device belongs to. The only
-        // exception is the history a household had before sync was set
-        // up, which its founding device sends once.
+        // record, names the member the device belongs to. The one exception
+        // is the founding device's history batches, numbered and hashed in
+        // the genesis roster (D-110), so it cannot be used later.
         let genesis = &st.bodies[0];
-        let founder = st.rosters[0].signer == author.device.id;
-        for o in &ops {
-            let pre_sync = founder && o.hlc.wall_ms < genesis.made_ms;
-            if pre_sync {
-                continue;
-            }
-            if o.author.to_string() != author.member {
-                return Ok(Opened::Refused);
-            }
-            if o.field == RECORD_FIELD
-                && let Some(by) = o.value.get("by")
-                && !by.is_null()
-                && by.as_str() != Some(author.member.as_str())
-            {
-                return Ok(Opened::Refused);
+        let history =
+            st.rosters[0].signer == author.device.id && h.device_seq <= genesis.history_batches;
+        if history
+            && h.device_seq == genesis.history_batches
+            && batch_hash(b)? != genesis.history_head
+        {
+            return Ok(Opened::Refused);
+        }
+        if !history {
+            for o in &ops {
+                if o.author.to_string() != author.member {
+                    return Ok(Opened::Refused);
+                }
+                if o.field == RECORD_FIELD
+                    && let Some(by) = o.value.get("by")
+                    && !by.is_null()
+                    && by.as_str() != Some(author.member.as_str())
+                {
+                    return Ok(Opened::Refused);
+                }
             }
         }
         Ok(Opened::Ops(ops))
@@ -962,7 +1324,15 @@ impl SyncClient {
             if blobs.has(hash)? {
                 continue;
             }
-            match self.download(store, blobs, st, hash) {
+            let mut got = self.download(store, blobs, st, hash, false);
+            if matches!(got, Err(SyncError::StaleKeys)) {
+                self.refresh(store, st)?;
+                if st.latest().epoch > st.chain.current_epoch() {
+                    self.fetch_keys(store, st)?;
+                }
+                got = self.download(store, blobs, st, hash, true);
+            }
+            match got {
                 Ok(Some(_)) => report.files_down += 1,
                 Ok(None) => {}
                 Err(e @ SyncError::Offline(_)) => return Err(e),
@@ -972,12 +1342,15 @@ impl SyncClient {
         Ok(())
     }
 
+    /// `refreshed`: keys were just fetched, so a missing key is no longer
+    /// a reason to wait.
     fn download(
         &mut self,
         store: &Store,
         blobs: &mut dyn BlobStore,
         st: &State,
         hash: &str,
+        refreshed: bool,
     ) -> Result<Option<Vec<u8>>> {
         let name = blob_name(&st.chain, st.config.space, hash)?;
         let path = format!("/v1/s/{}/blobs/{name}", st.config.space);
@@ -990,11 +1363,33 @@ impl SyncClient {
         };
         let bytes = match open_blob(&st.chain, st.config.space, &name, &r.body, hash) {
             Ok(b) => b,
+            // Sealed under a key this device has not got yet: never a
+            // reason to doubt the file (N3). The caller refreshes keys.
+            // (An epoch beyond the household's own is not stale keys: the
+            // file is bad.)
+            Err(CryptoError::Rejected(m))
+                if m.starts_with("no key for epoch")
+                    && (!refreshed
+                        || r.body
+                            .get(4..8)
+                            .map(|e| u32::from_be_bytes(e.try_into().expect("4 bytes")))
+                            <= Some(st.latest().epoch)) =>
+            {
+                return Err(SyncError::StaleKeys);
+            }
             Err(e) => {
-                // Damaged, or garbage uploaded under this name first: ask
-                // the server to drop it, so a device with the real file
-                // uploads it again on its next sync (L2).
-                let _ = self.call(store, &server, Some(&st.secret), "DELETE", &path, vec![]);
+                // Decrypted with the right key and still wrong (damaged, or
+                // garbage uploaded under this name first). Nothing is
+                // deleted: the server marks it, so a device holding the
+                // real file sends it again and that copy replaces it (D-108).
+                let _ = self.call(
+                    store,
+                    &server,
+                    Some(&st.secret),
+                    "POST",
+                    &format!("{path}/bad"),
+                    vec![],
+                );
                 return Err(e.into());
             }
         };
@@ -1014,11 +1409,21 @@ impl SyncClient {
         if !state::is_set_up(store)? {
             return Ok(None);
         }
-        let st = State::load(store)?;
+        let mut st = State::load(store)?;
         if st.status.removed {
             return Ok(None);
         }
-        self.download(store, blobs, &st, hash)
+        match self.download(store, blobs, &st, hash, false) {
+            Err(SyncError::StaleKeys) => {
+                self.refresh(store, &mut st)?;
+                if st.latest().epoch > st.chain.current_epoch() {
+                    self.fetch_keys(store, &mut st)?;
+                }
+                st.save(store)?;
+                self.download(store, blobs, &st, hash, true)
+            }
+            r => r,
+        }
     }
 
     // -- devices ----------------------------------------------------------
@@ -1322,7 +1727,8 @@ impl SyncClient {
             cursor: 0,
             push_cursor: 0,
             next_device_seq: 1,
-            pending: None,
+            acked_seq: 0,
+            acked_upto: 0,
             heads: Default::default(),
             own_head: ZERO_HASH.to_string(),
             status: SyncStatus::default(),
@@ -1353,7 +1759,8 @@ impl SyncClient {
             cursor: 0,
             push_cursor: 0,
             next_device_seq: 1,
-            pending: None,
+            acked_seq: 0,
+            acked_upto: 0,
             heads: Default::default(),
             own_head: ZERO_HASH.to_string(),
             status: SyncStatus {
@@ -1364,6 +1771,132 @@ impl SyncClient {
         st.save(store)?;
         self.sync(store, blobs)
     }
+}
+
+/// A sealed batch of this device, kept under `sent:<seq>` (D-107).
+fn load_sent(store: &Store, seq: u64) -> Result<Pending> {
+    let v = store.sync_get(&format!("sent:{seq:020}"))?.ok_or_else(|| {
+        SyncError::Invalid(format!("this device's change batch {seq} is missing"))
+    })?;
+    serde_json::from_str(&v).map_err(|e| SyncError::Invalid(e.to_string()))
+}
+
+fn save_sent(store: &Store, seq: u64, p: &Pending) -> Result<()> {
+    store.sync_set(
+        &format!("sent:{seq:020}"),
+        &serde_json::to_string(p).map_err(|e| SyncError::Invalid(e.to_string()))?,
+    )?;
+    Ok(())
+}
+
+/// Keep a batch that cannot be applied yet: one per number. A second,
+/// different batch under the same number is the device forking its own
+/// chain, and is refused (N5). Returns whether it was newly kept.
+fn hold(
+    store: &Store,
+    kind: &str,
+    dev: DeviceId,
+    seq: u64,
+    p: &Pulled,
+    hash: &str,
+    report: &mut SyncReport,
+) -> Result<bool> {
+    let key = format!("{kind}:{dev}:{seq:020}");
+    if let Some(v) = store.sync_get(&key)? {
+        let old: Pulled =
+            serde_json::from_str(&v).map_err(|e| SyncError::Invalid(e.to_string()))?;
+        let same = old.batch.as_ref().map(batch_hash).transpose()?.as_deref() == Some(hash);
+        if !same {
+            report.rejected_batches += 1;
+            report.tampered += 1;
+        }
+        return Ok(false);
+    }
+    store.sync_set(
+        &key,
+        &serde_json::to_string(p).map_err(|e| SyncError::Invalid(e.to_string()))?,
+    )?;
+    report.held += 1;
+    Ok(true)
+}
+
+fn device_name(st: &State, dev: DeviceId) -> String {
+    let latest = st.latest();
+    let e = latest
+        .find(dev)
+        .cloned()
+        .or_else(|| latest.find_removed(dev).map(|r| r.entry.clone()));
+    e.and_then(|e| open_label(&st.chain, latest.space, dev, &e.label).ok())
+        .unwrap_or_else(|| "a device".into())
+}
+
+/// What sealing the next batch gave.
+enum Sealed {
+    Done,
+    /// Only changes too big to send: skip past them.
+    Skipped(i64),
+    Batch(Box<SealedBatch>, i64, usize),
+}
+
+/// Seal the next batch of this device's changes after `cursor`.
+#[allow(clippy::too_many_arguments)]
+fn seal_next(
+    store: &Store,
+    secret: &DeviceSecret,
+    chain: &KeyChain,
+    space: SpaceId,
+    roster: Option<SignedRoster>,
+    seq: u64,
+    prev: &str,
+    cursor: i64,
+    unsent_too_large: &mut u64,
+) -> Result<Sealed> {
+    let ops = store.unsynced_ops(cursor, BATCH_OPS)?;
+    if ops.is_empty() {
+        return Ok(Sealed::Done);
+    }
+    let mut chosen: Vec<Op> = Vec::new();
+    let mut size = 0;
+    let mut upto = cursor;
+    for (n, op) in ops {
+        let len = serde_json::to_vec(&op).map(|v| v.len()).unwrap_or(0);
+        if len > MAX_OP_BYTES {
+            // Cannot be sent at all (no screen makes one this big); it
+            // stays on this device, and the person is told.
+            if chosen.is_empty() {
+                upto = n;
+                *unsent_too_large += 1;
+                continue;
+            }
+            break;
+        }
+        if !chosen.is_empty() && size + len > BATCH_BYTES {
+            break;
+        }
+        size += len;
+        chosen.push(op);
+        upto = n;
+    }
+    if chosen.is_empty() {
+        return Ok(Sealed::Skipped(upto));
+    }
+    let max_wall = chosen.iter().map(|o| o.hlc.wall_ms).max().unwrap_or(0);
+    let body = BatchBody {
+        roster,
+        ops: serde_json::to_value(&chosen).map_err(|e| SyncError::Invalid(e.to_string()))?,
+    };
+    let plaintext = Zeroizing::new(to_json(&body));
+    let batch = seal_batch(
+        secret,
+        chain,
+        space,
+        new_batch_id()?,
+        seq,
+        prev,
+        max_wall,
+        &plaintext,
+    )?;
+    Ok(Sealed::Batch(Box::new(batch), upto, chosen.len()))
 }
 
 /// Plain sentences for a roster change made elsewhere (M3): every other

@@ -175,6 +175,10 @@ fn init_db(conn: &Connection) -> rusqlite::Result<()> {
     )?;
     // Added after the first Phase 6 build.
     let _ = conn.execute("ALTER TABLE invitations ADD COLUMN confirm BLOB", []);
+    let _ = conn.execute(
+        "ALTER TABLE blobs ADD COLUMN bad INTEGER NOT NULL DEFAULT 0",
+        [],
+    );
     Ok(())
 }
 
@@ -424,10 +428,7 @@ pub fn router(state: AppState) -> Router {
         .allow_headers(tower_http::cors::Any)
         .expose_headers([axum::http::HeaderName::from_static(H_SERVER_TIME)]);
     let blobs = Router::new()
-        .route(
-            "/v1/s/{space}/blobs/{name}",
-            put(put_blob).get(get_blob).delete(delete_blob),
-        )
+        .route("/v1/s/{space}/blobs/{name}", put(put_blob).get(get_blob))
         .layer(DefaultBodyLimit::max(MAX_BLOB));
     Router::new()
         .route("/v1/health", get(health))
@@ -436,7 +437,10 @@ pub fn router(state: AppState) -> Router {
         .route("/v1/s/{space}/keys", get(get_keys))
         .route("/v1/s/{space}/ops", get(pull_ops).post(push_ops))
         .route("/v1/s/{space}/blobs/missing", post(missing_blobs))
+        .route("/v1/s/{space}/blobs/{name}/bad", post(report_bad_blob))
         .route("/v1/s/{space}/devices", get(list_devices))
+        .route("/v1/s/{space}/chain/{device}", get(chain_head))
+        .route("/v1/s/{space}/chain/{device}/{seq}", get(chain_batch))
         .route("/v1/s/{space}/invitations", post(create_invitation))
         .route(
             "/v1/s/{space}/invitations/{id}",

@@ -305,6 +305,9 @@
       </div>
     {/if}
     {#each status.warnings as w (w)}<p class="pill attention">{w}</p>{/each}
+    {#if status.warnings.length > 0 && status.notices.length === 0}
+      <p><button class="quiet" onclick={async () => (status = await call('sync_dismiss_notices'))}>OK</button></p>
+    {/if}
     <div class="card" aria-live="polite">
       <p>
         <strong>Sync is on</strong> with <span class="small">{status.server}</span>.

@@ -301,6 +301,8 @@ Independent security review (2026-11-28,
 [security-reviews/2026-11-28-phase6-review.md](security-reviews/2026-11-28-phase6-review.md)):
 verdict "ship after fixes". Every finding was fixed or mitigated the same
 day (D-99 to D-105, regression tests in `crates/sync/tests/review.rs`); the
-remaining limits are listed in SECURITY.md. The Android emulator pairing
+remaining limits are listed in SECURITY.md. The reviewer's verification
+pass found new problems in the fixes (N1 to N6, L6); those were fixed too
+(D-106 to D-111, `crates/sync/tests/verify.rs`). The Android emulator pairing
 was not re-run after the fixes (not enough disk for an Android build); the
 Rust and browser tests cover the protocol changes.

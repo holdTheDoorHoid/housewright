@@ -65,8 +65,7 @@ fn op(
 }
 fn body(ops: &[Op]) -> Vec<u8> {
     serde_json::to_vec(&BatchBody {
-        roster_version: 1,
-        roster_hash: String::new(),
+        roster: None,
         ops: serde_json::to_value(ops).unwrap(),
     })
     .unwrap()
@@ -483,6 +482,11 @@ fn m1_a_hidden_roster_version_stops_sealing() {
         rusqlite::params![sp.to_string(), n],
     )
     .unwrap();
+    // And keeps hiding it even when an owner's device sends it again.
+    db.execute_batch(&format!(
+        "CREATE TRIGGER hide AFTER INSERT ON rosters WHEN NEW.version = {n} BEGIN DELETE FROM rosters WHERE version = {n}; END;"
+    ))
+    .unwrap();
     a.room(30, "Gossip carrier");
     a.sync();
     b.room(31, "Ben's change while the roster is hidden");
@@ -500,6 +504,7 @@ fn m1_a_hidden_roster_version_stops_sealing() {
         "nothing was sealed while the list was hidden"
     );
     // The server stops hiding it: everything flows again.
+    db.execute_batch("DROP TRIGGER hide;").unwrap();
     db.execute(
         "INSERT INTO rosters (space, version, data) VALUES (?1, ?2, ?3)",
         rusqlite::params![sp.to_string(), n, row],
@@ -554,7 +559,7 @@ fn l3_an_unreadable_batch_is_kept_for_after_an_update() {
         .parse()
         .unwrap();
     // "From a newer app": a body this version does not understand.
-    let future = br#"{"roster_version":1,"roster_hash":"","ops":[{"kind":"solar_panel"}]}"#;
+    let future = br#"{"ops":[{"kind":"solar_panel"}]}"#;
     let bt = seal_batch(
         &s,
         &chain(&a),

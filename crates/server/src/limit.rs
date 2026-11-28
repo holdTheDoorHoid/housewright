@@ -64,14 +64,6 @@ fn take(e: &mut (f64, u64), (cap, per_min): (f64, f64), now_ms: u64) -> bool {
 
 impl Limiter {
     pub fn allow(&mut self, bucket: &'static str, ip: &str, now_ms: u64) -> bool {
-        let g = global_rule(bucket);
-        let global = self
-            .buckets
-            .entry((bucket, "*".to_string()))
-            .or_insert((g.0, now_ms));
-        if !take(global, g, now_ms) {
-            return false;
-        }
         let key = client_key(ip);
         if !self.buckets.contains_key(&(bucket, key.clone())) && self.buckets.len() >= MAX_KEYS {
             // Drop the older half (rare; keeps memory bounded).
@@ -82,7 +74,17 @@ impl Limiter {
         }
         let r = rule(bucket);
         let e = self.buckets.entry((bucket, key)).or_insert((r.0, now_ms));
-        take(e, r, now_ms)
+        // Per address first (N4): one address that is over its own limit
+        // spends nothing of everyone's.
+        if !take(e, r, now_ms) {
+            return false;
+        }
+        let g = global_rule(bucket);
+        let global = self
+            .buckets
+            .entry((bucket, "*".to_string()))
+            .or_insert((g.0, now_ms));
+        take(global, g, now_ms)
     }
 
     pub fn len(&self) -> usize {
@@ -130,5 +132,14 @@ mod tests {
             .filter(|i| l.allow("pair", &format!("10.0.{}.{}", i / 250, i % 250), 0))
             .count();
         assert_eq!(ok, 300);
+        // N4: one address hammering does not use up everyone's allowance.
+        let mut l = Limiter::default();
+        for _ in 0..10_000 {
+            let _ = l.allow("pair", "203.0.113.9", 0);
+        }
+        assert!(
+            l.allow("pair", "198.51.100.1", 0),
+            "another address still gets in"
+        );
     }
 }

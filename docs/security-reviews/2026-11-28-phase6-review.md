@@ -276,3 +276,172 @@ These need either a code fix or an honest rewrite.
 4. M3 (re-authentication before admin actions; limit what the recovery identity can remove; change alerts).
 5. Doc corrections: SECURITY.md lines 47-51, 79-85, 189-190, 205-207; SELF-HOSTING.md line 83.
 6. M4, then the Low items.
+
+---
+
+## Verification pass (commits 5a2be8b, 4331a24, 94fb0dd; HEAD 94fb0dd)
+
+**Verdict: ship after fixes.** Most of the original findings are now fixed correctly. The fixes introduced one new High: any member can permanently stop every other device from sending changes. They also introduced two new Mediums, and both lose data.
+
+**How I checked.**
+- I read the full diff against `b0b650f`.
+- I ran the sync-related crates' tests: crypto 23, core 142, server 2, sync 27 including `review.rs` 12/12. All pass. I did not run `housewright-api` or the app tests, so I did not reproduce the builder's figure of 256 tests.
+- I wrote four new attack tests in a scratch crate (`scratchpad/verify/tests/v.rs`). It reuses the project's own test harness by `#[path]` and changes nothing in the worktree.
+- My `forge/` scenario is now covered end to end by `review.rs::h1_a_removed_device_and_the_server_cannot_forge_batches`. That test uses the new batch format, includes a device that joins later and is shown the forged batches first, and passes. I re-ran it and checked its logic, rather than keeping a second copy.
+
+### Status of each original finding
+
+| Finding | Status | Notes |
+|---|---|---|
+| **H1** forged batches from a removed device | **Fixed** | See the bypass checks below. |
+| **H2** page too large wedges sync | **Fixed** | See H2 notes below. One leftover belongs under N2. |
+| **M1** fork / withholding | **Mitigated, documented** | Batches now carry the author's roster version and hash. A restoring device still trusts the newest roster it is shown; SECURITY.md now says so. The new gossip itself creates **N1**. |
+| **M2** record overwrite and forged `by` | **Fixed** | See M2 notes below. |
+| **M3** takeover | **Fixed for a stolen phone; documented for the paper** | See M3 notes below. |
+| **M4** disk filling and rate limiter | **Fixed** | See M4 notes below. One new problem is **N4**. |
+| **L1** server address check | **Fixed** | Uses the `url` crate. User names and passwords are refused. The debug allowance now checks parsed private IP addresses. |
+| **L2** squatted file | **Mitigated** | One file failing no longer stops the others, and temporary file names are unique. The heal-by-delete design introduces **N3**. |
+| **L3** divergence | (a) **Fixed** with an honest server (`removal_stale`); (b) **Fixed**: unreadable batches kept and retried with full checks; (c) **Mitigated**: same op id with different content is now a counted conflict, first-applied wins; order dependence under reordering is documented | |
+| **L4** pending batch resealed | **Fixed** | Same `device_seq` and same `prev`, new batch id. The server's `seq_reused` answer correctly makes the original the device's head. Receivers can't be given both, because the server enforces one batch per number, and if a hostile server did serve both, the second is refused as tampering. |
+| **L5** server robustness | **Fixed** | `spawn_blocking`, streamed file downloads, timed nonce cleanup. |
+| **L6** pairing confirmation | **Partly** | See L6 notes below. |
+| **L7** secure erase | **Fixed** (plausible; the builder's `l7` test passes) | `secure_delete` around sync-state writes, plus a WAL checkpoint on "stop syncing". |
+
+**H1: the chain rules hold.**
+- The `prev` hash is part of the AAD and the signature.
+- A current device's batch is accepted only at `head.seq + 1` with `prev == head.hash`. Any other batch at a number already used is counted as tampering.
+- A removed device's batches are held and applied only once the chain from the receiver's head back to `last_hash` is complete. A forged batch cannot be on that chain without a SHA-256 second preimage.
+- Edge cases I checked:
+  - `last_seq = 0`: nothing is accepted.
+  - A first batch at seq 1 with a zero `prev` from a removed device: held, never applied.
+  - A fork the removed device made of its own chain: never reaches `last_hash`.
+  - A gap in the chain: refused.
+- The server also enforces the chain on push.
+- The founding-device exception only relaxes authorship, not the chain rules (but see N6).
+
+**H2: paging.**
+- The server refuses any batch over 1 MB, pages stop at about 8 MB, and the client halves the page size and retries.
+- The leftover: a server can mark any real batch `oversize`. The client then skips it, which breaks that device's chain (N2). So "skip" can be used to cut a device off permanently, though it does show in the skipped and tampered counts.
+
+**M2: record binding.**
+- `by` is checked against the device's member, and records are now first-applied-wins. The backdating overwrite is gone.
+- Convergence:
+  - Honest devices apply batches in server order (the author applies its own copy first, and that also comes first in server order), and record ids carry 74+ random bits. So no honest conflicts.
+  - A member cannot plant an id first, because it only learns the id after the batch is sent.
+  - The order dependence is only adversarial: it needs a reordering server, or batches applied out of order (held or unreadable ones) colliding with a planted id. SECURITY.md documents this honestly.
+- What remains is N6.
+
+**M3: takeover.**
+- `verify_next` (run on clients and on the server) requires the previous recovery identity's co-signature to remove an owner device or the recovery identity.
+- A roster signed by the recovery identity may only add devices.
+- The server cannot forge the co-signature, and the recovery identity cannot use it to remove anyone.
+- What remains, and is documented:
+  - The paper is a master key: its holder adds an owner device, then co-signs.
+  - If the paper is lost, a stolen owner phone cannot be removed at all. The documented way out is setting up a new household.
+- Notices of roster changes are shown on every device.
+
+**M4: registration and quota.**
+- A registration token is now made by default and compared in constant time.
+- There is a 2 GB quota per household, the limiter counts IPv6 by /64, and memory is bounded.
+- Two small costs:
+  - The quota is a full `SUM()` scan on every batch push (cost grows with history).
+  - The token is printed to the server log at every start (documented).
+
+**L6: pairing confirmation.**
+- The owner can no longer finish before the new device confirms.
+- But the confirmation is a constant (`"numbers match"`) sealed with the pairing code. It is not bound to the joiner's keys or the safety number.
+- So in the scenario I described (someone with a leaked code joins first), that attacker sends the confirmation itself. The owner's screen then shows `other_confirmed: true`, which may reassure a hurried owner.
+- Protection still rests entirely on the person comparing the two screens.
+
+### New findings
+
+#### N1 (High). Any member can permanently freeze every other device's outgoing sync. **Confirmed** (demonstrated)
+
+- Where: `crates/sync/src/client.rs:851-865` (gossip handling); `client.rs:473-476` (push refused while `fork` or `newest_roster_seen > latest`); `state.rs:85-88` (both fields are persisted, and nothing ever clears them).
+- **What is wrong.** The `roster_version` and `roster_hash` inside a batch body are whatever the author wrote. Nothing checks them.
+- **Attack.** A Member or Limited device (a modified app) pushes one validly signed and chained batch containing either:
+  - `roster_version = u64::MAX`; or
+  - `roster_version = 1` with a wrong hash.
+
+  Every other device then refuses to send anything, permanently (`RosterHidden`). Its edits pile up locally, and pulling still works.
+  - `scratchpad/verify/tests/v.rs::n1_*`: both variants make two syncs in a row on Ana's phone return `Err(RosterHidden)`.
+  - There is no way back without editing the device's database.
+- **Fix:**
+  - Do not trust a version number on its own. Put the claimed `SignedRoster` (or its chain from the receiver's newest version) inside the batch, and verify it.
+  - Treat a claim that can't be verified, or a hash mismatch, as tampering by *that author*: say so, don't freeze the device.
+  - Clear `newest_roster_seen` once that version arrives, and let the person acknowledge or clear a fork warning.
+
+#### N2 (Medium). One missing batch cuts a device off from everyone else, permanently. A server restored from backup wedges every device. **Confirmed** (demonstrated)
+
+- Where: `client.rs` `receive()`, the gap check at `seq != head.seq + 1 || prev != head.hash` (rejected, head not advanced, cursor moves on); `handlers.rs` `push_ops` chain check (refuses if the server lacks `device_seq - 1`).
+- **Scenario 1: one lost batch.** The server loses, withholds once, or marks oversize a single batch from device E. Every device that had not yet pulled it then refuses *every later batch from E*, forever, counting each as tampering.
+  - `v.rs::n2_*`: after one of E's batches was deleted from the server database, neither Ana nor Ben ever received E's later changes (rooms 13 and 14).
+- **Scenario 2: old server backup.** The server is restored from an old backup (an honest operator, covered in SELF-HOSTING.md).
+  - Every device whose recent batches were lost now has its next push refused with `chain`. Its pending batch never goes, so its sync stays wedged.
+  - Receivers also see gaps, as in scenario 1.
+  - SECURITY.md's "not handled" understates this: it is now total and permanent, not "a few batches lost".
+- **Fix:**
+  - On a gap, hold the batch (as is done for removed devices), fetch the missing numbers by device and number (new endpoint), and apply once the chain is complete. Refuse only a *different* batch at a number already seen.
+  - When the server's `chain` error means it is missing earlier batches, the device should re-push its own chain from what it holds locally. Keep sent batches locally for this.
+  - Show the person a clear "missing changes from X" message.
+
+#### N3 (Medium). A device with stale keys deletes good files from the server; any member can delete any file. **Confirmed** (demonstrated)
+
+- Where: `client.rs` `download()` (any `open_blob` error leads to `DELETE`); `handlers.rs` `delete_blob` (any member, any blob, no condition).
+- **Scenario 1: honest data loss.**
+  1. Ben's phone has not synced since Ana removed a device (a new epoch).
+  2. Ana attaches a photo, which is sealed under the new epoch.
+  3. Ben opens it (`fetch_file` does not refresh keys).
+  4. Decryption fails with "no key for epoch 1", and Ben's phone deletes the good file from the server.
+  - `v.rs::n3_*`: server blob count went 1 → 0.
+- The same happens in `sync_files` if a rotation lands between refresh and download.
+- If no device still holds the file (files over 4 MB are not prefetched; the device that uploaded it was lost), it is gone, including from any later recovery.
+- **Scenario 2: malicious member.** A member can delete every file on the server deliberately.
+- **Fix:**
+  - Refresh keys and retry before deciding a file is bad.
+  - Ask for a delete only when decryption *authenticated* and the hash then failed, or the AEAD tag failed. Never on "no key for this epoch".
+  - Better: never delete. Let a device that holds the real file replace a blob that was reported bad (keep the old copy until a valid replacement arrives), and restrict DELETE to owners, or remove it.
+
+#### N4 (Low). One address can drain the global rate limit and lock everyone out of pairing, recovery and registration. **Confirmed** (traced)
+
+- Where: `crates/server/src/limit.rs` `allow()`. The global bucket's token is taken *before* the per-address check, so refused requests still spend global tokens.
+- **Attack.** One client sending more than 300 requests a minute to the pairing endpoints (more than 100 to recovery, more than 20 an hour to create) locks out every other user.
+- **Fix:**
+  - Check the per-address bucket first, and take a global token only if it passes.
+  - Consider a global bucket that only applies once many distinct addresses are active.
+
+#### N5 (Low). A malicious server can fill a device's storage with "held" batches. **Confirmed** (traced)
+
+- Where: `client.rs` `receive()`, the `Author::Removed` branch.
+- **What is wrong.**
+  - It stores `held:{dev}:{hash}` for any batch naming a removed device with `seq <= last_seq`, *before* checking the signature, and with no cap.
+  - `resolve_held` then rescans every held key each time.
+  - So the server can feed unlimited batches of about 1.4 MB each, with costs growing quadratically.
+- **Fix.**
+  - Run `verify_batch` against the removed entry's key before holding.
+  - Cap the held count at `last_seq - head.seq`.
+  - Keep at most one held batch per number. Since signatures are now checked first, a second, different one is a fork by the removed device itself.
+
+#### N6 (Low). The founding device's exception never closes. **Confirmed** (traced)
+
+- Where: `client.rs` `open_checked`: `pre_sync = founder && o.hlc.wall_ms < genesis.made_ms`.
+- **What is wrong.** The founding device can still write operations, and records whose `by` is someone else, in any member's name, at any time, just by backdating them before setup. Nothing limits it to sending them once.
+- This contradicts the claim in `review.rs` and SECURITY.md that nobody, an owner included, writes in another member's name. Impact is low, because the founder is an owner.
+- **Fix.** Accept the exception only in batches up to a number the founder records in the genesis roster (for example `history_upto_seq`), or only for operations whose ids are listed in a hash committed at setup.
+
+### Things checked and found sound
+
+- The co-signature transcript is separated from other signatures, covers the exact body bytes (including version and `prev`, so it can't be replayed), and is included in the roster hash.
+- `last_hash` is validated as hex.
+- The server's `removal_stale` check uses the stored chain head.
+- `unpad` and `KeyChain::from_bytes` now use checked arithmetic, and the clock-offset arithmetic saturates.
+- Unreadable batches are retried with every check applied again.
+- `secure_delete` is turned on only around sync-state writes.
+- The quota is enforced for both batches and files.
+
+### Recommended before shipping
+
+1. N1: verify gossip claims, never freeze on an unverifiable one, and let the person clear the state.
+2. N2: hold and refetch on chain gaps; re-push own history after a server restore.
+3. N3: no delete on "no key", refresh first; replace instead of delete; owners only.
+4. Then N4, N5, N6, and binding the L6 confirmation to the safety number (seal `H(safety number inputs)` rather than a constant, so it at least proves the joiner computed the same number).

@@ -866,6 +866,57 @@ token on first start, keeps it in its data folder and prints it;
 (2 GB by default), and the rate limiter counts IPv6 by /64, keeps at most
 10,000 addresses, and has a global bucket per purpose.
 
+## Verification-pass fixes (proposed 2026-11-28)
+
+After the reviewer's verification pass (same report, "Verification pass").
+
+**D-106 Roster claims must be signed (Proposed).** Fixes N1; revises
+D-103. A batch carries its author's newest *signed* roster version, not a
+bare number. A version newer than the receiver's counts only if one of the
+household's current owner devices signed it; a different version under a
+number the receiver has counts as a fork only if an owner of the version
+before signed it. Anything else is that author's tampering: counted and
+shown, and it never stops anyone sending. The "newer version" state clears
+by itself when the version arrives; a fork warning clears when the person
+presses OK.
+
+**D-107 Gaps are filled, not fatal; a restored server is repaired
+(Proposed).** Fixes N2. A batch ahead of a device's chain is held (one per
+number, signature checked) and the missing numbers are fetched by device
+and number. Each device keeps every batch it sealed (`sent:<n>`) and, on
+each sync, asks the server which of its numbers it lacks and sends those
+again. A server restored from a backup is noticed (its newest batch number
+is below the device's cursor): devices read everything again (duplicates
+ignored), send what it lost, and an owner's device sends back lost roster
+versions with fresh key envelopes. Still refused everywhere: a second,
+different batch under a used number; anything not on a removed device's
+recorded chain. Cost: each device keeps its sent batches, roughly doubling
+the space its own history takes.
+
+**D-108 Files are never deleted on a device's say-so (Proposed).** Fixes
+N3; replaces the delete of D-102's era. A device that lacks the key for a
+file's epoch fetches the keys and tries again. A file that decrypts wrong
+with the right key is *marked* bad on the server, not deleted; a device
+holding the real file sends it again and that copy replaces it. Any member
+may mark (it costs nothing but a re-upload); nobody can delete.
+
+**D-109 Rate limits: per address first (Proposed).** Fixes N4. A request
+spends the global allowance only after passing its own address's limit.
+Removed-device batches are held only when signed by that device, at most
+four per number and within its recorded count (N5).
+
+**D-110 The founder's history is committed at setup (Proposed).** Fixes
+N6. At setup the founding device seals the household's existing history as
+its first batches; the genesis roster records how many and the hash of the
+last. Only those batches may hold operations in other members' names.
+
+**D-111 The new device's confirmation is bound to the safety number
+(Proposed).** Revises D-102 (L6). The new device seals a hash of exactly the
+safety number's inputs (invitation, `r`, both devices' keys); the owner's
+device accepts it only if it matches its own view. A middleman's keys make
+the two views differ, so the owner's device cannot finish even if both
+people tap "they match".
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

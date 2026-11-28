@@ -106,6 +106,14 @@ pub struct RosterBody {
     pub devices: Vec<RosterEntry>,
     pub removed: Vec<RemovedEntry>,
     pub made_ms: u64,
+    /// Genesis only (D-110): how many of the founding device's first
+    /// batches carry the household's history from before sync, and the
+    /// hash of the last of them. Only those batches may hold operations in
+    /// other members' names.
+    #[serde(default)]
+    pub history_batches: u64,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub history_head: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -177,7 +185,8 @@ impl SignedRoster {
         )))
     }
 
-    fn check_sig(&self, signer: &DevicePublic) -> Result<()> {
+    /// Check the main signature against a given device's key.
+    pub fn check_sig(&self, signer: &DevicePublic) -> Result<()> {
         signer.verify(
             &transcript("housewright/v1/roster-sig", &[&self.body]),
             &self.sig,
@@ -202,6 +211,8 @@ impl RosterBody {
     pub fn successor(&self, signed: &SignedRoster, made_ms: u64) -> RosterBody {
         let mut n = self.clone();
         n.version += 1;
+        n.history_batches = 0;
+        n.history_head = String::new();
         n.prev = signed.hash();
         if self.version == 1 {
             n.genesis = signed.hash();
@@ -251,7 +262,12 @@ fn check_devices(b: &RosterBody) -> Result<()> {
 /// Check the first version.
 pub fn verify_genesis(s: &SignedRoster) -> Result<RosterBody> {
     let b = s.parse()?;
-    if b.version != 1 || b.epoch != 0 || b.prev != ZERO_HASH || !b.genesis.is_empty() {
+    if b.version != 1
+        || b.epoch != 0
+        || b.prev != ZERO_HASH
+        || !b.genesis.is_empty()
+        || (b.history_batches == 0) != b.history_head.is_empty()
+    {
         return Err(bad("not a valid first version"));
     }
     if !b.removed.is_empty() || b.devices.iter().any(|e| e.added_in != 1) {
@@ -273,7 +289,11 @@ pub fn verify_next(
     next: &SignedRoster,
 ) -> Result<RosterBody> {
     let n = next.parse()?;
-    if n.space != prev.space || n.version != prev.version + 1 {
+    if n.space != prev.space
+        || n.version != prev.version + 1
+        || n.history_batches != 0
+        || !n.history_head.is_empty()
+    {
         return Err(bad("out of sequence"));
     }
     if n.prev != prev_signed.hash() {
@@ -457,6 +477,8 @@ mod tests {
             ],
             removed: vec![],
             made_ms: 1,
+            history_batches: 0,
+            history_head: String::new(),
         };
         b.sort();
         let s = SignedRoster::sign(&b, owner).unwrap();
@@ -535,6 +557,8 @@ mod tests {
             ],
             removed: vec![],
             made_ms: 1,
+            history_batches: 0,
+            history_head: String::new(),
         };
         gb.sort();
         let g = SignedRoster::sign(&gb, &owner).unwrap();

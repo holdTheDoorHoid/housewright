@@ -19,7 +19,7 @@ use housewright_core::model::{Member, Role};
 use housewright_core::store::Store;
 use housewright_crypto::batch::ZERO_HASH;
 use housewright_crypto::encoding::{hex, unhex_array};
-use housewright_crypto::pairing::{PairingCode, Part, commitment, safety_number};
+use housewright_crypto::pairing::{PairingCode, Part, commitment, confirmation, safety_number};
 use housewright_crypto::primitives::random;
 use housewright_crypto::roster::{DeviceRole, RosterEntry, seal_label, verify_chain};
 use housewright_crypto::wire::*;
@@ -254,7 +254,9 @@ impl SyncClient {
                         .as_deref()
                         .and_then(|c| inv.code.open(Part::Confirm, c).ok())
                         .as_deref()
-                        == Some(b"numbers match".as_slice());
+                        == Some(
+                            confirmation(&id, &inv.r, &st.secret.public(), &j.device).as_slice(),
+                        );
                 Ok(PairState::Compare {
                     other_confirmed,
                     safety_number: safety_number(&id, &inv.r, &st.secret.public(), &j.device),
@@ -301,7 +303,11 @@ impl SyncClient {
                 .as_deref()
                 .and_then(|c| inv.code.open(Part::Confirm, c).ok())
                 .as_deref()
-                == Some(b"numbers match".as_slice());
+                == inv
+                    .joiner
+                    .as_ref()
+                    .map(|j| confirmation(&id, &inv.r, &st.secret.public(), &j.device).to_vec())
+                    .as_deref();
         if !confirmed {
             self.invite = Some(inv);
             return Err(SyncError::Invalid(
@@ -536,7 +542,14 @@ impl SyncClient {
             return Ok(PairState::Waiting);
         }
         if !j.confirmed {
-            let confirm = j.code.seal(Part::Confirm, b"numbers match")?;
+            // Bound to exactly what the safety number was made from (D-111).
+            let digest = confirmation(
+                &j.code.invitation_id(),
+                j.r.as_ref().expect("checked above"),
+                &j.offer.inviter,
+                &j.secret.public(),
+            );
+            let confirm = j.code.seal(Part::Confirm, &digest)?;
             let path = format!("/v1/invitations/{}/confirm", j.code.invitation_id());
             let server = j.server.clone();
             let body = serde_json::to_vec(&JoinConfirm { confirm }).expect("serialises");
@@ -612,7 +625,8 @@ impl SyncClient {
             cursor: 0,
             push_cursor: 0,
             next_device_seq: 1,
-            pending: None,
+            acked_seq: 0,
+            acked_upto: 0,
             heads: Default::default(),
             own_head: ZERO_HASH.to_string(),
             status: SyncStatus {

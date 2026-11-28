@@ -376,6 +376,14 @@ impl KeyChain {
         Ok(Self { keys })
     }
 
+    /// The chain as it was at `epoch` (for re-sending old envelopes).
+    pub fn truncated(&self, epoch: u32) -> Option<KeyChain> {
+        let n = epoch as usize + 1;
+        (n <= self.keys.len()).then(|| KeyChain {
+            keys: self.keys[..n].to_vec(),
+        })
+    }
+
     /// True if `other` is this chain plus zero or more later epochs.
     pub fn is_prefix_of(&self, other: &KeyChain) -> bool {
         self.keys.len() <= other.keys.len()

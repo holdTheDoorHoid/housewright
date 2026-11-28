@@ -578,19 +578,18 @@ fn a_middleman_with_the_code_is_caught_by_the_safety_number() {
         panic!()
     };
     assert_ne!(on_ana, on_ben, "the numbers differ, so the person stops");
-    // Even if both people tapped "match" by mistake, Ben's device refuses
-    // the household: the roster adds the attacker's key, not Ben's.
+    // Even if both people tapped "match" by mistake: Ben's confirmation is
+    // bound to the keys he saw (D-111), which are not the ones Ana's phone
+    // saw, so her phone cannot finish; nothing is added.
     ben.client
         .join_confirm(&mut ben.store, &mut ben.blobs, true)
         .unwrap();
-    a.client
-        .invite_confirm(&mut a.store, &mut a.blobs, true)
-        .unwrap();
     assert!(
-        ben.client
-            .join_poll(&mut ben.store, &mut ben.blobs)
+        a.client
+            .invite_confirm(&mut a.store, &mut a.blobs, true)
             .is_err()
     );
+    assert_eq!(a.client.devices(&a.store).unwrap().len(), 1);
     assert!(!housewright_sync::SyncClient::is_set_up(&ben.store).unwrap());
 }
 

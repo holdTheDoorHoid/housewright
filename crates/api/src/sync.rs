@@ -231,12 +231,24 @@ impl Api {
             warnings: {
                 let mut w = Vec::new();
                 if st.fork {
-                    w.push("The sync server showed this device a different history of the household's devices than another device saw. Changes made here are kept on this device. Check who runs the server.".to_string());
+                    w.push("The sync server showed this device a different history of the household's devices than another device saw. Changes made here are kept on this device until you press OK below. Check who runs the server.".to_string());
                 }
                 if st.unsent_too_large > 0 {
                     w.push(format!(
                         "{} change(s) were too large to send and stay on this device only.",
                         st.unsent_too_large
+                    ));
+                }
+                if !st.missing_from.is_empty() {
+                    w.push(format!(
+                        "Some changes from {} are missing on the sync server. Later changes from that device wait on this one until they arrive; that device sends them again when it next syncs.",
+                        st.missing_from.join(", ")
+                    ));
+                }
+                if st.bad_claims > 0 {
+                    w.push(format!(
+                        "{} change batch(es) from another device named a household device list that could not be checked. They were applied as usual; if this keeps happening, a device may be misbehaving.",
+                        st.bad_claims
                     ));
                 }
                 if st.skipped_too_large > 0 {

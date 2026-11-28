@@ -117,6 +117,28 @@ impl PairingCode {
     }
 }
 
+/// What the new device seals as "the numbers match" (D-102, revised
+/// D-111): a hash of exactly the inputs of the safety number, so the
+/// confirmation is bound to the keys and the `r` the new device saw.
+pub fn confirmation(
+    invitation_id: &str,
+    r: &[u8; 32],
+    inviter: &DevicePublic,
+    joiner: &DevicePublic,
+) -> [u8; 32] {
+    sha256(&transcript(
+        "housewright/v1/pair-confirm",
+        &[
+            invitation_id.as_bytes(),
+            r,
+            &inviter.sign,
+            &inviter.dh,
+            &joiner.sign,
+            &joiner.dh,
+        ],
+    ))
+}
+
 pub fn commitment(r: &[u8; 32]) -> [u8; 32] {
     sha256(&transcript("housewright/v1/pair-commit", &[r]))
 }

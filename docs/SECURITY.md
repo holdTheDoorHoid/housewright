@@ -56,8 +56,9 @@ stays on it (removing cannot reach into a phone and delete data); and if
 the person removed also controls the sync server, the server could keep
 the removal from your other devices for a while. Devices notice when
 another device knows of a newer device list than the server gives them,
-and then stop sending changes until it arrives (D-103), but a server that
-hides it from every device at once is not detected. Removing an owner's
+and then stop sending changes until it arrives (D-103, D-106; only a
+version signed by an owner's device counts, so a member cannot fake one),
+but a server that hides it from every device at once is not detected. Removing an owner's
 device needs the recovery key (D-101). Every device shows a notice when a
 device is added or removed elsewhere.
 
@@ -207,13 +208,24 @@ in order (`SyncClient::accept`):
    from before sync was set up (operations older than the genesis roster),
    sent once by the founding device.
 
-Before those content checks, the chain rules (D-99): each device's batches
-form a hash chain (`prev` in the signed header and the AAD). A receiver
-accepts a device's batch only as the next link after the last one it
-accepted from it, and refuses any second batch under a number already used
-(counted as tampering). A removed device's batches are held until the
-whole chain ending at the `last_hash` recorded in the roster is present,
-then applied in order; anything else from it is refused.
+Before those content checks, the chain rules (D-99, D-107): each device's
+batches form a hash chain (`prev` in the signed header and the AAD). A
+receiver applies a device's batch only as the next link after the last one
+it applied from it. A batch further ahead is held (signature checked, one
+per number) while the missing numbers are fetched by device and number; a
+second, different batch under a number already used is refused (counted as
+tampering). A removed device's batches are held (signed by it, at most four
+candidates per number, within its recorded count) until the chain ending
+at the `last_hash` recorded in the roster is present, then applied in
+order; anything else from it is refused.
+
+The founding device's exception to rule 5 covers exactly the batches the
+genesis roster commits to (their number and the last one's hash, D-110),
+sealed at setup.
+
+Each batch also carries its author's newest signed roster version (D-106).
+Receivers act on it only when an owner's device signed it; otherwise it is
+counted as that author's tampering and changes nothing.
 
 A batch that fails is skipped by every device the same way as long as the
 server shows every device the same batches in the same order (an honest
@@ -239,8 +251,11 @@ crash or dropped connection sends the same bytes; the server deduplicates by
   the hash in the attachment record (signed, encrypted, written once and
   bound to its author, D-104), so a file cannot be swapped by the server.
   A member can still attach a different file of their own; they cannot
-  change someone else's attachment. A file that fails the check is deleted
-  from the server so a device holding the real one uploads it again.
+  change someone else's attachment.
+- Nothing is deleted because a device could not open a file (D-108). A
+  device missing the key for a file's epoch fetches the keys and tries
+  again. A file that decrypts wrong with the right key is marked bad on the
+  server; a device holding the real file sends it again and replaces it.
 - Photos' thumbnails and files up to 4 MB are fetched during sync; larger
   ones when opened.
 - Files on the device stay as they were in Phase 4 (plain files in app
@@ -395,6 +410,16 @@ buffers holding plaintext operations are not all wiped.
 - pairing with a wrong code, with "they don't match" on either side, and
   with a middleman who has the code;
 - a member device writing in the owner's name is refused.
+- after the verification pass (`crates/sync/tests/verify.rs`): a member's
+  made-up roster claims freeze nobody (N1) and a real hidden version clears
+  when it arrives; one lost batch is sent again and the gap filled (N2); a
+  server restored from an old backup recovers, and a new device can still
+  join (N2); a device with old keys never loses a good file, and a member
+  marking a good file bad loses nothing (N3); one address cannot use up
+  everyone's pairing allowance (N4, server unit test); unsigned batches for
+  a removed device are not kept (N5); the founder cannot backdate changes
+  in another member's name (N6); a constant "numbers match" is refused
+  (L6). Each protection was switched off in turn to confirm its test fails.
 - after the review (`crates/sync/tests/review.rs`): a removed device with a
   colluding server injecting forged batches, including to a device that
   joins later and is shown the forgeries first (H1); an owner's device
@@ -469,7 +494,13 @@ create a household (D-105).
 - **Server robustness**: SQLite sits behind one lock; heavy handlers run
   on blocking threads and files are streamed, but a very busy server would
   want a connection pool.
-- **Server restored from an old backup**: devices' cursors would be ahead of
-  it; they would miss nothing they already have, but batches acknowledged
-  after the backup would be gone from the server (devices still hold them
-  locally and do not re-push). Not handled.
+- **Server restored from an old backup** (D-107): devices notice (the
+  server's newest batch number is below theirs), read everything again,
+  and send back what it lost: each device its own batches (it keeps every
+  batch it sealed) and an owner's device the roster versions, with fresh
+  key envelopes. A lost change of recovery key cannot be sent back without
+  the paper; the app asks for a new recovery key then. Changes made by a
+  device that was itself lost since the backup are gone from the server,
+  as they would be anyway.
+- **Storage on devices**: each device keeps every batch it sealed (to send
+  again after a server restore), and one small record per batch it applied.

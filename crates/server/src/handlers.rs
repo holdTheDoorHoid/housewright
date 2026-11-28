@@ -145,7 +145,20 @@ fn insert_device(
         ],
     )?;
     if n == 0 {
-        return Err(ApiErr::conflict("that device is already registered"));
+        // Already here (a roster version sent again after a server
+        // restore): fine if it is the same device of the same household.
+        let same: bool = conn.query_row(
+            "SELECT EXISTS(SELECT 1 FROM devices WHERE id = ?1 AND space = ?2 AND sign = ?3)",
+            params![
+                e.device.id.to_string(),
+                space.to_string(),
+                e.device.sign.to_vec()
+            ],
+            |r| r.get(0),
+        )?;
+        if !same {
+            return Err(ApiErr::conflict("that device is already registered"));
+        }
     }
     Ok(())
 }
@@ -307,11 +320,9 @@ fn update_roster_sync(
     let me = device_of(&s, &method, &uri, &headers, &body, space)?;
     need_manager(&me)?;
     let req: UpdateRoster = json(&body)?;
-    if req.roster.signer != me.id {
-        return Err(ApiErr::forbidden(
-            "a roster must be signed by the device sending it",
-        ));
-    }
+    // Normally the signer sends it. After a server restore an owner's
+    // device may send again versions another owner signed (D-107); they
+    // are checked exactly the same way.
     let now = s.now();
     let mut conn = s.db();
     let prev_signed = latest_roster(&conn, space)?.ok_or_else(ApiErr::not_found)?;
@@ -650,7 +661,7 @@ fn pull_ops_sync(
     let limit = q.limit.unwrap_or(200).clamp(1, 500);
     let conn = s.db();
     let mut stmt = conn.prepare(
-        "SELECT seq, received_ms, data FROM batches WHERE space = ?1 AND seq > ?2 ORDER BY seq LIMIT ?3",
+        "SELECT seq, received_ms, data, device, device_seq FROM batches WHERE space = ?1 AND seq > ?2 ORDER BY seq LIMIT ?3",
     )?;
     let rows = stmt.query_map(
         params![space.to_string(), q.after as i64, (limit + 1) as i64],
@@ -659,6 +670,8 @@ fn pull_ops_sync(
                 r.get::<_, i64>(0)?,
                 r.get::<_, i64>(1)?,
                 r.get::<_, String>(2)?,
+                r.get::<_, String>(3)?,
+                r.get::<_, i64>(4)?,
             ))
         },
     )?;
@@ -668,7 +681,7 @@ fn pull_ops_sync(
     let mut bytes = 0usize;
     let mut more = false;
     for r in rows {
-        let (seq, received, data) = r?;
+        let (seq, received, data, device, device_seq) = r?;
         if batches.len() as u64 >= limit || (bytes > 0 && bytes + data.len() > PAGE_BYTES) {
             more = true;
             break;
@@ -679,6 +692,8 @@ fn pull_ops_sync(
                 received_ms: received as u64,
                 batch: None,
                 oversize: true,
+                device: device.parse().ok(),
+                device_seq: device_seq as u64,
             });
             continue;
         }
@@ -689,9 +704,104 @@ fn pull_ops_sync(
             received_ms: received as u64,
             batch: Some(batch),
             oversize: false,
+            device: None,
+            device_seq: 0,
         });
     }
-    Ok(Json(PullOps { batches, more }))
+    drop(stmt);
+    let head: i64 = conn.query_row(
+        "SELECT COALESCE(MAX(seq), 0) FROM batches WHERE space = ?1",
+        [space.to_string()],
+        |r| r.get(0),
+    )?;
+    let roster_version: i64 = conn.query_row(
+        "SELECT COALESCE(MAX(version), 0) FROM rosters WHERE space = ?1",
+        [space.to_string()],
+        |r| r.get(0),
+    )?;
+    Ok(Json(PullOps {
+        batches,
+        more,
+        head: head as u64,
+        roster_version: roster_version as u64,
+    }))
+}
+
+/// `GET /v1/s/{space}/chain/{device}/{seq}`: one batch by its device's
+/// own number, to fill a gap (D-107).
+pub async fn chain_batch(
+    State(s): State<AppState>,
+    Path((space, device, dseq)): Path<(String, String, u64)>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<Json<OneBatch>> {
+    blocking(move || {
+        let space = space_id(&space)?;
+        device_of(&s, &method, &uri, &headers, &body, space)?;
+        let conn = s.db();
+        let row: Option<(i64, i64, String)> = conn
+            .query_row(
+                "SELECT seq, received_ms, data FROM batches WHERE space = ?1 AND device = ?2 AND device_seq = ?3",
+                params![space.to_string(), device, dseq as i64],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            )
+            .optional()?;
+        let (seq, received, data) = row.ok_or_else(ApiErr::not_found)?;
+        if data.len() > MAX_STORED_BATCH {
+            return Err(ApiErr::new(StatusCode::PAYLOAD_TOO_LARGE, "too_large", "that batch is too large to send"));
+        }
+        let batch: SealedBatch = serde_json::from_str(&data).map_err(|_| internal())?;
+        Ok(Json(OneBatch {
+            batch: Pulled {
+                seq: seq as u64,
+                received_ms: received as u64,
+                batch: Some(batch),
+                oversize: false,
+                device: None,
+                device_seq: 0,
+            },
+        }))
+    })
+    .await
+}
+
+/// `GET /v1/s/{space}/chain/{device}`: the newest number held for a device.
+pub async fn chain_head(
+    State(s): State<AppState>,
+    Path((space, device)): Path<(String, String)>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<Json<ChainHead>> {
+    blocking(move || {
+        let space = space_id(&space)?;
+        device_of(&s, &method, &uri, &headers, &body, space)?;
+        let conn = s.db();
+        let seq: i64 = conn.query_row(
+            "SELECT COALESCE(MAX(device_seq), 0) FROM batches WHERE space = ?1 AND device = ?2",
+            params![space.to_string(), device],
+            |r| r.get(0),
+        )?;
+        let mut stmt = conn.prepare(
+            "SELECT device_seq FROM batches WHERE space = ?1 AND device = ?2 ORDER BY device_seq",
+        )?;
+        let have: std::collections::BTreeSet<i64> = stmt
+            .query_map(params![space.to_string(), device], |r| r.get(0))?
+            .collect::<rusqlite::Result<_>>()?;
+        let missing = (1..seq)
+            .filter(|n| !have.contains(n))
+            .take(1000)
+            .map(|n| n as u64)
+            .collect();
+        Ok(Json(ChainHead {
+            seq: seq as u64,
+            missing,
+        }))
+    })
+    .await
 }
 
 /// Bytes of batch data per pull page.
@@ -749,8 +859,10 @@ fn missing_blobs_sync(
     let conn = s.db();
     let mut names = Vec::new();
     for n in req.names {
+        // Missing, or reported bad by a device (D-108): a device that has
+        // the real file sends it again.
         let have: bool = conn.query_row(
-            "SELECT EXISTS(SELECT 1 FROM blobs WHERE space = ?1 AND name = ?2)",
+            "SELECT EXISTS(SELECT 1 FROM blobs WHERE space = ?1 AND name = ?2 AND bad = 0)",
             params![space.to_string(), n],
             |r| r.get(0),
         )?;
@@ -794,6 +906,15 @@ fn put_blob_sync(
         eprintln!("housewright-server: file storage error: {}", e.kind());
         internal()
     };
+    let bad: bool = s
+        .db()
+        .query_row(
+            "SELECT bad FROM blobs WHERE space = ?1 AND name = ?2",
+            params![space.to_string(), name],
+            |r| r.get::<_, i64>(0),
+        )
+        .optional()?
+        .is_some_and(|b| b != 0);
     if !path.exists() && usage(&s.db(), space)? + body.len() as u64 > s.cfg().quota_bytes {
         return Err(ApiErr::new(
             StatusCode::INSUFFICIENT_STORAGE,
@@ -802,7 +923,9 @@ fn put_blob_sync(
         ));
     }
     std::fs::create_dir_all(dir).map_err(io)?;
-    if !path.exists() {
+    // The first copy stays; a copy reported bad is replaced by the next
+    // upload (the old one is kept until then, so nothing is lost; D-108).
+    if !path.exists() || bad {
         // A unique temporary name: two uploads at once never mix (L2).
         let rnd = housewright_crypto::encoding::hex(
             &housewright_crypto::primitives::random::<8>().map_err(|_| internal())?,
@@ -812,7 +935,9 @@ fn put_blob_sync(
         std::fs::rename(&tmp, &path).map_err(io)?;
     }
     s.db().execute(
-        "INSERT OR IGNORE INTO blobs (space, name, size, created_ms) VALUES (?1, ?2, ?3, ?4)",
+        "INSERT INTO blobs (space, name, size, created_ms) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(space, name) DO UPDATE SET bad = 0, size = excluded.size
+         WHERE blobs.bad != 0",
         params![space.to_string(), name, body.len() as i64, s.now() as i64],
     )?;
     Ok(StatusCode::OK)
@@ -841,11 +966,11 @@ pub async fn get_blob(
     }
 }
 
-/// `DELETE /v1/s/{space}/blobs/{name}`: a device found this file does not
-/// match its hash (it was damaged, or someone uploaded garbage under its
-/// name first). Removing it lets a device that has the real file upload
-/// it again on its next sync (L2).
-pub async fn delete_blob(
+/// `POST /v1/s/{space}/blobs/{name}/bad`: a device decrypted this file
+/// and it did not match its hash. Nothing is deleted: the file is only
+/// marked, so a device holding the real one sends it again, and the next
+/// upload replaces it (D-108).
+pub async fn report_bad_blob(
     State(s): State<AppState>,
     Path((space, name)): Path<(String, String)>,
     method: Method,
@@ -859,9 +984,8 @@ pub async fn delete_blob(
         if me.role == DeviceRole::Recovery || !blob_name_ok(&name) {
             return Err(ApiErr::forbidden("not allowed"));
         }
-        let _ = std::fs::remove_file(s.blob_path(space, &name));
         s.db().execute(
-            "DELETE FROM blobs WHERE space = ?1 AND name = ?2",
+            "UPDATE blobs SET bad = 1 WHERE space = ?1 AND name = ?2",
             params![space.to_string(), name],
         )?;
         Ok(StatusCode::OK)

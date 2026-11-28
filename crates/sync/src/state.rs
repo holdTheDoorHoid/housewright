@@ -92,6 +92,14 @@ pub struct SyncStatus {
     /// Local changes too large to send, kept on this device only.
     #[serde(default)]
     pub unsent_too_large: u64,
+    /// Devices whose changes have a gap the server cannot fill, by device
+    /// name: their later changes wait here until it is filled (D-107).
+    #[serde(default)]
+    pub missing_from: Vec<String>,
+    /// Batches whose roster claim could not be checked (a sign of a
+    /// tampering device; never stops anything, D-106).
+    #[serde(default)]
+    pub bad_claims: u64,
 }
 
 pub(crate) struct State {
@@ -101,9 +109,14 @@ pub(crate) struct State {
     pub rosters: Vec<SignedRoster>,
     pub bodies: Vec<RosterBody>,
     pub cursor: u64,
+    /// Local ops up to here are sealed into saved batches.
     pub push_cursor: i64,
+    /// The newest of this device's batches the server acknowledged, and the
+    /// local op it covers (D-107). Sealed batches are kept (`sent:<seq>`)
+    /// so they can be sent again to a server restored from a backup.
+    pub acked_seq: u64,
+    pub acked_upto: i64,
     pub next_device_seq: u64,
-    pub pending: Option<Pending>,
     pub heads: BTreeMap<DeviceId, Head>,
     /// The hash of this device's own newest sealed batch.
     pub own_head: String,
@@ -160,7 +173,8 @@ impl State {
             cursor: get(store, "cursor")?.unwrap_or(0),
             push_cursor: get(store, "push_cursor")?.unwrap_or(0),
             next_device_seq: get(store, "next_device_seq")?.unwrap_or(1),
-            pending: get::<Option<Pending>>(store, "pending")?.flatten(),
+            acked_seq: get(store, "acked_seq")?.unwrap_or(0),
+            acked_upto: get(store, "acked_upto")?.unwrap_or(0),
             heads: get(store, "heads")?.unwrap_or_default(),
             own_head: get(store, "own_head")?
                 .unwrap_or_else(|| housewright_crypto::batch::ZERO_HASH.to_string()),
@@ -181,7 +195,8 @@ impl State {
         let cursor = put(&self.cursor);
         let push_cursor = put(&self.push_cursor);
         let next = put(&self.next_device_seq);
-        let pending = put(&self.pending);
+        let acked_seq = put(&self.acked_seq);
+        let acked_upto = put(&self.acked_upto);
         let heads = put(&self.heads);
         let own_head = put(&self.own_head);
         let status = put(&self.status);
@@ -193,7 +208,8 @@ impl State {
             ("cursor", &cursor),
             ("push_cursor", &push_cursor),
             ("next_device_seq", &next),
-            ("pending", &pending),
+            ("acked_seq", &acked_seq),
+            ("acked_upto", &acked_upto),
             ("heads", &heads),
             ("own_head", &own_head),
             ("status", &status),

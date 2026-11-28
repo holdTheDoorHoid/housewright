@@ -76,6 +76,8 @@ pub enum SyncError {
     Removed,
     #[error("another device knows a newer list of the household's devices")]
     RosterHidden,
+    #[error("this device needs the household's newer keys first")]
+    StaleKeys,
     #[error("sync is not set up on this device")]
     NotSetUp,
     #[error("{0}")]
@@ -96,6 +98,7 @@ impl SyncError {
             SyncError::ClockAhead => "clock_ahead",
             SyncError::Removed => "removed",
             SyncError::RosterHidden => "roster_hidden",
+            SyncError::StaleKeys => "stale_keys",
             SyncError::NotSetUp => "not_set_up",
             SyncError::Invalid(_) => "invalid",
             SyncError::Crypto(_) => "security",
@@ -114,6 +117,7 @@ impl SyncError {
             ),
             SyncError::ClockAhead => "This device's clock was set ahead of the real time when some changes were made. Those changes will wait on this device until its clock is right; check the date and time in this device's settings.".into(),
             SyncError::Removed => "This device was removed from the household, so it no longer syncs. What is already here stays on this device.".into(),
+            SyncError::StaleKeys => "This file needs the household's newer keys; sync and try again.".into(),
             SyncError::RosterHidden => "Another of your devices has a newer list of the household's devices than the sync server is giving this one. To be safe, changes made here stay on this device until that list arrives. If this lasts, the server may be misbehaving: check who runs it.".into(),
             SyncError::NotSetUp => "Sync is not set up on this device.".into(),
             SyncError::Server { code, message, .. } => match code.as_str() {
