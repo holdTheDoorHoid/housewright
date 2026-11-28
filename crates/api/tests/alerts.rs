@@ -374,7 +374,8 @@ fn only_the_owner_marks_a_thing_or_its_serial_private() {
     let mut m: housewright_core::model::Member = a.store().fetch(&me.to_string()).unwrap();
     m.role = housewright_core::model::Role::Member;
     a.store_mut().put(&m).unwrap();
-    assert!(a
-        .call("update_item", json!({"id": safe, "sensitive": false}))
-        .is_err());
+    assert!(
+        a.call("update_item", json!({"id": safe, "sensitive": false}))
+            .is_err()
+    );
 }
