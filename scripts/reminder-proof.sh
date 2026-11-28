@@ -11,8 +11,8 @@
 #
 # Before you start:
 #   1. Build the debug APK:  (cd app && cargo tauri android build --debug --target x86_64 --apk)
-#   2. Start the emulator:   $ANDROID_HOME/emulator/emulator -avd hw_api35 -port 5554 \
-#                              -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim &
+#   2. Start the emulator in a window you can tap (in its own terminal tab):
+#        ANDROID_ADB_SERVER_PORT=5038 $ANDROID_HOME/emulator/emulator -avd hw_api35 -port 5554 -no-audio -no-boot-anim
 #      (create the AVD once with the avdmanager line in docs/DEVELOPING.md)
 set -euo pipefail
 
@@ -69,8 +69,8 @@ echo "== (c) Done in the notification records a completion without opening the a
 TITLE_LINE=$(grep -m1 'android.title=' "$EV/b-notification-after-kill.txt" || true)
 echo "    notification title: $TITLE_LINE"
 $ADB shell am kill $PKG
-pause "In the open notification shade on the emulator, tap 'Done' (use the screenshot to find it:
-    $ADB shell input tap X Y). Do NOT open the app."
+pause "In the emulator window, the notification shade is open: tap 'Done' on the reminder.
+    Do NOT open the app."
 sleep 3
 $ADB logcat -d -s housewright:I | tail -20 > "$EV/c-logcat.txt"; echo "    saved $EV/c-logcat.txt"
 echo "    LOOK FOR in c-logcat.txt: 'done recorded from notification for <task id>'"
