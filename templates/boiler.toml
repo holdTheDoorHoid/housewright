@@ -1,0 +1,112 @@
+format = 1
+id = "boiler"
+name = "Boiler (hot-water or steam heat)"
+kind = "generic"
+category = "heating_cooling"
+description = "A boiler that heats the house with hot water or steam through radiators or baseboards."
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "choice"
+options = ["gas", "oil", "electric"]
+
+[[fields]]
+key = "system"
+label = "System type"
+type = "choice"
+options = ["hot_water", "steam"]
+
+[[tasks]]
+key = "service_gas"
+title = "Book the yearly boiler service"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 90
+when = { field = "fuel", equals = "gas" }
+steps = [
+  "Hire a licensed heating technician to service the gas boiler before the cold weather.",
+  "Ask them to check the burner, gas connections, venting and safety controls.",
+  "Ask them to test for carbon monoxide and check the relief valve.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A yearly service keeps the burner and venting working safely and catches leaks early."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service_oil"
+title = "Book the yearly boiler service"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 120
+when = { field = "fuel", equals = "oil" }
+steps = [
+  "Hire a licensed oil heating technician to service the boiler before the cold weather.",
+  "Ask them to clean the burner, replace the oil filter and nozzle, and check the draft.",
+  "Ask them to check the flue connection, safety controls and relief valve.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Oil burners build up soot quickly; a yearly service keeps them burning cleanly and venting safely."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service_electric"
+title = "Book a boiler check-up"
+priority = "efficiency"
+schedule = { kind = "floating", every = "2 years" }
+minutes = 60
+when = { field = "fuel", equals = "electric" }
+steps = [
+  "Hire a licensed heating technician to look over the electric boiler.",
+  "Ask them to check the elements, wiring connections, pump and relief valve.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A check-up catches a failing pump or element before it leaves you without heat."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "pressure"
+title = "Check the boiler pressure gauge"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 5
+steps = [
+  "Find the pressure (or water level) gauge on the boiler.",
+  "Compare the reading with the normal range in the manual or on the label.",
+  "On a steam boiler, check the sight glass shows water at the marked level.",
+  "If the reading keeps falling or is out of range, call a heating technician.",
+]
+why = "Pressure that keeps dropping usually means a leak, and low water can damage the boiler."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "bleed_radiators"
+title = "Bleed the radiators"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 30
+when = { field = "system", equals = "hot_water" }
+steps = [
+  "Turn the heating on and let the radiators warm up, then turn it off and let them cool a little.",
+  "Hold a cloth under the bleed valve at the top of the radiator.",
+  "Open the valve slowly with a radiator key until air hisses out.",
+  "Close it as soon as water comes out steadily.",
+  "Check the boiler pressure afterwards and top it up if the manual says to.",
+]
+why = "Trapped air leaves cold patches at the top of radiators and makes the boiler work harder."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "leaks"
+title = "Look for leaks around the boiler and pipes"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 10
+steps = [
+  "Look under and around the boiler for water, rust or white crusty deposits.",
+  "Check visible pipe joints and radiator valves for drips.",
+  "Check the relief valve discharge pipe is dry.",
+  "If you find a leak, call a heating technician.",
+]
+why = "Small boiler leaks are cheap to fix early and can rot floors if ignored."
+source = "common manufacturer guidance"

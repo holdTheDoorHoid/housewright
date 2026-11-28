@@ -1,0 +1,48 @@
+format = 1
+id = "main-water-shutoff"
+name = "Main water shutoff valve"
+kind = "generic"
+category = "plumbing"
+description = "The valve that shuts off all water to the house."
+
+[[fields]]
+key = "location"
+label = "Where the valve is"
+type = "text"
+
+[[fields]]
+key = "valve_type"
+label = "Valve type"
+type = "choice"
+options = ["gate_wheel", "ball_lever", "unknown"]
+
+[[tasks]]
+key = "exercise"
+title = "Exercise the main water shutoff valve"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Tell everyone at home the water will be off for a minute.",
+  "Turn the valve slowly to closed, and check a tap to see the water stops.",
+  "Open the valve again slowly all the way.",
+  "Check the valve and its stem for drips afterwards.",
+  "If it is stuck or starts leaking, do not force it; call a plumber.",
+]
+why = "Valves that never move seize up; you want this one to work the first time a pipe bursts."
+source = "common plumber guidance"
+
+[[tasks]]
+key = "label"
+title = "Label the main shutoff and show everyone"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Tie a clear tag on the valve saying it is the main water shutoff.",
+  "Make sure the path to it is clear of boxes and storage.",
+  "Show everyone at home where it is and which way turns it off.",
+  "Record the location in this item so it is in the house binder.",
+]
+why = "In a leak, the minutes spent finding the valve are the ones that cause the most damage."
+source = "common plumber guidance"

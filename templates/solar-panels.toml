@@ -1,0 +1,56 @@
+format = 1
+id = "solar-panels"
+name = "Solar panels"
+kind = "generic"
+category = "electrical"
+description = "Rooftop or ground-mounted solar panels and their inverter."
+
+[[fields]]
+key = "installer"
+label = "Installer"
+type = "text"
+
+[[tasks]]
+key = "production"
+title = "Check solar production in the monitoring app"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 5
+steps = [
+  "Open the monitoring app or the inverter display.",
+  "Compare this month's production with the same month last year.",
+  "Check for error messages or panels reporting nothing.",
+  "If production drops sharply or shows an error, contact the installer.",
+]
+why = "A fault can quietly cut production for months unless someone looks."
+source = "common installer guidance"
+
+[[tasks]]
+key = "look"
+title = "Look over the solar panels from the ground"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+steps = [
+  "Stay on the ground; never climb onto the roof to check or clean panels.",
+  "Look for heavy dirt, leaves, bird droppings or snow on the panels.",
+  "Look for cracked glass, loose panels or hanging wires.",
+  "If they are dirty or damaged, call the installer.",
+]
+why = "Shading, dirt and damage cut output, and loose wiring needs a professional."
+source = "common installer guidance"
+
+[[tasks]]
+key = "inspection"
+title = "Book a solar system inspection"
+priority = "efficiency"
+schedule = { kind = "floating", every = "5 years" }
+minutes = 90
+steps = [
+  "Hire the installer or a qualified solar technician to inspect the system.",
+  "Ask them to check the mounts, roof seals, wiring and inverter.",
+  "Ask them to check the panels' output against what is expected.",
+  "Note what they found and keep the report with the warranty papers.",
+]
+why = "Mounts, roof seals and connections loosen over the years; an inspection keeps the warranty and output intact."
+source = "common installer guidance"

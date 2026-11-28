@@ -1,0 +1,51 @@
+format = 1
+id = "dishwasher"
+name = "Dishwasher"
+kind = "generic"
+category = "appliances"
+description = "A built-in or portable dishwasher."
+
+[[tasks]]
+key = "filter"
+title = "Clean the dishwasher filter"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Pull out the bottom rack.",
+  "Twist out the filter at the bottom of the tub (see the manual if it is fixed).",
+  "Rinse it under warm water and scrub off food and grease with a soft brush.",
+  "Wipe out the sump area and refit the filter until it locks.",
+]
+why = "A clogged filter leaves dishes gritty, causes smells, and can stop the dishwasher draining."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "spray_arms"
+title = "Check the dishwasher spray arms"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 10
+steps = [
+  "Spin each spray arm by hand: it should turn freely.",
+  "Look into the holes for food or scale.",
+  "Clear blocked holes with a toothpick, or remove the arm and rinse it.",
+]
+why = "Blocked spray holes leave parts of the load dirty."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "leaks"
+title = "Check the dishwasher hoses for leaks"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 15
+steps = [
+  "Switch the dishwasher off at its breaker or unplug it.",
+  "Remove the kick plate at the bottom front.",
+  "With a flashlight, look for water, stains or rust around the supply and drain hoses.",
+  "Check the floor in front and the cabinet under the sink for damp.",
+  "Refit the kick plate; if you found a leak, call a plumber or appliance technician.",
+]
+why = "Dishwasher leaks often hide under the machine until the floor is damaged."
+source = "common manufacturer guidance"

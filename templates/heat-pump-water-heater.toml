@@ -1,0 +1,75 @@
+format = 1
+id = "heat-pump-water-heater"
+name = "Heat pump water heater"
+kind = "generic"
+category = "plumbing"
+description = "A hybrid water heater that uses a heat pump on top of a storage tank."
+
+[[fields]]
+key = "capacity"
+label = "Capacity"
+type = "number"
+unit = "gal"
+
+[[tasks]]
+key = "air_filter"
+title = "Clean the heat pump water heater air filter"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 10
+steps = [
+  "Find the air filter on top of the unit (see the manual).",
+  "Slide it out and rinse it under warm water or vacuum it.",
+  "Let it dry completely and refit it.",
+]
+why = "A dusty filter forces the unit to fall back on its slower, costlier electric elements."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "condensate"
+title = "Check the condensate drain"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+steps = [
+  "Find the condensate drain line coming from the top of the unit.",
+  "Check it runs freely to a floor drain or pump and is not kinked.",
+  "Check for water pooling around the base of the tank.",
+  "If the line is clogged, flush it with warm water; if it keeps clogging, call a plumber.",
+]
+why = "The heat pump makes water as it runs; a blocked drain can overflow onto the floor."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "relief_valve"
+title = "Test the temperature and pressure relief valve"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Put a bucket under the discharge pipe.",
+  "Stand clear: the water will be scalding.",
+  "Lift the valve lever briefly and let it snap back.",
+  "Water should rush out and stop when released; if it drips afterwards or nothing comes out, call a plumber.",
+]
+why = "This valve stops the tank from building dangerous pressure if the controls fail."
+source = "common manufacturer guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["works", "drips", "no_flow"] },
+]
+
+[[tasks]]
+key = "flush"
+title = "Drain and flush the tank"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 60
+steps = [
+  "Switch off the unit's breaker.",
+  "Close the cold-water supply valve to the tank.",
+  "Attach a hose to the drain valve and run it to a floor drain or outside.",
+  "Open a hot tap in the house, then open the drain valve and let the tank drain until the water runs clear.",
+  "Close the drain, refill the tank until the hot tap runs steadily, then restore power.",
+]
+why = "Sediment buildup wastes energy and shortens the tank's life."
+source = "common manufacturer guidance"

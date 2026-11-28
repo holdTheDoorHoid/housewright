@@ -1,0 +1,66 @@
+format = 1
+id = "deck"
+name = "Deck"
+kind = "generic"
+category = "exterior"
+description = "A wooden or composite deck, its stairs and railings."
+
+[[fields]]
+key = "material"
+label = "Decking material"
+type = "choice"
+options = ["wood", "composite"]
+
+[[fields]]
+key = "last_sealed"
+label = "Last sealed or stained"
+type = "date"
+
+[[tasks]]
+key = "inspect"
+title = "Inspect the deck"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Push hard on every railing and stair rail: they should not move.",
+  "If a railing or stair is loose, keep people off it until it is fixed.",
+  "Look for soft, cracked or rotting boards, and push a screwdriver into suspect wood.",
+  "Look under the deck where it attaches to the house (the ledger) for rot, rust or loose bolts.",
+  "Check stairs and posts are solid and fasteners are not rusted through.",
+  "Call a deck builder or contractor for anything structural.",
+]
+why = "Decks most often fail at loose railings or at the connection to the house."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "reseal"
+title = "Clean and reseal the deck"
+priority = "property_loss"
+schedule = { kind = "floating", every = "2 years" }
+minutes = 360
+when = { field = "material", equals = "wood" }
+steps = [
+  "Sweep the deck and clear the gaps between boards.",
+  "Clean it with a deck cleaner and let it dry for the time the product says.",
+  "Sprinkle water on it: if it soaks in, it is ready for sealer.",
+  "Apply sealer or stain in dry weather, following the label.",
+  "Keep people off it until it is dry.",
+]
+why = "Sealer keeps water out of the wood; how often depends on the finish and the sun, often every 1 to 3 years."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "clean_composite"
+title = "Clean the composite deck"
+priority = "cosmetic"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 60
+when = { field = "material", equals = "composite" }
+steps = [
+  "Sweep the deck and clear the gaps between boards.",
+  "Wash it with a soft brush and the cleaner the manufacturer recommends.",
+  "Rinse it well with a garden hose.",
+]
+why = "Dirt and pollen trapped on composite boards feed mould and stains."
+source = "common manufacturer guidance"

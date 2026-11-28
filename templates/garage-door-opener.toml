@@ -1,0 +1,55 @@
+format = 1
+id = "garage-door-opener"
+name = "Garage door opener"
+kind = "generic"
+category = "exterior"
+description = "An automatic garage door and its opener."
+
+[[tasks]]
+key = "auto_reverse"
+title = "Test the garage door safety reverse"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Keep children, pets and cars clear of the door.",
+  "Lay a roll of paper towels or a 2x4 board flat on the floor under the door.",
+  "Close the door: it should reverse as soon as it touches the object.",
+  "Open the door and wave an object through the sensor beam as it closes: it should reverse.",
+  "If either test fails, do not use the opener until it is repaired.",
+]
+why = "The reverse feature stops a closing door from trapping a person or pet."
+source = "CPSC guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["pass", "fail"] },
+]
+
+[[tasks]]
+key = "lubricate"
+title = "Lubricate the garage door rollers and hinges"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 20
+steps = [
+  "Close the door and unplug the opener.",
+  "Spray a garage-door lubricant on the rollers, hinges and the opener's chain or screw.",
+  "Wipe off any excess.",
+  "Plug the opener back in and run the door a few times.",
+]
+why = "Lubricated parts run quieter and put less strain on the opener."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "springs"
+title = "Book a garage door spring and balance check"
+priority = "life_safety"
+schedule = { kind = "floating", every = "2 years" }
+minutes = 60
+steps = [
+  "Hire a garage door technician; never adjust or loosen the springs or cables yourself.",
+  "Ask them to check the springs, cables, pulleys and door balance.",
+  "Tell them if the door is noisy, jerky or slow.",
+  "Note what they found and anything they recommend replacing.",
+]
+why = "Garage door springs hold great tension and can cause serious injury if they are handled without training."
+source = "common manufacturer guidance"

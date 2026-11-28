@@ -1,0 +1,51 @@
+format = 1
+id = "windows-doors"
+name = "Windows and doors"
+kind = "generic"
+category = "exterior"
+description = "Outside windows and doors, their seals and locks."
+
+[[tasks]]
+key = "weatherstrip"
+title = "Check window and door weatherstripping"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 45
+steps = [
+  "On a windy day, hold a lit incense stick or a strip of tissue near window and door edges to find drafts.",
+  "Look for weatherstripping that is torn, flat or missing.",
+  "Replace worn weatherstripping and fit door sweeps where light shows under doors.",
+  "Seal gaps between frames and walls with caulk.",
+]
+why = "Sealing air leaks around windows and doors is one of the cheapest ways to cut heating and cooling bills."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "locks"
+title = "Check window and door locks"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 20
+steps = [
+  "Lock and unlock each outside door: the bolt should slide fully home.",
+  "Check each window latch closes and holds the sash tight.",
+  "Tighten loose screws on strike plates and latches.",
+  "Repair or replace locks that stick or do not catch.",
+]
+why = "Locks that work smoothly get used, and sticking ones get left open."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "egress"
+title = "Check every bedroom window opens for escape"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 15
+steps = [
+  "Open each bedroom and basement escape window fully.",
+  "Make sure it is not painted or nailed shut and opens without tools.",
+  "Check that window bars or security grilles have a quick-release inside.",
+  "Go over the home fire escape plan with everyone while you are at it.",
+]
+why = "In a fire, a window may be the second way out; it must open quickly."
+source = "NFPA guidance"

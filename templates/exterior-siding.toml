@@ -1,0 +1,63 @@
+format = 1
+id = "exterior-siding"
+name = "Siding and exterior paint"
+kind = "generic"
+category = "exterior"
+description = "The house's outside walls: siding, trim and paint."
+
+[[fields]]
+key = "material"
+label = "Siding material"
+type = "choice"
+options = ["wood", "vinyl", "fiber_cement", "brick", "stucco", "other"]
+
+[[fields]]
+key = "last_painted"
+label = "Last painted"
+type = "date"
+
+[[tasks]]
+key = "spring_walk"
+title = "Walk round the house and check the siding"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Walk round the whole house, looking at walls, trim and corners.",
+  "Look for cracks, holes, loose or missing pieces, and peeling paint.",
+  "Push a screwdriver gently into wood trim that looks soft; if it sinks in, it may be rotting.",
+  "Look for gaps around windows, doors, pipes and wires where water or pests could get in.",
+  "Note what needs repair.",
+]
+why = "Small gaps and rot spread fast once water gets behind the siding."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "autumn_walk"
+title = "Check the siding before winter"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 20
+steps = [
+  "Walk round the house and look for new damage from summer storms.",
+  "Seal small gaps around windows, doors and pipes with exterior caulk.",
+  "Trim plants back so they do not touch the walls.",
+  "Note anything bigger for a repair.",
+]
+why = "Sealing gaps before winter keeps water and pests out during the wettest months."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "repaint"
+title = "Repaint or repair the exterior"
+priority = "property_loss"
+schedule = { kind = "floating", every = "7 years" }
+minutes = 480
+steps = [
+  "Decide whether you can reach the work safely from the ground; hire a painter or contractor for anything high up.",
+  "Scrape loose paint, repair rot, and clean the surface.",
+  "Prime bare wood and patches.",
+  "Paint in dry, mild weather as the paint label says.",
+]
+why = "Paint is what keeps water out of wood siding and trim; once it fails, rot follows."
+source = "common contractor guidance"

@@ -1,0 +1,37 @@
+format = 1
+id = "attic"
+name = "Attic"
+kind = "generic"
+category = "structure"
+description = "The attic or roof space."
+
+[[tasks]]
+key = "inspect"
+title = "Inspect the attic"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 30
+steps = [
+  "Take a good flashlight and a dust mask; step only on joists or boarded areas, never between them.",
+  "Look at the underside of the roof for water stains, damp, mould or daylight.",
+  "Look for droppings, nests or chewed insulation from pests.",
+  "Check the insulation covers the floor evenly and is not crushed or missing in spots.",
+  "Check vents at the eaves and ridge are not blocked by insulation or debris.",
+]
+why = "Attic leaks and pests go unseen for a long time, and gaps in insulation waste heat."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "after_storm"
+title = "Check the attic after heavy rain"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 15
+steps = [
+  "After a heavy rain, go up with a flashlight; step only on joists or boards.",
+  "Look around chimneys, vents and skylights for drips or wet wood.",
+  "Feel the insulation below any stain for damp.",
+  "If you find water, book a roofer.",
+]
+why = "Leaks are easiest to trace while the wood is still wet."
+source = "common roofer guidance"

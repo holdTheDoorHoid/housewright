@@ -1,0 +1,74 @@
+format = 1
+id = "pool"
+name = "Swimming pool"
+kind = "generic"
+category = "yard"
+description = "An in-ground or above-ground swimming pool."
+
+[[fields]]
+key = "type"
+label = "Pool type"
+type = "choice"
+options = ["in_ground", "above_ground"]
+
+[[tasks]]
+key = "water"
+title = "Test the pool water"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 week" }
+minutes = 15
+steps = [
+  "Skip this while the pool is closed for the season.",
+  "Use a test kit or strips to check the sanitiser (chlorine) level and pH.",
+  "Adjust with the chemicals the kit or pool store recommends, following the label.",
+  "Store pool chemicals dry, separately, and out of children's reach.",
+]
+why = "The right sanitiser level and pH keep germs down and stop the water irritating eyes and skin."
+source = "CDC guidance"
+
+[[tasks]]
+key = "filter"
+title = "Clean the pool filter"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 45
+steps = [
+  "Switch off the pump at its switch or breaker.",
+  "Clean or backwash the filter as the manual says for your filter type.",
+  "Empty the skimmer and pump baskets.",
+  "Restart the pump and check the pressure gauge is back in its normal range.",
+]
+why = "A dirty filter lets water cloud and makes the pump work harder."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "barriers"
+title = "Check the pool fence, gate and cover"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 15
+steps = [
+  "Check the gate closes and latches by itself every time, from any open position.",
+  "Walk the fence and look for gaps, damage or things children could climb on.",
+  "Check drain covers in the pool are in place and not cracked.",
+  "If you use a safety cover, check it is intact and fastened.",
+  "Fix any problem before anyone swims.",
+]
+why = "A fence with a self-closing, self-latching gate keeps young children from reaching the water unseen."
+source = "CPSC guidance"
+
+[[tasks]]
+key = "season"
+title = "Open or close the pool for the season"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 240
+steps = [
+  "If you are unsure how, book a pool service company to do it.",
+  "Clean the pool and balance the water.",
+  "Lower the water level and drain pipes and equipment as the manual says for freezing weather.",
+  "Fit and secure the winter or safety cover.",
+  "Store chemicals dry and out of children's reach over winter.",
+]
+why = "Water left in pipes and pumps can freeze and crack them over winter."
+source = "common manufacturer guidance"

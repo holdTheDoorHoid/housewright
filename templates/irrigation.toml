@@ -1,0 +1,57 @@
+format = 1
+id = "irrigation"
+name = "Lawn sprinkler system"
+kind = "generic"
+category = "yard"
+description = "An in-ground lawn sprinkler (irrigation) system."
+
+[[fields]]
+key = "shutoff_location"
+label = "Where the system shutoff valve is"
+type = "text"
+
+[[tasks]]
+key = "spring_start"
+title = "Start up the sprinkler system"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "after_last_frost" }
+minutes = 45
+steps = [
+  "Open the main irrigation valve slowly so pressure does not slam the pipes.",
+  "Run each zone in turn from the controller.",
+  "Walk each zone and look for broken, clogged or tilted heads and soggy spots.",
+  "Adjust heads so they water the lawn, not the pavement or the house.",
+  "Set the controller schedule for the season and replace its backup battery.",
+]
+why = "Broken heads and leaks waste a lot of water and can soak the foundation."
+source = "EPA guidance"
+
+[[tasks]]
+key = "winterise"
+title = "Winterise the sprinkler system"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 60
+steps = [
+  "Book an irrigation contractor to blow out the lines with compressed air; this is usually a job for a pro.",
+  "Shut off the water supply to the system before they arrive.",
+  "Set the controller to off or rain mode.",
+  "Insulate the backflow preventer and any above-ground pipes.",
+]
+why = "Water left in the pipes freezes and splits them, which shows up as leaks in spring."
+source = "common irrigation contractor guidance"
+
+[[tasks]]
+key = "backflow"
+title = "Book the backflow preventer test"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Hire a certified backflow tester to test the device.",
+  "Ask your water utility whether it needs a yearly test result; many do.",
+  "Make sure the test report goes to the water utility if they ask for it.",
+  "Note the result and any repairs they recommend.",
+]
+why = "A backflow preventer stops lawn water and chemicals from being drawn back into your drinking water."
+source = "common water utility guidance"

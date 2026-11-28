@@ -1,0 +1,42 @@
+format = 1
+id = "whole-house-water-filter"
+name = "Whole-house water filter"
+kind = "generic"
+category = "plumbing"
+description = "A cartridge water filter on the main water line."
+
+[[fields]]
+key = "cartridge"
+label = "Replacement cartridge"
+type = "text"
+
+[[tasks]]
+key = "cartridge"
+title = "Replace the whole-house filter cartridge"
+priority = "efficiency"
+schedule = { kind = "floating", every = "6 months" }
+minutes = 20
+steps = [
+  "Turn off the water at the valve before the filter (or the main shutoff).",
+  "Press the pressure-release button or open a tap downstream to relieve pressure.",
+  "Put a bucket underneath and unscrew the housing with its wrench.",
+  "Swap the cartridge, rinse the housing, and check the O-ring is seated.",
+  "Screw the housing back hand-tight, turn the water on slowly and check for drips.",
+]
+why = "A clogged cartridge cuts water pressure and stops filtering; many last about 3 to 6 months."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "o_ring"
+title = "Check the filter housing O-ring"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 15
+steps = [
+  "Turn off the water before the filter and relieve the pressure.",
+  "Remove the housing and lift out the O-ring.",
+  "Replace it if it is flat, cracked or stretched; otherwise wipe it and apply food-grade silicone grease.",
+  "Refit the housing, turn the water on slowly and check for drips.",
+]
+why = "A worn O-ring is the usual cause of a leaking filter housing."
+source = "common manufacturer guidance"

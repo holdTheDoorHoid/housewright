@@ -1,0 +1,72 @@
+format = 1
+id = "window-ac"
+name = "Window air conditioner"
+kind = "generic"
+category = "heating_cooling"
+description = "A window or through-the-wall room air conditioner."
+
+[[fields]]
+key = "location"
+label = "Room"
+type = "text"
+
+[[tasks]]
+key = "filter"
+title = "Wash the window AC filter"
+priority = "efficiency"
+schedule = { kind = "months_of_year", months = [6, 7, 8, 9] }
+minutes = 10
+steps = [
+  "Switch the AC off and unplug it.",
+  "Slide or lift out the filter behind the front grille.",
+  "Wash it in warm soapy water, rinse it and let it dry completely.",
+  "Refit the filter and plug the AC back in.",
+]
+why = "A clogged filter cuts airflow and cooling, and makes the unit work harder."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "coils"
+title = "Clean the window AC coils and fins"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Unplug the AC.",
+  "Remove the front grille and filter.",
+  "Vacuum the coils gently with a soft brush attachment.",
+  "Straighten bent fins carefully with a fin comb if you have one.",
+  "Refit the grille and filter and plug it back in.",
+]
+why = "Dusty coils hold heat in and cut cooling."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "secure"
+title = "Check the window AC is secure"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 10
+steps = [
+  "Check the support brackets or window frame hold the unit firmly.",
+  "Check the window sash is locked down onto the unit.",
+  "Check the side panels and seals are closed against drafts and rain.",
+  "Check it tilts slightly outward so water drains outside.",
+]
+why = "A loose unit can fall out of the window, and a bad seal lets in rain and insects."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "winter"
+title = "Remove or cover the window AC for winter"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 30
+steps = [
+  "Unplug the AC.",
+  "With a helper, lift it out of the window and store it upright and dry.",
+  "If it stays in, fit an insulated cover outside and seal the edges inside.",
+  "Close and lock the window.",
+]
+why = "A unit left uncovered lets cold air and drafts in all winter."
+source = "US DOE guidance"

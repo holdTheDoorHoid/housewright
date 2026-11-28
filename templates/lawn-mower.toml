@@ -1,0 +1,61 @@
+format = 1
+id = "lawn-mower"
+name = "Lawn mower"
+kind = "generic"
+category = "yard"
+description = "A walk-behind or riding mower, gas or battery."
+
+[[fields]]
+key = "power"
+label = "Power"
+type = "choice"
+options = ["gas", "battery", "corded"]
+
+[[tasks]]
+key = "blade"
+title = "Sharpen or replace the mower blade"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 45
+steps = [
+  "Pull the spark plug wire off (gas), take the battery out (battery) or unplug it (corded) before touching the blade.",
+  "Tip a gas mower with the air filter and carburettor side up so fuel and oil do not leak.",
+  "Wear thick gloves, block the blade with a piece of wood, and unbolt it.",
+  "Sharpen it with a file or replace it with the one the manual names, and check it is balanced.",
+  "Refit it with the correct side up and tighten the bolt firmly.",
+]
+why = "A dull blade tears grass instead of cutting it, which browns the lawn and invites disease."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "oil"
+title = "Change the mower oil"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+when = { field = "power", equals = "gas" }
+steps = [
+  "Pull the spark plug wire off.",
+  "Run the engine for a few minutes beforehand so the oil drains easily, then let it cool slightly.",
+  "Drain the old oil into a pan, following the manual.",
+  "Refill with the oil type and amount the manual says and check the dipstick.",
+  "Take the old oil to a recycling point; do not pour it away.",
+]
+why = "Old, dirty oil wears the engine and makes it hard to start."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "clean_store"
+title = "Clean the mower and store it for winter"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "before_first_frost" }
+minutes = 30
+steps = [
+  "Pull the spark plug wire off (gas), take the battery out (battery) or unplug it (corded).",
+  "Scrape grass off the underside of the deck.",
+  "For gas mowers, add fuel stabiliser and run it a few minutes, or run the tank empty.",
+  "Store fuel only in an approved can, away from the house and from flames or pilot lights.",
+  "Store mower batteries indoors where they will not freeze.",
+]
+why = "Old fuel gums up the engine over winter, and caked grass rusts the deck."
+source = "common manufacturer guidance"

@@ -1,0 +1,44 @@
+format = 1
+id = "crawlspace"
+name = "Crawlspace"
+kind = "generic"
+category = "structure"
+description = "The crawlspace under the house."
+
+[[fields]]
+key = "vented"
+label = "Has outside vents"
+type = "yes_no"
+
+[[tasks]]
+key = "inspect"
+title = "Inspect the crawlspace"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Tell someone you are going in, and take a flashlight, gloves and a dust mask.",
+  "Look for standing water, wet soil or a musty smell.",
+  "Look at the joists and beams for mould, rot or damp.",
+  "Check the plastic vapor barrier covers the ground and is not torn.",
+  "Look for droppings, nests, insect tubes or holes pests could use.",
+  "Call a contractor or pest professional for anything you find.",
+]
+why = "Damp in a crawlspace rots floor framing and feeds mould and pests."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "vents"
+title = "Check the crawlspace vents and access"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 15
+when = { field = "vented", equals = "yes" }
+steps = [
+  "Walk round outside and check each vent screen is intact and not blocked by soil or plants.",
+  "Check the access door closes tightly.",
+  "Make sure gutters and downspouts drain away from the crawlspace walls.",
+  "Follow your builder's or local advice on closing vents in winter.",
+]
+why = "Broken screens let pests in, and water draining toward the house ends up in the crawlspace."
+source = "common contractor guidance"

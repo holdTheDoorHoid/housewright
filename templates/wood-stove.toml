@@ -1,0 +1,57 @@
+format = 1
+id = "wood-stove"
+name = "Wood stove"
+kind = "generic"
+category = "heating_cooling"
+description = "A freestanding wood or pellet stove with a stovepipe and chimney."
+
+[[fields]]
+key = "last_swept"
+label = "Chimney last swept"
+type = "date"
+
+[[tasks]]
+key = "inspection"
+title = "Book the yearly wood stove and chimney inspection"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "summer" }
+minutes = 90
+steps = [
+  "Hire a certified chimney sweep to inspect and sweep the stove, stovepipe and chimney.",
+  "Ask them to check for creosote, cracks and blockages.",
+  "Ask them to check the stove body, baffles and clearances to walls.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Creosote builds up quickly in wood stove flues and is a common cause of chimney fires."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "preseason"
+title = "Check the stove door gasket and stovepipe"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 20
+steps = [
+  "With the stove cold, close the door on a strip of paper; if it slides out easily, the gasket needs replacing.",
+  "Check the glass for cracks.",
+  "Check each stovepipe joint is tight, screwed together and not rusted.",
+  "Make sure there is a working carbon monoxide alarm and smoke alarm nearby.",
+  "If anything is loose or cracked, do not light the stove until it is fixed.",
+]
+why = "A leaky door or loose pipe can let smoke and carbon monoxide into the room."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "ashes"
+title = "Clear out ashes safely"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "2 weeks" }
+minutes = 10
+steps = [
+  "Let the stove cool and wait until the coals are fully out.",
+  "Shovel the ashes into a metal container with a tight lid.",
+  "Put the container outside on bare ground, well away from the house, deck and anything that burns.",
+  "Leave it there for several days before emptying it.",
+]
+why = "Ashes stay hot long after a fire seems out, and can start a fire in a bin or garage."
+source = "NFPA guidance"

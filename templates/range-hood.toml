@@ -1,0 +1,59 @@
+format = 1
+id = "range-hood"
+name = "Range hood"
+kind = "generic"
+category = "appliances"
+description = "A kitchen range hood or over-the-range microwave fan."
+
+[[fields]]
+key = "vent_type"
+label = "Vents to"
+type = "choice"
+options = ["outside", "recirculating"]
+
+[[tasks]]
+key = "grease_filter"
+title = "Degrease the range hood filter"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 20
+steps = [
+  "Switch off the hood and let it cool.",
+  "Slide or unclip the metal grease filters.",
+  "Soak them in very hot water with dish soap or a degreaser, then scrub with a soft brush.",
+  "Rinse, let them dry completely and refit them.",
+  "Wipe the grease off the inside of the hood.",
+]
+why = "Grease builds up in the filter and can feed a stove-top fire."
+source = "US Fire Administration guidance"
+
+[[tasks]]
+key = "charcoal"
+title = "Replace the range hood charcoal filter"
+priority = "efficiency"
+schedule = { kind = "floating", every = "6 months" }
+minutes = 10
+when = { field = "vent_type", equals = "recirculating" }
+steps = [
+  "Switch off the hood.",
+  "Remove the grease filter to reach the charcoal filter.",
+  "Swap in a new charcoal filter of the type the manual names.",
+  "Refit the grease filter.",
+]
+why = "A spent charcoal filter stops removing cooking smells; it cannot be washed."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "fan_light"
+title = "Check the range hood fan and light"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Run the fan on each speed and listen for rattles or grinding.",
+  "If it vents outside, check the outside flap opens when the fan runs.",
+  "Replace a dead bulb with the type the manual names, after the hood is cool and off.",
+  "If the fan is weak or noisy, call an appliance technician.",
+]
+why = "A weak fan leaves grease and moisture in the kitchen."
+source = "common manufacturer guidance"

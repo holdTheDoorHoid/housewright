@@ -1,0 +1,42 @@
+format = 1
+id = "water-softener"
+name = "Water softener"
+kind = "generic"
+category = "plumbing"
+description = "A salt-based water softener with a brine tank."
+
+[[fields]]
+key = "salt_type"
+label = "Salt type"
+type = "text"
+
+[[tasks]]
+key = "salt"
+title = "Check and top up the softener salt"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Lift the brine tank lid and look at the salt level.",
+  "Top it up with the type of salt the manual names if it is below about half full.",
+  "Press on the salt with a broom handle to check for a hard crust (a salt bridge).",
+  "If you find a bridge, break it up gently so the salt falls into the water below.",
+]
+why = "Without salt, or with a salt bridge, the softener stops softening and scale builds up in pipes and appliances."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "brine_tank"
+title = "Clean the softener brine tank"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 60
+steps = [
+  "Put the softener in bypass mode.",
+  "Scoop out the remaining salt and sludge, and drain or bail out the water.",
+  "Scrub the inside of the tank with warm soapy water and rinse it well.",
+  "Refill with salt and the amount of water the manual says.",
+  "Take the softener out of bypass and run a manual regeneration.",
+]
+why = "Sludge from impure salt builds up at the bottom and can clog the softener's valves."
+source = "common manufacturer guidance"

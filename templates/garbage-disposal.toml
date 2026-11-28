@@ -1,0 +1,36 @@
+format = 1
+id = "garbage-disposal"
+name = "Garbage disposal"
+kind = "generic"
+category = "appliances"
+description = "A sink-mounted food waste disposer."
+
+[[tasks]]
+key = "clean"
+title = "Clean the garbage disposal"
+priority = "cosmetic"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Switch the disposal off at its switch and unplug it or switch off its breaker before reaching anything.",
+  "Never put your hand inside; use tongs or pliers to lift out anything stuck.",
+  "Scrub the rubber splash guard with an old toothbrush and dish soap.",
+  "Restore power, then run cold water and grind a handful of ice cubes to scour the chamber.",
+]
+why = "Food residue builds up in the chamber and splash guard and causes smells."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "habits"
+title = "Review what goes down the disposal"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 5
+steps = [
+  "Keep grease, oil and fat out of the sink; let it cool and put it in the bin.",
+  "Keep out fibrous peels, coffee grounds, eggshells, bones and pasta or rice in large amounts.",
+  "Always run cold water while grinding and for a few seconds after.",
+  "Remind everyone at home of these rules.",
+]
+why = "Grease and fibrous food are the usual causes of disposal jams and clogged drains."
+source = "common plumber guidance"

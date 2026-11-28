@@ -1,0 +1,57 @@
+format = 1
+id = "dehumidifier"
+name = "Dehumidifier"
+kind = "generic"
+category = "heating_cooling"
+description = "A portable or basement dehumidifier."
+
+[[fields]]
+key = "drain"
+label = "How it drains"
+type = "choice"
+options = ["bucket", "hose", "pump"]
+
+[[tasks]]
+key = "filter"
+title = "Clean the dehumidifier filter"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Switch the dehumidifier off and unplug it.",
+  "Remove the air filter.",
+  "Vacuum it or rinse it in warm water and let it dry completely.",
+  "Refit the filter and plug it back in.",
+]
+why = "A dusty filter cuts airflow, so the unit removes less moisture for the same power."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "bucket"
+title = "Clean the dehumidifier bucket or drain hose"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+steps = [
+  "Unplug the dehumidifier.",
+  "Empty the bucket and wash it with warm soapy water to stop mould and slime.",
+  "If it drains by hose, check the hose is not kinked or clogged and still reaches the drain.",
+  "Refit the bucket or hose and plug it back in.",
+]
+why = "A blocked hose or dirty bucket can overflow, and standing water grows mould."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "coils"
+title = "Dust the dehumidifier coils and check the setting"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 20
+steps = [
+  "Unplug the dehumidifier.",
+  "Remove the filter and gently vacuum the coils with a soft brush attachment.",
+  "Refit the filter and plug it back in.",
+  "Set the target humidity; many sources suggest keeping indoor humidity below about 50 percent.",
+]
+why = "Clean coils work better, and the right setting keeps the space dry without wasting power."
+source = "EPA guidance"
