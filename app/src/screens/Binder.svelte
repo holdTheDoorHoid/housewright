@@ -26,6 +26,8 @@
   let includeNotes = $state(true);
   let busy = $state<string | null>(null);
   let location = $state('');
+  // Typed but not saved yet: a reload must not wipe it.
+  let locationEdited = $state(false);
   let contractors = $state<ContractorInfo[]>([]);
   let form = $state<(ContractorInfo & { tradesText: string }) | null>(null);
   let tick = $state(0);
@@ -36,7 +38,7 @@
     call('binder', {})
       .then((b) => {
         info = b;
-        location = b.sealed_location ?? '';
+        if (!locationEdited) location = b.sealed_location ?? '';
       })
       .catch((e) => (error = errorText(e)));
     call('contractors').then((c) => (contractors = c));
@@ -83,6 +85,7 @@
     e.preventDefault();
     try {
       info = await call('set_sealed_location', { text: location });
+      locationEdited = false;
       toast({ text: location.trim() ? 'Saved. It is printed in the binder.' : 'Cleared. The binder will have a line to write on.' });
     } catch (err) {
       toast({ text: errorText(err) });
@@ -247,7 +250,7 @@
       <h2>Where the sealed volume is kept</h2>
       <form onsubmit={saveLocation}>
         <label for="sealed-loc">This is printed in the main binder, so whoever needs it can find it.</label>
-        <input id="sealed-loc" bind:value={location} placeholder="In the fire safe, top shelf of the hall closet" />
+        <input id="sealed-loc" bind:value={location} oninput={() => (locationEdited = true)} placeholder="In the fire safe, top shelf of the hall closet" />
         <button type="submit">Save</button>
       </form>
     {/if}

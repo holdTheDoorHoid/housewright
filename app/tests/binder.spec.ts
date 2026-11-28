@@ -103,9 +103,9 @@ test('the house binder: every edition, the sealed volume, and reprinting what ch
 
   // Who to call, for the emergency page.
   await page.getByRole('button', { name: 'Add a contact' }).click();
-  await page.getByLabel('Name').fill('Ace Plumbing');
+  await page.getByLabel('Name', { exact: true }).fill('Ace Plumbing');
   await page.getByLabel('What they do').fill('plumbing');
-  await page.getByLabel('Phone').fill('555-0101');
+  await page.getByLabel('Phone', { exact: true }).fill('555-0101');
   await page.getByLabel(/Call them in an emergency/).check();
   await page.getByRole('button', { name: 'Save contact' }).click();
   await expect(page.getByText('Ace Plumbing')).toBeVisible();
@@ -113,6 +113,7 @@ test('the house binder: every edition, the sealed volume, and reprinting what ch
   // Where the sealed volume is kept.
   await page.getByLabel(/printed in the main binder/).fill('In the fire safe, top shelf');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Saved. It is printed in the binder.' })).toBeVisible();
 
   // The household binder: main volume, then the sealed one.
   const main = await pdfFrom(page, 'Print the whole binder');
@@ -179,6 +180,6 @@ test('the house binder: every edition, the sealed volume, and reprinting what ch
   await expect(page.getByRole('status').filter({ hasText: 'Nothing has changed since you printed it' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Remind me once a year' }).click();
-  await expect(page.getByText('You will be reminded once a year')).toBeVisible();
+  await expect(page.getByText('You will be reminded once a year to reprint the changed sections.')).toBeVisible();
   expect(errors).toEqual([]);
 });

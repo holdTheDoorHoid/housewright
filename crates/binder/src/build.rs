@@ -986,8 +986,8 @@ pub fn sealed_volume(d: &HouseData, edition: Edition, opts: Options) -> Option<D
     let title = format!("Sealed volume: {}", d.property.name);
     let mut cover = Section::new("sealed:cover", "Sealed", "SEALED — keep in a safe place");
     cover.push(Block::Cover {
-        title: "SEALED".into(),
-        subtitle: format!("Keep in a safe place. For {}.", d.property.name),
+        title: d.property.name.clone(),
+        subtitle: "The sealed volume of the house binder".into(),
         lines: vec![
             "This volume holds the details that are not printed in the household binder: codes, passwords, account numbers and where valuables are kept.".into(),
             "Keep it somewhere safe and private, such as a fire safe or with a lawyer, and tell someone you trust where it is. The household binder has a page saying where.".into(),

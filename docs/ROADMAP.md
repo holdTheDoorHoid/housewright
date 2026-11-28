@@ -10,7 +10,7 @@ assumption early. Status as of 2026-11-27.
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | done on branch `phase-2-app-shell` (PR #2): web verified in a browser; Android reminder proof passed on the emulator 2026-11-27 (see below) |
 | 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web (Playwright) and Android emulator walk-through pass; see below |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | built on branch `phase-4-records` (2026-11-27): Rust, web (Playwright) and Android emulator checks; see below |
-| 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | |
+| 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; ANDROID_STATUS; see below |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | |
@@ -173,3 +173,59 @@ added in the app after Done), attachments on contractors in the interface
 label reading on the web before the first use, item fields that look like
 sizes copied onto the facts sheet, and syncing blobs between devices
 (Phase 6).
+
+
+## Phase 5 notes
+
+Built (decisions D-80 to D-88):
+
+- **`housewright-binder`**: gathers one property's data, takes everything
+  sensitive out for the main volume (the main builders can only see a
+  redacted copy), builds the editions as a document model, and typesets
+  them with Typst embedded (two Lato fonts compiled in; no files, no
+  network; every piece of household text written as an escaped string
+  literal). Each section starts on a new page with its own numbers and the
+  footer "Printed Nov 28, 2026 · Water 3".
+- **Editions**: the emergency page (one page, always, Letter or A4: shutoffs
+  with their photos, who to call, gas smell, carbon monoxide alarm, water
+  leak, no power), the household binder and its sealed volume ("SEALED —
+  keep in a safe place", with a placeholder page for the Phase 6 recovery
+  key), the handover edition (no names, costs optional, transferable
+  warranties, no sealed volume) and the succession edition (accounts and
+  utilities to transfer, as tick lists, numbers in the sealed volume). The
+  handover and succession editions were planned for Phase 9; they are done.
+- **Stays current**: every print records a fingerprint per section; the
+  screen says how many sections changed since the last print and prints
+  just those. After the first print a yearly "Reprint the house binder"
+  task exists, switched off, offered once.
+- **Interface**: Home, then House binder: pick an edition, see the
+  sections with "changed" markers, print the main volume and the sealed
+  volume as separate PDFs, say where the sealed volume is kept, keep a
+  short "Who to call" list (emergency contacts go on page 1) and the
+  house's quirks. A thing's page has "Quirks only you know".
+- **Web**: Typst is a separate WebAssembly module fetched only on the
+  first print (D-80); Android and the desktop typeset in-process.
+- Storage schema 4 and export version 4 (`binder_print`, contractor
+  `emergency`); Phase 3 exports still import and print.
+
+SIZES_TABLE
+
+Verified: Rust format, clippy (native and wasm), tests (no sensitive value
+in any main volume: document model, laid-out pages and `pdftotext`
+output; the sealed volume holds every one; private rating never printed;
+handover anonymised; emergency page one page when crowded, on Letter and
+A4; hostile strings print literally and change nothing; a section's
+fingerprint changes only with its content; reprinting only changed
+sections; only the owner prints the sealed volume; the web's
+bundle-render-record path); svelte-check; vitest; Playwright on the
+production web build (every edition and the sealed volume, the change
+marker and a reprint). PDFs of a demo household were looked at page by
+page; see [phase-5-evidence/README.md](phase-5-evidence/README.md).
+
+Not built in Phase 5: editing a contractor's licence, insurance or private
+rating in the interface (Phase 9), a screen per room for room quirks (the
+data model and the binder support them), choosing which property to
+print when there are several (the API takes a property id; the screen
+prints the first), printing manuals themselves into the binder, and
+non-Latin scripts in the binder (Lato covers Latin, Greek and Cyrillic;
+other text would print as empty boxes).

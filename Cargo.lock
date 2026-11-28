@@ -1117,6 +1117,7 @@ dependencies = [
  "housewright-binder",
  "jiff",
  "serde_json",
+ "sqlite-wasm-rs",
  "uuid",
  "wasm-bindgen",
 ]

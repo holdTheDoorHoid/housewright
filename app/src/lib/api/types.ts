@@ -521,6 +521,8 @@ export interface Commands {
   set_sealed_location: [{ text: string }, BinderInfo];
   set_binder_reminder: [{ on: boolean }, BinderInfo];
   set_paper: [{ paper: Paper }, BinderInfo];
+  /** The web's binder module records its print with this (D-80). */
+  record_binder_print: [BinderReceipt, BinderInfo];
   notes: [{ about_kind: NoteAbout; about_id: string }, NoteInfo[]];
   add_note: [{ about_kind: NoteAbout; about_id: string; text: string; sensitive?: boolean }, NoteInfo[]];
   delete_note: [{ id: string }, null];
@@ -583,6 +585,14 @@ export interface ContractorInfo {
   emergency: boolean;
 }
 
+export interface BinderReceipt {
+  property: string;
+  edition: Edition;
+  volume: 'main' | 'sealed';
+  printed_on: DateStr;
+  sections: Record<string, string>;
+}
+
 export interface BinderPdfArgs {
   edition: Edition;
   volume?: 'main' | 'sealed';
@@ -613,6 +623,8 @@ export interface DownloadCommands {
   full_backup: None;
   label_sheet_pdf: { item_ids?: string[]; preset?: string; layout?: SheetLayout };
   binder_pdf: BinderPdfArgs;
+  /** The Typst source, photos and receipt for one PDF (the web typesets it in a separate module). */
+  binder_bundle: BinderPdfArgs;
 }
 
 export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = ['attach', 'scan_label', 'read_label', 'restore_backup'];
@@ -621,6 +633,7 @@ export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = [
   'full_backup',
   'label_sheet_pdf',
   'binder_pdf',
+  'binder_bundle',
 ];
 
 export type Command = keyof Commands;
@@ -677,6 +690,7 @@ export const COMMANDS: Command[] = [
   'set_sealed_location',
   'set_binder_reminder',
   'set_paper',
+  'record_binder_print',
   'notes',
   'add_note',
   'delete_note',
