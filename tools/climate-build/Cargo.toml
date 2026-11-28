@@ -1,0 +1,16 @@
+[package]
+name = "housewright-climate-build"
+description = "Builds the bundled US ZIP code climate table from NOAA climate normals and Census ZCTA centroids"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "climate-build"
+path = "src/main.rs"
+
+[dependencies]
+housewright-core.workspace = true

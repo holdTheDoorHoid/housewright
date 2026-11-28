@@ -4,6 +4,7 @@
 //! Licensed AGPL-3.0-only.
 
 pub mod audit;
+pub mod climate;
 pub mod error;
 pub mod export;
 pub mod fields;
