@@ -13,7 +13,7 @@ assumption early. Status as of 2026-11-28.
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; Android emulator checks pass (one bug found and fixed); see below |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
-| 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust and web (Playwright) checks; Android emulator check not run (disk); see below |
+| 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust, web (Playwright) and Android emulator touch checks; see below |
 | 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
 | 11 | Hosted + extras | Paid hosting, opt-in disclosure extras (email/SMS reminders, recalls), AI label reading, share links for contractors and tenants | |
@@ -413,13 +413,15 @@ readouts against the shared vectors, the plan screen); Playwright
 moves its thing into the kitchen, a second floor with walls tapped and
 one typed (12' 6" exactly), the closed space named, a door added, undo
 and redo, a traced picture, reload, the thing's plan thumbnail, and the
-floor printed as a PDF in the browser; a phone-sized pass. Screenshots
+floor printed as a PDF in the browser; a phone-sized pass. Android
+emulator (debug x86_64 APK, `input swipe`/`tap`): a room dragged out by
+touch and named, a thing pinned (it moved into the kitchen), one-finger
+pan in Move; screenshots in `docs/phase-8-evidence/android/`. Screenshots
 and the PDF are in `docs/phase-8-evidence/`.
 
 Not built or not checked: LiDAR scanning (D-25, later); tracing over a
 PDF (photos and screenshots only, Q-17); a drawn plan snippet on the
 emergency page (Q-16); walls crossing in an X are not split into rooms;
-pinch zoom was not exercised by an automated test (mouse, wheel and
-buttons were); the Android emulator touch check was skipped because the
-disk had under 7 GB free.
+pinch zoom was not exercised by any test (adb input cannot do two
+fingers; mouse, wheel, buttons and one-finger touch were).
 

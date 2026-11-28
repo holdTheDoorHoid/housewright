@@ -2081,6 +2081,7 @@ dependencies = [
  "housewright-core",
  "housewright-crypto",
  "housewright-media",
+ "housewright-plan",
  "housewright-sync",
  "jiff 1.0.3",
  "serde",
@@ -2111,6 +2112,7 @@ name = "housewright-binder"
 version = "0.1.0"
 dependencies = [
  "housewright-core",
+ "housewright-plan",
  "jiff 1.0.3",
  "serde",
  "serde_json",
@@ -2126,6 +2128,7 @@ dependencies = [
 name = "housewright-core"
 version = "0.1.0"
 dependencies = [
+ "housewright-plan",
  "jiff 1.0.3",
  "rusqlite",
  "serde",
@@ -2171,6 +2174,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "housewright-plan"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "housewright-sync"
 version = "0.1.0"
 dependencies = [
@@ -2180,6 +2190,7 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.21",
  "ureq",
+ "url",
  "zeroize",
 ]
 
