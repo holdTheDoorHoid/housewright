@@ -461,6 +461,11 @@ create a household (D-105).
 - **The PDF with the recovery key**, printed at setup, passes through the
   platform's viewer (Android keeps it in the app's cache until the next
   shared file replaces it; the browser in a blob URL until the tab closes).
+- **Dependency advisories**: `cargo deny check` passes except two
+  denial-of-service advisories in quick-xml 0.38 (RUSTSEC-2026-0194, -0195),
+  reached only through Typst's bibliography code, which the binder never
+  uses on outside input; ignored with that reason in `deny.toml` until
+  Typst upgrades.
 - **Server robustness**: SQLite sits behind one lock; heavy handlers run
   on blocking threads and files are streamed, but a very busy server would
   want a connection pool.

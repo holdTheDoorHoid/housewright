@@ -295,6 +295,12 @@ typed, or the QR text pasted), Android Keystore / WebCrypto wrapping of the
 device keys (D-95), cryptographic limits for limited members (D-98),
 detecting a server that forks or withholds roster versions, reporting gaps
 in a device's batch numbers, re-stamping changes made with a clock far
-ahead, a storage quota per household on the server, the hosted service and
-opt-in research data (Phase 11, Q-11). An independent review of the
-cryptography and protocol is still to come.
+ahead, the hosted service and opt-in research data (Phase 11, Q-11).
+
+Independent security review (2026-11-28,
+[security-reviews/2026-11-28-phase6-review.md](security-reviews/2026-11-28-phase6-review.md)):
+verdict "ship after fixes". Every finding was fixed or mitigated the same
+day (D-99 to D-105, regression tests in `crates/sync/tests/review.rs`); the
+remaining limits are listed in SECURITY.md. The Android emulator pairing
+was not re-run after the fixes (not enough disk for an Android build); the
+Rust and browser tests cover the protocol changes.

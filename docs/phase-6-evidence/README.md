@@ -58,3 +58,12 @@ Phase 5): about +5.8 MB for rustls, ring, ureq and the cryptography.
 Not checked on the emulator: background sync (not built), restore with the
 recovery key on Android (tested in Rust and through the API), a real phone,
 and an HTTPS server with a real certificate from the phone.
+
+## After the security review (2026-11-28)
+
+The web screenshots were refreshed after the review fixes: the owner's
+screen now waits for the new device to confirm first (D-102). The Android
+emulator run above was made before the fixes and was not repeated (the
+machine had under 6 GB free, too little for an Android build); the
+protocol changes are covered by the Rust tests (`crates/sync/tests`) and the
+browser test.
