@@ -10,6 +10,7 @@
 //! Licensed AGPL-3.0-only.
 
 mod dto;
+mod records;
 mod templates;
 
 use std::collections::BTreeMap;
@@ -33,6 +34,13 @@ use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
 
 pub use dto::*;
+pub use records::{DOWNLOAD_COMMANDS, UPLOAD_COMMANDS};
+
+use housewright_core::blobs::{BlobStore, MemoryBlobs};
+use housewright_media::ocr::Ocr;
+
+/// Builds the OCR engine the first time label reading is used.
+pub type OcrLoader = Box<dyn Fn() -> Result<Ocr, housewright_media::MediaError> + Send>;
 
 /// Every command [`Api::call`] understands. The TypeScript client keeps the
 /// same list; a test on each side checks it.
@@ -69,6 +77,21 @@ pub const COMMANDS: &[&str] = &[
     "starting_plan",
     "all_suggested",
     "answer_suggestion",
+    "attachments",
+    "delete_attachment",
+    "update_item",
+    "add_field",
+    "remove_field",
+    "reveal_field",
+    "add_details",
+    "facts",
+    "save_fact",
+    "delete_fact",
+    "reveal_fact",
+    "costs",
+    "set_currency",
+    "label_sheet",
+    "find_label",
 ];
 
 /// The bundled template library, parsed once.
@@ -85,6 +108,10 @@ pub fn bundled_library() -> Result<Library, ApiError> {
 pub struct Api {
     store: Store,
     library: Library,
+    /// Attachment bytes (D-71).
+    blobs: Box<dyn BlobStore>,
+    ocr: Option<Ocr>,
+    ocr_loader: Option<OcrLoader>,
 }
 
 fn args<T: DeserializeOwned>(v: Value) -> Result<T, ApiError> {
@@ -106,11 +133,34 @@ fn add_days(d: Date, n: i64) -> Date {
 }
 
 impl Api {
+    /// With attachments kept in memory (tests, and the web's fallback).
     pub fn new(store: Store) -> Result<Self, ApiError> {
+        Self::with_blobs(store, Box::new(MemoryBlobs::default()))
+    }
+
+    pub fn with_blobs(store: Store, blobs: Box<dyn BlobStore>) -> Result<Self, ApiError> {
         Ok(Self {
             store,
             library: bundled_library()?,
+            blobs,
+            ocr: None,
+            ocr_loader: None,
         })
+    }
+
+    /// How to load the label reader when it is first needed (Android: from
+    /// models compiled into the app).
+    pub fn set_ocr_loader(&mut self, loader: OcrLoader) {
+        self.ocr_loader = Some(loader);
+    }
+
+    /// Give a loaded label reader (the web worker loads the models itself).
+    pub fn set_ocr(&mut self, ocr: Ocr) {
+        self.ocr = Some(ocr);
+    }
+
+    pub fn has_ocr(&self) -> bool {
+        self.ocr.is_some() || self.ocr_loader.is_some()
     }
 
     pub fn store(&self) -> &Store {
@@ -238,7 +288,7 @@ impl Api {
                 let a: AnswerArgs = args(a)?;
                 ok(self.answer_suggestion(a)?)
             }
-            other => Err(ApiError::invalid(format!("unknown command '{other}'"))),
+            other => self.records_call(other, a),
         }
     }
 
@@ -372,12 +422,14 @@ impl Api {
                 household_name: None,
                 me: None,
                 property: None,
+                currency: None,
             });
         }
         let h = self.household()?;
         let p = self.store.list::<Property>()?.into_iter().next();
         Ok(StatusOut {
             initialized: true,
+            currency: Some(h.currency().to_string()),
             household_name: Some(h.name),
             me: Some(Self::member_dto(&self.me()?)),
             property: p.map(|p| PropertyDto {
@@ -514,6 +566,7 @@ impl Api {
             paused: t.paused,
             not_applicable: t.not_applicable,
             completions,
+            completion_fields: t.completion_fields.clone(),
         })
     }
 
@@ -530,7 +583,13 @@ impl Api {
                 .cloned();
             let mut texts: Vec<String> = c.notes.iter().map(|n| n.value.clone()).collect();
             texts.extend(notes.into_iter().map(|n| n.text.value));
+            let (attachments, costs, values) = self.completion_extras(c, t)?;
+            let cost_total = (!costs.is_empty()).then(|| costs.iter().map(|l| l.minor).sum());
             out.push(CompletionOut {
+                attachments,
+                costs,
+                cost_total,
+                values,
                 id: c.id.to_string(),
                 task_id: t.id.to_string(),
                 task_title: t.title.clone(),
@@ -730,11 +789,18 @@ impl Api {
                 .find(|d| &d.key == key)
                 .map(|d| d.label.clone())
                 .unwrap_or_else(|| key.clone());
+            let sensitive = v.sensitivity == Sensitivity::Sensitive;
             fields.push(FieldOut {
                 key: key.clone(),
                 label,
-                value: value_text(&v.value),
-                sensitive: v.sensitivity == Sensitivity::Sensitive,
+                // Sensitive values stay on the device's database until the
+                // person taps to reveal them (`reveal_field`).
+                value: if sensitive {
+                    String::new()
+                } else {
+                    value_text(&v.value)
+                },
+                sensitive,
             });
         }
         let mut tasks = Vec::new();
@@ -747,16 +813,48 @@ impl Api {
             history.extend(self.completions_of(t, &names)?);
         }
         history.sort_by_key(|a| std::cmp::Reverse(a.at));
+        let next = tasks
+            .iter()
+            .filter(|c| c.active && c.state.is_live())
+            .max_by(|a, b| {
+                a.state
+                    .urgency()
+                    .cmp(&b.state.urgency())
+                    .then(b.due.cmp(&a.due))
+            })
+            .cloned();
+        let attachments = self
+            .store
+            .attachments_about(&EntityRef {
+                kind: EntityKind::Item,
+                id: id.to_string(),
+            })?
+            .iter()
+            .map(records::attachment_out)
+            .collect();
+        let edit = self.field_edits(&item)?;
+        let serial_sensitive = item
+            .serial
+            .as_ref()
+            .is_some_and(|s| s.sensitivity == Sensitivity::Sensitive);
         Ok(ItemDetail {
             row,
             make: item.make,
             model: item.model,
-            serial: item.serial.map(|s| s.value),
+            serial: item
+                .serial
+                .filter(|s| s.sensitivity == Sensitivity::Normal)
+                .map(|s| s.value),
             installed: item.installed,
             purchased: item.purchased,
             fields,
             tasks,
             history,
+            code: housewright_core::labels::short_code(id),
+            next,
+            attachments,
+            edit,
+            serial_sensitive,
         })
     }
 
@@ -885,7 +983,7 @@ impl Api {
             category: t.category.clone(),
             make: none_if_blank(a.make),
             model: none_if_blank(a.model),
-            serial: None,
+            serial: none_if_blank(a.serial).map(|s| Flagged::normal(s.trim().to_string())),
             purchased: None,
             installed: a.installed,
             warranty: None,
@@ -1275,9 +1373,7 @@ fn parse_value(t: &FieldType, raw: &str) -> Result<FieldValue, ApiError> {
             _ => return Err(ApiError::invalid(format!("'{raw}' should be yes or no"))),
         }),
         FieldType::Choice { .. } => FieldValue::Choice(raw.into()),
-        FieldType::Photo => {
-            return Err(ApiError::invalid("photos arrive in Phase 4".to_string()));
-        }
+        FieldType::Photo => FieldValue::Photo(parse_id(raw, "photo")?),
     })
 }
 

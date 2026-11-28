@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use housewright_core::Error;
 use housewright_core::climate::ClimateLookup;
 use housewright_core::fields::FieldDef;
-use housewright_core::model::Role;
+use housewright_core::model::{AttachmentKind, CostKind, Role};
 use housewright_core::priority::PriorityClass;
 use housewright_core::profile::Profile;
 use housewright_core::reminders::{PlannedReminder, ReminderKind, ReminderPrefs};
@@ -138,6 +138,9 @@ pub struct AddFromTemplateArgs {
     pub make: Option<String>,
     #[serde(default)]
     pub model: Option<String>,
+    /// From label reading (D-29), as the person confirmed it.
+    #[serde(default)]
+    pub serial: Option<String>,
     #[serde(default)]
     pub installed: Option<Date>,
     /// Field values as typed, by field key.
@@ -197,6 +200,8 @@ pub struct StatusOut {
     pub household_name: Option<String>,
     pub me: Option<MemberDto>,
     pub property: Option<PropertyDto>,
+    /// ISO 4217 code for costs (D-76).
+    pub currency: Option<String>,
 }
 
 /// A task as a list row.
@@ -255,6 +260,20 @@ pub struct CompletionOut {
     pub by_name: String,
     pub notes: Vec<String>,
     pub voided: bool,
+    /// Photos and files added after Done.
+    pub attachments: Vec<AttachmentOut>,
+    /// The costs that count (the latest given), in minor units.
+    pub costs: Vec<CostLineOut>,
+    pub cost_total: Option<i64>,
+    /// Completion field values (sensitive ones hidden).
+    pub values: Vec<FieldOut>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct CostLineOut {
+    pub kind: CostKind,
+    pub minor: i64,
+    pub currency: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -268,6 +287,8 @@ pub struct TaskDetail {
     pub paused: bool,
     pub not_applicable: bool,
     pub completions: Vec<CompletionOut>,
+    /// Offered after Done, never required (P1).
+    pub completion_fields: Vec<FieldDef>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -315,6 +336,41 @@ pub struct ItemDetail {
     pub fields: Vec<FieldOut>,
     pub tasks: Vec<Card>,
     pub history: Vec<CompletionOut>,
+    /// Sticker code (D-30), e.g. `HW-7K3QM`.
+    pub code: String,
+    /// Its most pressing switched-on task, for the sticker's one-tap Done.
+    pub next: Option<Card>,
+    pub attachments: Vec<AttachmentOut>,
+    /// Every field it can have, with the current value for editing.
+    pub edit: Vec<FieldEdit>,
+    pub serial_sensitive: bool,
+}
+
+/// A field on the edit form. Sensitive values are not sent; the form shows
+/// "set, hidden" and a reveal button.
+#[derive(Clone, Debug, Serialize)]
+pub struct FieldEdit {
+    pub def: FieldDef,
+    /// `template`, `household` (added to the template here) or `item`.
+    pub origin: &'static str,
+    pub value: Option<String>,
+    pub has_value: bool,
+    pub sensitive: bool,
+    pub photo: Option<AttachmentOut>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct AttachmentOut {
+    pub id: String,
+    pub name: String,
+    pub media_type: String,
+    pub size: u64,
+    pub kind: AttachmentKind,
+    pub has_thumb: bool,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    pub at: Option<Timestamp>,
+    pub sensitive: bool,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -457,4 +513,232 @@ pub struct SuggestedGroup {
 #[derive(Clone, Debug, Serialize)]
 pub struct AnswerOut {
     pub switched_on: Vec<Card>,
+}
+
+// -- Phase 4: records -------------------------------------------------------
+
+#[derive(Deserialize)]
+pub struct UpdateItemArgs {
+    pub id: String,
+    #[serde(default)]
+    pub name: Option<String>,
+    /// For these, absent = unchanged, "" = cleared.
+    #[serde(default)]
+    pub make: Option<String>,
+    #[serde(default)]
+    pub model: Option<String>,
+    #[serde(default)]
+    pub serial: Option<String>,
+    #[serde(default)]
+    pub installed: Option<String>,
+    #[serde(default)]
+    pub purchased: Option<String>,
+    #[serde(default)]
+    pub room_id: Option<String>,
+    /// Field values as typed; `null` or "" clears one.
+    #[serde(default)]
+    pub values: BTreeMap<String, Option<String>>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct UpdateItemOut {
+    pub detail: ItemDetail,
+    /// Tasks that now apply (added switched off, to offer; never switched on).
+    pub offered: Vec<Card>,
+    /// Switched-on tasks whose condition no longer holds.
+    pub no_longer_apply: Vec<Card>,
+}
+
+#[derive(Deserialize)]
+pub struct AddFieldArgs {
+    pub item_id: String,
+    /// Add to every thing made from this thing's template.
+    #[serde(default)]
+    pub to_template: bool,
+    pub label: String,
+    /// `text`, `number`, `date`, `yes_no`, `choice` or `photo`.
+    #[serde(rename = "type")]
+    pub field_type: String,
+    #[serde(default)]
+    pub unit: Option<String>,
+    #[serde(default)]
+    pub options: Vec<String>,
+    /// Absent: decided from the label (codes, passwords are sensitive).
+    #[serde(default)]
+    pub sensitive: Option<bool>,
+}
+
+#[derive(Deserialize)]
+pub struct ItemKeyArgs {
+    pub item_id: String,
+    pub key: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct RevealOut {
+    pub value: String,
+}
+
+#[derive(Deserialize, Default)]
+pub struct CostsIn {
+    #[serde(default)]
+    pub parts: Option<String>,
+    #[serde(default)]
+    pub labour: Option<String>,
+    #[serde(default)]
+    pub contractor: Option<String>,
+    #[serde(default)]
+    pub other: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct AddDetailsArgs {
+    pub completion_id: String,
+    #[serde(default)]
+    pub note: Option<String>,
+    #[serde(default)]
+    pub costs: Option<CostsIn>,
+    #[serde(default)]
+    pub values: BTreeMap<String, String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct FactOut {
+    pub id: String,
+    pub group: String,
+    pub label: String,
+    /// Absent when sensitive: ask `reveal_fact`.
+    pub value: Option<String>,
+    pub sensitive: bool,
+    pub key: Option<String>,
+    pub room_id: Option<String>,
+    pub room_name: Option<String>,
+    pub attachments: Vec<AttachmentOut>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct FactGroupOut {
+    pub key: String,
+    pub label: String,
+    pub sensitive_by_default: bool,
+    pub facts: Vec<FactOut>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct FactsOut {
+    pub property_name: String,
+    pub groups: Vec<FactGroupOut>,
+    pub prompts: Vec<housewright_core::facts::FactPrompt>,
+}
+
+#[derive(Deserialize)]
+pub struct SaveFactArgs {
+    #[serde(default)]
+    pub id: Option<String>,
+    pub group: String,
+    pub label: String,
+    /// Absent on an edit of a sensitive fact = keep the hidden value.
+    #[serde(default)]
+    pub value: Option<String>,
+    #[serde(default)]
+    pub sensitive: Option<bool>,
+    #[serde(default)]
+    pub key: Option<String>,
+    #[serde(default)]
+    pub room_id: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct CurrencyArgs {
+    pub currency: String,
+}
+
+#[derive(Deserialize)]
+pub struct ItemIdsArgs {
+    #[serde(default)]
+    pub item_ids: Option<Vec<String>>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct StickerOut {
+    pub item_id: String,
+    pub name: String,
+    pub room_name: Option<String>,
+    pub code: String,
+    pub url: String,
+    pub qr_svg: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SheetPreset {
+    pub key: String,
+    pub label: String,
+    pub layout: housewright_media::sheet::Layout,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct LabelSheetOut {
+    pub presets: Vec<SheetPreset>,
+    pub stickers: Vec<StickerOut>,
+}
+
+#[derive(Deserialize)]
+pub struct SheetPdfArgs {
+    #[serde(default)]
+    pub item_ids: Option<Vec<String>>,
+    #[serde(default)]
+    pub preset: Option<String>,
+    #[serde(default)]
+    pub layout: Option<housewright_media::sheet::Layout>,
+}
+
+#[derive(Deserialize)]
+pub struct TextArgs {
+    pub text: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ScanOut {
+    /// What the QR codes in the photo said.
+    pub texts: Vec<String>,
+    /// The things they point at (usually one).
+    pub items: Vec<ItemRow>,
+}
+
+#[derive(Deserialize)]
+pub struct AttachArgs {
+    /// `item`, `completion`, `fact` or `contractor`.
+    pub about_kind: String,
+    pub about_id: String,
+    #[serde(default)]
+    pub kind: Option<AttachmentKind>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub sensitive: bool,
+}
+
+#[derive(Deserialize)]
+pub struct FileArgs {
+    pub id: String,
+    #[serde(default)]
+    pub thumb: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct TemplateRef {
+    pub id: String,
+    pub name: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct LabelReadOut {
+    /// Every line read, so the person can see what the phone saw.
+    pub lines: Vec<String>,
+    pub brand: Option<String>,
+    pub model: Option<String>,
+    pub serial: Option<String>,
+    pub model_alternatives: Vec<String>,
+    pub serial_alternatives: Vec<String>,
+    pub template: Option<TemplateRef>,
 }
