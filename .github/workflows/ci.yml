@@ -69,6 +69,10 @@ jobs:
         run: npm test
       - name: Web bundle
         run: npm run build:web
+      # The sync end-to-end test starts a real server from target/debug.
+      - name: Sync server binary
+        working-directory: .
+        run: cargo build -p housewright-server --locked
       - name: End-to-end (Playwright, Chromium)
         run: |
           npx playwright install --with-deps chromium

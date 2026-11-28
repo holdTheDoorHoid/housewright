@@ -164,11 +164,8 @@ pub fn send_to(
     }
     let request = b.body(axum::body::Body::from(req.body)).unwrap();
     rt.block_on(async {
-        let res = app
-            .clone()
-            .oneshot(request)
-            .await
-            .map_err(|e| e.to_string())?;
+        // The router's error type is Infallible, so this pattern is irrefutable.
+        let Ok(res) = app.clone().oneshot(request).await;
         let status = res.status().as_u16();
         let headers = res
             .headers()
