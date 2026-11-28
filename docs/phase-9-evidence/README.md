@@ -26,7 +26,7 @@ its own page and every thing a box, even with nothing recorded about it
 (nine mostly empty pages for twenty things). Fixed: rooms follow one
 another, things with nothing recorded are named in one line per room,
 receipts share a page with the totals, and the cover no longer repeats its
-title. Four pages now.
+title. Three pages now for this household.
 
 ## Android
 
