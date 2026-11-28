@@ -1,0 +1,15 @@
+[package]
+name = "tauri-plugin-reminders"
+description = "Housewright's local reminders on Android: alarms, notification actions, boot rescheduling"
+version = "0.1.0"
+license = "AGPL-3.0-only"
+edition = "2024"
+publish = false
+links = "tauri-plugin-reminders"
+
+[dependencies]
+tauri = { version = "2" }
+serde = "1"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }

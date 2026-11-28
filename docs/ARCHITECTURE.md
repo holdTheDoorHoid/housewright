@@ -29,13 +29,14 @@ lets the server stay unable to read anything (D-14).
 | Path | What it is |
 |---|---|
 | `crates/core` | Domain model, schedule engine, prioritisation, storage, operation log. No platform code. |
+| `crates/api` | One JSON command surface over the core, shared by the Tauri app, the WebAssembly build and Android's notification receivers (D-63). |
 | `crates/crypto` | Household keys, key wrapping, operation and file encryption (D-15). |
 | `crates/sync` | Operation exchange with a server; hybrid logical clocks; merge (D-13). |
 | `crates/binder` | House binder and reports through Typst (D-43). |
 | `crates/server` | Sync relay, share links, paid extras. |
 | `crates/cli` | A command-line front end over the core, for testing and for power users. |
-| `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop). |
-| `web/` | Web build: the same interface with the core compiled to WebAssembly. |
+| `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
+| `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
 | `integrations/home-assistant` | Custom integration and add-on (D-26). |
 | `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
 

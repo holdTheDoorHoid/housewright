@@ -66,7 +66,7 @@ Required fields are in **bold**.
 | Kind | Fields |
 |---|---|
 | `household` | **id**, **name**, **time_zone** (IANA) |
-| `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), contact (wrapped) |
+| `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), contact (wrapped), reminders `{quiet_hours: {start, end}, maintenance_window: {days, start, end}}` (times as `"HH:MM:SS"`, days as weekday names; D-59) |
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy}`, address (wrapped) |
 | `floor` | **id**, **property**, **name**, level |
 | `room` | **id**, **property**, **name**, floor |

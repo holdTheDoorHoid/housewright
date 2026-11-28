@@ -258,6 +258,81 @@ state; a file with state only imports as new history. See `docs/FILE-FORMAT.md`.
 ("Alex marked 'Test the smoke alarm' done on 2026-11-27") and names the fields
 changed, but never shows values, so sensitive values (D-41) cannot leak through it.
 
+## Phase 2 app shell (proposed by the Phase 2 build, 2026-11-27)
+
+**D-59 Reminder times and the reminder plan (Proposed).** Each member can set
+quiet hours and a preferred maintenance window (days of the week and a start
+and end time). They are stored on the member record, so they sync and merge
+like any other field. The core plans reminders with a pure function: one
+reminder on the day a task becomes due, at most one follow-up (half the grace
+period later, between two and seven days), and one reminder on the date a
+snoozed task was moved to. A reminder goes at the start of the person's
+maintenance window (on the first allowed day on or after the date), otherwise
+at 9:00, and never inside quiet hours (it moves to when they end). The plan
+lists only future reminders, so it can be recomputed after any change without
+repeating one that has already fired. It looks 60 days ahead and holds at most
+64 reminders. Reminders go only to the task's owner (P8), on their own devices.
+The weekly digest (P5) is not built yet.
+
+**D-60 When someone has lapsed (Proposed).** The welcome-back view (P10)
+appears when this device has not been used for 21 days or more and something
+is overdue. "Last used" is a local setting on the device, not synced data.
+Showing the full list, or marking anything done, counts as being back.
+
+**D-61 SQLite on the web (Proposed).** Refines D-17. The web build compiles
+the same Rust core to `wasm32-unknown-unknown`. rusqlite uses the
+`sqlite-wasm-rs` SQLite build on that target, and the database lives in the
+browser's private file system (OPFS) through the `opfs-sahpool` storage layer
+from `sqlite-wasm-vfs`. That layer needs synchronous file handles, which
+browsers only give to dedicated workers, so the core runs in a Web Worker and
+the page sends it messages. The storage layer holds the files exclusively, so a
+Web Lock lets only one tab own the database. A second tab gets a plain "already
+open in another tab" message instead of an error. If OPFS is missing, the app
+falls back to an in-memory database and says plainly that nothing will be
+kept. We chose this over the official SQLite WebAssembly JavaScript package
+because it keeps a single Rust core and no second SQLite binding. The cost is
+a WebAssembly file of about 5 MB (1.5 MB compressed), most of it SQLite and the
+time-zone database.
+
+**D-62 Reminders on Android (Proposed).** Reminders use a small custom Tauri
+mobile plugin (`app/src-tauri/plugins/reminders`), not
+`tauri-plugin-notification`. Its source code was not checked, but that plugin
+sends notification button taps to JavaScript listeners. Recording "Done" that
+way needs the app's WebView running, and P1 needs Done to work from the
+notification when the app is closed. The plugin's Android code is in Kotlin
+because Tauri mobile plugins and Android broadcast receivers need it; this is
+the only Kotlin in the project, and it makes no decisions of its own. It asks
+the Rust core for the reminder plan and records Done through JNI calls into
+the same command surface the interface uses (D-63), so every rule lives in
+Rust.
+- Alarms are inexact (`setAndAllowWhileIdle`), so the app needs no
+  exact-alarm permission. Android may deliver a reminder a few minutes late in
+  Doze, which is fine for home maintenance.
+- Notifications carry Done and Reschedule buttons. Done records the
+  completion in the background without opening the app. Reschedule opens the
+  app at the reschedule choices, because P6 and P7 want a choice of moment,
+  not a fixed delay.
+- After a reboot, an app update, or a time or time zone change, a boot
+  receiver plans everything again.
+- Android 13 and later ask for notification permission. The app asks from
+  Settings rather than at first launch.
+- Limit: if someone force-stops the app in Android settings, Android cancels
+  its alarms and blocks its receivers until the app is opened again. No app
+  can work around this, so the app explains it in Settings.
+- "Done + photo" waits for attachments (Phase 4).
+
+**D-63 One command surface for every front end (Proposed).** The new crate
+`housewright-api` exposes the core as named commands that take JSON in and
+give JSON out ("today", "complete", "snooze" and so on). The Tauri `api`
+command, the WebAssembly worker and the Android JNI bridge all call it, so the
+web page, the app and a notification button run identical code. The bundled
+templates are built into it at compile time. Its TypeScript mirror is
+`app/src/lib/api/types.ts`; tests on both sides check that the command lists
+match. The Tauri crate (`app/src-tauri`) is kept outside the Cargo workspace,
+so `cargo test --workspace` does not need Tauri's desktop system libraries.
+Each process holds exactly one open `Store` per database file, so a background
+receiver and the open app never have competing clocks.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

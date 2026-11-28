@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Schedule reminders, send a test reminder, read a tapped notification action, and ask for notification permission."
+permissions = [
+  "allow-sync",
+  "allow-test",
+  "allow-pending",
+  "allow-check-permissions",
+  "allow-request-permissions",
+]

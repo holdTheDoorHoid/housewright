@@ -3,3 +3,11 @@ node_modules/
 *.db
 *.sqlite
 .DS_Store
+web/pkg/
+app/dist/
+app/src-tauri/target/
+app/src-tauri/gen/schemas/
+.svelte-kit/
+test-results/
+playwright-report/
+app/dist-web/

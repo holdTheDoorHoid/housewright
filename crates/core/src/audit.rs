@@ -144,8 +144,16 @@ fn describe(store: &Store, group: &[Op], created: bool, tz: &TimeZone) -> String
             if created {
                 format!("{who} added {what}")
             } else {
-                let fields: Vec<&str> = group.iter().map(|o| o.field.as_str()).collect();
-                format!("{who} changed {} on {what}", fields.join(", "))
+                if kind == EntityKind::Task && group.len() == 1 && first.field == "active" {
+                    let state = if first.value == Value::Bool(true) {
+                        "on"
+                    } else {
+                        "off"
+                    };
+                    return format!("{who} switched {state} {what}");
+                }
+                let fields: Vec<String> = group.iter().map(|o| o.field.replace('_', " ")).collect();
+                format!("{who} changed the {} of {what}", fields.join(", "))
             }
         }
     }

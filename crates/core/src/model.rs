@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 use crate::fields::{CustomValues, FieldDef};
 use crate::ids::*;
 use crate::priority::PriorityClass;
+use crate::reminders::ReminderPrefs;
 use crate::schedule::{Climate, Schedule, WindowPolicy};
 
 /// Normal (main binder) or sensitive (sealed volume), per D-41.
@@ -207,6 +208,9 @@ pub struct Member {
     /// Phone or email; flagged because it is personal.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contact: Option<Flagged<String>>,
+    /// Quiet hours and preferred maintenance window (P5, D-59).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reminders: Option<ReminderPrefs>,
 }
 entity!(Member, Member);
 

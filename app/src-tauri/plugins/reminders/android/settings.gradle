@@ -1,0 +1,20 @@
+// Only used to open this plugin on its own; inside the app, Tauri wires it
+// into app/src-tauri/gen/android through tauri.settings.gradle.
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        google()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+include ':tauri-android'
+project(':tauri-android').projectDir = new File('./.tauri/tauri-api')

@@ -1,5 +1,6 @@
 //! Prioritisation: what matters most (P3, P10).
 
+use jiff::Timestamp;
 use jiff::civil::Date;
 use serde::{Deserialize, Serialize};
 
@@ -112,6 +113,21 @@ pub fn welcome_back(tasks: &[TaskStatus]) -> WelcomeBack {
         focus: overdue,
         others_overdue: others,
     }
+}
+
+/// How long away counts as a lapse (P10, D-60).
+pub const LAPSE_DAYS: i64 = 21;
+
+/// P10: whether someone coming back should see the welcome-back view rather
+/// than the plain list. True when they have been away at least
+/// [`LAPSE_DAYS`] (or never opened the app on this device) and something is
+/// overdue. Pure: `last_seen` and `now` are inputs.
+pub fn is_lapsed(last_seen: Option<Timestamp>, now: Timestamp, tasks: &[TaskStatus]) -> bool {
+    let away = match last_seen {
+        Some(seen) => now.as_second() - seen.as_second() >= LAPSE_DAYS * 86_400,
+        None => true,
+    };
+    away && tasks.iter().any(|t| t.eval.state == TaskState::Overdue)
 }
 
 #[cfg(test)]
@@ -260,5 +276,19 @@ mod tests {
         assert_eq!(names, ["co", "leak", "cos0"]);
         assert_eq!(wb.others_overdue, 9);
         assert!(welcome_back(&[]).focus.is_empty());
+    }
+
+    #[test]
+    fn lapse_needs_time_away_and_something_overdue() {
+        let now = Timestamp::from_second(1_795_780_800).unwrap();
+        let day = 86_400;
+        let recent = Timestamp::from_second(now.as_second() - 3 * day).unwrap();
+        let long_ago = Timestamp::from_second(now.as_second() - 40 * day).unwrap();
+        let overdue = vec![st("a", PriorityClass::Efficiency, TaskState::Overdue, None)];
+        let fine = vec![st("a", PriorityClass::Efficiency, TaskState::Due, None)];
+        assert!(is_lapsed(Some(long_ago), now, &overdue));
+        assert!(!is_lapsed(Some(recent), now, &overdue));
+        assert!(!is_lapsed(Some(long_ago), now, &fine));
+        assert!(is_lapsed(None, now, &overdue));
     }
 }

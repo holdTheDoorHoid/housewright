@@ -36,6 +36,7 @@ impl Store {
             name: owner_name.to_string(),
             role: Role::Owner,
             contact: None,
+            reminders: None,
         };
         let household = Household {
             id: HouseholdId::new(),

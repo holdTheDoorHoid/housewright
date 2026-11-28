@@ -142,6 +142,15 @@ fn start_small_switches_on_life_safety_first() {
         .ranked_tasks(h.owner.id, now(&h.clock), false)
         .unwrap();
     assert_eq!(active.len(), 5);
+    // History reads in plain words, not field names.
+    let log = audit_log(&h.store, &TimeZone::get("America/New_York").unwrap()).unwrap();
+    assert!(
+        log.iter()
+            .any(|e| e.text.starts_with("Alex switched on task '")),
+        "{:#?}",
+        log.iter().map(|e| &e.text).collect::<Vec<_>>()
+    );
+    assert!(!log.iter().any(|e| e.text.contains("changed active")));
 }
 
 #[test]
@@ -211,6 +220,7 @@ fn limited_members_see_only_their_tasks() {
         name: "Sam".into(),
         role: Role::Limited,
         contact: None,
+        reminders: None,
     };
     h.store.put(&kid).unwrap();
     let mut t = h.store.list::<Task>().unwrap().remove(0);

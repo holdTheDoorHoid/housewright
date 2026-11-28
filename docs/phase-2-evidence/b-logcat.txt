@@ -1,0 +1,8 @@
+11-27 19:59:50.262  4764  4764 I app.housewright: Late-enabling -Xcheck:jni
+11-27 19:59:50.278  4764  4764 I app.housewright: Using CollectorTypeCMC GC.
+11-27 19:59:50.279  4764  4764 W app.housewright: Unexpected CPU variant for x86: x86_64.
+11-27 19:59:50.279  4764  4764 W app.housewright: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+11-27 19:59:50.302  4764  4764 W ziparchive: Unable to open '/data/app/~~iF-WUe_MhN_vY1sNGMIrtw==/app.housewright-MCYYgM893XLHc3UoyQ5DGQ==/base.dm': No such file or directory
+11-27 19:59:50.302  4764  4764 W ziparchive: Unable to open '/data/app/~~iF-WUe_MhN_vY1sNGMIrtw==/app.housewright-MCYYgM893XLHc3UoyQ5DGQ==/base.dm': No such file or directory
+11-27 19:59:50.430  4764  4764 D nativeloader: Configuring clns-7 for other apk /data/app/~~iF-WUe_MhN_vY1sNGMIrtw==/app.housewright-MCYYgM893XLHc3UoyQ5DGQ==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~iF-WUe_MhN_vY1sNGMIrtw==/app.housewright-MCYYgM893XLHc3UoyQ5DGQ==/lib/x86_64:/data/app/~~iF-WUe_MhN_vY1sNGMIrtw==/app.housewright-MCYYgM893XLHc3UoyQ5DGQ==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/app.housewright
+11-27 19:59:50.466  4764  4764 I housewright: reminder shown for 01a21fa8-0ae1-77fe-9166-bc0faf1b1ece
