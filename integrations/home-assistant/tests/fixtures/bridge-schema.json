@@ -1,0 +1,113 @@
+{
+  "_comment": "Written by crates/bridge/tests/api.rs (schema_fixture_is_current). Keys of each object the bridge returns.",
+  "device_match": [
+    "existing_item",
+    "id",
+    "name",
+    "template",
+    "template_name"
+  ],
+  "event": [
+    "event",
+    "message",
+    "recorded",
+    "switched_on",
+    "tasks"
+  ],
+  "import": [
+    "added",
+    "skipped"
+  ],
+  "imported": [
+    "id",
+    "item_id",
+    "name",
+    "suggested_tasks",
+    "template"
+  ],
+  "item": [
+    "category",
+    "events",
+    "id",
+    "make",
+    "meters",
+    "model",
+    "name",
+    "room_name",
+    "template"
+  ],
+  "member": [
+    "home_assistant",
+    "id",
+    "name"
+  ],
+  "meter": [
+    "key",
+    "last_at",
+    "last_value",
+    "name",
+    "unit"
+  ],
+  "reading": [
+    "meter",
+    "reason",
+    "stored",
+    "tasks",
+    "value"
+  ],
+  "snapshot": [
+    "items",
+    "members",
+    "status",
+    "tasks"
+  ],
+  "states": [
+    "ok",
+    "due_soon",
+    "due",
+    "overdue",
+    "snoozed",
+    "paused"
+  ],
+  "status": [
+    "household",
+    "member",
+    "paired",
+    "service",
+    "sync",
+    "version",
+    "warnings"
+  ],
+  "status.sync": [
+    "enabled",
+    "last_error",
+    "last_sync",
+    "pending_changes",
+    "server"
+  ],
+  "task": [
+    "active",
+    "days_until",
+    "due",
+    "earliest",
+    "event",
+    "id",
+    "item_id",
+    "item_name",
+    "last_done",
+    "meter",
+    "minutes",
+    "overdue_after",
+    "owner_id",
+    "owner_name",
+    "priority",
+    "priority_label",
+    "room_name",
+    "schedule_text",
+    "state",
+    "state_label",
+    "title",
+    "usage_threshold",
+    "usage_used"
+  ]
+}

@@ -1,0 +1,82 @@
+complete:
+  fields:
+    task:
+      required: true
+      example: "Replace the furnace filter"
+      selector:
+        text:
+    member:
+      example: "Ana"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: housewright
+snooze:
+  fields:
+    task:
+      required: true
+      selector:
+        text:
+    until:
+      selector:
+        date:
+    days:
+      selector:
+        number:
+          min: 1
+          max: 366
+          mode: box
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: housewright
+add_meter_reading:
+  fields:
+    item:
+      required: true
+      example: "Washing machine"
+      selector:
+        text:
+    meter:
+      required: true
+      example: "loads"
+      selector:
+        text:
+    value:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 100000000
+          step: any
+          mode: box
+    delta:
+      default: false
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: housewright
+report_event:
+  fields:
+    item:
+      required: true
+      example: "Tank water heater"
+      selector:
+        text:
+    event:
+      required: true
+      example: "leak"
+      selector:
+        select:
+          custom_value: true
+          options:
+            - "leak"
+            - "battery_low"
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: housewright

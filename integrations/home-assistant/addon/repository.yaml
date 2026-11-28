@@ -1,0 +1,6 @@
+# Home Assistant add-on repository description. Home Assistant reads this
+# from the root of a repository; see README.md here for how it is
+# published (Q-13).
+name: Housewright add-ons
+url: https://github.com/holdTheDoorHoid/housewright
+maintainer: Housewright contributors

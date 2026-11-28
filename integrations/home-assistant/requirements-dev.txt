@@ -1,0 +1,5 @@
+# Test and lint tools only; nothing here ships with the integration.
+# The harness pins Home Assistant 2026.10.4 (and needs Python 3.14).
+pytest-homeassistant-custom-component==0.13.375
+ruff
+mypy

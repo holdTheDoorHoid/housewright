@@ -1,0 +1,33 @@
+# Development settings for the Home Assistant integration: tests, ruff
+# and mypy. The integration has no runtime dependencies beyond Home
+# Assistant itself (manifest.json "requirements": []).
+[project]
+name = "housewright-home-assistant"
+version = "0.1.0"
+license = "AGPL-3.0-only"
+requires-python = ">=3.14"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = [".venv", ".uv-python", ".bootstrap"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["custom_components"]
+combine-as-imports = true
+
+[tool.mypy]
+python_version = "3.14"
+ignore_missing_imports = true
+check_untyped_defs = true
