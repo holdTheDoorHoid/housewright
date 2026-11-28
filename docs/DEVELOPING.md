@@ -22,6 +22,8 @@
 | `app/src-tauri` | Tauri 2 shell for Android (and desktop). Outside the Cargo workspace. |
 | `app/src-tauri/plugins/reminders` | Android reminders: alarms, notification buttons, boot receiver (D-62). |
 | `tools/climate-build` | Rebuilds `crates/core/data/us-zip-climate.bin`; see [DATA-SOURCES.md](DATA-SOURCES.md). |
+| `library/` | The appliance library (CC BY 4.0) at a pinned commit; see "The appliance library" below. |
+| `tools/library-sync` | Refreshes `library/`, checks it, and builds library release files. |
 
 ## Rust checks
 
@@ -125,6 +127,40 @@ To try the integration by hand without a household of your own:
 cargo run -p housewright-bridge -- --data-dir /tmp/hwb demo
 cargo run -p housewright-bridge -- --data-dir /tmp/hwb serve   # token: /tmp/hwb/api-token
 ```
+
+## The appliance library
+
+`library/` is a copy of the data in
+[holdTheDoorHoid/housewright-library](https://github.com/holdTheDoorHoid/housewright-library)
+at one commit (recorded in `library/SNAPSHOT.toml`). Never edit it by
+hand: fix the library upstream, then refresh the copy.
+
+```sh
+# From a local checkout of the library (it must have no uncommitted data changes):
+cargo run -p housewright-library-sync -- copy --from ../housewright-library
+# Or from a tagged release on GitHub:
+cargo run -p housewright-library-sync -- fetch --tag v2026.12.1
+# Check what is in library/ (the tests do this too):
+cargo run -p housewright-library-sync -- check
+cargo test -p housewright-api --test library
+```
+
+The version defaults to the commit's date (`2026.11.28`); pass
+`--version 2026.11.28.1` for a second refresh on one day. Both commands
+refuse a library that fails the app's checks (for example a family that
+extends a template the app does not have): fix that first, upstream or in
+`templates/`. Commit `library/` together with the code that needs it.
+
+The library's maintainers publish updates for the app's "Check now" with
+
+```sh
+cargo run -p housewright-library-sync -- bundle --out published/
+```
+
+which writes `latest.json` and `library-<version>.json.gz` for the
+library repository's `published` branch (Q-23). `app/tests/library.spec.ts`
+builds the same files in the test and serves them in place of GitHub, so
+the tests never reach the network.
 
 ## Web
 

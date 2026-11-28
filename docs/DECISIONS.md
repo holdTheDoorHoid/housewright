@@ -1349,6 +1349,124 @@ version 7 adds `recall_dismissal`, item `price` and `value`, warranty
 detail `contractor` and `contractor_cleared`. Older files (the Phase 2 and
 Phase 3 fixtures and versions 3 to 6) import unchanged.
 
+## Library hookup (proposed by the library hookup build, 2026-11-28)
+
+**D-147 The library ships as a vendored, pinned snapshot (Proposed).**
+Implements D-127 to D-129 in the app. `library/` holds a copy of the
+appliance library's data files (`categories/`, `brands/`, `families/`,
+`reference/`, its CC BY 4.0 `LICENSE`) at one library commit, recorded in
+`library/SNAPSHOT.toml` (version, full commit hash, source, publication
+date, licence, credit line). `tools/library-sync` (Rust) is the only way to
+change it: `copy --from <checkout>` (the checkout must be clean; the commit
+is read from git) or `fetch --tag <tag>` (GitHub's tarball; the commit is
+read from the tarball's header), and both refuse a library that fails the
+app's checks. `crates/api/build.rs` packs the files into one
+gzip-compressed bundle compiled into every build: about 470 KB of TOML
+becomes 89 KB (measured). A git submodule was not chosen: CI and offline
+builds would need a second fetch, a submodule's change shows in review as
+a hash rather than as the data that changed, and D-128 keeps the
+templates here for now. `core::appliances` parses and checks the library
+in Rust with the same rules as the library's own validator (libcheck) plus
+the app's: every family's template must be one of `templates/`, every
+task override must name one of its tasks. The snapshot is loaded on first
+use, not at start (so Android's notification receivers do not pay for it).
+A test keeps the shipped snapshot free of problems; a file that ever fails
+is left out rather than stopping the app.
+
+**D-148 Library updates: off by default, "Check now", nothing about the
+home sent (Proposed).** Settings, Appliance library, "Get appliance
+library updates" (off by default; when on, a check at most weekly when the
+app is open) and a "Check now" button. A check reads two public files from
+the library repository's `published` branch through GitHub's raw file
+host, `https://raw.githubusercontent.com/holdTheDoorHoid/housewright-library/published/`:
+`latest.json` (the release note: version, commit, file name, size,
+SHA-256) and the bundle it names. The requests are the same for every
+user: plain GETs, no query, no cookies, no referrer (checked in
+Playwright). The raw host allows any origin, so the web build checks too;
+GitHub's release downloads do not, which is why releases are not used. A
+downloaded bundle is used only if: it is at most 2 MB compressed and 8 MB
+unpacked, its size and SHA-256 match the release note, every path is one
+a library may hold, every file passes every check (one problem refuses the
+whole update), its version and commit are the ones the note names, and it
+is newer than the one in use. It is kept in this device's `meta` table
+(never exported, backed up or synced; each device checks for itself), and
+"Go back to the version that came with the app" removes it. An app update
+with a newer snapshot wins over an older download. The release note comes
+from the same host as the bundle, so the checksum protects against damage,
+not against someone who controls the library repository; signing is Q-24.
+The app's content security policy adds exactly this origin for fetches.
+
+**D-149 Matching a make and model to a family; the person confirms
+(Proposed).** Conservative, on the device, always with the reasons shown
+(`core::appliances::matching`). Brand: the make as uppercase letters and
+digits must equal the brand's name or a label spelling (`aliases`); a make
+that starts with a spelling of four or more characters ("Whirlpool Corp")
+is only a possible match; no make, no match (a model number alone never
+suggests a family). Model: the library's model patterns (`#` digit, `@`
+letter, `?` either, `*` any run; whole number, case, spaces and dashes
+ignored), narrowed to the thing's kind when known (only families
+extending its template; so Bosch dishwashers and Bosch boilers stay
+apart). Up to two of the swaps labels cause (0/O, 1/I/L, 5/S, 8/B, 2/Z)
+are tried; a match that needed one is "possible" and shows the corrected
+reading. The pattern with the most fixed characters wins; "the model
+number matches" only when the brand is exact, no swap was needed, the
+family's patterns are confirmed and no other family fits as well;
+otherwise "possible" (with "more than one family fits" for ties). When
+the brand matches but no pattern does, the brand's families of that kind
+are listed by name with "None of these". Suggestions appear while adding a
+thing (typed or from a label photo, D-29), and on a thing's page whenever
+it has a make but no family (which covers things imported from Home
+Assistant and things edited later; the bridge is unchanged). Nothing is
+applied without a tap. A thing records the accepted family as
+`item.family` (`"rheem/endeavor-central-ac"`), or `"none"` after "None of
+these", which is cleared when the make or model changes so suggestions
+return.
+
+**D-150 Manufacturer or usual advice, per task, the person's choice
+(Proposed).** Implements P2 for model families. Where a family overrides
+one of its template's tasks (interval, steps, title), the thing's page
+shows both, each with where it comes from ("Whirlpool: every month";
+"Usual advice: every 3 months (common manufacturer guidance)"), the
+library's note, its source link and when it was checked, and buttons
+"Use Whirlpool's" and "Keep the usual". Choosing the manufacturer's
+rewrites the task's schedule, window, steps, minutes and title from the
+override, with the reason's source "manufacturer guidance (Whirlpool)" and
+a link to the page (`why.link`); choosing the usual one restores the
+template's values. Either way the choice is recorded on the task
+(`task.guidance = {family, follows: "maker" | "generic"}`), synced like any
+change, and can be switched later. An override marked "not confirmed" is
+never offered for a life-safety task or a life-safety category. Whole new
+tasks from a family are not offered yet (the library has none).
+
+**D-151 Saving the official manual onto the device (Proposed).**
+Implements D-127's fetch. On Android and desktop, "Save the official
+manual to this thing" downloads one of the thing's family's `manual-pdf`
+links straight from the manufacturer, only on that tap: https only; the
+link and every redirect (at most 5, each followed by hand) must be on the
+brand's own domains (never the shared government domains, never another
+host: a redirect elsewhere is refused with "open the page in the browser
+instead"); at most 25 MB (the existing document limit); the answer must
+start with `%PDF` and must not be labelled as something else. The request
+carries only the public URL, `Accept: application/pdf` and the user agent
+"Housewright (saving an appliance manual)"; no cookies are kept. The file
+becomes an attachment of kind `manual` with its source link
+(`attachment.source`) in the existing blob store, so it is on this device
+and in the household's own end-to-end encrypted sync, and nowhere else.
+The download runs outside the database lock (`save_manual` in the Tauri
+shell, checks in `api::library::download_manual`). On the web a page
+cannot download another site's file (the manufacturers do not allow other
+origins), so the button opens the manufacturer's PDF in a new tab and says
+so plainly, with "Add the PDF you saved". No manual is ever bundled or
+stored in a repository.
+
+**D-152 Credit, stored fields and export version 8 (Proposed).** The
+library's CC BY 4.0 credit (title, repository, licence, version, commit)
+is in Settings, About, at the foot of every "From <Brand>" section, and in
+THIRD-PARTY.md; every fact keeps its own source link and checked date.
+No storage migration was needed. Export version 8 adds `item.family`,
+`task.guidance`, `task.why.link` and `attachment.source`; version 7 and
+older files import unchanged.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -1422,4 +1540,25 @@ Phase 3 fixtures and versions 3 to 6) import unchanged.
   parts of the house (roof, gutters) in one line per room. Should it list
   only belongings (appliances, electronics, valuables), or leave it to a
   per-thing "include in the inventory" choice?
-
+- **Q-23** Library releases. The app reads updates from a `published`
+  branch of `holdTheDoorHoid/housewright-library` (D-148), which does not
+  exist yet: until it does, "Check now" says no updates have been
+  published. Proposed: a release workflow in the library repository that
+  runs `library-sync bundle --out published/` (or the same logic moved
+  into libcheck) on each tag and pushes `latest.json` and the bundle to
+  that branch. Needs the owner's go-ahead (it is the library repository).
+- **Q-24** Sign library releases? Today an update is checked against a
+  SHA-256 in a release note from the same host, plus every library rule;
+  that catches damage, not someone who controls the library repository.
+  Proposed: an Ed25519 key kept offline by the owner, the public key
+  compiled into the app, before automatic checks are switched on by
+  default.
+- **Q-25** Automatic library checks: off by default (as built, D-148), or
+  on once releases are signed?
+- **Q-26** Some manufacturers serve their PDFs from another company's
+  file host (a CDN), which D-151 refuses. Should the library format gain
+  a per-brand list of manual hosts, or should the app keep sending people
+  to the page?
+- **Q-27** Should Home Assistant's device import link a family when the
+  model number matches strongly? Proposed: no (as built): the thing's page
+  asks, so the person confirms.

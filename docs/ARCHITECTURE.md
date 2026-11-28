@@ -43,6 +43,8 @@ lets the server stay unable to read anything (D-14).
 | `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, fetched only on the first print; it turns a bundle made by `web/` into a PDF (D-80). |
 | `crates/bridge` | `housewright-bridge`: the Home Assistant bridge, a headless member device with a token-protected local JSON API (D-117, D-122, D-124). |
 | `integrations/home-assistant` | The Home Assistant custom integration (Python glue only, D-117), its tests, blueprints and the add-on (D-26). |
+| `library/` | The appliance library (CC BY 4.0, D-127 to D-129), vendored at a pinned commit by `tools/library-sync` and packed into the program by `crates/api/build.rs` (D-147). |
+| `tools/library-sync` | Copies a library version into `library/` from a clean checkout or a tagged GitHub tarball, checks it, and builds the release files the app's updates read (D-147, D-148). |
 | `templates/` | Bundled template library (D-21); moving later to the separate public appliance library `holdTheDoorHoid/housewright-library` (CC BY 4.0, D-127 to D-129). |
 | `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
 
@@ -301,6 +303,42 @@ binder::insurance (Inventory -> Document with Block::Inventory -> Typst; CSV)
 - **Private contractor fields** stay inside the core and the app's own
   screens: the binder's `gather` drops them (`Contractor::without_private`),
   and the bridge never reads contractors.
+
+## The appliance library (library hookup)
+
+```
+library/*.toml ─► api/build.rs ─► one gzip bundle in the program (89 KB)
+                                        │ first use
+                                        ▼
+            core::appliances::Library::load (libcheck's rules + the app's templates)
+                  ▲                                   │
+ downloaded bundle (meta, this device only) ──────────┤ newer and strict-valid wins
+   ◄─ library_import ◄─ interface fetch of            │
+      latest.json + bundle (raw.githubusercontent)    ▼
+make + model (typed, label, thing page) ─► matching::find ─► suggestions with reasons
+                                                     │ the person taps
+                                                     ▼
+          item.family ─► "From <Brand>": links, facts, parts, warranty, recalls
+                      ─► guidance: maker vs usual per task ─► task.guidance (op log)
+"Save the official manual" (native): api manual_source ─► download_manual
+      (hop by hop, brand domains, PDF, 25 MB) ─► attach_manual ─► blob store
+```
+
+- `core::appliances` is pure: `model` (the library's file types, aligned
+  with libcheck), `check` (its rules), `bundle` (bundle and release note,
+  limits, versions, SHA-256), `matching` (brands, patterns, OCR swaps,
+  ranking).
+- `api::library` holds the commands (`library*`, `set_family`,
+  `choose_guidance`, `manual_source`, `supplies`, uploads
+  `library_import` and `attach_manual`), the thing page's `maker` and
+  `family_suggestion`, and `download_manual` over a `Fetch` trait. The
+  library is loaded lazily into a `OnceCell` on the `Api`.
+- Network stays at the edges, as for recalls: the interface fetches
+  library updates (`app/src/lib/library.ts`); the Tauri shell downloads
+  manuals (`save_manual` in `app/src-tauri/src/lib.rs`, ureq without
+  automatic redirects) outside the database lock.
+- The Home Assistant bridge is unchanged: imported things get the same
+  suggestion on their page.
 
 ## Reminders
 
