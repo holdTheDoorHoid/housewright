@@ -1,0 +1,23 @@
+[package]
+name = "housewright-crypto"
+description = "Household keys, key wrapping, signed and encrypted envelopes for Housewright sync"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+ed25519-dalek = { version = "3", default-features = false, features = ["zeroize", "fast"] }
+hpke = { version = "0.15", default-features = false, features = ["alloc", "x25519", "chacha", "getrandom"] }
+chacha20poly1305 = { version = "0.11", default-features = false, features = ["alloc"] }
+hkdf = "0.13"
+hmac = "0.13"
+zeroize = { version = "1", features = ["derive"] }
+getrandom = "0.4"
+base64 = "0.22"
+subtle = "2"

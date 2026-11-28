@@ -6,6 +6,7 @@ members = [
     "crates/api",
     "crates/media",
     "crates/binder",
+    "crates/crypto",
     "web",
     "web-binder",
     "tools/climate-build",
