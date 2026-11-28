@@ -29,7 +29,9 @@ lets the server stay unable to read anything (D-14).
 | Path | What it is |
 |---|---|
 | `crates/core` | Domain model, schedule engine, prioritisation, storage, operation log. No platform code. |
-| `crates/api` | One JSON command surface over the core, shared by the Tauri app, the WebAssembly build and Android's notification receivers (D-63). |
+| `crates/api` | One JSON command surface over the core, shared by the Tauri app, the WebAssembly build and Android's notification receivers (D-63). File bytes travel beside the JSON (`call_upload`, `call_download`). |
+| `crates/media` | Pixel work shared by Android and the web: photo downscaling, QR codes, the sticker sheet PDF, on-device OCR (D-72, D-74, D-75). |
+| `models/ocr` | The bundled OCR models (CC BY-SA 4.0, D-74). |
 | `crates/crypto` | Household keys, key wrapping, operation and file encryption (D-15). |
 | `crates/sync` | Operation exchange with a server; hybrid logical clocks; merge (D-13). |
 | `crates/binder` | House binder and reports through Typst (D-43). |
@@ -64,10 +66,14 @@ lets the server stay unable to read anything (D-14).
   Home Assistant, used by usage-based schedules.
 - **Contractor**: contact, trades, licence and insurance expiry, private rating;
   linked to completions for job history and cost (D-28).
-- **Attachment**: an encrypted file (manual, receipt, warranty, photo) referenced
-  by content hash.
-- **Fact**: home facts sheet entries (D-27), each marked normal or sensitive for
-  the binder (D-41).
+- **Attachment**: a file (manual, receipt, warranty, photo) referenced by
+  content hash; the bytes live in a blob store beside the database (D-71),
+  encrypted from Phase 6.
+- **Completion detail**: append-only costs and completion field values added
+  after Done (D-76).
+- **Template fields**: the household's own fields on a template (D-77).
+- **Fact**: home facts sheet entries (D-27, D-78), in fixed groups, each
+  marked normal or sensitive for the binder (D-41).
 - **Profile**: the answers to the home questions, one per property (its id
   is the property's id). Every answer is optional ("Not sure"). Only counts
   are kept about the people at home (D-65).
@@ -119,6 +125,33 @@ weekly: Profile + items + switched-off tasks + answers + climate + today
 - `crates/core/src/onboard.rs`: the store-level glue: save the profile, add
   missing things (never change existing ones), switch on the plan, answer a
   suggestion.
+
+## Records (Phase 4)
+
+```
+photo/PDF ─► media::photo (shrink, thumbnail) ─► BlobStore.put ─► sha256
+                                                     │
+                Attachment {sha256, thumb, about} ◄──┘  (op log record)
+delete ─► tombstone ─► blobs::collect_garbage (drops unused blobs)
+full backup = JSON export + blobs/<sha256> in one ZIP (core::backup)
+
+label photo ─► media::ocr (ocrs + rten, bundled models) ─► lines
+            ─► core::labels::read_plate ─► brand/model/serial candidates
+            ─► the person checks and saves (never automatic)
+sticker: housewright://item/<id> + HW-XXXXX code ◄─ core::labels
+         QR drawn by media::qr, sheet by media::sheet (PDF);
+         scanned by media::qr (rqrr) or the phone's camera (Android link)
+```
+
+- `BlobStore` implementations: `DirBlobs` (a folder; Android, desktop),
+  `SqliteBlobs` (a second SQLite file; the web on OPFS), `MemoryBlobs`
+  (tests, the web's in-memory fallback). Phase 6 wraps the trait with
+  encryption.
+- Sensitive values (facts, fields, serials) are not sent to the interface
+  until it asks `reveal_*`, which only the owner may do. They never appear
+  in History or reminders.
+- On Android, files the WebView cannot handle (PDFs, backups) are written to
+  the app cache and opened or shared through the plugin (D-79).
 
 ## Sync and encryption (summary)
 

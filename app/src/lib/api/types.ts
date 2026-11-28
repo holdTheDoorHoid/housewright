@@ -67,6 +67,8 @@ export interface Status {
   household_name: string | null;
   me: Member | null;
   property: PropertyInfo | null;
+  /** ISO 4217, e.g. "USD". */
+  currency: string | null;
 }
 
 export interface Card {
@@ -113,6 +115,34 @@ export interface CompletionInfo {
   by_name: string;
   notes: string[];
   voided: boolean;
+  attachments: AttachmentInfo[];
+  costs: { kind: CostKind; minor: number; currency: string }[];
+  cost_total: number | null;
+  values: FieldInfo[];
+}
+
+export type CostKind = 'parts' | 'labour' | 'contractor' | 'other';
+export type AttachmentKind = 'manual' | 'receipt' | 'warranty' | 'photo' | 'other';
+
+export interface AttachmentInfo {
+  id: string;
+  name: string;
+  media_type: string;
+  size: number;
+  kind: AttachmentKind;
+  has_thumb: boolean;
+  width: number | null;
+  height: number | null;
+  at: string | null;
+  sensitive: boolean;
+}
+
+/** A field value for display; sensitive values come back empty. */
+export interface FieldInfo {
+  key: string;
+  label: string;
+  value: string;
+  sensitive: boolean;
 }
 
 export interface TaskDetail {
@@ -124,6 +154,7 @@ export interface TaskDetail {
   paused: boolean;
   not_applicable: boolean;
   completions: CompletionInfo[];
+  completion_fields: FieldDef[];
 }
 
 export interface SnoozeOption {
@@ -150,9 +181,24 @@ export interface ItemDetail {
   serial: string | null;
   installed: DateStr | null;
   purchased: DateStr | null;
-  fields: { key: string; label: string; value: string; sensitive: boolean }[];
+  fields: FieldInfo[];
   tasks: Card[];
   history: CompletionInfo[];
+  /** Sticker code, "HW-7K3QM". */
+  code: string;
+  next: Card | null;
+  attachments: AttachmentInfo[];
+  edit: FieldEdit[];
+  serial_sensitive: boolean;
+}
+
+export interface FieldEdit {
+  def: FieldDef;
+  origin: 'template' | 'household' | 'item';
+  value: string | null;
+  has_value: boolean;
+  sensitive: boolean;
+  photo: AttachmentInfo | null;
 }
 
 export interface Room {
@@ -269,6 +315,90 @@ export interface Suggestion {
 
 export type SuggestionAnswer = 'added' | 'not_for_us' | 'later';
 
+export interface Split {
+  parts: number;
+  labour: number;
+  contractor: number;
+  other: number;
+  total: number;
+}
+
+export interface CostRow<K> {
+  key: K;
+  label: string;
+  split: Split;
+  jobs: number;
+}
+
+export interface CostSummary {
+  currency: string;
+  total: Split;
+  by_year: CostRow<number>[];
+  by_item: CostRow<string | null>[];
+  by_property: CostRow<string>[];
+  other_currency_lines: number;
+}
+
+export interface FactInfo {
+  id: string;
+  group: string;
+  label: string;
+  value: string | null;
+  sensitive: boolean;
+  key: string | null;
+  room_id: string | null;
+  room_name: string | null;
+  attachments: AttachmentInfo[];
+}
+
+export interface FactPrompt {
+  key: string;
+  group: string;
+  label: string;
+  question: string;
+  hint: string;
+  sensitive: boolean;
+}
+
+export interface Facts {
+  property_name: string;
+  groups: { key: string; label: string; sensitive_by_default: boolean; facts: FactInfo[] }[];
+  prompts: FactPrompt[];
+}
+
+export interface SheetLayout {
+  page_width: number;
+  page_height: number;
+  columns: number;
+  rows: number;
+  label_width: number;
+  label_height: number;
+  margin_left: number;
+  margin_top: number;
+  gap_x: number;
+  gap_y: number;
+  outline: boolean;
+}
+
+export interface Sticker {
+  item_id: string;
+  name: string;
+  room_name: string | null;
+  code: string;
+  url: string;
+  qr_svg: string;
+}
+
+export interface LabelRead {
+  lines: string[];
+  brand: string | null;
+  model: string | null;
+  serial: string | null;
+  model_alternatives: string[];
+  serial_alternatives: string[];
+  template: { id: string; name: string } | null;
+}
+
 type None = Record<string, never> | undefined;
 
 /** Every command: [arguments, result]. */
@@ -310,6 +440,7 @@ export interface Commands {
       new_room?: string;
       make?: string;
       model?: string;
+      serial?: string;
       installed?: DateStr;
       values?: Record<string, string>;
     },
@@ -328,7 +459,88 @@ export interface Commands {
   starting_plan: [None, StartingPlan];
   all_suggested: [None, SuggestedGroup[]];
   answer_suggestion: [{ key: string; answer: SuggestionAnswer }, { switched_on: Card[] }];
+  attachments: [{ about_kind: AboutKind; about_id: string }, AttachmentInfo[]];
+  delete_attachment: [{ id: string }, { freed: number }];
+  update_item: [
+    {
+      id: string;
+      name?: string;
+      make?: string;
+      model?: string;
+      serial?: string;
+      installed?: string;
+      purchased?: string;
+      room_id?: string;
+      values?: Record<string, string | null>;
+    },
+    { detail: ItemDetail; offered: Card[]; no_longer_apply: Card[] },
+  ];
+  add_field: [
+    {
+      item_id: string;
+      to_template?: boolean;
+      label: string;
+      type: FieldDef['type'];
+      unit?: string;
+      options?: string[];
+      sensitive?: boolean;
+    },
+    ItemDetail,
+  ];
+  remove_field: [{ item_id: string; key: string }, ItemDetail];
+  reveal_field: [{ item_id: string; key: string }, { value: string }];
+  add_details: [
+    {
+      completion_id: string;
+      note?: string;
+      costs?: Partial<Record<CostKind, string>>;
+      values?: Record<string, string>;
+    },
+    TaskDetail,
+  ];
+  facts: [None, Facts];
+  save_fact: [
+    {
+      id?: string;
+      group: string;
+      label: string;
+      value?: string;
+      sensitive?: boolean;
+      key?: string;
+      room_id?: string;
+    },
+    FactInfo,
+  ];
+  delete_fact: [{ id: string }, null];
+  reveal_fact: [{ id: string }, { value: string }];
+  costs: [None, CostSummary];
+  set_currency: [{ currency: string }, Status];
+  label_sheet: [{ item_ids?: string[] }, { presets: { key: string; label: string; layout: SheetLayout }[]; stickers: Sticker[] }];
+  find_label: [{ text: string }, ItemRow[]];
 }
+
+export type AboutKind = 'item' | 'completion' | 'fact' | 'contractor';
+
+/** Commands that send a file's bytes too: [arguments, result]. */
+export interface UploadCommands {
+  attach: [
+    { about_kind: AboutKind; about_id: string; kind?: AttachmentKind; name?: string; sensitive?: boolean },
+    AttachmentInfo,
+  ];
+  scan_label: [None, { texts: string[]; items: ItemRow[] }];
+  read_label: [None, LabelRead];
+  restore_backup: [None, Status];
+}
+
+/** Commands that return bytes: their arguments. */
+export interface DownloadCommands {
+  attachment_file: { id: string; thumb?: boolean };
+  full_backup: None;
+  label_sheet_pdf: { item_ids?: string[]; preset?: string; layout?: SheetLayout };
+}
+
+export const UPLOAD_COMMANDS: (keyof UploadCommands)[] = ['attach', 'scan_label', 'read_label', 'restore_backup'];
+export const DOWNLOAD_COMMANDS: (keyof DownloadCommands)[] = ['attachment_file', 'full_backup', 'label_sheet_pdf'];
 
 export type Command = keyof Commands;
 
@@ -365,4 +577,19 @@ export const COMMANDS: Command[] = [
   'starting_plan',
   'all_suggested',
   'answer_suggestion',
+  'attachments',
+  'delete_attachment',
+  'update_item',
+  'add_field',
+  'remove_field',
+  'reveal_field',
+  'add_details',
+  'facts',
+  'save_fact',
+  'delete_fact',
+  'reveal_fact',
+  'costs',
+  'set_currency',
+  'label_sheet',
+  'find_label',
 ];

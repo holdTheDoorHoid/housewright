@@ -15,6 +15,10 @@
   import Questions from './screens/Questions.svelte';
   import StartingPlan from './screens/StartingPlan.svelte';
   import Suggested from './screens/Suggested.svelte';
+  import Home from './screens/Home.svelte';
+  import Costs from './screens/Costs.svelte';
+  import Labels from './screens/Labels.svelte';
+  import Scan from './screens/Scan.svelte';
 
   let fatal = $state<{ text: string; locked: boolean } | null>(null);
 
@@ -22,6 +26,7 @@
     const p = await reminders().takePendingAction();
     if (p?.action === 'reschedule') go(`#/task/${p.taskId}/reschedule`);
     else if (p?.action === 'open') go(`#/task/${p.taskId}`);
+    else if (p?.action === 'open_item') go(`#/thing/${p.taskId}`);
   }
 
   function started(s: Status, fresh = false) {
@@ -56,15 +61,18 @@
   const tabs = [
     { hash: '#/', name: 'today', label: 'Today' },
     { hash: '#/things', name: 'things', label: 'Things' },
+    { hash: '#/home', name: 'home', label: 'Home' },
     { hash: '#/history', name: 'history', label: 'History' },
     { hash: '#/settings', name: 'settings', label: 'Settings' },
   ];
   const current = $derived(
     app.route.name === 'task' || app.route.name === 'plan' || app.route.name === 'suggested'
       ? 'today'
-      : app.route.name === 'thing' || app.route.name === 'add'
+      : app.route.name === 'thing' || app.route.name === 'add' || app.route.name === 'scan'
         ? 'things'
-        : app.route.name,
+        : app.route.name === 'costs' || app.route.name === 'labels'
+          ? 'home'
+          : app.route.name,
   );
 </script>
 
@@ -96,6 +104,10 @@
     {:else if app.route.name === 'questions'}{#key app.route.redo}<Questions redo={app.route.redo} />{/key}
     {:else if app.route.name === 'plan'}<StartingPlan />
     {:else if app.route.name === 'suggested'}<Suggested />
+    {:else if app.route.name === 'home'}<Home />
+    {:else if app.route.name === 'costs'}<Costs />
+    {:else if app.route.name === 'labels'}<Labels />
+    {:else if app.route.name === 'scan'}<Scan />
     {/if}
   </main>
   {#if app.route.name !== 'questions'}

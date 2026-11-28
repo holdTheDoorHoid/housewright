@@ -14,9 +14,10 @@ use crate::store::{RawEntity, Store};
 
 /// The value of the `format` field.
 pub const EXPORT_FORMAT: &str = "housewright-export";
-/// The current export version. Version 2 (Phase 3) adds the `profile` and
-/// `suggestion_answer` kinds; version 1 files import unchanged.
-pub const EXPORT_VERSION: u32 = 2;
+/// The current export version. Version 2 (Phase 3) added the `profile` and
+/// `suggestion_answer` kinds; version 3 (Phase 4) adds `completion_detail`
+/// and `template_fields`. Older files import unchanged.
+pub const EXPORT_VERSION: u32 = 3;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Export {

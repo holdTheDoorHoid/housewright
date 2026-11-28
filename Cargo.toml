@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/cli", "crates/api", "web", "tools/climate-build"]
+members = ["crates/core", "crates/cli", "crates/api", "crates/media", "web", "tools/climate-build"]
 exclude = ["app/src-tauri"]
 
 [workspace.package]
@@ -13,6 +13,7 @@ rust-version = "1.89"
 [workspace.dependencies]
 housewright-core = { path = "crates/core" }
 housewright-api = { path = "crates/api" }
+housewright-media = { path = "crates/media" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
@@ -23,3 +24,31 @@ rusqlite = { version = "0.43", features = ["bundled"] }
 toml = "1"
 clap = { version = "4", features = ["derive", "env"] }
 proptest = "1"
+# Phase 4 records (licences in docs/THIRD-PARTY.md).
+sha2 = "0.11"
+zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+qrcode = { version = "0.15", default-features = false, features = ["svg"] }
+rqrr = "0.11"
+pdf-writer = "0.15"
+ocrs = { version = "0.14", default-features = false, features = ["onnx"] }
+rten = { version = "0.28", default-features = false, features = ["onnx_format"] }
+
+# Pixel and model code is unusably slow unoptimised (OCR takes minutes in a
+# debug build); optimise just these dependencies in dev and test builds.
+[profile.dev.package]
+image = { opt-level = 3 }
+zune-jpeg = { opt-level = 3 }
+png = { opt-level = 3 }
+fdeflate = { opt-level = 3 }
+rqrr = { opt-level = 3 }
+ocrs = { opt-level = 3 }
+rten = { opt-level = 3 }
+rten-base = { opt-level = 3 }
+rten-gemm = { opt-level = 3 }
+rten-simd = { opt-level = 3 }
+rten-tensor = { opt-level = 3 }
+rten-vecmath = { opt-level = 3 }
+rten-imageproc = { opt-level = 3 }
+rten-sequence = { opt-level = 3 }
+rten-onnx = { opt-level = 3 }

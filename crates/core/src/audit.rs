@@ -28,6 +28,8 @@ pub struct AuditEntry {
 fn noun(kind: EntityKind) -> &'static str {
     match kind {
         EntityKind::MeterReading => "meter reading",
+        EntityKind::CompletionDetail => "completion details",
+        EntityKind::TemplateFields => "own fields of template",
         k => k.as_str(),
     }
 }
@@ -133,9 +135,26 @@ fn describe(store: &Store, group: &[Op], created: bool, tz: &TimeZone) -> String
                     format!("{who} recorded a reading of {value} on {meter}")
                 }
                 EntityKind::Attachment => {
-                    format!("{who} attached {}", label(store, kind, &first.entity))
+                    // "attached 'manual.pdf'", not "attached attachment 'manual.pdf'".
+                    let what = label(store, kind, &first.entity);
+                    let what = what
+                        .strip_prefix(noun(kind))
+                        .map(str::trim_start)
+                        .filter(|s| s.starts_with('\''))
+                        .unwrap_or(&what);
+                    format!("{who} attached {what}")
                 }
                 EntityKind::Note => format!("{who} added a note"),
+                // Costs and readings are values: never shown here (D-58).
+                EntityKind::CompletionDetail => {
+                    let task = r
+                        .get("completion")
+                        .and_then(Value::as_str)
+                        .and_then(|c| store.raw(EntityKind::Completion, c).ok().flatten())
+                        .map(|c| title_of_task(store, c.data.get("task")))
+                        .unwrap_or_else(|| "a task".into());
+                    format!("{who} added details to a completion of {task}")
+                }
                 _ => format!("{who} wrote {}", label(store, kind, &first.entity)),
             }
         }

@@ -5,13 +5,16 @@
   import { markDone, errorText } from '../lib/actions';
   import { resync } from '../lib/reminders';
   import Reschedule from './Reschedule.svelte';
+  import CompletionDetails from './CompletionDetails.svelte';
+  import { money } from '../lib/money';
+  import { attachmentUrl } from '../lib/files';
 
-  let { id, sheet }: { id: string; sheet?: 'reschedule' } = $props();
+  let { id, sheet }: { id: string; sheet?: 'reschedule' | 'details' } = $props();
   let t = $state<TaskDetail | null>(null);
   let error = $state<string | null>(null);
   let rescheduling = $state(false);
-  let noteFor = $state<string | null>(null);
-  let note = $state('');
+  let detailsFor = $state<string | null>(null);
+  let thumbs = $state<Record<string, string>>({});
 
   $effect(() => {
     void app.tick;
@@ -25,17 +28,23 @@
   $effect(() => {
     if (sheet === 'reschedule') rescheduling = true;
   });
-
-  async function saveNote(completionId: string) {
-    try {
-      await call('annotate', { completion_id: completionId, text: note });
-      note = '';
-      noteFor = null;
-      refresh();
-    } catch (e) {
-      toast({ text: errorText(e) });
+  // "Add details" from the Done toast opens the newest record's form.
+  let opened = false;
+  $effect(() => {
+    if (sheet === 'details' && t && !opened) {
+      opened = true;
+      detailsFor = t.completions.find((c) => !c.voided)?.id ?? null;
     }
-  }
+  });
+  $effect(() => {
+    for (const c of t?.completions ?? []) {
+      for (const a of c.attachments) {
+        if (a.has_thumb && !thumbs[a.id]) {
+          attachmentUrl(a.id, a.media_type, true).then((u) => (thumbs[a.id] = u)).catch(() => {});
+        }
+      }
+    }
+  });
 
   async function setActive(active: boolean) {
     await call('set_active', { id, active });
@@ -113,24 +122,32 @@
           <li class="card" class:voided={h.voided}>
             <div>{when(h.at)} · {h.by_name}{h.voided ? ' · undone' : ''}</div>
             {#each h.notes as n, i (i)}<div class="muted">{n}</div>{/each}
+            {#if h.cost_total !== null || h.values.length || h.attachments.length}
+              <div class="extras small">
+                {#if h.cost_total !== null}<span>Cost {money(h.cost_total, app.status?.currency ?? 'USD')}</span>{/if}
+                {#each h.values as v (v.key)}<span>{v.label}: {v.sensitive ? 'hidden' : v.value.replaceAll('_', ' ')}</span>{/each}
+              </div>
+              {#if h.attachments.length}
+                <div class="row">
+                  {#each h.attachments as a (a.id)}
+                    {#if thumbs[a.id]}<img class="mini" src={thumbs[a.id]} alt={a.name} />{/if}
+                  {/each}
+                </div>
+              {/if}
+            {/if}
             {#if !h.voided}
-              {#if noteFor === h.id}
-                <form
-                  onsubmit={(e) => {
-                    e.preventDefault();
-                    saveNote(h.id);
+              {#if detailsFor === h.id}
+                <CompletionDetails
+                  completion={h}
+                  fields={t.completion_fields}
+                  onsaved={(d) => {
+                    t = d;
+                    refresh();
                   }}
-                >
-                  <label for={`note-${h.id}`}>Note</label>
-                  <textarea id={`note-${h.id}`} bind:value={note} placeholder="Anything worth remembering"></textarea>
-                  <div class="row">
-                    <button class="primary" type="submit">Save note</button>
-                    <button type="button" class="quiet" onclick={() => (noteFor = null)}>Cancel</button>
-                  </div>
-                  <p class="muted small">Photos can be added once attachments arrive (Phase 4).</p>
-                </form>
+                  onclose={() => (detailsFor = null)}
+                />
               {:else}
-                <button class="quiet" onclick={() => (noteFor = h.id)}>Add a note</button>
+                <button class="quiet" onclick={() => (detailsFor = h.id)}>Add a note, photo or cost</button>
               {/if}
             {/if}
           </li>
@@ -164,5 +181,17 @@
   }
   .voided {
     opacity: 0.6;
+  }
+  .extras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    color: var(--muted);
+  }
+  .mini {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
   }
 </style>

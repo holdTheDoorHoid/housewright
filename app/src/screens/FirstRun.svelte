@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { call, type Status } from '../lib/api';
+  import { call, upload, type Status } from '../lib/api';
+  import { readFile } from '../lib/files';
   import { errorText } from '../lib/actions';
 
   let { ondone }: { ondone: (s: Status, fresh?: boolean) => void } = $props();
@@ -37,7 +38,8 @@
     if (!f) return;
     busy = true;
     try {
-      ondone(await call('import', { json: await f.text() }));
+      // A full backup (.zip, with photos) or a plain JSON export.
+      ondone(await upload('restore_backup', {}, await readFile(f)));
     } catch (err) {
       error = errorText(err);
     } finally {
@@ -67,10 +69,10 @@
     <button class="primary wide" type="submit" disabled={busy}>Next: the home questions</button>
   </form>
   {#if importing}
-    <label for="imp">Choose a Housewright export file</label>
-    <input id="imp" type="file" accept="application/json,.json" onchange={importFile} />
+    <label for="imp">Choose a Housewright backup (.zip) or export (.json)</label>
+    <input id="imp" type="file" accept="application/json,.json,application/zip,.zip" onchange={importFile} />
   {:else}
-    <p><button class="quiet" onclick={() => (importing = true)}>I have an export file to restore</button></p>
+    <p><button class="quiet" onclick={() => (importing = true)}>I have a backup or export to restore</button></p>
   {/if}
 </section>
 

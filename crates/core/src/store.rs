@@ -66,7 +66,7 @@ impl WallClock for ManualClock {
 type Migration = fn(&Connection) -> rusqlite::Result<()>;
 
 /// Versioned schema migrations, applied in order, each exactly once.
-const MIGRATIONS: &[(i64, Migration)] = &[(1, migration_1), (2, migration_2)];
+const MIGRATIONS: &[(i64, Migration)] = &[(1, migration_1), (2, migration_2), (3, migration_3)];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
     let mut sql = String::from(
@@ -113,6 +113,15 @@ fn entity_table(kind: EntityKind) -> String {
 fn migration_2(conn: &Connection) -> rusqlite::Result<()> {
     let mut sql = String::new();
     for kind in [EntityKind::Profile, EntityKind::SuggestionAnswer] {
+        sql.push_str(&entity_table(kind));
+    }
+    conn.execute_batch(&sql)
+}
+
+/// Phase 4: completion details and household template fields.
+fn migration_3(conn: &Connection) -> rusqlite::Result<()> {
+    let mut sql = String::new();
+    for kind in [EntityKind::CompletionDetail, EntityKind::TemplateFields] {
         sql.push_str(&entity_table(kind));
     }
     conn.execute_batch(&sql)

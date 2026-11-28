@@ -162,6 +162,8 @@ fn run(w: &mut World, a: &Action) {
                 } else {
                     Sensitivity::Normal
                 },
+                key: None,
+                room: None,
             };
             let _ = w.stores[r].put(&f);
         }

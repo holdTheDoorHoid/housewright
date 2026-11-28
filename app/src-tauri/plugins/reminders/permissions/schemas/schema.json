@@ -331,6 +331,18 @@
           "markdownDescription": "Denies the request_permissions command without any pre-configured scope."
         },
         {
+          "description": "Enables the share_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-share-file",
+          "markdownDescription": "Enables the share_file command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the share_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-share-file",
+          "markdownDescription": "Denies the share_file command without any pre-configured scope."
+        },
+        {
           "description": "Enables the sync command without any pre-configured scope.",
           "type": "string",
           "const": "allow-sync",
@@ -355,10 +367,22 @@
           "markdownDescription": "Denies the test command without any pre-configured scope."
         },
         {
-          "description": "Schedule reminders, send a test reminder, read a tapped notification action, and ask for notification permission.\n#### This default permission set includes:\n\n- `allow-sync`\n- `allow-test`\n- `allow-pending`\n- `allow-check-permissions`\n- `allow-request-permissions`",
+          "description": "Enables the view_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-view-file",
+          "markdownDescription": "Enables the view_file command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the view_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-view-file",
+          "markdownDescription": "Denies the view_file command without any pre-configured scope."
+        },
+        {
+          "description": "Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, and open or share a file with the phone's own apps.\n#### This default permission set includes:\n\n- `allow-sync`\n- `allow-test`\n- `allow-pending`\n- `allow-view-file`\n- `allow-share-file`\n- `allow-check-permissions`\n- `allow-request-permissions`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Schedule reminders, send a test reminder, read a tapped notification action, and ask for notification permission.\n#### This default permission set includes:\n\n- `allow-sync`\n- `allow-test`\n- `allow-pending`\n- `allow-check-permissions`\n- `allow-request-permissions`"
+          "markdownDescription": "Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, and open or share a file with the phone's own apps.\n#### This default permission set includes:\n\n- `allow-sync`\n- `allow-test`\n- `allow-pending`\n- `allow-view-file`\n- `allow-share-file`\n- `allow-check-permissions`\n- `allow-request-permissions`"
         }
       ]
     }

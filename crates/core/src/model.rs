@@ -10,6 +10,8 @@
 //! whereabouts of valuables carries a [`Sensitivity`] flag, either directly or
 //! through a [`Flagged`] wrapper, so the binder can file it into the sealed volume.
 
+use std::collections::BTreeMap;
+
 use jiff::Timestamp;
 use jiff::civil::Date;
 use serde::de::DeserializeOwned;
@@ -78,10 +80,16 @@ pub enum EntityKind {
     Profile,
     /// Append-only answer to a weekly suggestion (Add / Not for us / Later).
     SuggestionAnswer,
+    /// Append-only details added after a completion: costs and completion
+    /// field values (P1: offered after Done, never required).
+    CompletionDetail,
+    /// The household's own fields added to a template (D-22), kept apart
+    /// from the bundled template copy so a library update cannot drop them.
+    TemplateFields,
 }
 
 impl EntityKind {
-    pub const ALL: [EntityKind; 18] = [
+    pub const ALL: [EntityKind; 20] = [
         EntityKind::Household,
         EntityKind::Member,
         EntityKind::Property,
@@ -100,6 +108,8 @@ impl EntityKind {
         EntityKind::Fact,
         EntityKind::Profile,
         EntityKind::SuggestionAnswer,
+        EntityKind::CompletionDetail,
+        EntityKind::TemplateFields,
     ];
 
     /// The kinds that existed at schema version 1. Migration 1 creates
@@ -144,6 +154,8 @@ impl EntityKind {
             EntityKind::Fact => "fact",
             EntityKind::Profile => "profile",
             EntityKind::SuggestionAnswer => "suggestion_answer",
+            EntityKind::CompletionDetail => "completion_detail",
+            EntityKind::TemplateFields => "template_fields",
         }
     }
 
@@ -161,6 +173,7 @@ impl EntityKind {
                 | EntityKind::Attachment
                 | EntityKind::Note
                 | EntityKind::SuggestionAnswer
+                | EntityKind::CompletionDetail
         )
     }
 
@@ -169,7 +182,10 @@ impl EntityKind {
     pub fn deletable(self) -> bool {
         !matches!(
             self,
-            EntityKind::Completion | EntityKind::Snooze | EntityKind::SuggestionAnswer
+            EntityKind::Completion
+                | EntityKind::Snooze
+                | EntityKind::SuggestionAnswer
+                | EntityKind::CompletionDetail
         )
     }
 }
@@ -207,8 +223,17 @@ pub struct Household {
     pub name: String,
     /// Default IANA time zone for new properties.
     pub time_zone: String,
+    /// ISO 4217 currency for costs; absent means USD (D-06).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
 }
 entity!(Household, Household);
+
+impl Household {
+    pub fn currency(&self) -> &str {
+        self.currency.as_deref().unwrap_or("USD")
+    }
+}
 
 /// Roles (D-23). Contractor/tenant links are not members; they arrive with
 /// share links in Phase 11.
@@ -515,16 +540,29 @@ pub struct Attachment {
     pub about: EntityRef,
     #[serde(default)]
     pub sensitivity: Sensitivity,
+    /// A small preview (photos only), also a content hash.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thumb_sha256: Option<String>,
+    /// Pixel size of a stored photo.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub width: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub height: Option<u32>,
+    /// Who added it, and when (absent in Phase 1-3 records).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub by: Option<MemberId>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub at: Option<Timestamp>,
 }
 entity!(Attachment, Attachment);
 
 impl Attachment {
     pub fn validate(&self) -> Result<(), String> {
-        if self.sha256.len() != 64
-            || !self
-                .sha256
-                .chars()
-                .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c))
+        if !crate::blobs::is_hash(&self.sha256)
+            || self
+                .thumb_sha256
+                .as_deref()
+                .is_some_and(|t| !crate::blobs::is_hash(t))
         {
             return Err("sha256 must be 64 lowercase hex characters".into());
         }
@@ -553,5 +591,61 @@ pub struct Fact {
     pub label: String,
     pub value: String,
     pub sensitivity: Sensitivity,
+    /// Set when the fact answers one of the suggested questions
+    /// (`water_main`), so the question is not asked again.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    /// The room it is about (paint colours per room).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub room: Option<RoomId>,
 }
 entity!(Fact, Fact);
+
+/// What a cost was for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CostKind {
+    Parts,
+    Labour,
+    Contractor,
+    Other,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CostLine {
+    pub kind: CostKind,
+    pub amount: Money,
+}
+
+/// Details added to a completion after Done (P1): costs and the task's
+/// completion fields. Append-only. A later detail for the same completion
+/// replaces an earlier one's costs (and the values it sets), so a typo is
+/// corrected by adding again, never by editing history.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CompletionDetail {
+    pub id: CompletionDetailId,
+    pub completion: CompletionId,
+    pub by: MemberId,
+    pub at: Timestamp,
+    /// `None` leaves earlier costs as they were; `Some(vec![])` clears them.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub costs: Option<Vec<CostLine>>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub values: CustomValues,
+}
+entity!(CompletionDetail, CompletionDetail);
+
+/// The household's own fields on a template (D-22). The id is the template id.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct TemplateFields {
+    pub id: String,
+    #[serde(default)]
+    pub fields: Vec<FieldDef>,
+}
+
+impl Entity for TemplateFields {
+    const KIND: EntityKind = EntityKind::TemplateFields;
+    fn entity_id(&self) -> String {
+        self.id.clone()
+    }
+}

@@ -4,6 +4,7 @@
   import { go, refresh, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import { resync } from '../lib/reminders';
+  import LabelReader, { type LabelChoice } from './LabelReader.svelte';
 
   let templates = $state<TemplateSummary[]>([]);
   let rooms = $state<Room[]>([]);
@@ -13,6 +14,8 @@
   let newRoom = $state('');
   let make = $state('');
   let model = $state('');
+  let serial = $state('');
+  let fromLabel = $state(false);
   let installed = $state('');
   let values = $state<Record<string, string>>({});
   let added = $state<{ item_id: string; tasks: Card[] } | null>(null);
@@ -39,6 +42,19 @@
     values = {};
   }
 
+  /** A read label fills in make, model and serial, and picks the kind of
+   * thing when the label says what it is. The person still checks it all
+   * before adding. */
+  function useLabel(c: LabelChoice) {
+    fromLabel = false;
+    const t = c.template ? templates.find((x) => x.id === c.template?.id) : undefined;
+    if (t && !chosen) pick(t);
+    make = c.make;
+    model = c.model;
+    serial = c.serial;
+    if (!chosen) toast({ text: 'Now choose what kind of thing it is.' }, 4000);
+  }
+
   async function save(e: SubmitEvent) {
     e.preventDefault();
     if (!chosen) return;
@@ -51,6 +67,7 @@
         new_room: roomId === '__new' ? newRoom : undefined,
         make,
         model,
+        serial: serial || undefined,
         installed: installed || undefined,
         values,
       });
@@ -91,7 +108,12 @@
         <button onclick={() => added && go(`#/thing/${added.item_id}`)}>Not now</button>
       </div>
     </div>
+  {:else if fromLabel}
+    <LabelReader onuse={useLabel} showTemplate={true} />
+    <button class="quiet" onclick={() => (fromLabel = false)}>Back</button>
   {:else if !chosen}
+    <p><button onclick={() => (fromLabel = true)}>Start from a photo of its label</button></p>
+    {#if make || model}<p class="small muted">From the label: {[make, model, serial].filter(Boolean).join(' · ')}</p>{/if}
     <label for="filter">What is it?</label>
     <input id="filter" bind:value={filter} placeholder="Search: dryer, gutters, alarm…" />
     <ul class="stack grid">
@@ -119,12 +141,14 @@
         <label for="newroom">New room name</label>
         <input id="newroom" bind:value={newRoom} placeholder="Basement" />
       {/if}
-      <details>
+      <details open={!!(make || model || serial)}>
         <summary>More details (optional)</summary>
         <label for="make">Make</label>
         <input id="make" bind:value={make} />
         <label for="model">Model</label>
         <input id="model" bind:value={model} />
+        <label for="serial">Serial</label>
+        <input id="serial" bind:value={serial} />
         <label for="installed">Installed on</label>
         <input id="installed" type="date" bind:value={installed} />
         {#each chosen.fields.filter((f) => f.type !== 'photo') as f (f.key)}

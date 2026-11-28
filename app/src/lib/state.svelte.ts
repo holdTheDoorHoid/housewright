@@ -2,7 +2,7 @@ import type { Status } from './api';
 
 export type Route =
   | { name: 'today' }
-  | { name: 'task'; id: string; sheet?: 'reschedule' }
+  | { name: 'task'; id: string; sheet?: 'reschedule' | 'details' }
   | { name: 'things' }
   | { name: 'thing'; id: string }
   | { name: 'add' }
@@ -10,14 +10,22 @@ export type Route =
   | { name: 'settings' }
   | { name: 'questions'; redo: boolean }
   | { name: 'plan' }
-  | { name: 'suggested' };
+  | { name: 'suggested' }
+  | { name: 'home' }
+  | { name: 'costs' }
+  | { name: 'labels' }
+  | { name: 'scan' };
 
 export function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   switch (parts[0]) {
     case 'task':
       return parts[1]
-        ? { name: 'task', id: parts[1], sheet: parts[2] === 'reschedule' ? 'reschedule' : undefined }
+        ? {
+            name: 'task',
+            id: parts[1],
+            sheet: parts[2] === 'reschedule' || parts[2] === 'details' ? parts[2] : undefined,
+          }
         : { name: 'today' };
     case 'things':
       return { name: 'things' };
@@ -35,6 +43,14 @@ export function parse(hash: string): Route {
       return { name: 'plan' };
     case 'suggested':
       return { name: 'suggested' };
+    case 'home':
+      return { name: 'home' };
+    case 'costs':
+      return { name: 'costs' };
+    case 'labels':
+      return { name: 'labels' };
+    case 'scan':
+      return { name: 'scan' };
     default:
       return { name: 'today' };
   }

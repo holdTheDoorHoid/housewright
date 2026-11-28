@@ -1,12 +1,14 @@
 ## Default Permission
 
-Schedule reminders, send a test reminder, read a tapped notification action, and ask for notification permission.
+Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, and open or share a file with the phone's own apps.
 
 #### This default permission set includes the following:
 
 - `allow-sync`
 - `allow-test`
 - `allow-pending`
+- `allow-view-file`
+- `allow-share-file`
 - `allow-check-permissions`
 - `allow-request-permissions`
 
@@ -100,6 +102,32 @@ Denies the request_permissions command without any pre-configured scope.
 <tr>
 <td>
 
+`reminders:allow-share-file`
+
+</td>
+<td>
+
+Enables the share_file command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`reminders:deny-share-file`
+
+</td>
+<td>
+
+Denies the share_file command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `reminders:allow-sync`
 
 </td>
@@ -145,6 +173,32 @@ Enables the test command without any pre-configured scope.
 <td>
 
 Denies the test command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`reminders:allow-view-file`
+
+</td>
+<td>
+
+Enables the view_file command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`reminders:deny-view-file`
+
+</td>
+<td>
+
+Denies the view_file command without any pre-configured scope.
 
 </td>
 </tr>

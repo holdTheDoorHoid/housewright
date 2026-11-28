@@ -33,6 +33,10 @@
     <h1 id="things-h">Things</h1>
     <a class="button primary" href="#/add">Add a thing</a>
   </div>
+  <p class="row">
+    <a class="button" href="#/scan">Scan a sticker</a>
+    <a class="button" href="#/labels">Print stickers</a>
+  </p>
   <div class="row" role="radiogroup" aria-label="Group by">
     <button role="radio" aria-checked={by === 'room'} class:primary={by === 'room'} onclick={() => (by = 'room')}
       >By room</button

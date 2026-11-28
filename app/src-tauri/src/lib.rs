@@ -10,22 +10,102 @@ mod core;
 #[cfg(target_os = "android")]
 mod android;
 
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD as B64;
 use housewright_api::ApiError;
 use serde_json::Value;
 use tauri::Manager;
 
-#[tauri::command]
-async fn api(app: tauri::AppHandle, cmd: String, args: Value) -> Result<Value, ApiError> {
-    let path = core::db_path().or_else(|| {
-        app.path()
-            .app_data_dir()
-            .ok()
-            .map(|d| d.join(core::DB_FILE))
-    });
-    let path = path.ok_or_else(|| ApiError::internal("no place to store the database"))?;
-    tauri::async_runtime::spawn_blocking(move || core::call(&path, &cmd, args))
+fn db_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf, ApiError> {
+    core::db_path()
+        .or_else(|| {
+            app.path()
+                .app_data_dir()
+                .ok()
+                .map(|d| d.join(core::DB_FILE))
+        })
+        .ok_or_else(|| ApiError::internal("no place to store the database"))
+}
+
+async fn blocking<T: Send + 'static>(
+    f: impl FnOnce() -> Result<T, ApiError> + Send + 'static,
+) -> Result<T, ApiError> {
+    tauri::async_runtime::spawn_blocking(f)
         .await
         .map_err(|e| ApiError::internal(e.to_string()))?
+}
+
+#[tauri::command]
+async fn api(app: tauri::AppHandle, cmd: String, args: Value) -> Result<Value, ApiError> {
+    let path = db_path(&app)?;
+    blocking(move || core::call(&path, &cmd, args)).await
+}
+
+/// A command with a file. The bytes travel as base64 text: on Android the
+/// WebView cannot pass a raw request body to the app (requests go through
+/// a JSON message bridge), so raw IPC bodies do not arrive there.
+#[tauri::command]
+async fn api_upload(
+    app: tauri::AppHandle,
+    cmd: String,
+    args: Value,
+    data: String,
+) -> Result<Value, ApiError> {
+    let path = db_path(&app)?;
+    blocking(move || {
+        let bytes = B64
+            .decode(data.as_bytes())
+            .map_err(|e| ApiError::invalid(format!("the file did not arrive whole: {e}")))?;
+        core::with_api(&path, |api| api.call_upload(&cmd, args, &bytes))
+    })
+    .await
+}
+
+/// A command that returns bytes, as base64 text (see `api_upload`).
+#[tauri::command]
+async fn api_download(app: tauri::AppHandle, cmd: String, args: Value) -> Result<String, ApiError> {
+    let path = db_path(&app)?;
+    let bytes =
+        blocking(move || core::with_api(&path, |api| api.call_download(&cmd, args))).await?;
+    Ok(B64.encode(bytes))
+}
+
+/// Write a command's bytes to a file in the app's cache folder and return
+/// its path, so the phone's own viewer or share sheet can open it (a PDF
+/// manual, a sticker sheet, a backup).
+#[tauri::command]
+async fn save_for_viewer(
+    app: tauri::AppHandle,
+    cmd: String,
+    args: Value,
+    filename: String,
+) -> Result<String, ApiError> {
+    let path = db_path(&app)?;
+    let dir = app
+        .path()
+        .app_cache_dir()
+        .map_err(|e| ApiError::internal(e.to_string()))?
+        .join("shared");
+    let safe: String = filename
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || ".-_".contains(c) {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    blocking(move || {
+        let bytes = core::with_api(&path, |api| api.call_download(&cmd, args))?;
+        // Only the latest few shared files are kept.
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).map_err(|e| ApiError::internal(e.to_string()))?;
+        let out = dir.join(if safe.is_empty() { "file".into() } else { safe });
+        std::fs::write(&out, bytes).map_err(|e| ApiError::internal(e.to_string()))?;
+        Ok(out.to_string_lossy().to_string())
+    })
+    .await
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -38,7 +118,12 @@ pub fn run() {
     );
     tauri::Builder::default()
         .plugin(tauri_plugin_reminders::init())
-        .invoke_handler(tauri::generate_handler![api])
+        .invoke_handler(tauri::generate_handler![
+            api,
+            api_upload,
+            api_download,
+            save_for_viewer
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Housewright");
 }

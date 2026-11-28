@@ -110,7 +110,7 @@ pub struct Condition {
 }
 
 impl Condition {
-    fn holds(&self, item: &Item) -> bool {
+    pub fn holds(&self, item: &Item) -> bool {
         match item.custom.get(&self.field).map(|c| &c.value) {
             Some(FieldValue::Choice(v)) => v == &self.equals,
             Some(FieldValue::Text(v)) => v == &self.equals,

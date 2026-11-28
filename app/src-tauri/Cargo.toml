@@ -24,9 +24,17 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
+base64 = "0.22"
 housewright-api = { path = "../../crates/api" }
 housewright-core = { path = "../../crates/core" }
+housewright-media = { path = "../../crates/media" }
 tauri-plugin-reminders = { path = "plugins/reminders" }
+
+[features]
+default = ["ocr"]
+# Label reading on the device (D-74): compiles the ~12 MB OCR models into
+# the app. `--no-default-features` builds without it (to measure its size).
+ocr = []
 
 [target.'cfg(target_os = "android")'.dependencies]
 jni = "0.21"
@@ -37,3 +45,22 @@ opt-level = "s"
 lto = "thin"
 codegen-units = 4
 strip = true
+
+# As in the workspace: pixel and model code is unusably slow unoptimised, so
+# even the debug APK optimises these dependencies.
+[profile.dev.package]
+image = { opt-level = 3 }
+zune-jpeg = { opt-level = 3 }
+png = { opt-level = 3 }
+fdeflate = { opt-level = 3 }
+rqrr = { opt-level = 3 }
+ocrs = { opt-level = 3 }
+rten = { opt-level = 3 }
+rten-base = { opt-level = 3 }
+rten-gemm = { opt-level = 3 }
+rten-simd = { opt-level = 3 }
+rten-tensor = { opt-level = 3 }
+rten-vecmath = { opt-level = 3 }
+rten-imageproc = { opt-level = 3 }
+rten-sequence = { opt-level = 3 }
+rten-onnx = { opt-level = 3 }
