@@ -228,8 +228,11 @@ Each batch also carries its author's last eight signed roster versions
 its own verified chain, step by step, under the same rules as any roster
 update. A claim not signed by an owner's device is counted as that author's
 tampering and changes nothing. A verified version the server will not give
-the device pauses its sending, with a notice naming the device that made
-the claim; the person can press OK to send anyway.
+the device, or a verified fork (a different valid successor under a number
+the device has), pauses its sending, with a notice naming the device that
+made the claim; the person can press OK to send anyway. Each device can
+cause such a pause only once; after OK, its later claims only add a notice
+(D-115).
 
 A batch that fails is skipped by every device the same way as long as the
 server shows every device the same batches in the same order (an honest
@@ -416,6 +419,10 @@ buffers holding plaintext operations are not all wiped.
 - pairing with a wrong code, with "they don't match" on either side, and
   with a middleman who has the code;
 - a member device writing in the owner's name is refused.
+- after the third verification pass (also `verify2.rs`): a stolen owner
+  phone's repeated fork claims pause sending at most once (Q1); growing
+  one's own file copy past the quota is refused (Q2); `restore` cannot
+  skip the removal race check (`restore_flag_does_not_reopen_the_removal_race`).
 - after the second verification pass (`crates/sync/tests/verify2.rs`): a
   stolen owner phone's bogus newer claim freezes nobody, and a real but
   unpublished one pauses sending until OK (P1); a member cannot replace a

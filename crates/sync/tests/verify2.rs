@@ -365,3 +365,167 @@ fn l_a_forks_cannot_block_a_removed_devices_real_batches() {
     assert_eq!(c.room_name(10).as_deref(), Some("tablet one"));
     assert_eq!(c.room_name(11).as_deref(), Some("tablet two"));
 }
+
+/// Q1: a stolen owner phone re-signing the current roster (a "fork") can
+/// pause sending once; after the person's OK it never pauses it again.
+#[test]
+fn q1_a_fork_claim_pauses_at_most_once_per_device() {
+    let lab = Lab::new("q1");
+    let (mut a, _b, mut e, _k) = house(&lab);
+    let mut c = lab.device("Cy");
+    pair(&mut a, &mut c, Invitee::MyDevice);
+    e.sync();
+    let mut paused = 0;
+    for i in 0..3u64 {
+        let rs = rosters(&e);
+        let mut body = rs.last().unwrap().parse().unwrap();
+        body.made_ms += 1 + i;
+        let claim = SignedRoster::sign(&body, &secret(&e)).unwrap();
+        assert_eq!(
+            push_raw(
+                &lab,
+                &mut e,
+                &BatchBody {
+                    rosters: vec![claim],
+                    ops: serde_json::json!([])
+                }
+            ),
+            200
+        );
+        a.room(60 + i as u128, "x");
+        if a.try_sync().is_err() {
+            paused += 1;
+        }
+        SyncClient::dismiss_notices(&a.store).unwrap();
+    }
+    assert!(paused <= 1, "paused {paused} times");
+    a.try_sync().expect("sending after the last OK");
+}
+
+/// Q2: replacing one's own file copy with a bigger one counts against the
+/// quota.
+#[test]
+fn q2_overwriting_ones_own_copy_respects_the_quota() {
+    let lab = Lab::new("q2");
+    let (_a, b, _e, _k) = house(&lab);
+    let sp = space(&b);
+    let s = secret(&b);
+    let names: Vec<String> = (0..4u32).map(|i| format!("{:032x}", i + 1)).collect();
+    for n in &names {
+        assert_eq!(
+            signed(
+                &lab,
+                &s,
+                "PUT",
+                &format!("/v1/s/{sp}/blobs/{n}"),
+                vec![1u8; 64]
+            ),
+            200
+        );
+    }
+    let db = lab.server_db();
+    db.execute(
+        "UPDATE blob_copies SET size = 2147483000 WHERE space = ?1 AND name = ?2",
+        rusqlite::params![sp.to_string(), names[0]],
+    )
+    .unwrap();
+    let st_new = signed(
+        &lab,
+        &s,
+        "PUT",
+        &format!("/v1/s/{sp}/blobs/{:032x}", 99),
+        vec![2u8; 4096],
+    );
+    let st_over = signed(
+        &lab,
+        &s,
+        "PUT",
+        &format!("/v1/s/{sp}/blobs/{}", names[1]),
+        vec![3u8; 20 * 1024 * 1024],
+    );
+    assert_eq!(st_new, 507);
+    assert_eq!(
+        st_over, 507,
+        "growing one's own copy past the quota is refused"
+    );
+    // Replacing it with something the same size or smaller still works.
+    assert_eq!(
+        signed(
+            &lab,
+            &s,
+            "PUT",
+            &format!("/v1/s/{sp}/blobs/{}", names[1]),
+            vec![4u8; 64]
+        ),
+        200
+    );
+}
+
+/// Low: `restore: true` does not let a removal skip the check that the
+/// device has not sent more than the removal names.
+#[test]
+fn restore_flag_does_not_reopen_the_removal_race() {
+    use housewright_crypto::roster::RemovedEntry;
+    use housewright_crypto::wire::UpdateRoster;
+    let lab = Lab::new("rr");
+    let (mut a, _b, mut e, key) = house(&lab);
+    e.room(10, "one");
+    e.sync();
+    a.sync();
+    e.room(11, "sent after Ana last synced");
+    e.sync();
+    let rs = rosters(&a);
+    let latest_signed = rs.last().unwrap();
+    let latest = latest_signed.parse().unwrap();
+    let eid = my_id(&mut e);
+    let heads: serde_json::Value =
+        serde_json::from_str(&a.store.sync_get("heads").unwrap().unwrap()).unwrap();
+    let h = &heads[&eid];
+    let mut next = latest.successor(latest_signed, lab.clock.now_ms());
+    let pos = next
+        .devices
+        .iter()
+        .position(|d| d.device.id.to_string() == eid)
+        .unwrap();
+    let entry = next.devices.remove(pos);
+    next.removed.push(RemovedEntry {
+        entry,
+        removed_in: next.version,
+        last_seq: h["seq"].as_u64().unwrap(),
+        last_hash: h["hash"].as_str().unwrap().to_string(),
+    });
+    next.epoch += 1;
+    next.sort();
+    let s = secret(&a);
+    let mut signed_next = SignedRoster::sign(&next, &s).unwrap();
+    signed_next.cosign(
+        &housewright_crypto::recovery::RecoveryKey::parse(&key)
+            .unwrap()
+            .identity(),
+    );
+    let new_chain = chain(&a).rotated().unwrap();
+    let sp = space(&a);
+    let envelopes = next
+        .devices
+        .iter()
+        .map(|d| housewright_crypto::wrap::wrap(&s, sp, &d.device, &new_chain).unwrap())
+        .collect();
+    let req = UpdateRoster {
+        roster: signed_next,
+        envelopes,
+        anchor: None,
+        invitation: None,
+        restore: true,
+    };
+    let st = signed(
+        &lab,
+        &s,
+        "POST",
+        &format!("/v1/s/{sp}/roster"),
+        serde_json::to_vec(&req).unwrap(),
+    );
+    assert_eq!(
+        st, 409,
+        "the tablet sent more than the removal names: refused even with restore"
+    );
+}

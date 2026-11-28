@@ -945,6 +945,25 @@ bind what devices accept) and re-apply revocations. A device whose batches
 use a key the restored server does not know yet waits (keeping everything)
 until an owner's device has repaired the server, and says so.
 
+## Third verification-pass fixes (proposed 2026-11-28)
+
+**D-115 Each device can pause sending at most once (Proposed).** Fixes Q1;
+refines D-112. A claimed different version under a number this device has
+must be a valid successor of the version before (`verify_next`) and come
+from a device still in the newest roster; a removed device's old forks are
+ignored. A given device's claims (fork or newer) can pause sending once;
+after the person presses OK, later claims from that device only add a
+notice. A stolen owner phone without the paper can therefore cause one
+pause, then only notices, until it is removed.
+
+**D-116 The quota counts replaced copies, atomically (Proposed).** Fixes
+Q2 and the quota race. A device replacing its own copy of a file is charged
+the difference; the check and the write happen under one database lock, so
+parallel uploads cannot both pass. Shrinking a copy is always allowed.
+`restore: true` on a roster version still refuses a removal if the server
+holds *more* batches from the device than the removal names (only fewer is
+excused), so it cannot reopen the removal race.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

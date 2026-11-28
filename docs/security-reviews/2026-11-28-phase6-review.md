@@ -523,3 +523,57 @@ These need either a code fix or an honest rewrite.
   - Their founding device's pre-sync batches, which carry other members' names, are now refused by newly joined devices, while older devices already applied them.
   - Phase 6 is unreleased, so this only matters for test households. Fix: a one-off migration, or document that pre-3d058c3 households must be set up again.
 - **L-c. A server can hide a removal from one device if it also hides the remover's later batches from that device.** That device then only shows "missing changes from …" and keeps sealing under the old epoch. This residual is known; SECURITY.md should say "missing changes" is a warning to act on.
+
+---
+
+## Third verification pass (commit 0c7ccba)
+
+**Verdict: ship after fixes.** Two Medium problems remain. Both are availability or storage abuse; neither exposes data. Each is a small, local fix.
+
+**How I checked.** I read the diff and re-ran the sync, crypto and server tests: all pass (sync 37, including `review`, `verify` and `verify2`). I ran two new tests in `scratchpad/verify/tests/v.rs` (q1, q2).
+
+### What holds
+
+- **`restore: true` can't be abused.**
+  - The flag only skips the server's `removal_stale` check.
+  - `verify_next` still runs: next version only, linked to the previous one, signed by a manager, and co-signed whenever an owner device or the recovery identity is removed.
+  - So nobody can use it to undo a removal, replay an old version, or bypass the co-signature, whether a member, an owner device or the server.
+  - The worst case: an owner device that sets the flag on a *new* removal re-opens the L3a race. Owners are trusted; that is a Low.
+- **"Pause sending" from claims of a newer version (P1)** is now bounded.
+  - A newer version must link to the device's own chain through `verify_next`, and only the last 8 versions are carried.
+  - A stolen owner phone can therefore cause at most about 8 pauses this way, one clearable notice each.
+  - M3 still holds: removing an owner device still needs the co-signature.
+- **Per-device file copies.**
+  - No device can overwrite another device's copy.
+  - The client tries every copy listed in `hw-copies` against the hash in the signed record, so a bad copy listed first doesn't win forever. Only the server can hide copies, which is denial of service it could do anyway.
+- **`epoch_ahead`** waits until an owner's device repairs the server. That wait is permanent only if no owner device ever syncs again, or if a lost recovery-key change needs the paper. Both are documented.
+- **L-a** walk-back fetching is correct: the fetched batch's number, device, hash and signature are all checked.
+
+### Medium
+
+**Q1. A stolen owner phone (no paper) can pause every device's sending again after every OK, indefinitely.** **Confirmed** (q1)
+
+- Where: `crates/sync/src/client.rs`, the same-number branch of `check_claim` (around lines 1197-1214).
+- **What is wrong.** A claimed version with the *same* number as the device's own, but a different hash, counts as a fork if a manager of the previous version signed it. It is never checked with `verify_next`, and every new one sets `fork = true` again.
+- **Attack.** The phone ships a freshly signed copy of the current roster body (only `made_ms` changed) in each batch.
+  - Observed: three rounds in a row of `RosterHidden` with `fork=true`, each straight after "OK".
+  - Removing that phone needs the paper. Without the paper, the household's sending is paused until it is set up again.
+- The same works for a removed owner device whose signed claim is carried by a current member.
+- **Fix:**
+  - Require the claimed same-number version to pass `verify_next` from version − 1.
+  - Pause at most once per signing device, until the person acts. After an OK, show a notice and keep sending.
+  - Do not count signers that are no longer in the newest roster.
+
+**Q2. Re-uploading a device's own file copy skips the household quota.** **Confirmed** (q2)
+
+- Where: `crates/server/src/handlers.rs`, `put_blob_sync`. The quota is checked only when `!path.exists()`; an existing copy is overwritten and `blob_copies.size` updated without a check.
+- **Attack.**
+  - At the quota limit, a new file name is refused (507), but overwriting an existing own copy with 20 MB is accepted (200).
+  - A member uploads many 64-byte copies, then grows each to about 26 MB. Disk use is unbounded.
+- **Fix.** Always check `usage − old_size + new_size <= quota`, inside the same lock or transaction as the insert.
+
+### Low (one line each)
+
+- `restore: true` on a fresh removal re-opens the L3a race (owner-only).
+- With the paper lost and no owner device left, members stay in `epoch_ahead` waiting for good (documented).
+- `put_blob` still reads the quota (`usage()` with `SUM`) and writes in separate steps, so two parallel uploads can both pass the check.

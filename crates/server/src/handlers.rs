@@ -372,7 +372,7 @@ fn update_roster_sync(
     // Not for versions sent again after a restore (D-114): the server lost
     // what it would compare against, and the signed last_seq/last_hash
     // already bind what every device accepts.
-    for r in next.removed.iter().filter(|_| !req.restore) {
+    for r in &next.removed {
         if prev.find_removed(r.entry.device.id).is_some() {
             continue;
         }
@@ -390,7 +390,16 @@ fn update_roster_sync(
             }
             None => (0, ZERO_HASH.to_string()),
         };
-        if seq != r.last_seq || hash != r.last_hash {
+        // Re-sent after a restore: the server may have lost the device's
+        // later batches (fewer here is fine), but if it holds *more* than
+        // the removal names, the device sent changes since: refused either
+        // way, so `restore` cannot reopen the race (L3a).
+        let stale = if req.restore {
+            seq > r.last_seq
+        } else {
+            seq != r.last_seq || hash != r.last_hash
+        };
+        if stale {
             return Err(ApiErr::new(
                 StatusCode::CONFLICT,
                 "removal_stale",
@@ -916,7 +925,22 @@ fn put_blob_sync(
         eprintln!("housewright-server: file storage error: {}", e.kind());
         internal()
     };
-    if !path.exists() && usage(&s.db(), space)? + body.len() as u64 > s.cfg().quota_bytes {
+    // Check and write under the database lock, so parallel uploads cannot
+    // both pass the quota; a device replacing its own copy is charged the
+    // difference (Q2).
+    let conn = s.db();
+    let old: i64 = conn
+        .query_row(
+            "SELECT size FROM blob_copies WHERE space = ?1 AND name = ?2 AND device = ?3",
+            params![space.to_string(), name, me.id.to_string()],
+            |r| r.get(0),
+        )
+        .optional()?
+        .unwrap_or(0);
+    // (Shrinking or keeping the size is always allowed.)
+    if body.len() as i64 > old
+        && (usage(&conn, space)? as i64 - old + body.len() as i64) as u64 > s.cfg().quota_bytes
+    {
         return Err(ApiErr::new(
             StatusCode::INSUFFICIENT_STORAGE,
             "quota",
@@ -931,7 +955,6 @@ fn put_blob_sync(
     let tmp = dir.join(format!(".{name}.{rnd}.tmp"));
     std::fs::write(&tmp, &body).map_err(io)?;
     std::fs::rename(&tmp, &path).map_err(io)?;
-    let conn = s.db();
     conn.execute(
         "INSERT INTO blob_copies (space, name, device, size, created_ms) VALUES (?1, ?2, ?3, ?4, ?5)
          ON CONFLICT(space, name, device) DO UPDATE SET size = excluded.size",

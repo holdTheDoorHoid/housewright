@@ -215,6 +215,12 @@ impl SyncClient {
         // (D-106). A new fork sets it again.
         s.fork = false;
         s.roster_acknowledged = s.roster_acknowledged.max(s.newest_roster_seen);
+        let pausing = std::mem::take(&mut s.pausing_signers);
+        for d in pausing {
+            if !s.acknowledged_signers.contains(&d) {
+                s.acknowledged_signers.push(d);
+            }
+        }
         state::save_status(store, &s)
     }
 
@@ -1206,17 +1212,25 @@ impl SyncClient {
             if body.version < 2 {
                 return false;
             }
-            // A different version with the same number: real only if an
-            // owner of the version before signed it; then it is a fork.
-            let prev = &st.bodies[(body.version - 2) as usize];
-            let genuine = prev
+            // A different version with the same number: a fork only if it
+            // is a valid successor of the version before (verify_next) and
+            // signed by a device still in the newest verified roster (Q1).
+            let prev_signed = &st.rosters[(body.version - 2) as usize];
+            let prev_body = &st.bodies[(body.version - 2) as usize];
+            if verify_next(prev_signed, prev_body, newest).is_err() {
+                return false;
+            }
+            if st
+                .latest()
                 .find(newest.signer)
-                .filter(|e| e.role.can_manage())
-                .is_some_and(|e| newest.check_sig(&e.device).is_ok());
-            if genuine {
+                .is_none_or(|e| !e.role.can_manage())
+            {
+                return true; // a removed device's old fork: ignored
+            }
+            if self.pause_once(st, newest.signer, body.made_ms) {
                 st.status.fork = true;
             }
-            return genuine;
+            return true;
         }
         // Not even signed by one of our owner devices: the author's
         // tampering.
@@ -1262,6 +1276,7 @@ impl SyncClient {
             > st.status
                 .newest_roster_seen
                 .max(st.status.roster_acknowledged)
+            && self.pause_once(st, newest.signer, body.made_ms)
         {
             st.status.newest_roster_seen = body.version;
             let who = device_name(st, author);
@@ -1272,6 +1287,25 @@ impl SyncClient {
                     body.version
                 ),
             });
+        }
+        true
+    }
+
+    /// A device may pause this device's sending once (Q1). After the person
+    /// presses OK, further claims signed by that device only add a notice.
+    fn pause_once(&self, st: &mut State, signer: DeviceId, at_ms: u64) -> bool {
+        if st.status.acknowledged_signers.contains(&signer) {
+            let who = device_name(st, signer);
+            let text = format!(
+                "“{who}” again says the household's device list differs from what the server shows. Sending was not paused this time. If you don't recognise this, remove “{who}”."
+            );
+            if !st.status.notices.iter().any(|n| n.text == text) {
+                st.status.notices.push(Notice { at_ms, text });
+            }
+            return false;
+        }
+        if !st.status.pausing_signers.contains(&signer) {
+            st.status.pausing_signers.push(signer);
         }
         true
     }

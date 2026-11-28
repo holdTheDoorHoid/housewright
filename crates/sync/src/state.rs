@@ -87,6 +87,12 @@ pub struct SyncStatus {
     /// sending despite it; D-112).
     #[serde(default)]
     pub roster_acknowledged: u64,
+    /// Devices whose roster claims paused sending, until the person acts;
+    /// and those the person said OK to, which never pause it again (Q1).
+    #[serde(default)]
+    pub pausing_signers: Vec<DeviceId>,
+    #[serde(default)]
+    pub acknowledged_signers: Vec<DeviceId>,
     /// Waiting for an owner's device to give a restored server back the
     /// household's newer keys (D-114).
     #[serde(default)]
