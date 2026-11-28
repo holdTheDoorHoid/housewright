@@ -100,7 +100,8 @@ fn a_photo_on_a_thing_is_downscaled_with_a_thumbnail() {
     assert_eq!(d["attachments"].as_array().unwrap().len(), 1);
     assert!(d["code"].as_str().unwrap().starts_with("HW-"));
     let h = call(&mut a, "history", Value::Null);
-    assert!(h[0]["text"].as_str().unwrap().contains("attached"));
+    let text = h[0]["text"].as_str().unwrap();
+    assert!(text.ends_with("attached 'IMG_2041.jpg'"), "{text}");
 }
 
 #[test]

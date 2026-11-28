@@ -135,7 +135,14 @@ fn describe(store: &Store, group: &[Op], created: bool, tz: &TimeZone) -> String
                     format!("{who} recorded a reading of {value} on {meter}")
                 }
                 EntityKind::Attachment => {
-                    format!("{who} attached {}", label(store, kind, &first.entity))
+                    // "attached 'manual.pdf'", not "attached attachment 'manual.pdf'".
+                    let what = label(store, kind, &first.entity);
+                    let what = what
+                        .strip_prefix(noun(kind))
+                        .map(str::trim_start)
+                        .filter(|s| s.starts_with('\''))
+                        .unwrap_or(&what);
+                    format!("{who} attached {what}")
                 }
                 EntityKind::Note => format!("{who} added a note"),
                 // Costs and readings are values: never shown here (D-58).
