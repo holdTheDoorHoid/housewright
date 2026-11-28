@@ -1,0 +1,14 @@
+format = 1
+id = "flotec"
+name = "Flotec"
+aliases = ["FLOTEC", "Pentair Flotec"]
+parent = "Pentair"
+domains = ["pentair.com"]
+website = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+support_url = "https://www.pentair.com/en-us/education-support/residential.html"
+manual_search_url = "https://www.pentair.com/en-us/download-center.html"
+note = "Flotec pump pages and manuals live on pentair.com. flotecwater.com refused the connection during the check."
+
+[[sources]]
+url = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+checked = 2026-11-28

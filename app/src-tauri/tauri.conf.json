@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' ipc: http://ipc.localhost; connect-src 'self' ipc: http://ipc.localhost https://www.saferproducts.gov; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self' ipc: http://ipc.localhost; connect-src 'self' ipc: http://ipc.localhost https://www.saferproducts.gov https://raw.githubusercontent.com; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {

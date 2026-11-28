@@ -1,0 +1,60 @@
+format = 1
+id = "refrigerators"
+brand = "maytag"
+name = "Maytag refrigerators"
+category = "refrigerator"
+status = "current"
+description = "Maytag full-size refrigerators and freezers; help articles live on producthelp.maytag.com."
+
+[[manuals]]
+kind = "support-page"
+title = "Refrigeration product help"
+url = "https://producthelp.maytag.com/Refrigeration"
+source = "https://producthelp.maytag.com/Refrigeration"
+
+[[manuals]]
+kind = "support-page"
+title = "Water filter information"
+url = "https://producthelp.maytag.com/Refrigeration/Water_Filter_Information"
+source = "https://producthelp.maytag.com/Refrigeration"
+
+[[manuals]]
+kind = "parts-page"
+title = "Refrigerator water filters"
+url = "https://www.maytag.com/accessories/kitchen-accessories/refrigerator/water-filters.html"
+source = "https://producthelp.maytag.com/Refrigeration"
+unverified = true
+note = "page blocked automated fetch; URL seen as a link on producthelp.maytag.com"
+
+[[manuals]]
+kind = "manual-search"
+title = "Owners center"
+url = "https://www.maytag.com/owners.html"
+source = "https://producthelp.maytag.com/Refrigeration"
+unverified = true
+note = "page blocked automated fetch at review (403); URL is linked from producthelp.maytag.com/Refrigeration"
+
+[[facts]]
+topic = "filter"
+text = "The water filter help page lists no part number or change interval; it sends owners to a model-number lookup for manuals. It gives 1-800-344-1274 for customer service."
+source = "https://producthelp.maytag.com/Refrigeration/Water_Filter_Information"
+
+[[sources]]
+url = "https://producthelp.maytag.com/Refrigeration"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.maytag.com/Refrigeration/Water_Filter_Information"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.maytag.com/accessories/kitchen-accessories/refrigerator/water-filters.html"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review"
+
+[[sources]]
+url = "https://www.maytag.com/owners.html"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review"

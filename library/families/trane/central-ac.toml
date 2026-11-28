@@ -1,0 +1,52 @@
+format = 1
+id = "central-ac"
+brand = "trane"
+name = "Trane air conditioners (XV, XR and TruComfort lines)"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+description = "Trane split air conditioners, including the XV20i TruComfort variable-speed model and XR13 to XR17 lines."
+
+[[manuals]]
+kind = "product-page"
+title = "Trane air conditioners"
+url = "https://www.trane.com/residential/en/products/air-conditioners/"
+source = "https://www.trane.com/residential/en/products/air-conditioners/"
+
+[[manuals]]
+kind = "support-page"
+title = "Trane owner's manuals (one manual covers all AC, heat pump and air handler models)"
+url = "https://www.trane.com/residential/en/resources/owners-guides/"
+source = "https://www.trane.com/residential/en/resources/owners-guides/"
+
+[[facts]]
+topic = "manuals"
+text = "Trane publishes one owner's manual for all air conditioners, heat pumps and air handlers and another for gas heating systems, so no model number is needed to find them."
+source = "https://www.trane.com/residential/en/resources/owners-guides/"
+
+[[facts]]
+topic = "filter"
+text = "Trane advises changing furnace or air-handler filters year-round: every 30 to 90 days with no pets, sooner with pets or allergies. A thicker filter can last longer than a 1 inch one."
+source = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+
+[warranty]
+summary = "Registered within 60 days of installation: usually 10 years on parts. Otherwise usually 5 years. Terms vary by product. Labor is not included; a dealer-sold extended plan may add it. No maintenance condition is stated."
+length = "10 years parts"
+source = "https://www.trane.com/residential/en/resources/warranty-and-registration/"
+
+[[sources]]
+url = "https://www.trane.com/residential/en/products/air-conditioners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/owners-guides/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/warranty-and-registration/"
+checked = 2026-11-28

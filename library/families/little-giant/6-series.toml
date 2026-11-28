@@ -1,0 +1,30 @@
+format = 1
+id = "6-series"
+brand = "little-giant"
+name = "6 Series sump pumps"
+category = "sump-pump"
+status = "current"
+
+[[manuals]]
+kind = "product-page"
+title = "6 Series sump pump"
+url = "https://www.littlegiant.com/products/sump--effluent-pumps--systems/sump-pumps----solids-handling/1-3-hp-sump-pumps/6-series/"
+source = "https://www.littlegiant.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Resource library"
+url = "https://www.littlegiant.com/resources/resource-library/"
+source = "https://www.littlegiant.com/"
+
+[[sources]]
+url = "https://www.littlegiant.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.littlegiant.com/products/sump--effluent-pumps--systems/sump-pumps----solids-handling/1-3-hp-sump-pumps/6-series/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.littlegiant.com/resources/resource-library/"
+checked = 2026-11-28

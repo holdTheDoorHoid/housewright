@@ -1,0 +1,7 @@
+format = 1
+id = "dryer"
+name = "Clothes dryers"
+template = "clothes-dryer"
+life_safety = false
+brands = ["whirlpool", "lg", "samsung", "ge-appliances", "maytag", "frigidaire", "speed-queen", "bosch"]
+why_brands = "Common US retail brands, picked by our own judgement of what homeowners most often own, as no public per-brand count was found. Speed Queen is added for its home line sold through dealers."

@@ -1,0 +1,36 @@
+format = 1
+id = "aquasential-whole-house-filters"
+brand = "culligan"
+name = "Aquasential whole-house filters"
+category = "whole-house-filter"
+extends = "whole-house-water-filter"
+status = "current"
+
+[[manuals]]
+kind = "product-page"
+title = "Select and Select Plus whole-house filters"
+url = "https://www.culligan.com/product/aquasential-select-series-whole-house-water-filter"
+source = "https://www.culligan.com/product-category/whole-home-water-filtration-systems"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product manuals"
+url = "https://www.culligan.com/support/product-information/product-manuals"
+source = "https://www.culligan.com/product-category/whole-home-water-filtration-systems"
+
+[[facts]]
+topic = "filter"
+text = "Culligan whole-house media is replaced by gallons treated rather than a fixed date, can last several years, and is normally changed by a Culligan dealer."
+source = "https://www.culligan.com/product-category/whole-home-water-filtration-systems"
+
+[[sources]]
+url = "https://www.culligan.com/product-category/whole-home-water-filtration-systems"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.culligan.com/product/aquasential-select-series-whole-house-water-filter"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.culligan.com/support/product-information/product-manuals"
+checked = 2026-11-28

@@ -837,6 +837,7 @@ impl Bridge {
             sensitivity: Sensitivity::Sensitive,
             price: Default::default(),
             value: Default::default(),
+            family: None,
         };
         store.put(&safe)?;
         store.put(&Task {
@@ -860,6 +861,7 @@ impl Bridge {
             active: true,
             paused: false,
             not_applicable: false,
+            guidance: None,
         })?;
         store.put(&Fact {
             pin: None,

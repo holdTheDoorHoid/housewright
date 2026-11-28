@@ -1,0 +1,27 @@
+format = 1
+id = "preferred-softeners"
+brand = "rheem"
+name = "Rheem Preferred series water softeners"
+category = "water-softener"
+status = "current"
+description = "Preferred, Preferred Plus, Preferred Platinum (Wi-Fi) and Preferred Compact salt softeners."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem water treatment home page"
+url = "https://www.rheemwatertreatment.com/"
+source = "https://www.rheemwatertreatment.com/"
+
+[[facts]]
+topic = "lineup"
+text = "Preferred is 32,000 grain for up to 4 people; Preferred Plus and Preferred Platinum are 42,000 grain for any household size; Preferred Compact is 42,000 grain for up to 4 people in a small footprint."
+source = "https://www.rheemwatertreatment.com/"
+
+[[facts]]
+topic = "features"
+text = "All use usage-learning regeneration to trim salt and water. Platinum adds Wi-Fi alerts and a remote shut-off; Plus and Platinum have a self-cleaning sediment filter."
+source = "https://www.rheemwatertreatment.com/"
+
+[[sources]]
+url = "https://www.rheemwatertreatment.com/"
+checked = 2026-11-28

@@ -1,0 +1,44 @@
+format = 1
+id = "residential-submersible-well-pumps"
+brand = "franklin-electric"
+name = "Residential submersible well pumps (3200, TRI-SEAL, Series V, FS)"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+description = "4 inch residential submersible well pump series sold under FPS and J-Class names."
+
+[[manuals]]
+kind = "product-page"
+title = "Submersible well pumps"
+url = "https://www.franklinwater.com/products/submersible-well-pumps/"
+source = "https://www.franklinwater.com/products/submersible-well-pumps/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Resource library"
+url = "https://www.franklinwater.com/resources/resource-library/"
+source = "https://www.franklinwater.com/products/submersible-well-pumps/"
+
+[[manuals]]
+kind = "support-page"
+title = "Technical support"
+url = "https://www.franklinwater.com/support/technical-support/"
+source = "https://www.franklinwater.com/products/submersible-well-pumps/"
+
+[[facts]]
+topic = "series"
+text = "Residential duty 4 inch series are 3200, TRI-SEAL, Series V and FS; the first three come as both FPS and J-Class branded versions."
+source = "https://www.franklinwater.com/products/submersible-well-pumps/"
+
+[[sources]]
+url = "https://www.franklinwater.com/products/submersible-well-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.franklinwater.com/resources/resource-library/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.franklinwater.com/support/technical-support/"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "chamberlain"
+name = "Chamberlain"
+aliases = ["CHAMBERLAIN", "The Chamberlain Group", "Chamberlain Group"]
+parent = "The Chamberlain Group"
+domains = ["chamberlain.com", "chamberlaingroup.com"]
+website = "https://www.chamberlain.com/"
+support_url = "https://support.chamberlaingroup.com/"
+note = "chamberlain.com home page returned no readable content; the support site address is from search results."
+
+[[sources]]
+url = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+title = "Chamberlain recommended maintenance article"
+checked = 2026-11-28

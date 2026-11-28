@@ -1,0 +1,12 @@
+format = 1
+id = "kinetico"
+name = "Kinetico"
+aliases = ["KINETICO", "Kinetico Incorporated"]
+domains = ["kinetico.com"]
+website = "https://www.kinetico.com/"
+support_url = "https://www.kinetico.com/customer-support/"
+manual_search_url = "https://resourcecenter.kinetico.com/"
+
+[[sources]]
+url = "https://www.kinetico.com/"
+checked = 2026-11-28

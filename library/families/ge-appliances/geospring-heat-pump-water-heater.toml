@@ -1,0 +1,39 @@
+format = 1
+id = "geospring-heat-pump-water-heater"
+brand = "ge-appliances"
+name = "GE Profile GeoSpring hybrid heat pump water heater"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+model_examples = ["PF65S10FPY"]
+description = "The current GE Profile GeoSpring 65-gallon 120V FlexCapacity hybrid; older GeoSpring models are not covered by the cited pages."
+
+[[manuals]]
+kind = "product-page"
+title = "PF65S10FPY product page"
+url = "https://www.geappliances.com/appliance/GE-Profile-GEOSPRING-Smart-Hybrid-Heat-Pump-Water-Heater-65-gallon-120V-FlexCapacity-PF65S10FPY"
+source = "https://products.geappliances.com/appliance/gea-specs/PF65S10FPY/install"
+
+[[manuals]]
+kind = "support-page"
+title = "GE support home"
+url = "https://www.geappliances.com/ge/service-and-support/"
+source = "https://products.geappliances.com/appliance/gea-specs/PF65S10FPY/install"
+
+[[facts]]
+topic = "support"
+text = "The PF65S10FPY spec page shows production starting in November 2025 and lists 1-800-626-2005 for GE Appliances help."
+source = "https://products.geappliances.com/appliance/gea-specs/PF65S10FPY/install"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-specs/PF65S10FPY/install"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.geappliances.com/appliance/GE-Profile-GEOSPRING-Smart-Hybrid-Heat-Pump-Water-Heater-65-gallon-120V-FlexCapacity-PF65S10FPY"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.geappliances.com/ge/service-and-support/"
+checked = 2026-11-28

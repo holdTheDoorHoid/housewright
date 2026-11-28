@@ -1,0 +1,20 @@
+format = 1
+id = "kohler-energy"
+name = "Kohler Energy"
+aliases = ["KOHLER", "Kohler Power Systems", "Kohler Co", "Rehlko"]
+parent = "Rehlko"
+domains = ["kohlerpower.com", "kohlerenergy.com", "rehlko.com", "kohler.com"]
+website = "https://www.rehlko.com/"
+support_url = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+phone = "+1-833-393-6650"
+note = "Kohler Energy (generators) is separate from Kohler plumbing; kohlerenergy.com redirected to rehlko.com, which blocked automated fetching, so the Rehlko home page is used for website. support_url and phone (home generator support line) are from the kohlerhomeenergy.rehlko.com owner support page, which opened at review. Operation manuals are on techcomm.rehlko.com; older kohler.com copies returned 403."
+
+[[sources]]
+url = "https://www.rehlko.com/"
+title = "Redirect target of kohlerenergy.com (page itself blocked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+title = "Kohler home generator owner support"
+checked = 2026-11-28

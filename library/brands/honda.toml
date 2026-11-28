@@ -1,0 +1,14 @@
+format = 1
+id = "honda"
+name = "Honda"
+aliases = ["HONDA", "Honda Power Equipment", "American Honda Motor Co"]
+parent = "Honda Motor Co"
+domains = ["honda.com"]
+website = "https://powerequipment.honda.com/"
+support_url = "https://powerequipment.honda.com/"
+note = "Honda Power Equipment (generators and engines) only; powerequipment.honda.com blocked automated fetching. Manual PDFs are hosted on cdn.powerequipment.honda.com. support_url is the site home page."
+
+[[sources]]
+url = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+title = "EU2200i owner manual (HEAD checked at review; powerequipment.honda.com still blocked)"
+checked = 2026-11-28

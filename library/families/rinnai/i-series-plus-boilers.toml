@@ -1,0 +1,64 @@
+format = 1
+id = "i-series-plus-boilers"
+brand = "rinnai"
+name = "Rinnai I-Series condensing gas boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["IP###S", "IP######C", "I150SN"]
+model_examples = ["i150SN", "IP199199C", "IP150199C", "IP199S", "IP060S"]
+description = "Rinnai I-Series and I-Series+ condensing boilers, in heat-only (Solo) and combi versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Condensing boilers"
+url = "https://www.rinnai.us/residential/condensing-boilers"
+source = "https://www.rinnai.us/residential/condensing-boilers"
+
+[[manuals]]
+kind = "product-page"
+title = "I-Series Plus"
+url = "https://www.rinnai.us/residential/i-series-plus"
+source = "https://www.rinnai.us/residential/condensing-boilers"
+
+[[manuals]]
+kind = "product-page"
+title = "i150SN heat-only boiler (earlier I-Series)"
+url = "https://www.rinnai.us/residential/product-detail/i150sn"
+source = "https://www.rinnai.us/residential/product-detail/i150sn"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product document library"
+url = "https://www.rinnai.us/professional/document-library"
+source = "https://www.rinnai.us/residential/condensing-boilers"
+
+[[facts]]
+topic = "fuel"
+text = "Every Rinnai boiler series can be set up for natural gas or propane."
+source = "https://www.rinnai.us/residential/condensing-boilers"
+
+[[facts]]
+topic = "models"
+text = "On the I-Series+ page, combi models end in C (for example IP199199C) and heat-only Solo models end in S (for example IP199S)."
+source = "https://www.rinnai.us/residential/i-series-plus"
+
+[[sources]]
+url = "https://www.rinnai.us/residential/condensing-boilers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/i-series-plus"
+title = "Opened at review; lists the IP combi and Solo model numbers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/product-detail/i150sn"
+title = "Opened at review; i150SN 150K Btu heat-only model"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/professional/document-library"
+title = "Opened at review"
+checked = 2026-11-28

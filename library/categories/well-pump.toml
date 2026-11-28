@@ -1,0 +1,7 @@
+format = 1
+id = "well-pump"
+name = "Well pumps"
+template = "well-pump"
+life_safety = false
+brands = ["goulds", "franklin-electric", "grundfos", "wayne", "little-giant", "flotec", "sta-rite"]
+why_brands = "Common US residential well pump brands; chosen as well-known makers with official US pages, not from a public ranking. Little Giant, Flotec and Sta-Rite added from their own pump pages."

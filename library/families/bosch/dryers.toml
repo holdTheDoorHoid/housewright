@@ -1,0 +1,36 @@
+format = 1
+id = "dryers"
+brand = "bosch"
+name = "Bosch condenser dryers"
+category = "dryer"
+status = "current"
+description = "Bosch US tumble dryers, including 500 and 800 series with a self-cleaning condenser."
+
+[[manuals]]
+kind = "product-page"
+title = "Tumble dryers"
+url = "https://www.bosch-home.com/us/en/category/washers-and-dryers/tumble-dryers"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-dryers-washer-dryer-cleaning"
+
+[[manuals]]
+kind = "support-page"
+title = "Dryer self-help"
+url = "https://www.bosch-home.com/us/owner-support/get-support/dryers"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-dryers-washer-dryer-cleaning"
+
+[[facts]]
+topic = "condenser"
+text = "On Bosch washer-dryers the owner can take out and empty the condenser water box (pour the water away, it is not fit for reuse), but cleaning the condenser itself is left to Bosch service."
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-dryers-washer-dryer-cleaning"
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-dryers-washer-dryer-cleaning"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/en/category/washers-and-dryers/tumble-dryers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/get-support/dryers"
+checked = 2026-11-28

@@ -1,0 +1,19 @@
+format = 1
+id = "washers"
+brand = "ge-appliances"
+name = "GE and GE Profile washers"
+category = "washer"
+status = "current"
+description = "GE and GE Profile front-load and top-load washers; manuals are looked up per model on the GE support site."
+
+[[manuals]]
+kind = "support-page"
+title = "Support and manual page for a GE front-load washer (example model page)"
+url = "https://products.geappliances.com/appliance/gea-specs/GFW148SSMWW/support"
+source = "https://products.geappliances.com/appliance/gea-specs/GFW148SSMWW/support"
+unverified = true
+note = "page blocked automated fetch; URL from search results. Other models follow the same address pattern."
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-specs/GFW148SSMWW/support"
+checked = 2026-11-28

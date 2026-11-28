@@ -1,0 +1,21 @@
+format = 1
+id = "westinghouse"
+name = "Westinghouse Outdoor Power Equipment"
+aliases = ["Westinghouse", "WESTINGHOUSE", "Westinghouse Outdoor Power"]
+parent = "Westinghouse Electric Corporation (licensed brand)"
+domains = ["westinghouseoutdoorpower.com", "westinghouse.com"]
+website = "https://westinghouse.com/"
+support_url = "https://westinghouse.com/pages/faq"
+manual_search_url = "https://westinghouse.com/pages/manuals"
+phone = "+1-855-944-3571"
+note = "At review westinghouseoutdoorpower.com redirected to westinghouse.com, which now hosts the FAQ, manuals page and support phone. Owner manual PDFs are still on cdn.westinghouseoutdoorpower.com."
+
+[[sources]]
+url = "https://cdn.westinghouseoutdoorpower.com/owners_manuals/WGen5300_manual_web.pdf"
+title = "WGen5300 user manual (HEAD checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://westinghouse.com/pages/faq"
+title = "Westinghouse FAQ with support phone"
+checked = 2026-11-28

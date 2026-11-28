@@ -1,0 +1,14 @@
+format = 1
+id = "kidde"
+name = "Kidde"
+aliases = ["KIDDE", "Kidde Fire Safety", "Walter Kidde Portable Equipment"]
+parent = "Carrier Global"
+domains = ["kidde.com"]
+website = "https://www.kidde.com/"
+support_url = "https://www.kidde.com/support"
+note = "Smoke, carbon monoxide and combination alarms. The US site shows no phone number on its home page; contact is by web form."
+
+[[sources]]
+url = "https://www.kidde.com/"
+title = "Kidde US home page"
+checked = 2026-11-28

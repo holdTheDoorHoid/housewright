@@ -1,0 +1,30 @@
+format = 1
+id = "signature-series-softeners"
+brand = "kinetico"
+name = "Signature series water softeners"
+category = "water-softener"
+status = "current"
+
+[[manuals]]
+kind = "product-page"
+title = "Signature series softeners"
+url = "https://www.kinetico.com/water-softeners/kinetico-signature-series/"
+source = "https://www.kinetico.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranties"
+url = "https://www.kinetico.com/customer-support/warranties/"
+source = "https://www.kinetico.com/"
+
+[[sources]]
+url = "https://www.kinetico.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kinetico.com/water-softeners/kinetico-signature-series/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kinetico.com/customer-support/warranties/"
+checked = 2026-11-28

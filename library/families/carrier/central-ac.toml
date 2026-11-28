@@ -1,0 +1,60 @@
+format = 1
+id = "central-ac"
+brand = "carrier"
+name = "Carrier Infinity, Performance and Comfort air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["26@@@#*"]
+model_examples = ["26VNA1", "26TPA8", "26SPA6", "26SCA5", "26SCA4"]
+description = "Carrier split-system air conditioners; model numbers start 26, and Coastal versions of some models end in C."
+
+[[manuals]]
+kind = "product-page"
+title = "Carrier air conditioner range"
+url = "https://www.carrier.com/residential/en/us/products/air-conditioners/"
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/"
+
+[[manuals]]
+kind = "support-page"
+title = "Carrier air conditioner maintenance guide"
+url = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[[facts]]
+topic = "filter"
+text = "Look at the air filter every 2 to 3 months and replace it when dirty; pets, smoke, cooking, allergies and long run times mean sooner."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[[facts]]
+topic = "outdoor"
+text = "Keep 2 to 3 feet of open space around the condenser, trim plants, and clear leaves from the base. With power off, vacuum the fins with a soft brush or have a pro rinse them; never use a power washer."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[[facts]]
+topic = "service"
+text = "Plan a yearly technician visit in early spring, before the hot weather; expect it to take one to two hours. Carrier warns that skipping licensed maintenance can void a warranty, so read your certificate. Book a technician."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[[facts]]
+topic = "condensate"
+text = "A blocked condensate line can be cleared with a wet/dry shop vacuum or a flexible brush; keeping it clear stops water backing up and mold growing."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[warranty]
+summary = "Registered within 90 days: choose 10 years parts-only, or 5 years parts plus 3 years labor if the installer joins the labor program. Not registered in time: 5 years parts only. The warranty page itself states no maintenance requirement."
+length = "10 years parts"
+source = "https://www.carrier.com/residential/en/us/homeowner-resources/warranty/"
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/air-conditioners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/homeowner-resources/warranty/"
+checked = 2026-11-28

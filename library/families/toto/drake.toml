@@ -1,0 +1,59 @@
+format = 1
+id = "drake"
+brand = "toto"
+name = "TOTO Drake toilets"
+category = "toilet"
+status = "current"
+description = "Two-piece and close-coupled toilets in 1.6 and 1.28 gallon-per-flush versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Drake collection"
+url = "https://www.totousa.com/products/collections/drake"
+source = "https://www.totousa.com/products/collections/drake"
+
+[[manuals]]
+kind = "parts-page"
+title = "TOTO parts store"
+url = "https://totousaparts.com/"
+source = "https://www.totousa.com/products/collections/drake"
+
+[[manuals]]
+kind = "support-page"
+title = "Customer support form"
+url = "https://www.totousa.com/toto-customer-support"
+source = "https://www.totousa.com/products/collections/drake"
+
+[[manuals]]
+kind = "support-page"
+title = "Product FAQ"
+url = "https://www.totousa.com/product-faq"
+source = "https://www.totousa.com/products/collections/drake"
+
+[[facts]]
+topic = "water-use"
+text = "The Drake collection includes 1.6 and 1.28 gallon-per-flush versions in elongated and round bowls; check the model number for which one you have."
+source = "https://www.totousa.com/products/collections/drake"
+
+[[facts]]
+topic = "rough-in"
+text = "Some Drake models are sold in a separate 10 inch rough-in version, for example CST776CSFG.10; others are 12 inch."
+source = "https://www.totousa.com/products/collections/drake"
+
+[[sources]]
+url = "https://www.totousa.com/products/collections/drake"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://totousaparts.com/"
+checked = 2026-11-28
+unverified = true
+note = "linked from the Drake page; not fetched"
+
+[[sources]]
+url = "https://www.totousa.com/toto-customer-support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.totousa.com/product-faq"
+checked = 2026-11-28

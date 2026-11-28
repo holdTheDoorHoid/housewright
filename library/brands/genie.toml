@@ -1,0 +1,15 @@
+format = 1
+id = "genie"
+name = "Genie"
+aliases = ["GENIE", "The Genie Company", "Genie Company", "Aladdin Connect"]
+parent = "Overhead Door Corporation"
+domains = ["geniecompany.com"]
+website = "https://www.geniecompany.com/"
+support_url = "https://support.geniecompany.com/"
+manual_search_url = "https://support.geniecompany.com/app/answers/detail/a_id/1308"
+note = "Links read from the Genie home page. The site footer credits GMI Holdings Inc. and its careers link goes to the Overhead Door Corporation site; the parent is not stated outright."
+
+[[sources]]
+url = "https://www.geniecompany.com/"
+title = "Genie home page"
+checked = 2026-11-28

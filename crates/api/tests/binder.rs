@@ -194,6 +194,7 @@ fn demo() -> Demo {
             sensitivity: Sensitivity::Sensitive,
             price: Default::default(),
             value: Default::default(),
+            family: None,
         })
         .unwrap();
     }

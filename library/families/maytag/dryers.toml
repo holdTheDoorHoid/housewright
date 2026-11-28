@@ -1,0 +1,19 @@
+format = 1
+id = "dryers"
+brand = "maytag"
+name = "Maytag clothes dryers"
+category = "dryer"
+status = "current"
+description = "Maytag electric and gas clothes dryers."
+
+[[manuals]]
+kind = "support-page"
+title = "Owners Center page for a dryer, with manual and warranty documents"
+url = "https://www.maytag.com/owners-center-pdp.MEDX655DW.html"
+source = "https://www.maytag.com/owners-center-pdp.MEDX655DW.html"
+unverified = true
+note = "page blocked automated fetch; URL from search results. Each model has its own Owners Center page."
+
+[[sources]]
+url = "https://www.maytag.com/owners-center-pdp.MEDX655DW.html"
+checked = 2026-11-28

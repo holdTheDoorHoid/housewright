@@ -1,0 +1,45 @@
+format = 1
+id = "over-the-range-microwaves"
+brand = "whirlpool"
+name = "Whirlpool over-the-range microwaves"
+category = "microwave"
+status = "current"
+description = "Whirlpool microwave hood combinations with a grease filter and, on recirculating installs, a charcoal filter."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals lookup"
+url = "https://www.whirlpool.com/services/manuals.html"
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+note = "Linked from a producthelp page; whirlpool.com itself returned 403 at review."
+
+[[manuals]]
+kind = "support-page"
+title = "Cleaning the grease and charcoal filters"
+url = "https://producthelp.whirlpool.com/Cooking/Microwaves/Over-the-Range_Microwave/Cleaning_and_Filters/Exterior/Cleaning_the_Filters_(Grease_and_Charcoal)_-_Over-the-Range_Microwave"
+source = "https://producthelp.whirlpool.com/Cooking/Microwaves/Over-the-Range_Microwave/Cleaning_and_Filters/Exterior/Cleaning_the_Filters_(Grease_and_Charcoal)_-_Over-the-Range_Microwave"
+
+[[facts]]
+topic = "charcoal filter"
+text = "The charcoal filter behind the top vent grille cannot be washed. Whirlpool suggests a new one roughly every 6 months, or whenever the filter indicator asks for it."
+source = "https://producthelp.whirlpool.com/Cooking/Microwaves/Over-the-Range_Microwave/Cleaning_and_Filters/Exterior/Cleaning_the_Filters_(Grease_and_Charcoal)_-_Over-the-Range_Microwave"
+
+[[facts]]
+topic = "grease filter"
+text = "Wash the grease filter once a month, or when the filter indicator comes on, using mild soap and water. Most can also go in the dishwasher, but confirm that in your owner manual first."
+source = "https://producthelp.whirlpool.com/Cooking/Microwaves/Over-the-Range_Microwave/Cleaning_and_Filters/Exterior/Cleaning_the_Filters_(Grease_and_Charcoal)_-_Over-the-Range_Microwave"
+
+[[sources]]
+url = "https://www.whirlpool.com/services/manuals.html"
+checked = 2026-11-28
+unverified = true
+note = "whirlpool.com blocked automated fetch; URL linked from producthelp.whirlpool.com."
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Cooking/Microwaves/Over-the-Range_Microwave/Cleaning_and_Filters/Exterior/Cleaning_the_Filters_(Grease_and_Charcoal)_-_Over-the-Range_Microwave"
+title = "Cleaning the Filters (Grease and Charcoal) - Over-the-Range Microwave"
+checked = 2026-11-28

@@ -1,0 +1,33 @@
+format = 1
+id = "dishwashers"
+brand = "bosch"
+name = "Bosch dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Bosch dishwashers sold in the US; filter at the bottom of the tub."
+
+[[manuals]]
+kind = "manual-search"
+title = "Bosch US owner manuals"
+url = "https://www.bosch-home.com/us/owner-support/owner-manuals"
+source = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+
+[[manuals]]
+kind = "support-page"
+title = "Dishwasher cleaning and maintenance"
+url = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+source = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+
+[[facts]]
+topic = "filter"
+text = "Bosch suggests taking out and cleaning the filter at the bottom of the tub every few months so food scraps do not hurt wash results; rinse it under water with soap and a soft brush."
+source = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/owner-manuals"
+checked = 2026-11-28
+note = "The cleaning page links /get-support/owner-manuals, which redirects here."
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+title = "Bosch US dishwasher cleaning and maintenance"
+checked = 2026-11-28

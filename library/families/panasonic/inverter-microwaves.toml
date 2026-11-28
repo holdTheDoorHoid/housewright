@@ -1,0 +1,68 @@
+format = 1
+id = "inverter-microwaves"
+brand = "panasonic"
+name = "Panasonic NN-SN inverter microwaves"
+category = "microwave"
+status = "current"
+model_patterns = ["NN-SN##*"]
+model_examples = ["NN-SN755S", "NN-SN96JS"]
+description = "Panasonic countertop and built-in inverter microwaves in the NN-SN series."
+
+[[manuals]]
+kind = "product-page"
+title = "NN-SN755S support page"
+url = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+source = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+
+[[manuals]]
+kind = "product-page"
+title = "NN-SN96JS support page"
+url = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn96js/"
+source = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn96js/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Documents and manuals index"
+url = "https://help.na.panasonic.com/manuals/"
+source = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+
+[[manuals]]
+kind = "support-page"
+title = "How to care for and clean the microwave oven"
+url = "https://help.na.panasonic.com/answers/how-to-care-and-clean-the-microwave-oven/"
+source = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+
+[[facts]]
+topic = "cleaning"
+text = "Pull the plug and let the oven cool before cleaning. Light soiling comes off with a soft damp cloth; use only mild, non-abrasive detergent, and avoid spray cleaners and anything containing ammonia or alcohol."
+source = "https://help.na.panasonic.com/answers/how-to-care-and-clean-the-microwave-oven/"
+
+[[facts]]
+topic = "turntable"
+text = "Wash the glass tray with a sponge and dish detergent, never a metal brush. Stop using a tray that is cracked, chipped or scratched."
+source = "https://help.na.panasonic.com/answers/how-to-care-and-clean-the-microwave-oven/"
+
+[warranty]
+summary = "The NN-SN755S and NN-SN96JS pages list 1 year parts and labor, plus 4 more years on the magnetron tube, parts only."
+length = "1 year"
+source = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+
+[[sources]]
+url = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+title = "NN-SN755S"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn96js/"
+title = "NN-SN96JS"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://help.na.panasonic.com/manuals/"
+title = "Panasonic documents and manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://help.na.panasonic.com/answers/how-to-care-and-clean-the-microwave-oven/"
+title = "Panasonic microwave care and cleaning"
+checked = 2026-11-28

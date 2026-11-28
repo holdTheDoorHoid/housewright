@@ -1,0 +1,46 @@
+format = 1
+id = "dehumidifiers"
+brand = "homelabs"
+name = "hOmeLabs dehumidifiers (Wi-Fi and pump models)"
+category = "dehumidifier"
+status = "current"
+description = "hOmeLabs portable dehumidifiers, sold in sizes from 8 to 50 pints, some with a built-in pump."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals page"
+url = "https://www.homelabs.com/pages/manuals"
+source = "https://www.homelabs.com/pages/manuals"
+note = "Page opened at review; manual links load in the browser, so individual dehumidifier manuals were not listed in the fetched text."
+
+[[manuals]]
+kind = "support-page"
+title = "Support"
+url = "https://www.homelabs.com/pages/support"
+source = "https://www.homelabs.com/pages/support"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty"
+url = "https://www.homelabs.com/pages/warranty"
+source = "https://www.homelabs.com/pages/warranty"
+
+[warranty]
+summary = "One-year limited warranty from the original purchase date against manufacturing defects, for household use; a receipt is required, and repairs by outside shops or non-hOme parts can void it."
+length = "1 year"
+source = "https://www.homelabs.com/pages/warranty"
+
+[[sources]]
+url = "https://www.homelabs.com/pages/manuals"
+title = "hOmeLabs manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.homelabs.com/pages/support"
+title = "hOmeLabs support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.homelabs.com/pages/warranty"
+title = "hOmeLabs warranty"
+checked = 2026-11-28

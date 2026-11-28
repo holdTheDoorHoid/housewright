@@ -1,0 +1,7 @@
+format = 1
+id = "sump-pump"
+name = "Sump pumps"
+template = "sump-pump"
+life_safety = false
+brands = ["zoeller", "wayne", "basement-watchdog", "little-giant", "liberty-pumps", "superior-pump"]
+why_brands = "Common US retail and plumbing-supply brands for residential sump pumps and battery backups."

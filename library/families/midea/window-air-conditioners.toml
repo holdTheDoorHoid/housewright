@@ -1,0 +1,32 @@
+format = 1
+id = "window-air-conditioners"
+brand = "midea"
+name = "Midea U-shaped and standard window air conditioners"
+category = "window-ac"
+status = "current"
+description = "Midea window units including the U-shaped inverter models."
+model_examples = ["MAW08V1DWT", "MAW10V1DWT", "MAW12V1DWT", "MAW10S1DWBL"]
+
+[[manuals]]
+kind = "manual-pdf"
+title = "U-shaped window air conditioner manual (MAW08, MAW10, MAW12 V1DWT)"
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/u-shape-all-models/Midea%20U%20AC%20User%20Manual.pdf"
+source = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/u-shape-all-models/Midea%20U%20AC%20User%20Manual.pdf"
+note = "Link confirmed live (application/pdf) by HEAD request at review; contents not opened."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "User guide MAW10S1DWBL"
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/maw10s1dwbl/MAW10S1DWBL-User-Guide.pdf"
+source = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/maw10s1dwbl/MAW10S1DWBL-User-Guide.pdf"
+note = "Link confirmed live (application/pdf) by HEAD request at review; contents not opened."
+
+[[sources]]
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/u-shape-all-models/Midea%20U%20AC%20User%20Manual.pdf"
+title = "Midea U-shaped manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/window-air-conditioners/maw10s1dwbl/MAW10S1DWBL-User-Guide.pdf"
+title = "MAW10S1DWBL user guide"
+checked = 2026-11-28

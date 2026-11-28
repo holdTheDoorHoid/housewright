@@ -1,0 +1,27 @@
+format = 1
+id = "home-and-garden-pumps"
+brand = "grundfos"
+name = "Grundfos home and garden pumps (incl. well)"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+description = "Grundfos US product selection for homeowners; specific well pump series not confirmed."
+
+[[manuals]]
+kind = "manual-search"
+title = "Product selection home and garden"
+url = "https://product-selection.grundfos.com/us/home-and-garden"
+source = "https://www.grundfos.com/us"
+unverified = true
+note = "Series not confirmed; link seen on the US home page"
+
+[[sources]]
+url = "https://www.grundfos.com/us"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://product-selection.grundfos.com/us/home-and-garden"
+checked = 2026-11-28
+unverified = true
+note = "link seen on the US home page; not opened"

@@ -1,0 +1,7 @@
+format = 1
+id = "garage-door-opener"
+name = "Garage door openers"
+template = "garage-door-opener"
+life_safety = false
+brands = ["chamberlain", "liftmaster", "genie", "ryobi", "skylink"]
+why_brands = "Common US retail brands; Chamberlain and LiftMaster are sister brands of one company, and Genie is the other long-standing name. Craftsman and Linear were not covered."

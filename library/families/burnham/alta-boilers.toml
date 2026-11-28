@@ -1,0 +1,40 @@
+format = 1
+id = "alta-boilers"
+brand = "burnham"
+name = "Alta high efficiency boilers and combis"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+description = "Burnham-family high efficiency residential gas boilers and combis from U.S. Boiler Company."
+
+[[manuals]]
+kind = "product-page"
+title = "Alta product page"
+url = "https://www.usboiler.net/product/alta-high-efficiency-boiler"
+source = "https://www.usboiler.net/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product literature (data sheets)"
+url = "https://www.usboiler.net/us-boiler-product-literature.html"
+source = "https://www.usboiler.net/"
+
+[warranty]
+summary = "Parts are covered for 5 years and the heat exchanger has a 12-year limited warranty."
+length = "5 years"
+source = "https://www.usboiler.net/product/alta-high-efficiency-boiler"
+
+[[sources]]
+url = "https://www.usboiler.net/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.usboiler.net/product/alta-high-efficiency-boiler"
+title = "ALTA product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.usboiler.net/us-boiler-product-literature.html"
+title = "Linked from home page"
+checked = 2026-11-28

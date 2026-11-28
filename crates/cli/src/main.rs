@@ -483,6 +483,7 @@ fn run(cli: Cli) -> Result<()> {
                 sensitivity: Sensitivity::Normal,
                 price: Default::default(),
                 value: Default::default(),
+                family: None,
             };
             for kv in set {
                 let (k, v) = kv
@@ -592,6 +593,7 @@ fn run(cli: Cli) -> Result<()> {
                 active: true,
                 paused: false,
                 not_applicable: false,
+                guidance: None,
             };
             store.put(&t)?;
             println!("added task '{}' {}", t.title, short(t.id));

@@ -1,0 +1,44 @@
+format = 1
+id = "whole-home-filters"
+brand = "whirlpool"
+name = "Whirlpool whole-home filtration cartridges"
+category = "whole-house-filter"
+status = "current"
+description = "Whirlpool Water Solutions sediment and carbon whole-home filters; part numbers were not shown on the pages we could read."
+
+[[manuals]]
+kind = "support-page"
+title = "Filtration FAQ"
+url = "https://whirlpoolwatersolutions.com/owner-center/contaminants-filtration-systems-faq/"
+source = "https://www.whirlpoolwatersolutions.com/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Replacement parts"
+url = "https://whirlpoolwatersolutions.com/our-products/replacement-parts/"
+source = "https://www.whirlpoolwatersolutions.com/"
+
+[[facts]]
+topic = "filter"
+text = "A whole-home (point-of-entry) filter goes on the main supply where it enters the house and stops grit and rust before it reaches pipes and appliances. Finer micron ratings catch smaller particles but plug up sooner in sediment-heavy water."
+source = "https://whirlpoolwatersolutions.com/owner-center/contaminants-filtration-systems-faq/"
+
+[[facts]]
+topic = "filter"
+text = "Whirlpool's filtration FAQ gives 6 months as the usual change interval for its filter systems in general, adjusted to your water; it does not single out whole-home units. It also says its Premium Carbon whole-home filters (FACT media) last twice as long as its other whole-home filters."
+source = "https://whirlpoolwatersolutions.com/owner-center/contaminants-filtration-systems-faq/"
+note = "The 6-month figure is general guidance, not a whole-home-specific rating; follow the cartridge label."
+
+[[sources]]
+url = "https://whirlpoolwatersolutions.com/owner-center/contaminants-filtration-systems-faq/"
+title = "Whirlpool Water Solutions filtration FAQ"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whirlpoolwatersolutions.com/our-products/replacement-parts/"
+title = "Whirlpool Water Solutions replacement parts (softener and RO parts only at review)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.whirlpoolwatersolutions.com/"
+checked = 2026-11-28

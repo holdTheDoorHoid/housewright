@@ -1,0 +1,40 @@
+format = 1
+id = "endeavor-heat-pumps"
+brand = "rheem"
+name = "Rheem Endeavor Line heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["RP##@@*", "RD##@@*", "WP##@@*"]
+model_examples = ["RP19AY", "RD18AY", "RP18AZ", "RP16AZ", "RP14AY", "WP15AY"]
+description = "Rheem split heat pumps: Prestige, Classic Plus, Classic and Select series."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem heat pumps"
+url = "https://www.rheem.com/products/residential/heating-and-cooling/heat-pumps/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/heat-pumps/"
+
+[[manuals]]
+kind = "support-page"
+title = "Rheem residential heating and cooling product documentation"
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+
+[[facts]]
+topic = "model"
+text = "Rheem heat pump names start RP, RD or WP then efficiency digits and series letters, for example RP19AY is Prestige and RP14AY is Classic. RD units are side discharge."
+source = "https://www.rheem.com/products/residential/heating-and-cooling/heat-pumps/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/heating-and-cooling/heat-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+checked = 2026-11-28

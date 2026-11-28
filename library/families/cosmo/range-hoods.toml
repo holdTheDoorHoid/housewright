@@ -1,0 +1,53 @@
+format = 1
+id = "range-hoods"
+brand = "cosmo"
+name = "Cosmo range hoods"
+category = "range-hood"
+extends = "range-hood"
+status = "current"
+description = "Cosmo wall-mount, under-cabinet and island hoods, many with ARC-FLOW baffle filters."
+
+[[manuals]]
+kind = "support-page"
+title = "Cleaning your range hood and filters"
+url = "https://cosmoappliances.com/how-to-clean-your-range-hood-and-filters/"
+source = "https://cosmoappliances.com/how-to-clean-your-range-hood-and-filters/"
+
+[[manuals]]
+kind = "support-page"
+title = "General range hood FAQ"
+url = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+source = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+
+[[facts]]
+topic = "grease filter"
+text = "Clean monthly if you cook daily, seasonally if not, and after any big holiday meal. Soak 15+ minutes in boiling water with degreasing dish soap and half a cup of baking soda, lift it out while hot, rinse hot and dry fully."
+source = "https://cosmoappliances.com/how-to-clean-your-range-hood-and-filters/"
+
+[[facts]]
+topic = "filter types"
+text = "Stainless baffle filters may go in the dishwasher or be hand-washed; aluminum mesh filters are hand-wash only and should be replaced once badly clogged. Carbon filters cannot be washed and are replaced every 4 to 6 months depending on use."
+source = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+
+[[consumables]]
+name = "Charcoal filter kit with mounting plates"
+part = "CFK5"
+replace_every = "6 months"
+for_task = "charcoal"
+source = "https://cosmoappliances.com/product/cosmo-charcoal-filter-kit-cfk5/"
+note = "Listed for COS-QS48, COS-QS75, COS-QS90, COS-QB75 and COS-QB90; replace sooner with heavy cooking."
+
+[[sources]]
+url = "https://cosmoappliances.com/how-to-clean-your-range-hood-and-filters/"
+title = "How to Clean Your Range Hood and Filters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+title = "Cosmo general range hood FAQ"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://cosmoappliances.com/product/cosmo-charcoal-filter-kit-cfk5/"
+title = "Cosmo CFK5 charcoal filter kit"
+checked = 2026-11-28

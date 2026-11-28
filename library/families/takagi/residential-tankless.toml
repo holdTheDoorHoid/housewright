@@ -1,0 +1,50 @@
+format = 1
+id = "residential-tankless"
+brand = "takagi"
+name = "Takagi residential gas tankless (X3, P, C and T series)"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_examples = ["TK-540X3-NIH", "TK-340X3-PIH", "TK-240X3-NEH", "TK-540P-NIH", "TK-110C-NI", "TK-310C-NI", "TK-510C-NI"]
+description = "Condensing X3 and P series and non-condensing concentric-vent C series (natural gas or propane versions), plus older T-series units."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals"
+url = "https://www.takagi.com/support/manuals"
+source = "https://www.takagi.com/support/manuals"
+
+[[manuals]]
+kind = "support-page"
+title = "Frequently asked questions"
+url = "https://www.takagi.com/support/frequently-asked-questions"
+source = "https://www.takagi.com/support/frequently-asked-questions"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty information"
+url = "https://www.takagi.com/support/warranty"
+source = "https://www.takagi.com/support/warranty"
+
+[[facts]]
+topic = "scale"
+text = "Takagi suggests a softener or anti-scale treatment where water is hard; in very hard water, book a plumber to descale the heat exchanger. A lower temperature setting also slows scale. The FAQ gives no fixed interval."
+source = "https://www.takagi.com/support/frequently-asked-questions"
+
+[warranty]
+summary = "For homes, the heat exchanger is covered for 15 years and the rest of the unit for 5 years; fuses are not covered."
+length = "15 years heat exchanger"
+source = "https://www.takagi.com/support/frequently-asked-questions"
+
+[[sources]]
+url = "https://www.takagi.com/support/manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.takagi.com/support/frequently-asked-questions"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.takagi.com/support/warranty"
+checked = 2026-11-28

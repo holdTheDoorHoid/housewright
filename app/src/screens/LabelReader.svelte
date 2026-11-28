@@ -4,6 +4,8 @@
     model: string;
     serial: string;
     template: { id: string; name: string } | null;
+    /** An appliance library family the person accepted (D-148). */
+    family: FamilyHit | null;
   }
 </script>
 
@@ -11,7 +13,8 @@
   // Read brand, model and serial from a photo of a rating plate (D-29),
   // on the device. Everything read is shown and can be corrected; nothing
   // is saved until the person says so.
-  import { upload, type LabelRead } from '../lib/api';
+  import { call, upload, type FamilyHit, type LabelRead, type LibraryMatch } from '../lib/api';
+  import FamilySuggestion from './FamilySuggestion.svelte';
   import { readFile } from '../lib/files';
   import { errorText } from '../lib/actions';
 
@@ -27,6 +30,33 @@
   let model = $state('');
   let serial = $state('');
   let useTemplate = $state(true);
+  let family = $state<FamilyHit | null>(null);
+  let suggestion = $state<LibraryMatch | null>(null);
+  let declined = $state(false);
+
+  // Fixing the make or model asks the library again.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  $effect(() => {
+    if (!read) return;
+    const mk = make.trim();
+    const md = model.trim();
+    const tpl = useTemplate ? (read.template?.id ?? null) : null;
+    clearTimeout(timer);
+    if (family || declined || !mk) {
+      suggestion = null;
+      return;
+    }
+    timer = setTimeout(() => {
+      call('library_match', { make: mk, model: md, template: tpl })
+        .then((m) => (suggestion = m.families.length ? m : null))
+        .catch(() => (suggestion = null));
+    }, 250);
+  });
+
+  function useFamily(h: FamilyHit) {
+    family = h;
+    if (h.corrected_model) model = h.corrected_model;
+  }
 
   async function pick(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -39,6 +69,9 @@
     try {
       const r = await upload('read_label', {}, await readFile(f));
       read = r;
+      family = null;
+      declined = false;
+      suggestion = r.family.families.length ? r.family : null;
       make = r.brand ?? '';
       model = r.model ?? '';
       serial = r.serial ?? '';
@@ -55,6 +88,7 @@
       model: model.trim(),
       serial: serial.trim(),
       template: useTemplate ? (read?.template ?? null) : null,
+      family,
     });
     read = null;
   }
@@ -83,6 +117,14 @@
     <input id="lr-serial" bind:value={serial} placeholder="Not found" />
     {#if read.serial_alternatives.length}
       <p class="row small">Or: {#each read.serial_alternatives as m (m)}<button type="button" class="quiet" onclick={() => (serial = m)}>{m}</button>{/each}</p>
+    {/if}
+    {#if family}
+      <p class="small" data-testid="family-chosen">
+        Linked to <strong>{family.name}</strong> from the appliance library.
+        <button type="button" class="quiet" onclick={() => (family = null)}>Remove</button>
+      </p>
+    {:else if suggestion}
+      <FamilySuggestion match={suggestion} onuse={useFamily} onnone={() => (declined = true)} heading="What the label looks like" />
     {/if}
     {#if showTemplate && read.template}
       <label class="check"><input type="checkbox" bind:checked={useTemplate} /> It looks like a {read.template.name.toLowerCase()}: use that</label>

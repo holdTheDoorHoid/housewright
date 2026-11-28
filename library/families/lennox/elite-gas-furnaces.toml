@@ -1,0 +1,47 @@
+format = 1
+id = "elite-gas-furnaces"
+brand = "lennox"
+name = "Lennox Elite series gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["EL296V"]
+description = "Lennox Elite series gas furnaces, such as the EL296V two-stage variable-speed model."
+
+[[manuals]]
+kind = "product-page"
+title = "Lennox EL296V product page"
+url = "https://www.lennox.com/residential/products/heating-cooling/furnaces/el296v"
+source = "https://www.lennox.com/residential/products/heating-cooling/furnaces/el296v"
+
+[[facts]]
+topic = "filter"
+text = "For a plain 1 inch throwaway filter Lennox gives 3 months between changes, dropping to about one month in homes with pets, allergy sufferers or a lot of dust. Buy the size shown on the old filter frame and fit it with the arrows facing the furnace."
+source = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+
+[[facts]]
+topic = "filter"
+text = "Look for the filter at a return air grille (ceiling, wall or furnace side) or inside the unit behind an access panel. The furnace owner's manual or a Lennox dealer can confirm the size."
+source = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+
+[[facts]]
+topic = "efficiency"
+text = "The EL296V is a two-stage, variable-speed furnace rated up to 96 percent AFUE and ENERGY STAR certified."
+source = "https://www.lennox.com/residential/products/heating-cooling/furnaces/el296v"
+
+[warranty]
+summary = "The factory warranty is parts only, but registered owners may pick up to 3 years of labor. A Lennox dealer files claims, not the owner. Basic coverage passes to later owners; extended coverage stays with the original owner. No maintenance condition is stated on the page."
+source = "https://www.lennox.com/residential/owners/assistance/warranty/"
+
+[[sources]]
+url = "https://www.lennox.com/residential/products/heating-cooling/furnaces/el296v"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/assistance/warranty/"
+checked = 2026-11-28

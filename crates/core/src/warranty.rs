@@ -156,6 +156,7 @@ mod tests {
             sensitivity: Default::default(),
             price: None,
             value: None,
+            family: None,
         }
     }
 

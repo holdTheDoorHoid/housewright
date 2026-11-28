@@ -1,0 +1,40 @@
+format = 1
+id = "fit-heat-pumps"
+brand = "daikin"
+name = "Daikin FIT ducted heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["DH#VS*"]
+model_examples = ["DH9VS", "DH7VS", "DH6VS"]
+description = "Daikin FIT inverter-driven split heat pumps, including the Aurora cold-climate model."
+
+[[manuals]]
+kind = "product-page"
+title = "Daikin ducted heat pumps"
+url = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/heat-pumps"
+source = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/heat-pumps"
+
+[[manuals]]
+kind = "support-page"
+title = "Daikin Owner Support Center"
+url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+source = "https://daikincomfort.com/products"
+
+[[facts]]
+topic = "support"
+text = "Daikin lists a homeowner support line and a technician line, plus warranty lookup and registration, through its Owner Support Center."
+source = "https://daikincomfort.com/products"
+
+[[sources]]
+url = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/heat-pumps"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://daikincomfort.com/products"
+checked = 2026-11-28

@@ -1,0 +1,19 @@
+format = 1
+id = "top-load-washers"
+brand = "maytag"
+name = "Maytag top-load washers"
+category = "washer"
+status = "current"
+description = "Maytag top-load washing machines."
+
+[[manuals]]
+kind = "support-page"
+title = "Owners Center page for a top-load washer, with manual and warranty documents"
+url = "https://www.maytag.com/owners-center-pdp.MVWC200BW.html"
+source = "https://www.maytag.com/owners-center-pdp.MVWC200BW.html"
+unverified = true
+note = "page blocked automated fetch; URL from search results. Each model has its own Owners Center page."
+
+[[sources]]
+url = "https://www.maytag.com/owners-center-pdp.MVWC200BW.html"
+checked = 2026-11-28

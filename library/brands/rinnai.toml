@@ -1,0 +1,22 @@
+format = 1
+id = "rinnai"
+name = "Rinnai"
+aliases = ["RINNAI", "Rinnai America Corporation"]
+domains = ["rinnai.us"]
+website = "https://www.rinnai.us/"
+support_url = "https://www.rinnai.us/support/contact"
+manual_search_url = "https://www.rinnai.us/professional/document-library"
+phone = "800-621-9419"
+note = "Phone is the toll-free warranty service line on the warranty page; the contact page offers live chat only."
+
+[[sources]]
+url = "https://www.rinnai.us/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/support/warranty"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/support/contact"
+checked = 2026-11-28

@@ -1,0 +1,7 @@
+format = 1
+id = "dehumidifier"
+name = "Dehumidifiers"
+template = "dehumidifier"
+life_safety = false
+brands = ["frigidaire", "ge-appliances", "lg", "midea", "homelabs", "whynter"]
+why_brands = "Common US retail brands for portable dehumidifiers, mixing the big appliance makers with the popular direct-to-consumer names; no public ranking was used. CPSC has recalled dehumidifiers made by a few OEM factories and sold under many names."

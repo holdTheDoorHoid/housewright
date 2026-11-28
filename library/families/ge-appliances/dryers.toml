@@ -1,0 +1,33 @@
+format = 1
+id = "dryers"
+brand = "ge-appliances"
+name = "GE and GE Profile dryers"
+category = "dryer"
+status = "current"
+description = "GE and GE Profile electric and gas clothes dryers."
+
+[[manuals]]
+kind = "support-page"
+title = "Dryer excessive lint support article"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+
+[[facts]]
+topic = "vent"
+text = "GE calls for a 4 inch solid metal or aluminum vent, not plastic, no longer than your model installation instructions allow. Keep the inside free of buildup and make sure the outside wall cap opens all the way."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+
+[[facts]]
+topic = "lint"
+text = "Fabric softener residue can clog the fine mesh of the lint screen; wash the screen in soapy water and let it dry completely before refitting it."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+
+[[facts]]
+topic = "safety"
+text = "GE says to disconnect the dryer from power before you clean or maintain it."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+title = "Dryer excessive lint"
+checked = 2026-11-28

@@ -1,0 +1,32 @@
+format = 1
+id = "elite-softeners"
+brand = "ecowater"
+name = "Elite series water softeners"
+category = "water-softener"
+status = "current"
+description = "EcoWater's top softener series with Wi-Fi alerts and a touchscreen; Core and Advanced series exist but had no product page link."
+
+[[manuals]]
+kind = "product-page"
+title = "Elite water softeners"
+url = "https://www.ecowater.com/elite-water-softeners/"
+source = "https://www.ecowater.com/water-softeners/"
+
+[[manuals]]
+kind = "product-page"
+title = "All EcoWater softeners (Core, Advanced, Elite)"
+url = "https://www.ecowater.com/water-softeners/"
+source = "https://www.ecowater.com/water-softeners/"
+
+[[facts]]
+topic = "salt"
+text = "EcoWater says the Elite series adjusts regeneration to actual use, which means fewer salt refills, and its app sends a low-salt alert."
+source = "https://www.ecowater.com/water-softeners/"
+
+[[sources]]
+url = "https://www.ecowater.com/water-softeners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ecowater.com/elite-water-softeners/"
+checked = 2026-11-28

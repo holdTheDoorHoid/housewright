@@ -1,0 +1,14 @@
+format = 1
+id = "burnham"
+name = "Burnham"
+aliases = ["BURNHAM", "Burnham Holdings", "U.S. Boiler Company", "US Boiler"]
+parent = "Burnham Holdings"
+domains = ["usboiler.net"]
+website = "https://www.usboiler.net/"
+support_url = "https://www.usboiler.net/contact.html"
+manual_search_url = "https://www.usboiler.net/us-boiler-product-literature.html"
+note = "Burnham-branded residential boilers are documented on the U.S. Boiler Company site. The burnham.com address refused automated connections when checked."
+
+[[sources]]
+url = "https://www.usboiler.net/"
+checked = 2026-11-28

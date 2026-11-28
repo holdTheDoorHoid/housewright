@@ -1,0 +1,19 @@
+format = 1
+id = "takagi"
+name = "Takagi"
+aliases = ["TAKAGI", "Takagi Industrial"]
+domains = ["takagi.com"]
+website = "https://www.takagi.com/"
+support_url = "https://www.takagi.com/contact/"
+manual_search_url = "https://www.takagi.com/support/manuals"
+note = "Support pages are linked from the site navigation; the find-a-service-technician link redirects to the where-to-buy page, so the contact page is used as support_url."
+
+[[sources]]
+url = "https://www.takagi.com/"
+title = "Takagi home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.takagi.com/support/manuals"
+title = "Takagi manuals"
+checked = 2026-11-28

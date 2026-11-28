@@ -1,0 +1,13 @@
+format = 1
+id = "moen"
+name = "Moen"
+aliases = ["MOEN", "Moen Incorporated"]
+parent = "Fortune Brands Innovations"
+domains = ["moen.com"]
+website = "https://www.moen.com/"
+support_url = "https://www.moen.com/pages/support"
+manual_search_url = "https://www.moen.com/pages/literature-center"
+
+[[sources]]
+url = "https://www.moen.com/"
+checked = 2026-11-28

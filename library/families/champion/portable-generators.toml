@@ -1,0 +1,82 @@
+format = 1
+id = "portable-generators"
+brand = "champion"
+name = "Champion portable and inverter generators"
+category = "generator"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Open-frame, dual fuel, tri-fuel and inverter portable generators; manuals are per model number."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manual and diagram search"
+url = "https://www.championpowerequipment.com/product-manuals-diagrams/"
+source = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+
+[[manuals]]
+kind = "support-page"
+title = "Help Center"
+url = "https://help.championpowerequipment.com/"
+source = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Operator manual, model 100522"
+url = "https://www.championpowerequipment.com/wp-content/uploads/2018/08/100522-om-english.pdf"
+source = "https://www.championpowerequipment.com/wp-content/uploads/2018/08/100522-om-english.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read."
+
+[[facts]]
+topic = "service"
+text = "Change the oil once the first 5 hours of break-in are done, then about every 100 hours unless your manual says otherwise; halve that interval in very dusty or hot places. Check the dipstick before each use."
+source = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+
+[[facts]]
+topic = "service"
+text = "Before each use make sure the air intake is clear. At the 100-hour service clean a reusable filter or fit a new one; foam filters can be washed, dried and lightly oiled, paper ones are replaced. Fit a new spark plug every year."
+source = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+
+[[facts]]
+topic = "storage"
+text = "If fuel will sit more than 30 days, add stabilizer to the fuel container, then run the engine about 10 minutes so treated fuel reaches the carburetor. For long storage also drain the carburetor."
+source = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+title = "Champion portable generator maintenance guide"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.championpowerequipment.com/product-manuals-diagrams/"
+title = "Manual and diagram search"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://help.championpowerequipment.com/"
+title = "Help Center"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.championpowerequipment.com/wp-content/uploads/2018/08/100522-om-english.pdf"
+title = "Model 100522 operator manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

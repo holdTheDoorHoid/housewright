@@ -1,0 +1,41 @@
+format = 1
+id = "dishwashers"
+brand = "maytag"
+name = "Maytag dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Maytag dishwashers; cleaning articles are under the dishwasher product help section."
+
+[[manuals]]
+kind = "support-page"
+title = "Dishwasher product help"
+url = "https://producthelp.maytag.com/Dishwashers"
+source = "https://producthelp.maytag.com/Dishwashers"
+
+[[manuals]]
+kind = "support-page"
+title = "Dishwasher cleaning and care"
+url = "https://producthelp.maytag.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care"
+source = "https://producthelp.maytag.com/Dishwashers"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and literature"
+url = "https://www.maytag.com/owners.html"
+source = "https://producthelp.maytag.com/Dishwashers"
+unverified = true
+note = "page blocked automated fetch; URL linked from producthelp.maytag.com"
+
+[[sources]]
+url = "https://producthelp.maytag.com/Dishwashers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.maytag.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.maytag.com/owners.html"
+checked = 2026-11-28
+unverified = true
+note = "not opened"

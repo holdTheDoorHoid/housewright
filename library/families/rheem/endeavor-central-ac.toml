@@ -1,0 +1,40 @@
+format = 1
+id = "endeavor-central-ac"
+brand = "rheem"
+name = "Rheem Endeavor Line air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["RA##@@*", "WA##@@*"]
+model_examples = ["RA19AY", "RA18AZ", "RA16AY", "RA14AZ", "RA13NY", "WA15AY"]
+description = "Rheem split air conditioners: Prestige, Classic Plus, Classic and Select series."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem air conditioners"
+url = "https://www.rheem.com/products/residential/heating-and-cooling/air-conditioners/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/air-conditioners/"
+
+[[manuals]]
+kind = "support-page"
+title = "Rheem residential heating and cooling product documentation"
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+
+[[facts]]
+topic = "model"
+text = "Rheem AC model names read like RA19AY: RA for air conditioner, then the efficiency digits, then letters for the series. Full model numbers carry tonnage and options after that."
+source = "https://www.rheem.com/products/residential/heating-and-cooling/air-conditioners/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/heating-and-cooling/air-conditioners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+checked = 2026-11-28

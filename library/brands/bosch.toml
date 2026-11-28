@@ -1,0 +1,26 @@
+format = 1
+id = "bosch"
+name = "Bosch"
+aliases = ["BOSCH", "BSH Home Appliances", "Bosch Home Appliances"]
+parent = "BSH Hausgeraete"
+domains = ["bosch-home.com", "bosch-homecomfort.com"]
+website = "https://www.bosch-home.com/us/"
+support_url = "https://www.bosch-home.com/us/owner-support/contact-us"
+manual_search_url = "https://www.bosch-home.com/us/owner-support/owner-manuals"
+phone = "+1-800-944-2904"
+note = "Appliances (bosch-home.com) are BSH. Heating and water heating (bosch-homecomfort.com) is run by Bosch Thermotechnology Corp., whose corporate page names Robert Bosch GmbH as its parent; the parent field refers to the appliance side."
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/dishwashers/cleaning-maintenance"
+title = "Bosch US dishwasher cleaning and maintenance page (links to manuals, contact, phone)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/contact-us"
+title = "Bosch US contact page (large appliances 1-800-944-2904)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/corporate-information/"
+title = "Bosch Home Comfort corporate information (Bosch Thermotechnology Corp., parent Robert Bosch GmbH)"
+checked = 2026-11-28

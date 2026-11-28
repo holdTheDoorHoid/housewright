@@ -30,6 +30,9 @@ housewright-core = { path = "../../crates/core" }
 housewright-media = { path = "../../crates/media" }
 housewright-sync = { path = "../../crates/sync", features = ["native-http"] }
 tauri-plugin-reminders = { path = "plugins/reminders" }
+# Saving a manufacturer's manual onto the device (D-151); already in the
+# tree through sync.
+ureq = { version = "3", default-features = false, features = ["rustls"] }
 
 [features]
 default = ["ocr"]

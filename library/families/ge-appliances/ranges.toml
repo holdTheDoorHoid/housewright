@@ -1,0 +1,66 @@
+format = 1
+id = "ranges"
+brand = "ge-appliances"
+name = "GE and GE Profile ranges"
+category = "range"
+fuel = ["gas", "electric"]
+status = "current"
+description = "GE freestanding, slide-in and drop-in gas and electric ranges."
+
+[[manuals]]
+kind = "support-page"
+title = "Anti-tip bracket: how to check it"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=19292"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=19292"
+
+[[manuals]]
+kind = "support-page"
+title = "Smoke and odor from a new oven"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34424"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34424"
+
+[[facts]]
+topic = "anti-tip"
+text = "Tip test for any GE range: clear everything off the cooktop and out of the oven, then pull gently on the back of the range. An anchored range stops within 4 inches of the wall; if it goes further the bracket is missing or wrong. Never pull past 4 inches, it could fall on you."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=19292"
+
+[[facts]]
+topic = "anti-tip"
+text = "Checking by eye (drawer out, torch on the rear leg in its forked bracket) only suits 30 inch electric ranges with a removable drawer, not gas, drop-in, double-oven or warming-drawer models. GE supplies a missing bracket free if you fit it yourself."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=19292"
+
+[[facts]]
+topic = "gas smell"
+text = "If you smell gas or hear it leaking, CPSC says to get out of the home at once without touching lights, phones or any other electronics on the way, then call the gas utility or local gas authority from outside."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+note = "General CPSC advice from its 2026-03-16 release; GE's own wording is only in PDF manuals, which were not opened."
+
+[[facts]]
+topic = "self-clean"
+text = "A new oven smokes and smells at first; GE suggests a self-clean run of 3 hours or more to burn that off. Self-clean fumes can harm some pet birds, so take them to a different room with good airflow first."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34424"
+
+[[facts]]
+topic = "safety"
+text = "CPSC advises that every freestanding range or stove be installed with an anti-tip bracket."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2011/Anchor-for-Safety-TV-and-Furniture-Tip-Over-Related-Deaths-and-Injuries-Not-Slowing-Down"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=19292"
+title = "Range - Anti-Tip Brackets"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34424"
+title = "Smoke and Odor from a New Oven"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+title = "CPSC winter weather safety tips (gas leak advice)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2011/Anchor-for-Safety-TV-and-Furniture-Tip-Over-Related-Deaths-and-Injuries-Not-Slowing-Down"
+title = "CPSC 2011 tip-over release (range anti-tip bracket advice)"
+checked = 2026-11-28

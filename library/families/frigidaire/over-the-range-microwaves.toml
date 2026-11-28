@@ -1,0 +1,42 @@
+format = 1
+id = "over-the-range-microwaves"
+brand = "frigidaire"
+name = "Frigidaire over-the-range microwaves"
+category = "microwave"
+status = "unknown"
+description = "Frigidaire and Gallery over-the-range microwaves; several older models are listed as discontinued."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support for FFMV164LS 1.6 cu ft over-the-range microwave"
+url = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals?productCode=FFMV164LS"
+source = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals?productCode=FFMV164LS"
+unverified = true
+note = "frigidaire.com timed out on fetch at review; URL from search results (review-paging parameter removed)."
+
+[[manuals]]
+kind = "support-page"
+title = "How to change the oven light (covers taking out the charcoal filter)"
+url = "https://owner.frigidaire.com/support-articles/article/1847534-microwaves-how-do-i-change-the-oven-light-on-my-over-the-range-microwave-"
+source = "https://owner.frigidaire.com/support-articles/article/1847534-microwaves-how-do-i-change-the-oven-light-on-my-over-the-range-microwave-"
+
+[[facts]]
+topic = "charcoal filter"
+text = "The charcoal filter, where fitted, sits behind the vent grille. With power off at the plug or breaker, take out the grille screws and grille, then push the filter in, twist it and pull it free; refit so the grille's top and bottom tabs engage."
+source = "https://owner.frigidaire.com/support-articles/article/1847534-microwaves-how-do-i-change-the-oven-light-on-my-over-the-range-microwave-"
+
+[[facts]]
+topic = "light"
+text = "The oven light is reached by lifting its cover once the vent grille and charcoal filter are out; replace the bulb with an equivalent 30-watt one."
+source = "https://owner.frigidaire.com/support-articles/article/1847534-microwaves-how-do-i-change-the-oven-light-on-my-over-the-range-microwave-"
+
+[[sources]]
+url = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals?productCode=FFMV164LS"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch at review."
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1847534-microwaves-how-do-i-change-the-oven-light-on-my-over-the-range-microwave-"
+title = "Frigidaire OTR microwave oven light article"
+checked = 2026-11-28

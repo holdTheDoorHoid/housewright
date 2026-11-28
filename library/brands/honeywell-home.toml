@@ -1,0 +1,19 @@
+format = 1
+id = "honeywell-home"
+name = "Honeywell Home"
+aliases = ["HONEYWELL HOME", "Honeywell", "Resideo"]
+parent = "Resideo Technologies"
+domains = ["honeywellhome.com", "resideo.com"]
+website = "https://www.honeywellhome.com/"
+support_url = "https://www.resideo.com/us/en/support/"
+phone = "1-800-633-3991"
+note = "Honeywell Home products come from Resideo, which uses the trademark under licence from Honeywell International. Phone is the technical support line on the Resideo support page."
+
+[[sources]]
+url = "https://www.resideo.com/us/en/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.resideo.com/us/en/support/"
+title = "Resideo product support"
+checked = 2026-11-28

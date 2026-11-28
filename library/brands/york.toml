@@ -1,0 +1,16 @@
+format = 1
+id = "york"
+name = "YORK"
+aliases = ["YORK", "York", "York International", "Johnson Controls"]
+domains = ["york.com", "york.bosch-hcgroup.com"]
+website = "https://york.bosch-hcgroup.com/"
+support_url = "https://york.bosch-hcgroup.com/residential-equipment/york-homeowner-support"
+note = "As of 2026-11 every york.com residential URL answers 301 to york.bosch-hcgroup.com, where the YORK residential site now lives. The site footer says YORK is a Johnson Controls trademark used under license. No phone number is shown on the homeowner support page."
+
+[[sources]]
+url = "https://york.bosch-hcgroup.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://york.bosch-hcgroup.com/residential-equipment/york-homeowner-support"
+checked = 2026-11-28

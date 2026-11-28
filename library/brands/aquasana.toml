@@ -1,0 +1,13 @@
+format = 1
+id = "aquasana"
+name = "Aquasana"
+aliases = ["AQUASANA", "Aquasana Inc."]
+domains = ["aquasana.com"]
+website = "https://www.aquasana.com/"
+support_url = "https://www.aquasana.com/product-owners-manuals.html"
+manual_search_url = "https://www.aquasana.com/product-owners-manuals.html"
+phone = "+1-866-662-6885"
+
+[[sources]]
+url = "https://www.aquasana.com/"
+checked = 2026-11-28

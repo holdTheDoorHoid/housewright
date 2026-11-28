@@ -1,0 +1,15 @@
+format = 1
+id = "champion"
+name = "Champion Power Equipment"
+aliases = ["Champion", "CHAMPION POWER EQUIPMENT", "Champion Power Equipment Inc"]
+domains = ["championpowerequipment.com"]
+website = "https://www.championpowerequipment.com/"
+support_url = "https://help.championpowerequipment.com/"
+manual_search_url = "https://www.championpowerequipment.com/product-manuals-diagrams/"
+phone = "+1-877-338-0999"
+note = "Phone number and manual search link were read on the maintenance guide page."
+
+[[sources]]
+url = "https://www.championpowerequipment.com/news-updates/portable-generator-maintenance-schedule-and-checklist/"
+title = "Champion portable generator maintenance guide"
+checked = 2026-11-28

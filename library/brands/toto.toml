@@ -1,0 +1,17 @@
+format = 1
+id = "toto"
+name = "TOTO"
+aliases = ["TOTO USA", "TOTO U.S.A."]
+domains = ["totousa.com", "totousaparts.com"]
+website = "https://www.totousa.com/"
+support_url = "https://www.totousa.com/toto-customer-support"
+phone = "888-295-8134"
+
+[[sources]]
+url = "https://www.totousa.com/products/collections/drake"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.totousa.com/toto-customer-support"
+title = "TOTO customer support"
+checked = 2026-11-28

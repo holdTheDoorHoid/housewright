@@ -1,0 +1,63 @@
+format = 1
+id = "gas-furnaces"
+brand = "goodman"
+name = "Goodman 80 percent and 90 percent AFUE gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["GRVT80", "GDVT80", "GR9S92", "GRVM97"]
+description = "Goodman gas furnaces in two groups: 80 percent AFUE and 90-plus percent AFUE."
+
+[[manuals]]
+kind = "manual-search"
+title = "Goodman literature library (spec sheets, warranty certificates)"
+url = "https://www.goodmanmfg.com/support/literature-library"
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[manuals]]
+kind = "product-page"
+title = "Goodman 90 percent AFUE furnaces"
+url = "https://www.goodmanmfg.com/products/gas-furnaces/90-afue-gas-furnaces"
+source = "https://www.goodmanmfg.com/products/gas-furnaces"
+
+[[manuals]]
+kind = "product-page"
+title = "Goodman 80 percent AFUE furnaces"
+url = "https://www.goodmanmfg.com/products/gas-furnaces/80-afue-gas-furnaces"
+source = "https://www.goodmanmfg.com/products/gas-furnaces"
+
+[[facts]]
+topic = "manuals"
+text = "Look up documents by product category in the literature library: every listed model has its own spec sheet entry and warranty certificate entry, though paired models such as GRVT80 and GDVT80 point to the same file."
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[facts]]
+topic = "filter"
+text = "Goodman links a Filter Search Tool from its support menu for finding a replacement filter."
+source = "https://www.goodmanmfg.com/products/gas-furnaces"
+
+[[facts]]
+topic = "warranty"
+text = "No term lengths appear on the warranty page; use the online Warranty Lookup or the model's certificate. California, Florida, Georgia and Quebec, from various install dates, do not let coverage hinge on registration."
+source = "https://www.goodmanmfg.com/warranty-information"
+
+[[sources]]
+url = "https://www.goodmanmfg.com/support/literature-library"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/products/gas-furnaces"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/products/gas-furnaces/90-afue-gas-furnaces"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/products/gas-furnaces/80-afue-gas-furnaces"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/warranty-information"
+checked = 2026-11-28

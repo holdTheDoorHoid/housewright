@@ -1,0 +1,29 @@
+format = 1
+id = "dishwashers"
+brand = "ge-appliances"
+name = "GE and GE Profile dishwashers"
+category = "dishwasher"
+status = "current"
+description = "GE, GE Profile and Cafe dishwashers with fine and ultra-fine filters; some models self-clean."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean fine and ultra fine filters"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=35611"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=35611"
+
+[[facts]]
+topic = "filter"
+text = "Clean the fine and ultra-fine filters about every other month, sooner with heavy use or gritty dishes. Rinse in warm soapy water, no scouring pads. Self-cleaning filtration models have no removable filter."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=35611"
+
+[[tasks]]
+key = "filter"
+schedule = { kind = "fixed", every = "2 months" }
+note = "The maker advises about every other month, more often with heavy use."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=35611"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=35611"
+title = "Dishwasher filter cleaning"
+checked = 2026-11-28

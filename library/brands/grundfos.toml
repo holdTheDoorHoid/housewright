@@ -1,0 +1,12 @@
+format = 1
+id = "grundfos"
+name = "Grundfos"
+aliases = ["GRUNDFOS", "Grundfos Pumps", "Grundfos Americas Corporation"]
+domains = ["grundfos.com"]
+website = "https://www.grundfos.com/us"
+support_url = "https://www.grundfos.com/us/contact"
+manual_search_url = "https://product-selection.grundfos.com/us/products"
+
+[[sources]]
+url = "https://www.grundfos.com/us"
+checked = 2026-11-28

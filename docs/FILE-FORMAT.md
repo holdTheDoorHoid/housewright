@@ -1,4 +1,4 @@
-# Housewright export format (version 7)
+# Housewright export format (version 8)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -12,7 +12,7 @@ database. The code is `crates/core/src/export.rs`.
 ```json
 {
   "format": "housewright-export",
-  "version": 6,
+  "version": 8,
   "exported_at": "2026-11-27T17:00:00Z",
   "household_id": "01a21f65-3c12-72cb-92ba-a9ba73a49591",
   "entities": { "household": [ ... ], "member": [ ... ], "task": [ ... ] },
@@ -23,7 +23,7 @@ database. The code is `crates/core/src/export.rs`.
 | Key | Meaning |
 |---|---|
 | `format` | Always `"housewright-export"`. |
-| `version` | `6` (since Phase 8; `5` in Phase 7, `4` in Phase 5, `3` in Phase 4, `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
+| `version` | `8` (since the library hookup; `7` in Phase 9, `6` in Phase 8, `5` in Phase 7, `4` in Phase 5, `3` in Phase 4, `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
 | `exported_at` | When the file was written (RFC 3339, UTC). |
 | `household_id` | The household this file holds. |
 | `entities` | The current state, grouped by kind. |
@@ -70,15 +70,15 @@ Required fields are in **bold**.
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy, hard_freeze}`, address (wrapped) |
 | `floor` | **id**, **property**, **name**, level, background (version 6: `{attachment, at: {x, y}, width, opacity}`, a picture of an existing plan to trace over; `at` is its top-left corner and `width` its real-life width, in plan millimetres; `opacity` 0 to 100) |
 | `room` | **id**, **property**, **name**, floor, outline (version 6: the room's shape on its floor's plan, a list of `{x, y}` corners in plan millimetres; a simple polygon) |
-| `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, months, register_url, provider, transferable, reference (wrapped)}` (version 7: `months` is the warranty's length when given as one, counted from the earlier of `installed` and `purchased`, and `expires` is then worked out from it; `register_url` is an https link), location_note (wrapped), template, extra_fields, custom, sensitivity, price, value (version 7: Money, what it cost and the household's own estimate of what it is worth now) |
+| `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, months, register_url, provider, transferable, reference (wrapped)}` (version 7: `months` is the warranty's length when given as one, counted from the earlier of `installed` and `purchased`, and `expires` is then worked out from it; `register_url` is an https link), location_note (wrapped), template, extra_fields, custom, sensitivity, price, value (version 7: Money, what it cost and the household's own estimate of what it is worth now), family (version 8: the appliance library model family the person confirmed, `"<brand>/<family>"` such as `"rheem/endeavor-central-ac"`, or `"none"` when they said none of the suggestions fit; D-149) |
 | `template` | the template, exactly as in `templates/README.md` |
-| `task` | **id**, **property**, **title**, **owner** (member id), **priority**, **schedule**, **start** (date), item, room, window, steps, why `{text, source}`, minutes, completion_fields, template `{template, task}`, active, paused, not_applicable |
+| `task` | **id**, **property**, **title**, **owner** (member id), **priority**, **schedule**, **start** (date), item, room, window, steps, why `{text, source, link}` (version 8: `link`, an https page the advice comes from, set for manufacturer guidance), minutes, completion_fields, template `{template, task}`, active, paused, not_applicable, guidance (version 8: `{family, follows: "maker" or "generic"}`, the person's choice between the manufacturer's and the usual advice for this task, D-150) |
 | `completion` | **id**, **task**, **by**, **at**, notes (wrapped), cost, values, contractor, attachments, voids, done_by (version 5: the member it was done for, when `by` is the Home Assistant bridge) |
 | `snooze` | **id**, **task**, **by**, **at**, **until** (date), reason |
 | `meter` | **id**, **key**, **name**, **unit**, item |
 | `meter_reading` | **id**, **meter**, **at**, **value**, **by** |
 | `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5), notes (wrapped), emergency (version 4: `true` puts them on the binder's emergency page), company, website, service_area, would_hire_again (`true`/`false`), private_notes (version 7). `private_rating`, `would_hire_again` and `private_notes` are the household's private opinion (D-136): never printed, never sent to Home Assistant or a server extra. They are in a full export, which is the household's own data. |
-| `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant) |
+| `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant), source (version 8: the https link a manual was downloaded from, D-151) |
 | `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped). A note about a `property`, `room` or `item` is a "quirk only you know", printed in the house binder (main volume, or the sealed volume when sensitive). |
 | `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`; `sealed_volume_location` is where the binder's sealed volume is kept, always normal so the main binder can print it), room, pin (version 6: the `plan_pin` showing where it is) |
 | `profile` | (version 2) the answers to the home questions, one per property: **id** (the property's id), home_type, built, zip (wrapped), heating `[...]`, cooling `[...]`, water_heater, water_supply, sewer, features `{basement: true, ...}`, smoke_alarms, smoke_power, co_alarms, **people** `{adults, children, older_adults, pets}`. A missing answer means "not sure". Values are the snake_case names in `crates/core/src/profile.rs`. |
@@ -229,6 +229,12 @@ The downloaded US recall list (`recall_cache`, D-141) is public data kept
 on one device only: it is not in an export or a backup, is not synced, and
 is downloaded again when needed.
 
+The appliance library (D-147, D-148) is not household data either: the
+copy that came with the app is part of the program, and a downloaded
+newer version is kept on one device only (in its `meta` table), never
+exported, backed up or synced. Only the household's own choices about it
+are records: `item.family`, `task.guidance` and saved manuals.
+
 ## Compatibility
 
 New optional fields may appear in any version; readers should ignore fields
@@ -273,4 +279,10 @@ removes one, or adds a new kind bumps `version`.
   it saves a thing or a contractor it does not know the new fields, so its
   save clears them (a store writes only the fields it knows): every device
   in a household should run the Phase 9 version.
-
+- **Version 8** (library hookup) added optional fields: `item.family`,
+  `task.guidance`, `task.why.link` and `attachment.source` (D-152). No new
+  kinds and no storage migration. Version 1 to 7 files import unchanged
+  (the Phase 2 and Phase 3 fixtures still import in the core's tests). A
+  version 7 program refuses a version 8 file, and when it saves a thing or
+  a task it does not know the new fields, so its save clears them: every
+  device in a household should run this version.

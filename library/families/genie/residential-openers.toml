@@ -1,0 +1,60 @@
+format = 1
+id = "residential-openers"
+brand = "genie"
+name = "Genie residential garage door openers"
+category = "garage-door-opener"
+status = "current"
+description = "Genie home openers with Safe-T-Beam photo-eye sensors, some with battery backup and Aladdin Connect."
+
+[[manuals]]
+kind = "manual-search"
+title = "Operation and maintenance manuals (owner manuals list)"
+url = "https://support.geniecompany.com/app/answers/detail/a_id/1308"
+source = "https://www.geniecompany.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Maintenance and safety tips"
+url = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+source = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+
+[[manuals]]
+kind = "support-page"
+title = "Customer support"
+url = "https://support.geniecompany.com/"
+source = "https://www.geniecompany.com/"
+
+[[facts]]
+topic = "safety"
+text = "Genie's monthly contact-reverse test: put a 2x4 flat, wide side down, at the middle of the doorway and close the door. It should hit the board and reverse to fully open within two seconds. If not, the close force must be lowered as the owner manual describes; if it still fails, call a Genie dealer."
+source = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+
+[[facts]]
+topic = "safety"
+text = "To test the Safe-T-Beam sensors, block the beam before pressing the button (the door must not start down), then roll a ball through the beam while the door is closing (it must stop and reverse). If either check fails, Genie says the sensor system may need replacing by a dealer."
+source = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+
+[[facts]]
+topic = "springs"
+text = "Do not touch, adjust or remove the high-tension springs or the parts they fasten to, and do not run a door that is jammed or has a broken spring; Genie leaves spring work to its professional dealers."
+source = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+
+[[sources]]
+url = "https://www.geniecompany.com/"
+title = "Genie home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.geniecompany.com/"
+title = "Genie customer support, linked from home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.geniecompany.com/app/answers/detail/a_id/1308"
+title = "Genie owner manuals list, linked from home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.geniecompany.com/app/answers/detail/a_id/1221/~/maintenance-and-safety-tips"
+title = "Genie maintenance and safety tips"
+checked = 2026-11-28

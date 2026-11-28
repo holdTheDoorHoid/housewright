@@ -1,0 +1,15 @@
+format = 1
+id = "morton"
+name = "Morton"
+aliases = ["MORTON", "Morton Salt", "Morton Water Softeners"]
+parent = "Morton Salt"
+domains = ["mortonsalt.com"]
+website = "https://www.mortonsalt.com/"
+support_url = "https://www.mortonsalt.com/contact/"
+manual_search_url = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+note = "mortonsalt.com lists EcoWater under its Licenses menu, linking to mortonwatersofteners.com; softener manuals and salt guidance are on mortonsalt.com."
+
+[[sources]]
+url = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+title = "Morton water softener manuals"
+checked = 2026-11-28

@@ -1,0 +1,26 @@
+format = 1
+id = "dishwashers"
+brand = "lg"
+name = "LG dishwashers"
+category = "dishwasher"
+status = "current"
+description = "LG dishwashers with an inner filter and stainless steel mesh filter."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+
+[[facts]]
+topic = "filter"
+text = "LG says to clean the filters at least monthly, more in hard-water areas. Lift out the inner and steel filters together, separate them, rinse with a soft cloth or non-abrasive brush, then lock the inner filter back."
+source = "https://www.lg.com/us/support/video-tutorials/cleaning-the-filter-dishwasher-CT10000009-20150210129262"
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+[[sources]]
+url = "https://www.lg.com/us/support/video-tutorials/cleaning-the-filter-dishwasher-CT10000009-20150210129262"
+title = "Cleaning the dishwasher filter"
+checked = 2026-11-28

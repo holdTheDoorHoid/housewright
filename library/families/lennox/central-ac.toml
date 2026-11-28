@@ -1,0 +1,51 @@
+format = 1
+id = "central-ac"
+brand = "lennox"
+name = "Lennox Signature, Elite and Merit air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_examples = ["SL25KCV", "EL22KCV", "EL18KCV", "EL16KC1", "ML17KC2", "ML14KC1"]
+description = "Lennox split air conditioners in the Dave Lennox Signature, Elite and Merit series."
+
+[[manuals]]
+kind = "product-page"
+title = "Lennox air conditioners"
+url = "https://www.lennox.com/products/heating-cooling/air-conditioners"
+source = "https://www.lennox.com/products/heating-cooling/air-conditioners"
+
+[[manuals]]
+kind = "support-page"
+title = "Lennox product help index"
+url = "https://www.lennox.com/residential/support/product-help"
+source = "https://www.lennox.com/residential/support/"
+
+[[facts]]
+topic = "filter"
+text = "Lennox says to change standard 1 inch disposable filters about every 3 months, or monthly with allergies, pets or dust. The size is on the filter frame; arrows point toward the furnace or air handler."
+source = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+
+[warranty]
+summary = "Parts-only factory warranty; registering lets the original owner pick up to 3 years of labor cover. Claims go through a Lennox dealer. No maintenance condition is stated on the page."
+source = "https://www.lennox.com/residential/owners/assistance/warranty/"
+
+[[sources]]
+url = "https://www.lennox.com/products/heating-cooling/air-conditioners"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/product-help"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/assistance/warranty/"
+checked = 2026-11-28

@@ -1,0 +1,89 @@
+format = 1
+id = "proline-gas-tank"
+brand = "ao-smith"
+name = "ProLine and Vertex gas tank water heaters"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "A. O. Smith gas storage heaters from ProLine atmospheric vent models to Vertex and Polaris condensing models."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas tank water heaters listing"
+url = "https://www.hotwater.com/residential/water-heaters/gas-tank/"
+source = "https://www.hotwater.com/residential/water-heaters/gas-tank/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals, documents and videos"
+url = "https://www.hotwater.com/find-documents-and-videos"
+source = "https://www.hotwater.com/support.html"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty status check"
+url = "https://www.hotwater.com/support/warranty-verification.html"
+source = "https://www.hotwater.com/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Replacement parts"
+url = "https://www.hotwater.com/support/parts.html"
+source = "https://www.hotwater.com/"
+
+[[facts]]
+topic = "relief valve"
+text = "A. O. Smith wants owners to try the T&P relief valve yearly, working its lever a few times to confirm water comes out, and a professional to inspect it every 5 years."
+source = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+
+[[facts]]
+topic = "anode"
+text = "Pull and look at the anode rod yearly; fit a new one when it is badly eaten away or several inches of core wire are exposed. A. O. Smith uses a 1 1/16 inch deep well socket to remove it."
+source = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+
+[[facts]]
+topic = "flush"
+text = "Plan on a flush at least yearly, and more often where the water is hard. Turn the heater off a few hours beforehand so the water has time to cool."
+source = "https://www.hotwater.com/info-center/how-to-drain-a-water-heater.html"
+
+[[facts]]
+topic = "safety"
+text = "A. O. Smith suggests a 120 F thermostat setting, and the tank must be completely full of water before the gas or power goes back on."
+source = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+
+[warranty]
+summary = "Listed models carry 6 to 10 year warranties by line and model (most ProLine 6, ProLine Master and Vertex 8, Polaris and ProLine high recovery 10); check the model's own page."
+source = "https://www.hotwater.com/residential/water-heaters/gas-tank/"
+
+[[sources]]
+url = "https://www.hotwater.com/residential/water-heaters/gas-tank/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/find-documents-and-videos"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/support.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/support/warranty-verification.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/support/parts.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/info-center/how-to-drain-a-water-heater.html"
+checked = 2026-11-28

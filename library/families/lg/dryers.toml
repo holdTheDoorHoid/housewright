@@ -1,0 +1,65 @@
+format = 1
+id = "dryers"
+brand = "lg"
+name = "LG clothes dryers"
+category = "dryer"
+fuel = ["electric", "gas"]
+status = "current"
+description = "LG electric and gas front-load dryers, some with Flow Sense duct monitoring and a moisture sensor behind the lint filter."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Owner manual for DLEX8000 and DLGX8001 series"
+url = "https://www.lg.com/us/support/products/documents/DLGX8001.pdf"
+source = "https://www.lg.com/us/support/products/documents/DLGX8001.pdf"
+unverified = true
+note = "PDF exists (HEAD check returned a PDF) but was not opened, so the model coverage in the title is from search results."
+
+[[facts]]
+topic = "lint"
+text = "Empty the lint filter after each load, by hand or with a vacuum; if you rinse it in water, make sure it is completely dry before it goes back in."
+source = "https://www.lg.com/us/support/help-library/lg-dryer-how-to-perform-dryer-maintenance--1428690638456"
+
+[[facts]]
+topic = "vent"
+text = "LG advises a yearly exhaust duct cleaning. The moisture sensor sits behind the lint filter and should be wiped with a dry cloth often; also clear any lint caught on the door gaskets."
+source = "https://www.lg.com/us/support/help-library/lg-dryer-how-to-perform-dryer-maintenance--1428690638456"
+
+[[facts]]
+topic = "vent length"
+text = "In 4 inch rigid metal duct the run may be up to 65 ft with no bends, 55 ft with one 90 degree elbow, 47 ft with two, 36 ft with three and 28 ft with four; never use more than four elbows."
+source = "https://www.lg.com/us/support/help-library/lg-dryer-proper-venting-and-installation-tips--1384530313229"
+
+[[facts]]
+topic = "vent length"
+text = "Where the outside cap has a 2.5 inch opening the limits shrink to 55 ft straight, and 47, 41, 30 or 22 ft with one to four 90 degree elbows."
+source = "https://www.lg.com/us/support/help-library/lg-dryer-proper-venting-and-installation-tips--1384530313229"
+
+[[facts]]
+topic = "vent material"
+text = "Keep the exhaust duct short and either straight or in a gentle S bend, free of kinks, crushing and dents; LG says to avoid plastic or vinyl duct."
+source = "https://www.lg.com/us/support/help-library/lg-dryer-proper-venting-and-installation-tips--1384530313229"
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/products/documents/DLGX8001.pdf"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-dryer-how-to-perform-dryer-maintenance--1428690638456"
+title = "LG dryer maintenance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-dryer-proper-venting-and-installation-tips--1384530313229"
+title = "LG dryer proper venting and installation tips"
+checked = 2026-11-28

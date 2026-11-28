@@ -1,0 +1,19 @@
+format = 1
+id = "front-load-washers"
+brand = "frigidaire"
+name = "Frigidaire front-load washers"
+category = "washer"
+status = "current"
+description = "Frigidaire and Frigidaire Affinity front-load washing machines."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support page for a front-load washer, listing owner guide and installation sheets"
+url = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals/?productCode=FFFW5000QW"
+source = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals/?productCode=FFFW5000QW"
+unverified = true
+note = "page blocked automated fetch; URL from search results. Other models change the productCode value."
+
+[[sources]]
+url = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals/?productCode=FFFW5000QW"
+checked = 2026-11-28

@@ -1,0 +1,48 @@
+format = 1
+id = "professional-classic-electric-tank"
+brand = "rheem"
+name = "Professional Classic electric tank water heaters"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["electric"]
+status = "current"
+description = "Rheem electric storage heaters in 20 to 55 gallon sizes, some with leak detection or demand response."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem tank water heaters listing"
+url = "https://www.rheem.com/products/residential/water-heating/tank/"
+source = "https://www.rheem.com/products/residential/water-heating/tank/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product documentation"
+url = "https://www.rheem.com/professionals/residential-water-heating/product-documentation/"
+source = "https://www.rheem.com/products/residential/water-heating/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty and registration lookup"
+url = "https://www.rheem.com/warranties/"
+source = "https://www.rheem.com/warranties/"
+
+[[facts]]
+topic = "warranty"
+text = "Rheem asks owners to register the heater; warranty is checked by serial number through its lookup, and service is arranged through a local Rheem pro."
+source = "https://www.rheem.com/warranties/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/tank/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-water-heating/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/warranties/"
+checked = 2026-11-28

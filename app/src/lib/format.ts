@@ -54,3 +54,9 @@ export function when(iso: string): string {
     minute: '2-digit',
   });
 }
+
+/** "Nov 2026", for when a source was last checked. */
+export function monthYear(d: DateStr | null | undefined): string {
+  if (!d || d.length < 7) return '';
+  return `${MONTHS[+d.slice(5, 7) - 1]} ${d.slice(0, 4)}`;
+}

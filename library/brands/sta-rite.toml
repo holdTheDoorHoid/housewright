@@ -1,0 +1,13 @@
+format = 1
+id = "sta-rite"
+name = "Sta-Rite"
+aliases = ["STA-RITE", "Pentair Sta-Rite", "STA RITE"]
+parent = "Pentair"
+domains = ["pentair.com"]
+website = "https://www.pentair.com/en-us/flow/sta-rite.html"
+support_url = "https://www.pentair.com/en-us/education-support/residential.html"
+manual_search_url = "https://www.pentair.com/en-us/download-center.html"
+
+[[sources]]
+url = "https://www.pentair.com/en-us/flow/sta-rite/sta-rite-products/sta-rite-water-supply-pumps/sta-rite-jet-pumps.html"
+checked = 2026-11-28

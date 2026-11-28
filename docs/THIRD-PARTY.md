@@ -110,3 +110,31 @@ starts from Home Assistant's Debian base image (Apache-2.0) and installs
 
 No new Rust or JavaScript libraries were added in Phase 9.
 
+## Library hookup: the Housewright appliance library
+
+- **Housewright appliance library**, by Housewright appliance library
+  contributors, <https://github.com/holdTheDoorHoid/housewright-library>,
+  licensed under [Creative Commons Attribution 4.0 International
+  (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). The app
+  ships version 2026.11.28, commit
+  `d623c10820f220f6c3de8d415394bb271a18b416`, unmodified, in `library/`
+  (with its licence in `library/LICENSE` and the version in
+  `library/SNAPSHOT.toml`); `tools/library-sync` records the version and
+  commit whenever it is refreshed. The app packs those files into one
+  compressed file inside the program (D-147) and may download a newer
+  published version (D-148). Credit appears in Settings, About (title,
+  repository, licence, version and commit), at the foot of every
+  "From <Brand>" section on a thing's page, and per fact as its source
+  link and checked date. The library holds links to manufacturers' pages
+  and facts in its contributors' own words, never manuals (D-127); the
+  manuals and pages it links to remain their manufacturers' property, and
+  brand names are their owners' trademarks, used only to identify
+  products. CC BY 4.0 data shipped beside AGPL code is compatible: the
+  data keeps its own licence.
+
+No new Rust crates were added: `flate2` (MIT OR Apache-2.0, with
+`zlib-rs`, Zlib) was already in the build through `zip` and is now also a
+direct dependency of the core and of the API's build script; `ureq`
+(MIT OR Apache-2.0) was already in the Android app through sync and is
+now a direct dependency there for downloading manuals, and of
+`tools/library-sync`.

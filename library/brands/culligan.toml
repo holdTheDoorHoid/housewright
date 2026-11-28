@@ -1,0 +1,13 @@
+format = 1
+id = "culligan"
+name = "Culligan"
+aliases = ["CULLIGAN", "Culligan International"]
+domains = ["culligan.com"]
+website = "https://www.culligan.com/"
+support_url = "https://www.culligan.com/support"
+manual_search_url = "https://www.culligan.com/support/product-information/product-manuals"
+phone = "+1-877-431-9752"
+
+[[sources]]
+url = "https://www.culligan.com/"
+checked = 2026-11-28

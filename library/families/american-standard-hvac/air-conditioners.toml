@@ -1,0 +1,44 @@
+format = 1
+id = "air-conditioners"
+brand = "american-standard-hvac"
+name = "American Standard split-system air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+description = "Silver, Platinum and AccuComfort variable-speed central air conditioners."
+
+[[manuals]]
+kind = "product-page"
+title = "Air conditioners"
+url = "https://www.americanstandardair.com/products/air-conditioners/"
+source = "https://www.americanstandardair.com/products/air-conditioners/"
+
+[[manuals]]
+kind = "support-page"
+title = "Maintenance tips"
+url = "https://www.americanstandardair.com/resources/maintenance/"
+source = "https://www.americanstandardair.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "The range spans 13.4 to 23.6 SEER2 depending on the outdoor unit and the indoor coil it is paired with."
+source = "https://www.americanstandardair.com/products/air-conditioners/"
+
+[[facts]]
+topic = "sizing"
+text = "Sizes are 2 to 5 tons; the maker recommends a dealer load calculation before picking one."
+source = "https://www.americanstandardair.com/products/air-conditioners/"
+
+[[sources]]
+url = "https://www.americanstandardair.com/products/air-conditioners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/resources/maintenance/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/"
+checked = 2026-11-28

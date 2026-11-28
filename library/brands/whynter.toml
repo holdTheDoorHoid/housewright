@@ -1,0 +1,24 @@
+format = 1
+id = "whynter"
+name = "Whynter"
+aliases = ["WHYNTER", "Whynter LLC"]
+domains = ["whynter.com"]
+website = "https://www.whynter.com/"
+support_url = "https://whynter.com/product-support/"
+phone = "866-949-6837"
+note = "Model manuals are PDFs on whynter.com. Phone (printed as 866-Whynter) is from the home page; there is also a legacy product support page for older models."
+
+[[sources]]
+url = "https://whynter.com/wp-content/uploads/2020/11/2020-RPD-506EWP-Manual.pdf"
+title = "RPD-506EWP manual (HEAD-checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whynter.com/"
+title = "Whynter home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whynter.com/product-support/"
+title = "Whynter product support"
+checked = 2026-11-28

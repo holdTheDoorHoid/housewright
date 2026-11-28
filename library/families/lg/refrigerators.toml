@@ -1,0 +1,50 @@
+format = 1
+id = "refrigerators"
+brand = "lg"
+name = "LG refrigerators"
+category = "refrigerator"
+status = "current"
+description = "LG refrigerators with internal water filters; filter code depends on model."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+
+[[facts]]
+topic = "filter"
+text = "LG says to change the fridge water filter about every 6 months, or sooner if flow is slow or the replace-filter light comes on. After the swap, hold the filter button for 3 seconds until a chime sounds or the light goes out."
+source = "https://www.lg.com/us/support/help-library/lg-refrigerator-how-to-replace-the-water-filter-CT10000021-20155582266968"
+
+[[facts]]
+topic = "filter"
+text = "The water filter is a different part from the air filter. LG lists LT500P, LT600P, LT700P, LT800P and LT1000P internal filters plus the external FFS-002, so match the old cartridge or your manual."
+source = "https://www.lg.com/us/support/help-library/lg-refrigerator-how-to-replace-the-water-filter-CT10000021-20155582266968"
+
+[[consumables]]
+name = "LT1000P water filter"
+part = "LT1000P"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://www.lg.com/us/appliances-accessories/lg-lt1000pb-refrigerator-water-filter"
+note = "Listed as 6 months or 200 gallons."
+
+[[consumables]]
+name = "LT700P water filter"
+part = "LT700P"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://www.lg.com/us/support/help-library/lg-refrigerator-how-to-replace-the-water-filter-CT10000021-20155582266968"
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-refrigerator-how-to-replace-the-water-filter-CT10000021-20155582266968"
+title = "LG refrigerator: how to replace the water filter"
+checked = 2026-11-28
+[[sources]]
+url = "https://www.lg.com/us/appliances-accessories/lg-lt1000pb-refrigerator-water-filter"
+title = "LT1000P accessory page"
+checked = 2026-11-28

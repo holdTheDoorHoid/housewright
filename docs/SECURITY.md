@@ -544,9 +544,9 @@ Recalls are **not** proxied through the sync server: a proxy would see the
 household's address and timing at least, which D-16 allows only as a
 switched-on paid extra with a disclosure.
 
-The app's content security policy (Android, desktop) allows fetches to
+The app's content security policy (Android, desktop) allowed fetches to
 exactly one outside origin, `https://www.saferproducts.gov`, besides its
-own.
+own (the library hookup adds a second; see below).
 
 **Private contractor fields.** A contractor's rating, "would hire again"
 and private notes are ordinary fields of the contractor record, so they
@@ -565,6 +565,62 @@ registration pages and recall notices open outside the app: on Android
 through the reminders plugin's `open_link`, which accepts only `tel:`
 (dialer, nothing dialled), `mailto:` and `http(s):`; stored warranty
 registration links must be https with a real host.
+
+### Library hookup: library updates and manual downloads (D-148, D-151)
+
+**Library updates send nothing about the household.** "Get appliance
+library updates" is off by default; "Check now" (or, when switched on, a
+check at most weekly while the app is open) makes two plain GET requests,
+the same for every user:
+`https://raw.githubusercontent.com/holdTheDoorHoid/housewright-library/published/latest.json`
+and the bundle file it names in the same folder. No query string, no
+body, `credentials: 'omit'`, no referrer (`app/src/lib/library.ts`); the
+Playwright test intercepts every request and checks this, and that a make
+and model typed into the app appear in none of them. What GitHub (and
+anyone on the path, under TLS) can still learn: that this IP address uses
+Housewright, and when it checks. The User-Agent is the browser's or
+WebView's own.
+
+A downloaded bundle is untrusted until checked (`core::appliances::bundle`
+and `Library::load` in strict mode): the release note is at most 4 KB and
+must name a file `library-<version>.json.gz`; the file must be at most
+2 MB, unpack to at most 8 MB (the decompressor stops reading there), hold
+at most 5000 files of at most 64 KB each with only the paths a library may
+have, match the note's size and SHA-256, and pass every library rule:
+every link https with a plain host on the brand's own domains (or a
+government domain), no URLs or line breaks in text, every family's
+template and task overrides real. One problem refuses the whole update and
+nothing changes. It must also be newer than the version in use and be the
+version and commit the note names (no silent downgrade). Everything in it
+is shown as text (Svelte escapes it) and links open outside the app
+(D-145). What this does not protect against: someone who controls the
+library repository (or GitHub) can publish a well-formed bundle with
+misleading facts or links to pages on a brand's real domains, or change
+a brand's listed domains. Signing releases with a key kept offline is
+proposed (Q-24); until then automatic checks stay off by default.
+
+**Saving a manual downloads from the manufacturer only, and only on a
+tap.** On Android and desktop, "Save the official manual to this thing"
+fetches one of the thing's family's `manual-pdf` links. The core first
+checks the link is one of that family's (never a URL from anywhere
+else), then the native shell downloads it hop by hop: every hop and
+redirect must be https on the brand's own domains (at most 5 redirects;
+a redirect anywhere else is refused before it is followed), at most
+25 MB, and the answer must begin `%PDF` and not be labelled as another
+type. The request is the URL, `Accept: application/pdf` and the user agent
+"Housewright (saving an appliance manual)": no cookies, no account, nothing
+about the home. The manufacturer learns that this IP address fetched that
+manual. The PDF is stored like any file the person adds (an attachment of
+kind `manual`, with its source link), so it reaches only the household's
+own devices through end-to-end encrypted sync (D-14). PDFs are never
+opened inside the app (the phone's viewer opens them, D-79). On the web
+nothing is downloaded by the app: the manufacturer's page opens in a new
+tab, and the person can add the PDF they saved.
+
+The app's content security policy (Android, desktop) now allows fetches
+to two outside origins besides its own: `https://www.saferproducts.gov`
+(D-141) and `https://raw.githubusercontent.com` (library updates). Manual
+downloads do not go through the WebView at all.
 
 ### Known weaknesses and open questions
 

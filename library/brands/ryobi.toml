@@ -1,0 +1,15 @@
+format = 1
+id = "ryobi"
+name = "Ryobi"
+aliases = ["RYOBI", "Ryobi Tools", "Techtronic Industries"]
+parent = "Techtronic Industries"
+domains = ["ryobitools.com"]
+website = "https://www.ryobitools.com/"
+support_url = "https://www.ryobitools.com/support"
+phone = "1-800-525-2579"
+note = "Garage door openers are one product line among many power tools."
+
+[[sources]]
+url = "https://www.ryobitools.com/support"
+title = "Ryobi support"
+checked = 2026-11-28

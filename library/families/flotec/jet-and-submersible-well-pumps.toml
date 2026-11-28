@@ -1,0 +1,48 @@
+format = 1
+id = "jet-and-submersible-well-pumps"
+brand = "flotec"
+name = "Flotec jet and submersible well pumps"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["FP2###*", "FP3###*", "FP4###*"]
+model_examples = ["FP4032", "FP4112", "FP4205", "FP4432-01", "FP2222", "FP3342"]
+description = "Flotec shallow and deep well jet pumps and 4 inch submersibles, sold by Pentair."
+
+[[manuals]]
+kind = "product-page"
+title = "Flotec product range"
+url = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+source = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+
+[[manuals]]
+kind = "manual-search"
+title = "Pentair download center"
+url = "https://www.pentair.com/en-us/download-center.html"
+source = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+
+[[manuals]]
+kind = "support-page"
+title = "Residential product support"
+url = "https://www.pentair.com/en-us/education-support/residential.html"
+source = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+
+[[facts]]
+topic = "model"
+text = "Among the 4 inch submersibles, FP22xx models are 2-wire and FP32xx or FP33xx models are 3-wire. Shallow well, convertible and deep well jet pumps carry FP4xxx numbers and are listed under Jet and Sprinkler Pumps."
+source = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+
+[[sources]]
+url = "https://www.pentair.com/en-us/flow/flotec/flotec-products.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/download-center.html"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/education-support/residential.html"
+title = "Opened at review"
+checked = 2026-11-28

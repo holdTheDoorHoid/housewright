@@ -1,0 +1,13 @@
+format = 1
+id = "little-giant"
+name = "Little Giant"
+aliases = ["LITTLE GIANT", "Little Giant Pump Company"]
+parent = "Franklin Electric"
+domains = ["littlegiant.com"]
+website = "https://www.littlegiant.com/"
+support_url = "https://www.littlegiant.com/support/technical-support/"
+manual_search_url = "https://www.littlegiant.com/resources/resource-library/"
+
+[[sources]]
+url = "https://www.littlegiant.com/"
+checked = 2026-11-28

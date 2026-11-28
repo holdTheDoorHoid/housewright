@@ -1,0 +1,23 @@
+format = 1
+id = "state"
+name = "State Water Heaters"
+aliases = ["STATE", "State Industries", "STATE WATER HEATERS"]
+parent = "A. O. Smith"
+domains = ["statewaterheaters.com"]
+website = "https://www.statewaterheaters.com/"
+support_url = "https://www.statewaterheaters.com/support.html"
+manual_search_url = "https://www.statewaterheaters.com/find-documents-and-videos"
+phone = "877-552-0010"
+note = "Phone is listed on the customer support contact page (the same number A. O. Smith lists)."
+
+[[sources]]
+url = "https://www.statewaterheaters.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/support/contact-tech-support.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/support.html"
+checked = 2026-11-28

@@ -1,0 +1,13 @@
+format = 1
+id = "ispring"
+name = "iSpring"
+aliases = ["ISPRING", "iSpring Water Systems"]
+domains = ["ispringfilter.com"]
+website = "https://www.ispringfilter.com/"
+support_url = "https://www.ispringfilter.com/pages/contact"
+note = "Support links are from the site header."
+
+[[sources]]
+url = "https://www.ispringfilter.com/"
+title = "iSpring home page"
+checked = 2026-11-28

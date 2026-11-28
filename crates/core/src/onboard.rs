@@ -404,5 +404,6 @@ fn item_from_plan(
         sensitivity: Sensitivity::Normal,
         price: Default::default(),
         value: Default::default(),
+        family: None,
     })
 }

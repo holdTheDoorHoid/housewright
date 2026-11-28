@@ -15,6 +15,7 @@ assumption early. Status as of 2026-11-28.
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust, web (Playwright) and Android emulator touch checks; see below |
 | 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | built on branch `phase-9-contractors` (2026-11-28): contractors with private fields and job history, warranties and notices, on-device CPSC recall checks (web included: the API allows any origin), insurance inventory PDF and CSV; Rust, web (Playwright) and Android emulator checks; see below |
+| — | Library hookup | The appliance library (D-127 to D-129) in the app: shipped offline, optional updates, matching from make and model, the manufacturer's section on a thing, manual saving | built on branch `library-hookup` (2026-11-28): see "Library hookup notes" below |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
 | 11 | Hosted + extras | Paid hosting, opt-in disclosure extras (email/SMS reminders, recalls), AI label reading, share links for contractors and tenants | |
 | 12 | Landlord depth | Multi-property dashboards, tenant problem reports, per-property costs | |
@@ -491,3 +492,42 @@ counted, not added); the Android check of tapping a notice from another
 screen (the app was already on that thing); the notice receiver logs
 nothing when notifications are not allowed.
 
+## Library hookup notes
+
+Built on branch `library-hookup` (2026-11-28), D-147 to D-152.
+
+- **Shipped offline**: `library/` is the appliance library at commit
+  `d623c10` (version 2026.11.28: 94 brands, 198 families), copied and
+  checked by `tools/library-sync`, packed into the program as one 89 KB
+  gzip bundle and parsed in Rust (`core::appliances`) on first use.
+- **Updates** (Settings, Appliance library): off by default, "Check now",
+  weekly when switched on; two plain GETs of public files on GitHub's raw
+  host; size limits, SHA-256 against the release note, every library
+  check, newer only; kept on the device; "Go back to the version that came
+  with the app". Nothing is published yet (Q-23); signing is Q-24.
+- **Matching**: make (label spellings) and model (the library's patterns,
+  up to two OCR swaps, most specific pattern first), narrowed to the kind
+  of thing; suggestions with their reasons while adding a thing (typed or
+  from a label photo) and on any thing's page with a make but no family
+  (so Home Assistant imports get them too); the person confirms; "None of
+  these" is remembered until the make or model changes.
+- **On a thing**: "From <Brand>": official manual and support links (open
+  outside the app), maintenance facts in our own words with source links
+  and checked dates, parts and supplies as data (also in the API's
+  `supplies` command for the coming tools and supplies list), the warranty
+  summary, recalls the library lists, and, where the maker's advice for a
+  task differs, both side by side with "Use <Brand>'s" / "Keep the usual"
+  (recorded on the task; the task then says "manufacturer guidance
+  (<Brand>)" with a link).
+- **Manuals**: on Android and desktop, "Save the official manual to this
+  thing" downloads a family's PDF link from the manufacturer's own domains
+  (redirects checked hop by hop, 25 MB, must be a PDF) into the thing's
+  files; on the web the page opens in a new tab, with "Add the PDF you
+  saved" and a plain explanation.
+- **Credit**: Settings, About; every "From <Brand>" section; THIRD-PARTY.md.
+- Export version 8; no storage migration.
+
+Not built: whole new tasks a family might add (the library has none yet);
+a family on a Home Assistant import (the thing's page asks, Q-27);
+templates moving to the library repository (D-128, later); signed
+releases (Q-24).

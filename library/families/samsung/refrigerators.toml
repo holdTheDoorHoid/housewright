@@ -1,0 +1,44 @@
+format = 1
+id = "refrigerators"
+brand = "samsung"
+name = "Samsung refrigerators"
+category = "refrigerator"
+status = "current"
+description = "Samsung refrigerators including Family Hub; filter type depends on model."
+
+[[manuals]]
+kind = "support-page"
+title = "Replacing the water filter"
+url = "https://www.samsung.com/us/support/answer/ANS10005090/"
+source = "https://www.samsung.com/us/support/answer/ANS10005090/"
+
+[[facts]]
+topic = "filter"
+text = "Samsung says to change the water filter every 6 months. After fitting a new one, hold the filter reset button for 3 seconds; Family Hub models reset in the Fridge Manager app settings instead."
+source = "https://www.samsung.com/us/support/answer/ANS10005090/"
+
+[[consumables]]
+name = "HAF-QIN water filter"
+part = "HAF-QIN"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://www.samsung.com/us/support/answer/ANS10005090/"
+
+[[consumables]]
+name = "HAF-CIN water filter"
+part = "HAF-CIN"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://www.samsung.com/us/support/answer/ANS10005090/"
+
+[[consumables]]
+name = "HAFCU1 water filter"
+part = "HAFCU1"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://www.samsung.com/us/support/answer/ANS10005090/"
+
+[[sources]]
+url = "https://www.samsung.com/us/support/answer/ANS10005090/"
+title = "How to replace the water filter in a Samsung refrigerator"
+checked = 2026-11-28

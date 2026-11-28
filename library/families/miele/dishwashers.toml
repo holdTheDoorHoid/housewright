@@ -1,0 +1,23 @@
+format = 1
+id = "dishwashers"
+brand = "miele"
+name = "Miele dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Miele USA dishwashers; support articles are on mieleusa.com, which blocks automated fetching."
+unverified = true
+note = "mieleusa.com returned 403 to WebFetch and curl at review; the link below comes from search results and no facts are recorded"
+
+[[manuals]]
+kind = "support-page"
+title = "Dishwasher customer assistance"
+url = "https://www.mieleusa.com/support/customer-assistance/dishwashing-1316/all"
+source = "https://www.mieleusa.com/support/customer-assistance/dishwashing-1316/all"
+unverified = true
+note = "source blocked automated fetch at review; URL from search results"
+
+[[sources]]
+url = "https://www.mieleusa.com/support/customer-assistance/dishwashing-1316/all"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review; URL from search results"

@@ -1,0 +1,41 @@
+format = 1
+id = "heat-pumps"
+brand = "amana-hvac"
+name = "Amana split-system heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["AZV#S*", "ALZ@#@*"]
+model_examples = ["AZV6S", "AZV7S", "AZV9S", "ALZT7C", "ALZS5B", "ALZS4B", "ALZS4N"]
+description = "Amana S-Series inverter heat pumps, the ALZT7C two-stage model and the ALZS R-32 split-system heat pumps."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pumps"
+url = "https://www.amana-hac.com/products/heat-pumps"
+source = "https://www.amana-hac.com/products/heat-pumps"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature library"
+url = "https://www.amana-hac.com/resources/literature-library"
+source = "https://www.amana-hac.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "AZV6S and AZV7S inverter models reach up to 19 SEER2 and 8.8 HSPF2; the ALZT7C two-stage reaches up to 17.5 SEER2; the ALZS4B and ALZS4N entry models reach up to 15.2 SEER2."
+source = "https://www.amana-hac.com/products/heat-pumps"
+
+[[sources]]
+url = "https://www.amana-hac.com/products/heat-pumps"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/resources/literature-library"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/"
+checked = 2026-11-28

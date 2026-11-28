@@ -1,0 +1,44 @@
+format = 1
+id = "heat-pumps"
+brand = "american-standard-hvac"
+name = "American Standard split-system heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+description = "Variable-speed, multi-speed and single-stage heat pumps in 2 to 5 ton sizes, including cold-climate versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pumps"
+url = "https://www.americanstandardair.com/products/heat-pumps/"
+source = "https://www.americanstandardair.com/products/heat-pumps/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Owner's manuals and support"
+url = "https://www.americanstandardair.com/resources/owners-support/"
+source = "https://www.americanstandardair.com/"
+
+[[facts]]
+topic = "cold-weather"
+text = "Low-profile cold-climate models keep full heating capacity down to 5 F; the most efficient standard models hold full capacity to 27 F and 70 to 82 percent at 5 F."
+source = "https://www.americanstandardair.com/products/heat-pumps/"
+
+[[facts]]
+topic = "service-life"
+text = "Maker puts typical life of a properly installed heat pump at about 15 years, and pairs one with a gas furnace for a dual-fuel setup in cold areas."
+source = "https://www.americanstandardair.com/products/heat-pumps/"
+
+[[sources]]
+url = "https://www.americanstandardair.com/products/heat-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/resources/owners-support/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/"
+checked = 2026-11-28

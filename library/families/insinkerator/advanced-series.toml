@@ -1,0 +1,31 @@
+format = 1
+id = "advanced-series"
+brand = "insinkerator"
+name = "Advanced series garbage disposals"
+category = "garbage-disposal"
+status = "current"
+description = "Mid-range disposals with more motor power and sound insulation than the Badger line."
+
+[[manuals]]
+kind = "product-page"
+title = "Advanced series product page"
+url = "https://www.insinkerator.com/en-us/insinkerator-products/garbage-disposals/advanced-series"
+source = "https://www.insinkerator.com/en-us/support"
+
+[[manuals]]
+kind = "support-page"
+title = "Resetting a disposal"
+url = "https://www.insinkerator.com/en-us/support/resetting-a-garbage-disposal"
+source = "https://www.insinkerator.com/en-us/support"
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/insinkerator-products/garbage-disposals/advanced-series"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support/resetting-a-garbage-disposal"
+checked = 2026-11-28

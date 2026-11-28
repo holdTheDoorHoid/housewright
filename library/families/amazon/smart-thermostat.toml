@@ -1,0 +1,36 @@
+format = 1
+id = "smart-thermostat"
+brand = "amazon"
+name = "Amazon Smart Thermostat"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+description = "Amazon-branded low-voltage Wi-Fi thermostat set up through the Alexa app."
+
+[[manuals]]
+kind = "support-page"
+title = "Installation and wiring help"
+url = "https://www.amazon.com/gp/help/customer/display.html?nodeId=G5G4QAS54VUG26Z7"
+source = "https://www.amazon.com/gp/help/customer/display.html?nodeId=G5G4QAS54VUG26Z7"
+unverified = true
+note = "source blocked automated fetch at review (WebFetch 503, HEAD 405); URL from search results"
+
+[[manuals]]
+kind = "product-page"
+title = "Product page with compatibility checker"
+url = "https://www.amazon.com/Amazon-Smart-Thermostat/dp/B08J4C8871"
+source = "https://www.amazon.com/Amazon-Smart-Thermostat/dp/B08J4C8871"
+unverified = true
+note = "source blocked automated fetch at review (WebFetch 503, HEAD 405); URL from search results"
+
+[[sources]]
+url = "https://www.amazon.com/gp/help/customer/display.html?nodeId=G5G4QAS54VUG26Z7"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review (WebFetch 503, HEAD 405)"
+
+[[sources]]
+url = "https://www.amazon.com/Amazon-Smart-Thermostat/dp/B08J4C8871"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review (WebFetch 503, HEAD 405)"

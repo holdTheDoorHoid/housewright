@@ -1,0 +1,35 @@
+format = 1
+id = "well-pumps"
+brand = "wayne"
+name = "Wayne well pumps (shallow, convertible, precharged tank systems)"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+model_examples = ["SWS50-8.5FX"]
+description = "Wayne jet-style shallow and convertible well pumps plus tank-system sets."
+
+[[manuals]]
+kind = "product-page"
+title = "Well pumps"
+url = "https://www.waynepumps.com/product-category/well-pumps/"
+source = "https://www.waynepumps.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Operating manuals"
+url = "https://www.waynepumps.com/wayne-operating-manuals/"
+source = "https://www.waynepumps.com/"
+
+[[sources]]
+url = "https://www.waynepumps.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.waynepumps.com/product-category/well-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.waynepumps.com/wayne-operating-manuals/"
+checked = 2026-11-28
+

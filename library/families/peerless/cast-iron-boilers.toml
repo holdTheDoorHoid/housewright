@@ -1,0 +1,50 @@
+format = 1
+id = "cast-iron-boilers"
+brand = "peerless"
+name = "Peerless cast iron residential boilers (MI, 63, PSCII, WBV, EC)"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "propane", "oil"]
+status = "current"
+description = "Peerless cast iron gas boilers (Series MI-x, MI-e, 63-x, 63, PSCII) and oil boilers (WBV, EC, WV-DV)."
+
+[[manuals]]
+kind = "product-page"
+title = "Residential boiler list"
+url = "https://www.peerlessboilers.com/product_category/residential/"
+source = "https://www.peerlessboilers.com/product_category/residential/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature library"
+url = "https://www.peerlessboilers.com/document_category/literature/"
+source = "https://www.peerlessboilers.com/product_category/residential/"
+
+[[manuals]]
+kind = "support-page"
+title = "Residential warranty page"
+url = "https://www.peerlessboilers.com/consumers/warranty/"
+source = "https://www.peerlessboilers.com/product_category/residential/"
+
+[[facts]]
+topic = "specs"
+text = "Gas series MI-x and MI-e run 70 to 280 MBH input; the oil Series WBV runs 84 to 273 MBH. Each series has its own product page with specs and documents."
+source = "https://www.peerlessboilers.com/product_category/residential/"
+
+[[facts]]
+topic = "warranty"
+text = "Peerless warranties are full-cost, not reduced over time, and 5 or 10 year extended plans are sold through installers and run by a third party."
+source = "https://www.peerlessboilers.com/consumers/warranty/"
+
+[[sources]]
+url = "https://www.peerlessboilers.com/product_category/residential/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.peerlessboilers.com/consumers/warranty/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.peerlessboilers.com/document_category/literature/"
+title = "Opened at review"
+checked = 2026-11-28

@@ -1,0 +1,15 @@
+format = 1
+id = "electrolux"
+name = "Electrolux"
+aliases = ["ELECTROLUX", "Electrolux Home Products"]
+parent = "Electrolux Group"
+domains = ["electrolux.com", "electroluxappliances.com"]
+website = "https://www.electrolux.com/en/"
+support_url = "https://www.electrolux.com/en/contact-us"
+manual_search_url = "https://owner.electrolux.com/support-articles"
+note = "electroluxappliances.com redirects to electrolux.com/en; US owner support articles live on owner.electrolux.com."
+
+[[sources]]
+url = "https://owner.electrolux.com/support-articles"
+title = "Owner Center resource library"
+checked = 2026-11-28

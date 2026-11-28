@@ -1,0 +1,54 @@
+format = 1
+id = "ranges"
+brand = "frigidaire"
+name = "Frigidaire ranges"
+category = "range"
+fuel = ["gas", "electric"]
+status = "current"
+description = "Frigidaire and Frigidaire Gallery freestanding gas and electric ranges."
+
+[[manuals]]
+kind = "support-page"
+title = "Self-clean help article"
+url = "https://www.frigidaire.com/en/owner-center/article/1847354-range-how-do-i-set-my-oven-or-range-to-self-clean-"
+source = "https://www.frigidaire.com/en/owner-center/article/1847354-range-how-do-i-set-my-oven-or-range-to-self-clean-"
+unverified = true
+note = "source blocked automated fetch at review (frigidaire.com timed out on WebFetch and curl); URL from search results."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support page for FFGH3054UB gas range"
+url = "https://support.frigidaire.com/Owner-Center/Product-Support/FFGH3054UB"
+source = "https://support.frigidaire.com/Owner-Center/Product-Support/FFGH3054UB"
+unverified = true
+note = "URL from search results; at review it redirected to a malformed frigidaire.com address and the target timed out."
+
+[[facts]]
+topic = "self-clean"
+text = "Take out the oven racks, choose Clean on the control, then pick a time or soil level; about 3 hours or the medium setting suits typical soil. The door stays locked while cooling and unlocks itself when cool enough."
+source = "https://www.frigidaire.com/en/owner-center/article/1847354-range-how-do-i-set-my-oven-or-range-to-self-clean-"
+unverified = true
+note = "source blocked automated fetch at review; wording came from a search result summary. Not every model has self-clean."
+
+[[facts]]
+topic = "gas smell"
+text = "If you smell gas or hear it leaking, CPSC says to get out of the home at once without touching lights, phones or any other electronics on the way, then call the gas utility or local gas authority from outside."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+note = "General CPSC advice from its 2026-03-16 release, not Frigidaire-specific; no Frigidaire page could be opened."
+
+[[sources]]
+url = "https://www.frigidaire.com/en/owner-center/article/1847354-range-how-do-i-set-my-oven-or-range-to-self-clean-"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review; URL from search results."
+
+[[sources]]
+url = "https://support.frigidaire.com/Owner-Center/Product-Support/FFGH3054UB"
+checked = 2026-11-28
+unverified = true
+note = "URL from search results; redirect target timed out at review."
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+title = "CPSC winter weather safety tips (gas leak advice)"
+checked = 2026-11-28

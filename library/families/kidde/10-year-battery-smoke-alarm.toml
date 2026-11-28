@@ -1,0 +1,52 @@
+format = 1
+id = "10-year-battery-smoke-alarm"
+brand = "kidde"
+name = "Kidde 10-year battery smoke alarm (20SD10)"
+category = "smoke-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["20SD10"]
+model_examples = ["20SD10"]
+description = "Battery-powered smoke alarm with a sealed battery meant to last as long as the alarm."
+
+[[manuals]]
+kind = "product-page"
+title = "Product page for the 20SD10"
+url = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "English user guide (linked from the product page)"
+url = "https://brand.kidde.com/m/46fc0720d3d7e5d4/original/UG_DETECT_5in_DC_EN.pdf"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[[facts]]
+topic = "replacement"
+text = "A decade after it is first switched on, the 20SD10 starts a reminder beep; at that point the whole alarm is swapped for a new one, since the battery cannot be changed."
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[[facts]]
+topic = "battery"
+text = "Its built-in battery runs the alarm for 10 years with no changes, and Kidde advertises it as free of low-battery chirps."
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[[facts]]
+topic = "testing"
+text = "Kidde says internal components keep the alarm working as expected, but the product page gives no test schedule; test it with the button as the user guide directs."
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[warranty]
+summary = "Ten-year limited warranty; the page notes it is not a promise about battery performance."
+length = "10 years"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+
+[[sources]]
+url = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-10-year-battery-powered"
+title = "Kidde 10-year battery smoke alarm product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://brand.kidde.com/m/46fc0720d3d7e5d4/original/UG_DETECT_5in_DC_EN.pdf"
+title = "User guide (PDF, not fetched)"
+checked = 2026-11-28

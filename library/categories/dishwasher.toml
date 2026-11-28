@@ -1,0 +1,7 @@
+format = 1
+id = "dishwasher"
+name = "Dishwashers"
+template = "dishwasher"
+life_safety = false
+brands = ["whirlpool", "ge-appliances", "bosch", "samsung", "lg", "frigidaire", "kitchenaid", "maytag", "miele"]
+why_brands = "Common US retail brands, chosen without a public count; each publishes filter-cleaning guidance on its own support site."

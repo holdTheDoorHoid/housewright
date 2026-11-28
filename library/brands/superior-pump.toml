@@ -1,0 +1,14 @@
+format = 1
+id = "superior-pump"
+name = "Superior Pump"
+aliases = ["SUPERIOR PUMP", "Superior Pump Co."]
+parent = "Pedrollo Group USA"
+domains = ["superiorpump.com"]
+website = "https://www.superiorpump.com/"
+support_url = "https://www.superiorpump.com/en/about-us#contact"
+manual_search_url = "https://www.superiorpump.com/en/resources"
+phone = "+1-877-733-7655"
+
+[[sources]]
+url = "https://www.superiorpump.com/"
+checked = 2026-11-28

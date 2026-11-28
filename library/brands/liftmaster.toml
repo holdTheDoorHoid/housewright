@@ -1,0 +1,14 @@
+format = 1
+id = "liftmaster"
+name = "LiftMaster"
+aliases = ["LIFTMASTER", "Lift-Master", "LiftMaster Professional"]
+parent = "The Chamberlain Group"
+domains = ["liftmaster.com"]
+website = "https://www.liftmaster.com/"
+support_url = "https://support.partner.liftmaster.com/"
+note = "Sister brand of Chamberlain. The support site failed TLS certificate checks at review (2026-11-28)."
+
+[[sources]]
+url = "https://www.liftmaster.com/for-homes/garage-door-openers"
+title = "LiftMaster residential garage door openers"
+checked = 2026-11-28

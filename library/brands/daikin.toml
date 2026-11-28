@@ -1,0 +1,15 @@
+format = 1
+id = "daikin"
+name = "Daikin"
+aliases = ["DAIKIN", "Daikin Comfort", "Daikin Comfort Technologies"]
+parent = "Daikin Industries"
+domains = ["daikincomfort.com"]
+website = "https://daikincomfort.com/"
+support_url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+manual_search_url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+phone = "+1-866-588-6454"
+note = "Phone is the homeowner support line on the Daikin Comfort products page. Sister brand of Goodman and Amana."
+
+[[sources]]
+url = "https://daikincomfort.com/products"
+checked = 2026-11-28

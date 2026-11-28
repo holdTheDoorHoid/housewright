@@ -1,0 +1,322 @@
+# Generic template ids and keys from the Housewright app
+# (holdTheDoorHoid/housewright, templates/ at commit 01d8b19).
+# Only ids, keys and each task's schedule summary are mirrored here, so
+# `extends`, task overrides and redundant overrides can be checked without the
+# app. Update this file when the app's templates change.
+format = 1
+app_commit = "01d8b19"
+
+[[template]]
+id = "attic"
+category = "structure"
+tasks = ["inspect", "after_storm"]
+fields = []
+schedules = { inspect = "seasonal autumn", after_storm = "seasonal spring" }
+
+[[template]]
+id = "boiler"
+category = "heating_cooling"
+tasks = ["service_gas", "service_oil", "service_electric", "pressure", "bleed_radiators", "leaks"]
+fields = ["fuel", "system"]
+schedules = { service_gas = "seasonal autumn", service_oil = "seasonal autumn", service_electric = "floating 2 years", pressure = "fixed 1 month", bleed_radiators = "seasonal autumn", leaks = "fixed 3 months" }
+
+[[template]]
+id = "central-ac"
+category = "heating_cooling"
+tasks = ["condenser", "condensate", "service"]
+fields = ["installed_on"]
+schedules = { condenser = "seasonal spring", condensate = "seasonal summer", service = "seasonal spring" }
+
+[[template]]
+id = "clothes-dryer"
+category = "appliances"
+tasks = ["lint_screen", "vent_clean", "vent_hood"]
+fields = ["fuel", "vent_length"]
+schedules = { lint_screen = "fixed 3 months", vent_clean = "fixed 1 year", vent_hood = "seasonal before_first_frost" }
+
+[[template]]
+id = "co-alarm"
+category = "safety"
+tasks = ["test", "battery", "replace"]
+fields = ["power", "end_of_life"]
+schedules = { test = "fixed 1 month", battery = "fixed 1 year", replace = "floating 7 years" }
+
+[[template]]
+id = "crawlspace"
+category = "structure"
+tasks = ["inspect", "vents"]
+fields = ["vented"]
+schedules = { inspect = "seasonal spring", vents = "seasonal autumn" }
+
+[[template]]
+id = "deck"
+category = "exterior"
+tasks = ["inspect", "reseal", "clean_composite"]
+fields = ["material", "last_sealed"]
+schedules = { inspect = "seasonal spring", reseal = "floating 2 years", clean_composite = "seasonal spring" }
+
+[[template]]
+id = "dehumidifier"
+category = "heating_cooling"
+tasks = ["filter", "bucket", "coils"]
+fields = ["drain"]
+schedules = { filter = "fixed 1 month", bucket = "fixed 1 month", coils = "seasonal spring" }
+
+[[template]]
+id = "dishwasher"
+category = "appliances"
+tasks = ["filter", "spray_arms", "leaks"]
+fields = []
+schedules = { filter = "fixed 1 month", spray_arms = "fixed 3 months", leaks = "fixed 1 year" }
+
+[[template]]
+id = "electrical-panel"
+category = "electrical"
+tasks = ["gfci_test", "afci_test", "panel_clear", "inspection"]
+fields = ["location", "has_afci"]
+schedules = { gfci_test = "fixed 1 month", afci_test = "fixed 1 month", panel_clear = "fixed 1 year", inspection = "floating 10 years" }
+
+[[template]]
+id = "exterior-siding"
+category = "exterior"
+tasks = ["spring_walk", "autumn_walk", "repaint"]
+fields = ["material", "last_painted"]
+schedules = { spring_walk = "seasonal spring", autumn_walk = "seasonal autumn", repaint = "floating 7 years" }
+
+[[template]]
+id = "fire-extinguisher"
+category = "safety"
+tasks = ["check", "know", "replace"]
+fields = ["location", "manufactured"]
+schedules = { check = "fixed 1 month", know = "fixed 1 year", replace = "floating 10 years" }
+
+[[template]]
+id = "fireplace"
+category = "heating_cooling"
+tasks = ["inspection", "preseason", "ashes"]
+fields = ["last_swept"]
+schedules = { inspection = "seasonal summer", preseason = "seasonal autumn", ashes = "fixed 1 month" }
+
+[[template]]
+id = "furnace"
+category = "heating_cooling"
+tasks = ["service_gas", "service_oil", "service_electric", "autumn_startup", "vent_check_gas", "vent_check_oil", "oil_tank"]
+fields = ["fuel", "installed_on"]
+schedules = { service_gas = "seasonal autumn", service_oil = "seasonal autumn", service_electric = "floating 2 years", autumn_startup = "seasonal autumn", vent_check_gas = "fixed 6 months", vent_check_oil = "fixed 6 months", oil_tank = "fixed 6 months" }
+
+[[template]]
+id = "garage-door-opener"
+category = "exterior"
+tasks = ["auto_reverse", "lubricate", "springs"]
+fields = []
+schedules = { auto_reverse = "fixed 1 month", lubricate = "fixed 6 months", springs = "floating 2 years" }
+
+[[template]]
+id = "garbage-disposal"
+category = "appliances"
+tasks = ["clean", "habits"]
+fields = []
+schedules = { clean = "fixed 1 month", habits = "fixed 1 year" }
+
+[[template]]
+id = "generator"
+category = "electrical"
+tasks = ["exercise_standby", "service_standby", "portable_setup"]
+fields = ["type", "fuel"]
+schedules = { exercise_standby = "fixed 1 month", service_standby = "fixed 1 year", portable_setup = "fixed 3 months" }
+
+[[template]]
+id = "gutters"
+category = "exterior"
+tasks = ["clean_autumn", "check_spring"]
+fields = ["has_guards", "storeys"]
+schedules = { clean_autumn = "seasonal autumn", check_spring = "seasonal spring" }
+
+[[template]]
+id = "heat-pump"
+category = "heating_cooling"
+tasks = ["outdoor_clear", "service", "condensate"]
+fields = ["installed_on"]
+schedules = { outdoor_clear = "fixed 3 months", service = "fixed 1 year", condensate = "fixed 6 months" }
+
+[[template]]
+id = "heat-pump-water-heater"
+category = "plumbing"
+tasks = ["air_filter", "condensate", "relief_valve", "flush"]
+fields = ["capacity"]
+schedules = { air_filter = "fixed 3 months", condensate = "fixed 6 months", relief_valve = "fixed 1 year", flush = "fixed 1 year" }
+
+[[template]]
+id = "hose-bibs"
+category = "exterior"
+tasks = ["winterise", "spring_on"]
+fields = ["frost_free", "shutoff_location"]
+schedules = { winterise = "seasonal before_first_frost", spring_on = "seasonal after_last_frost" }
+
+[[template]]
+id = "hvac-air-filter"
+category = "heating_cooling"
+tasks = ["check_replace"]
+fields = ["filter_size", "rating", "location"]
+schedules = { check_replace = "floating 3 months" }
+
+[[template]]
+id = "irrigation"
+category = "yard"
+tasks = ["spring_start", "winterise", "backflow"]
+fields = ["shutoff_location"]
+schedules = { spring_start = "seasonal after_last_frost", winterise = "seasonal before_first_frost", backflow = "seasonal spring" }
+
+[[template]]
+id = "lawn-mower"
+category = "yard"
+tasks = ["blade", "oil", "clean_store"]
+fields = ["power"]
+schedules = { blade = "seasonal spring", oil = "seasonal spring", clean_store = "seasonal before_first_frost" }
+
+[[template]]
+id = "main-water-shutoff"
+category = "plumbing"
+tasks = ["exercise", "label"]
+fields = ["location", "valve_type"]
+schedules = { exercise = "fixed 1 year", label = "fixed 1 year" }
+
+[[template]]
+id = "pool"
+category = "yard"
+tasks = ["water", "filter", "barriers", "season"]
+fields = ["type"]
+schedules = { water = "fixed 1 week", filter = "fixed 1 month", barriers = "fixed 1 month", season = "seasonal before_first_frost" }
+
+[[template]]
+id = "range-hood"
+category = "appliances"
+tasks = ["grease_filter", "charcoal", "fan_light"]
+fields = ["vent_type"]
+schedules = { grease_filter = "fixed 1 month", charcoal = "floating 6 months", fan_light = "fixed 1 year" }
+
+[[template]]
+id = "refrigerator"
+category = "appliances"
+tasks = ["coils", "water_filter", "door_seals"]
+fields = ["water_filter", "filter_part", "coil_location"]
+schedules = { coils = "fixed 1 year", water_filter = "floating 6 months", door_seals = "fixed 6 months" }
+
+[[template]]
+id = "roof"
+category = "structure"
+tasks = ["spring_look", "autumn_look", "inspection"]
+fields = ["material", "installed_on"]
+schedules = { spring_look = "seasonal spring", autumn_look = "seasonal autumn", inspection = "floating 3 years" }
+
+[[template]]
+id = "septic-system"
+category = "plumbing"
+tasks = ["inspect_pump", "drain_field", "habits"]
+fields = ["tank_location", "last_pumped"]
+schedules = { inspect_pump = "floating 3 years", drain_field = "seasonal spring", habits = "fixed 1 year" }
+
+[[template]]
+id = "smoke-alarm"
+category = "safety"
+tasks = ["test", "battery", "replace", "clean"]
+fields = ["power", "manufactured", "battery_type"]
+schedules = { test = "fixed 1 month", battery = "fixed 1 year", replace = "floating 10 years", clean = "fixed 6 months" }
+
+[[template]]
+id = "solar-panels"
+category = "electrical"
+tasks = ["production", "look", "inspection"]
+fields = ["installer"]
+schedules = { production = "fixed 1 month", look = "fixed 6 months", inspection = "floating 5 years" }
+
+[[template]]
+id = "sump-pump"
+category = "plumbing"
+tasks = ["test", "spring_check", "backup_battery"]
+fields = ["battery_backup", "installed_on"]
+schedules = { test = "fixed 3 months", spring_check = "seasonal spring", backup_battery = "fixed 6 months" }
+
+[[template]]
+id = "tankless-water-heater"
+category = "plumbing"
+tasks = ["descale", "inlet_screen", "vent_service"]
+fields = ["fuel", "hard_water"]
+schedules = { descale = "fixed 1 year", inlet_screen = "fixed 6 months", vent_service = "fixed 1 year" }
+
+[[template]]
+id = "toilets"
+category = "plumbing"
+tasks = ["dye_test", "valves", "base"]
+fields = ["count"]
+schedules = { dye_test = "fixed 6 months", valves = "fixed 1 year", base = "fixed 1 year" }
+
+[[template]]
+id = "tub-shower-caulk"
+category = "plumbing"
+tasks = ["inspect", "recaulk"]
+fields = []
+schedules = { inspect = "fixed 1 year", recaulk = "floating 3 years" }
+
+[[template]]
+id = "under-sink-plumbing"
+category = "plumbing"
+tasks = ["look", "supply_lines"]
+fields = []
+schedules = { look = "fixed 6 months", supply_lines = "fixed 1 year" }
+
+[[template]]
+id = "washing-machine"
+category = "appliances"
+tasks = ["hoses_inspect", "hoses_replace", "clean_drum"]
+fields = ["hose_type", "hoses_installed"]
+schedules = { hoses_inspect = "fixed 6 months", hoses_replace = "floating 5 years", clean_drum = "usage 2 months" }
+
+[[template]]
+id = "water-heater"
+category = "plumbing"
+tasks = ["flush", "relief_valve", "anode", "flue"]
+fields = ["fuel", "capacity", "anode_checked"]
+schedules = { flush = "fixed 1 year", relief_valve = "fixed 1 year", anode = "fixed 3 years", flue = "fixed 1 year" }
+
+[[template]]
+id = "water-softener"
+category = "plumbing"
+tasks = ["salt", "brine_tank"]
+fields = ["salt_type"]
+schedules = { salt = "fixed 1 month", brine_tank = "fixed 1 year" }
+
+[[template]]
+id = "well-pump"
+category = "plumbing"
+tasks = ["water_test", "pressure_tank", "wellhead", "inspection"]
+fields = ["last_tested", "pressure_range"]
+schedules = { water_test = "seasonal spring", pressure_tank = "fixed 3 months", wellhead = "seasonal autumn", inspection = "floating 5 years" }
+
+[[template]]
+id = "whole-house-water-filter"
+category = "plumbing"
+tasks = ["cartridge", "o_ring"]
+fields = ["cartridge"]
+schedules = { cartridge = "floating 6 months", o_ring = "fixed 1 year" }
+
+[[template]]
+id = "window-ac"
+category = "heating_cooling"
+tasks = ["filter", "coils", "secure", "winter"]
+fields = ["location"]
+schedules = { filter = "months_of_year", coils = "seasonal spring", secure = "seasonal spring", winter = "seasonal before_first_frost" }
+
+[[template]]
+id = "windows-doors"
+category = "exterior"
+tasks = ["weatherstrip", "locks", "egress"]
+fields = []
+schedules = { weatherstrip = "seasonal autumn", locks = "fixed 1 year", egress = "fixed 1 year" }
+
+[[template]]
+id = "wood-stove"
+category = "heating_cooling"
+tasks = ["inspection", "preseason", "ashes"]
+fields = ["last_swept"]
+schedules = { inspection = "seasonal summer", preseason = "seasonal autumn", ashes = "fixed 2 weeks" }

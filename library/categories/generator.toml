@@ -1,0 +1,8 @@
+format = 1
+id = "generator"
+name = "Generators"
+template = "generator"
+life_safety = true
+brands = ["generac", "champion", "honda", "kohler-energy", "briggs-and-stratton", "westinghouse", "duromax"]
+why_brands = "Common US retail brands covering both home standby and portable generators; no public ranking was used. Carbon monoxide guidance from CPSC applies to every portable unit."
+why_brands_source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"

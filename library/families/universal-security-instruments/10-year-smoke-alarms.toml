@@ -1,0 +1,56 @@
+format = 1
+id = "10-year-smoke-alarms"
+brand = "universal-security-instruments"
+name = "USI 10-year battery smoke alarms"
+category = "smoke-alarm"
+fuel = ["battery", "hardwired"]
+status = "current"
+model_patterns = ["USI/SM/10YR", "USI/SM/HW10YR/P"]
+model_examples = ["USI/SM/10YR", "USI/SM/HW10YR/P"]
+description = "USI smoke and fire alarms sold with ten-year sealed batteries, in battery-only and hardwired-with-backup versions."
+
+[[manuals]]
+kind = "product-page"
+title = "10-Year Battery Smoke and Fire Alarm (USI/SM/10YR)"
+url = "https://www.universalsecurity.com/products/10-year-battery-smoke-and-fire-alarm-usi-sm-10yr"
+source = "https://www.universalsecurity.com/products/10-year-battery-smoke-and-fire-alarm-usi-sm-10yr"
+
+[[manuals]]
+kind = "product-page"
+title = "Hardwire smoke alarm with 10-year battery backup"
+url = "https://www.universalsecurity.com/products/hardwire-smoke-and-fire-alarm-with-10-year-battery-backup-usi-sm-hw10yr-p"
+source = "https://www.universalsecurity.com/products/hardwire-smoke-and-fire-alarm-with-10-year-battery-backup-usi-sm-hw10yr-p"
+
+[[facts]]
+topic = "end of life"
+text = "On USI alarms, a repeating double chirp once a minute usually marks end of life at around 10 years; changing the battery will not stop it, so replace the alarm."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+
+[[facts]]
+topic = "low battery"
+text = "A lone chirp every 30 to 60 seconds is a low-battery warning on models with a replaceable battery; fit a fresh alkaline 9V or whatever type the label on the back names. The sealed 10-year models instead give one end-of-life alert."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+
+[[facts]]
+topic = "replacement"
+text = "Replace each smoke alarm 10 years after the manufacture date on the back, and sooner if it has been flooded, exposed to strong heat from a fire, cracked, or keeps chirping after a battery change while under 10 years old."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+
+[[facts]]
+topic = "testing"
+text = "Press the test button on every smoke alarm once a month. Alarms with replaceable batteries need new ones yearly; the 10-year models' test/silence button also hushes a false alarm."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+
+[[sources]]
+url = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.universalsecurity.com/products/10-year-battery-smoke-and-fire-alarm-usi-sm-10yr"
+title = "USI/SM/10YR product page (read through the store's product data; the page rate-limits automated fetch)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.universalsecurity.com/products/hardwire-smoke-and-fire-alarm-with-10-year-battery-backup-usi-sm-hw10yr-p"
+title = "USI/SM/HW10YR/P product page (read through the store's product data)"
+checked = 2026-11-28

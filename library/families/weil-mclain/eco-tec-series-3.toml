@@ -1,0 +1,57 @@
+format = 1
+id = "eco-tec-series-3"
+brand = "weil-mclain"
+name = "ECO Tec Series 3 condensing gas boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+model_examples = ["ECO Tec 80-H", "ECO Tec 110-H"]
+description = "Wall-hung condensing boilers in heat-only and combi versions, all rated 95 percent AFUE."
+
+[[manuals]]
+kind = "product-page"
+title = "ECO Tec Series 3 product page with manuals"
+url = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+source = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "ECO Tec Series 3 User Manual"
+url = "https://www.weil-mclain.com/wp-content/uploads/ECO-Tec-Series-3-Users-Manual-0925.pdf"
+source = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+
+[[facts]]
+topic = "sizes"
+text = "Heat-only sizes are 80, 110, 150 and 199 MBH; combi sizes are 110, 150 and 199 MBH. The combi version supplies hot tap water up to 5.4 GPM."
+source = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+
+[[facts]]
+topic = "design"
+text = "Stainless steel firetube heat exchanger, built-in ECM circulator and a colour touchscreen control. A maintenance kit flyer is listed among its downloads."
+source = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+
+[[facts]]
+topic = "safety"
+text = "Weil-McLain does not service boilers itself; it expects a local heating professional to fit, look after and repair them and recommends one for any parts or maintenance work. Book a technician for the yearly service."
+source = "https://www.weil-mclain.com/faq/"
+
+[warranty]
+summary = "Registering the boiler within 90 days of installation adds a 5-year extended warranty on service parts; residential installs only."
+length = "5 years"
+source = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+
+[[sources]]
+url = "https://www.weil-mclain.com/products/eco-tec-boiler-3/"
+title = "ECO Tec Series 3"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.weil-mclain.com/wp-content/uploads/ECO-Tec-Series-3-Users-Manual-0925.pdf"
+title = "Linked from product page (HEAD checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.weil-mclain.com/faq/"
+title = "Weil-McLain FAQ"
+checked = 2026-11-28

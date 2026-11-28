@@ -1,0 +1,28 @@
+format = 1
+id = "dishwashers"
+brand = "samsung"
+name = "Samsung dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Samsung dishwashers with either a twist-lock fine filter or a handle-lock micro filter, depending on model."
+
+[[manuals]]
+kind = "support-page"
+title = "Routine and deep clean your Samsung dishwasher"
+url = "https://www.samsung.com/us/support/answer/ANS10002330/"
+source = "https://www.samsung.com/us/support/answer/ANS10002330/"
+
+[[facts]]
+topic = "filter"
+text = "Samsung US gives no fixed filter schedule: clean the filter and drain area whenever debris builds up. Scraping the largest scraps off plates before loading means it needs doing less often."
+source = "https://www.samsung.com/us/support/answer/ANS10002330/"
+
+[[facts]]
+topic = "filter"
+text = "Twist-lock filters come out by turning them counterclockwise and lifting; rinse under the tap and turn clockwise to lock. Handle-lock models: take out the lower rack, unlock the handle, lift out the cylinder filter, rinse and dry both parts, then relock."
+source = "https://www.samsung.com/us/support/answer/ANS10002330/"
+
+[[sources]]
+url = "https://www.samsung.com/us/support/answer/ANS10002330/"
+title = "Routine and deep clean your Samsung dishwasher (Samsung US)"
+checked = 2026-11-28

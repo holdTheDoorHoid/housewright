@@ -1,0 +1,7 @@
+format = 1
+id = "heat-pump"
+name = "Heat pumps"
+template = "heat-pump"
+life_safety = false
+brands = ["carrier", "trane", "lennox", "goodman", "rheem", "bryant", "daikin", "mitsubishi-electric", "american-standard-hvac", "ruud", "amana-hvac", "york"]
+why_brands = "Common US dealer-installed split-system brands, plus Mitsubishi Electric for ductless units; no public per-brand sales count was found, so the list is our own judgment."

@@ -1,0 +1,20 @@
+format = 1
+id = "utica"
+name = "Utica Boilers"
+aliases = ["UTICA", "Utica Boilers", "Utica Heating", "ECR International"]
+parent = "ECR International"
+domains = ["uticaboilers.com", "ecrinternational.com"]
+website = "https://uticaboilers.com/"
+support_url = "https://uticaboilers.com/contact-us/"
+manual_search_url = "https://uticaboilers.com/owner-resources/documents/"
+phone = "866-847-6656"
+note = "Phone is the homeowner assistance line on the contact page; 800-325-5479 is for installing contractors."
+
+[[sources]]
+url = "https://uticaboilers.com/products/utica-heating/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://uticaboilers.com/contact-us/"
+title = "Contact page with phone numbers"
+checked = 2026-11-28

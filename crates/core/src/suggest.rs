@@ -754,6 +754,7 @@ mod tests {
             why: Some(Why {
                 text: "because".into(),
                 source: "test".into(),
+                link: None,
             }),
             minutes: None,
             completion_fields: vec![],
@@ -761,6 +762,7 @@ mod tests {
             active: false,
             paused: false,
             not_applicable: false,
+            guidance: None,
         }
     }
 

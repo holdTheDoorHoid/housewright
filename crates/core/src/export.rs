@@ -25,7 +25,7 @@ pub const EXPORT_FORMAT: &str = "housewright-export";
 /// `register_url`, contractor `company`, `website`, `service_area`,
 /// `would_hire_again` and `private_notes`, and completion detail
 /// `contractor`. Older files import unchanged.
-pub const EXPORT_VERSION: u32 = 7;
+pub const EXPORT_VERSION: u32 = 8;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Export {

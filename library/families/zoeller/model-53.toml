@@ -1,0 +1,57 @@
+format = 1
+id = "model-53"
+brand = "zoeller"
+name = "Model 53 sump pump"
+category = "sump-pump"
+status = "current"
+model_examples = ["M53", "N53", "BN53", "M53-0001"]
+description = "Zoeller sump pump in the 50 series, made in automatic and non-automatic versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Model 53 product page"
+url = "https://zoellerpumps.com/product/model-53-sump-pump/"
+source = "https://zoellerpumps.com/product/model-53-sump-pump/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Installation instructions and 3-year warranty (FM2676)"
+url = "https://zoellerpumps.com/wp-content/uploads/sites/3/2026/07/fm2676-3-Year-Warranty-Installation-Instructions.pdf"
+source = "https://zoellerpumps.com/product/model-53-sump-pump/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Parts list (FM0472)"
+url = "https://zoellerpumps.com/wp-content/uploads/sites/3/2023/10/fm0472.pdf"
+source = "https://zoellerpumps.com/product/model-53-sump-pump/"
+
+[[manuals]]
+kind = "support-page"
+title = "Battery backup lineup"
+url = "https://zoellerpumps.com/lineup-of-battery-backups/"
+source = "https://zoellerpumps.com/"
+
+[warranty]
+summary = "Three-year limited warranty from Zoeller on the Model 53."
+length = "3 years"
+source = "https://zoellerpumps.com/product/model-53-sump-pump/"
+
+[[sources]]
+url = "https://zoellerpumps.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://zoellerpumps.com/product/model-53-sump-pump/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://zoellerpumps.com/wp-content/uploads/sites/3/2026/07/fm2676-3-Year-Warranty-Installation-Instructions.pdf"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://zoellerpumps.com/wp-content/uploads/sites/3/2023/10/fm0472.pdf"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://zoellerpumps.com/lineup-of-battery-backups/"
+checked = 2026-11-28

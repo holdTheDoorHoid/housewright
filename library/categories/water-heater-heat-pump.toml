@@ -1,0 +1,7 @@
+format = 1
+id = "water-heater-heat-pump"
+name = "Heat pump water heaters"
+template = "heat-pump-water-heater"
+life_safety = false
+brands = ["rheem", "ao-smith", "state", "bradford-white", "ruud", "ge-appliances"]
+why_brands = "Common US retail and trade brands that sell hybrid electric heat pump storage water heaters; GE is added from its own owner page; LG was not found."

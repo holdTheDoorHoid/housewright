@@ -1,0 +1,58 @@
+format = 1
+id = "front-load-washers"
+brand = "whirlpool"
+name = "Whirlpool front-load washers"
+category = "washer"
+status = "current"
+description = "Whirlpool front-load washing machines, including models with a Clean Washer cycle."
+
+[[manuals]]
+kind = "manual-search"
+title = "Product manuals and literature by model number"
+url = "https://www.whirlpool.com/services/manuals.html"
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[manuals]]
+kind = "support-page"
+title = "Owners center"
+url = "https://www.whirlpool.com/owners.html"
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[facts]]
+topic = "cleaning"
+text = "Run the washer cleaning routine about once a month or every 30 loads, whichever comes first. Use an empty tub and keep it uninterrupted; add no detergent."
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[facts]]
+topic = "cleaning"
+text = "For the Clean Washer cycle, drop one affresh Washer Cleaner tablet at the bottom of the basket, not into the dispenser. If the cycle is interrupted, finish with a Rinse and Spin."
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[facts]]
+topic = "cleaning"
+text = "Instead of the tablet you can pour 1 cup of ordinary liquid chlorine bleach in the dispenser; more than that can harm the washer over time, and thickened or no-splash bleach causes too many suds."
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[facts]]
+topic = "care"
+text = "Leave the lid or door open after cleaning and between loads so the inside dries and odor-causing residue does not build up."
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[tasks]]
+key = "clean_drum"
+schedule = { kind = "fixed", every = "1 month" }
+note = "The maker asks for the cleaning routine monthly or every 30 loads, whichever comes first."
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+title = "Removing odors from the interior of a washer"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.whirlpool.com/services/manuals.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.whirlpool.com/owners.html"
+checked = 2026-11-28

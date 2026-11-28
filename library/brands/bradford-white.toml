@@ -1,0 +1,18 @@
+format = 1
+id = "bradford-white"
+name = "Bradford White"
+aliases = ["BRADFORD WHITE", "Bradford-White", "Bradford White Corporation"]
+domains = ["bradfordwhite.com"]
+website = "https://www.bradfordwhite.com/"
+support_url = "https://www.bradfordwhite.com/contact-bradford-white/"
+manual_search_url = "https://forthepro.bradfordwhite.com/documentation/usa/residential/tank-type-gas/"
+phone = "800-523-2931"
+note = "Phone is the general questions line on the US contact page. Sold through plumbing professionals. Manuals and product pages live on the forthepro subdomain."
+
+[[sources]]
+url = "https://www.bradfordwhite.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bradfordwhite.com/contact-bradford-white/"
+checked = 2026-11-28

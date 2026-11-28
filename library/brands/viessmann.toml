@@ -1,0 +1,12 @@
+format = 1
+id = "viessmann"
+name = "Viessmann"
+aliases = ["VIESSMANN", "Viessmann Manufacturing Company"]
+domains = ["viessmann-us.com"]
+website = "https://www.viessmann-us.com/"
+support_url = "https://www.viessmann-us.com/en/contacts/support.html"
+manual_search_url = "https://www.viessmann-us.com/en/services/downloads/manuals.html"
+
+[[sources]]
+url = "https://www.viessmann-us.com/"
+checked = 2026-11-28

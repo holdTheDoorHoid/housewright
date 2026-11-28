@@ -1,0 +1,20 @@
+format = 1
+id = "dehumidifiers"
+brand = "midea"
+name = "Midea Cube and MAD series dehumidifiers"
+category = "dehumidifier"
+status = "current"
+description = "Midea portable dehumidifiers sold in the US; the cited manual covers the 2024 Cube models MAD20S1QWT, MAD35S1QWT and MAD50S1QWT."
+model_examples = ["MAD20S1QWT", "MAD35S1QWT", "MAD50S1QWT"]
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Cube dehumidifier user manual (2024)"
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/dehumidifiers/mad20s1qwt/MAD20S1QWT-2024-Cube-Manual.pdf"
+source = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/dehumidifiers/mad20s1qwt/MAD20S1QWT-2024-Cube-Manual.pdf"
+note = "Link confirmed live (application/pdf) by HEAD request at review; contents not opened."
+
+[[sources]]
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/dehumidifiers/mad20s1qwt/MAD20S1QWT-2024-Cube-Manual.pdf"
+title = "Midea Cube manual"
+checked = 2026-11-28

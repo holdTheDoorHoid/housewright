@@ -1,0 +1,14 @@
+format = 1
+id = "x-sense"
+name = "X-Sense"
+aliases = ["XSENSE", "X SENSE", "X-SENSE"]
+domains = ["x-sense.com"]
+website = "https://www.x-sense.com/"
+support_url = "https://www.x-sense.com/pages/support"
+manual_search_url = "https://www.x-sense.com/pages/support"
+note = "Sells mostly online. The US storefront home page shows no phone number."
+
+[[sources]]
+url = "https://www.x-sense.com/"
+title = "X-Sense US storefront"
+checked = 2026-11-28

@@ -1,0 +1,16 @@
+format = 1
+id = "fluidmaster"
+name = "Fluidmaster"
+aliases = ["FLUIDMASTER", "Fluidmaster Inc."]
+domains = ["fluidmaster.com"]
+website = "https://fluidmaster.com/"
+support_url = "https://fluidmaster.com/contact-us/"
+note = "Makes replacement fill valves, flappers and flush valves. The contact page gives no US phone number; US help is by live chat or email."
+
+[[sources]]
+url = "https://fluidmaster.com/toilet/part-type/toilet-fill-valves/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://fluidmaster.com/contact-us/"
+checked = 2026-11-28

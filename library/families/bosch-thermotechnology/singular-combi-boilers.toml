@@ -1,0 +1,29 @@
+format = 1
+id = "singular-combi-boilers"
+brand = "bosch-thermotechnology"
+name = "Bosch Singular combi boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+description = "95 percent AFUE condensing combi boilers with a built-in circulator."
+
+[[manuals]]
+kind = "product-page"
+title = "Singular combi boilers"
+url = "https://www.bosch-homecomfort.com/us/en/ocs/residential/singular-combi-boilers-18584728-p/"
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/condensing-boilers-1098952-c/"
+
+[[facts]]
+topic = "specs"
+text = "Rated 95 percent AFUE with up to 7.7 gpm of hot water, up to 10 to 1 turndown and a built-in boiler circulator."
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/condensing-boilers-1098952-c/"
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/ocs/residential/condensing-boilers-1098952-c/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/ocs/residential/singular-combi-boilers-18584728-p/"
+title = "Opened at review"
+checked = 2026-11-28

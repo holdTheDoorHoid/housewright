@@ -1,0 +1,15 @@
+format = 1
+id = "mitsubishi-electric"
+name = "Mitsubishi Electric"
+aliases = ["MITSUBISHI ELECTRIC", "Mitsubishi Electric Trane HVAC", "Mitsubishi Electric US"]
+parent = "Mitsubishi Electric"
+domains = ["mitsubishicomfort.com", "mitsubishipro.com"]
+website = "https://www.mitsubishicomfort.com/"
+support_url = "https://www.mitsubishicomfort.com/register-your-product"
+manual_search_url = "https://www.mitsubishipro.com/catalog"
+phone = "+1-800-433-4822"
+note = "Ductless and ducted heat pumps. Phone is the customer line on the Mitsubishi Comfort home page."
+
+[[sources]]
+url = "https://www.mitsubishicomfort.com/"
+checked = 2026-11-28

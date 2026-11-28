@@ -1,0 +1,56 @@
+format = 1
+id = "aquasential-softeners"
+brand = "culligan"
+name = "Aquasential water softeners"
+category = "water-softener"
+status = "current"
+description = "Culligan's dealer-installed softener range, including the Smart HE and Select series."
+
+[[manuals]]
+kind = "product-page"
+title = "Aquasential Smart High Efficiency softener"
+url = "https://www.culligan.com/product/aquasential-smart-high-efficiency-water-softener"
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[manuals]]
+kind = "product-page"
+title = "Aquasential Select series softener"
+url = "https://www.culligan.com/product/aquasential-select-series-water-softener"
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product manuals"
+url = "https://www.culligan.com/support/product-information/product-manuals"
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[facts]]
+topic = "salt"
+text = "If hard-water signs come back (spots, scale, dry skin), look at the salt level first. Culligan also offers a connected app and a salt-level monitor that warn when salt runs low."
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[facts]]
+topic = "service"
+text = "Call a dealer for a pressure drop, a leak, or unusually high water in the brine tank rather than opening the control valve yourself."
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[facts]]
+topic = "lifespan"
+text = "Culligan cites about 10 years as the usual replacement point for softeners, with some of its units lasting much longer."
+source = "https://www.culligan.com/product-category/water-softeners"
+
+[[sources]]
+url = "https://www.culligan.com/product-category/water-softeners"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.culligan.com/product/aquasential-smart-high-efficiency-water-softener"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.culligan.com/product/aquasential-select-series-water-softener"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.culligan.com/support/product-information/product-manuals"
+checked = 2026-11-28

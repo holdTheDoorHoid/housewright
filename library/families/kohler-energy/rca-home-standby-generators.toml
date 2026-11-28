@@ -1,0 +1,75 @@
+format = 1
+id = "rca-home-standby-generators"
+brand = "kohler-energy"
+name = "Kohler RCA/RCL residential standby generators (RDC2 controller)"
+category = "generator"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Air-cooled and liquid-cooled home standby generator sets with the RDC2 controller; the exact manual depends on the kW size."
+
+[[manuals]]
+kind = "support-page"
+title = "Kohler home generator owner support and FAQs"
+url = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+source = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Operation manual TP-7092, 14/20/26 RCA and RCAL with RDC2"
+url = "https://techcomm.rehlko.com/techcomm/pdf/tp7092.pdf"
+source = "https://techcomm.rehlko.com/techcomm/pdf/tp7092.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read. The older kohler.com copy returned 403."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Operation manual TP-6905, 24/30/38 RCL with RDC2"
+url = "https://techcomm.rehlko.com/techcomm/pdf/tp6905.pdf"
+source = "https://techcomm.rehlko.com/techcomm/pdf/tp6905.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read. The older kohler.com copy returned 403."
+
+[[facts]]
+topic = "exercise"
+text = "The RDC2 exerciser runs the set with no load for 20 minutes; weekly is the recommended setting and every other week is also offered."
+source = "https://techcomm.rehlko.com/techcomm/pdf/tp6905.pdf"
+unverified = true
+note = "source blocked automated fetch at review (kohler.com copy returned 403); figure came from a search-result excerpt and the manual PDF was not opened"
+
+[[facts]]
+topic = "service"
+text = "During a long outage, check the oil level after every 8 to 24 hours of running, depending on generator size and model. Oil and filter change intervals vary by model, so follow the operation manual."
+source = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://www.kohlerhomeenergy.rehlko.com/owner-support"
+title = "Kohler home generator owner support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://techcomm.rehlko.com/techcomm/pdf/tp7092.pdf"
+title = "Operation manual TP-7092 (HEAD checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://techcomm.rehlko.com/techcomm/pdf/tp6905.pdf"
+title = "Operation manual TP-6905 (HEAD checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

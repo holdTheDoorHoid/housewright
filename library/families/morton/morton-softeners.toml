@@ -1,0 +1,44 @@
+format = 1
+id = "morton-softeners"
+brand = "morton"
+name = "Morton water softeners (M20, M27, M30, M34, MC30, MSD45E, MCWF)"
+category = "water-softener"
+status = "current"
+model_examples = ["M20", "M27", "M30", "M34", "MC30", "MSD45E", "MCWF"]
+description = "Morton-branded salt softeners; the maker's page links one PDF per model or model group."
+
+[[manuals]]
+kind = "manual-search"
+title = "Morton water softener manuals"
+url = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+source = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+
+[[manuals]]
+kind = "support-page"
+title = "Maintaining a Morton water softener"
+url = "https://www.mortonsalt.com/resources/maintaining-morton-water-softener/"
+source = "https://www.mortonsalt.com/resources/maintaining-morton-water-softener/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Models M20, M27, M30, M34, MC30 manual"
+url = "https://www.mortonsalt.com/wp-content/uploads/2026/05/Models-M20-M27-M30-M34-MC30.pdf"
+source = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+
+[[facts]]
+topic = "salt"
+text = "Morton sets no single salt-check interval; it suggests linking refills to a routine, for example two bags whenever you change the furnace air filter (about every 60 to 90 days)."
+source = "https://www.mortonsalt.com/resources/maintaining-morton-water-softener/"
+
+[[facts]]
+topic = "resin"
+text = "To clean the resin, Morton suggests adding two or three bags of its System Saver II or Rust Remover salt, timed to a routine such as a car oil change, or sooner if hard-water signs come back."
+source = "https://www.mortonsalt.com/resources/maintaining-morton-water-softener/"
+
+[[sources]]
+url = "https://www.mortonsalt.com/resources/morton-water-softener-manuals/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.mortonsalt.com/resources/maintaining-morton-water-softener/"
+checked = 2026-11-28

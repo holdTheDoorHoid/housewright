@@ -14,6 +14,7 @@ mod binder;
 mod contractors;
 mod dto;
 mod insurance;
+pub mod library;
 mod plan;
 mod records;
 mod sync;
@@ -153,6 +154,17 @@ pub const COMMANDS: &[&str] = &[
     "sync_new_recovery_key",
     "sync_stop",
     "sync_dismiss_notices",
+    "library",
+    "library_set_updates",
+    "library_check",
+    "library_reset",
+    "library_match",
+    "library_families",
+    "library_family",
+    "set_family",
+    "choose_guidance",
+    "manual_source",
+    "supplies",
 ];
 
 /// The bundled template library, parsed once.
@@ -165,6 +177,12 @@ pub fn bundled_library() -> Result<Library, ApiError> {
     Ok(Library::new(parsed)?)
 }
 
+/// The appliance library snapshot compiled into the app, gzip-compressed
+/// bundle bytes (D-147).
+pub fn library_bundle_bytes() -> &'static [u8] {
+    templates::LIBRARY_GZ
+}
+
 /// A household database plus the bundled templates.
 pub struct Api {
     store: Store,
@@ -175,6 +193,8 @@ pub struct Api {
     ocr_loader: Option<OcrLoader>,
     /// Sync, when the platform gave a transport (Phase 6).
     sync: Option<housewright_sync::SyncClient>,
+    /// The appliance library, loaded the first time it is needed (D-147).
+    appliances: std::cell::OnceCell<library::Appliances>,
 }
 
 fn args<T: DeserializeOwned>(v: Value) -> Result<T, ApiError> {
@@ -209,6 +229,7 @@ impl Api {
             ocr: None,
             ocr_loader: None,
             sync: None,
+            appliances: std::cell::OnceCell::new(),
         })
     }
 
@@ -372,7 +393,10 @@ impl Api {
                         Some(r) => r,
                         None => match self.alerts_call(other, a.clone()) {
                             Some(r) => r,
-                            None => self.records_call(other, a),
+                            None => match self.library_call(other, a.clone()) {
+                                Some(r) => r,
+                                None => self.records_call(other, a),
+                            },
                         },
                     },
                 },
@@ -677,6 +701,7 @@ impl Api {
             steps: t.steps.clone(),
             why: t.why.as_ref().map(|w| w.text.clone()),
             source: t.why.as_ref().map(|w| w.source.clone()),
+            source_link: t.why.as_ref().and_then(|w| w.link.clone()),
             interval,
             paused: t.paused,
             not_applicable: t.not_applicable,
@@ -979,7 +1004,10 @@ impl Api {
                 }),
             None => None,
         };
+        let (maker, family_suggestion) = self.maker_parts(&item, &item_tasks);
         Ok(ItemDetail {
+            maker,
+            family_suggestion,
             pin,
             row,
             make: item.make,
@@ -1132,6 +1160,7 @@ impl Api {
             );
         }
         let none_if_blank = |s: Option<String>| s.filter(|s| !s.trim().is_empty());
+        let family = self.family_for_new(a.family, &t.id)?;
         let item = Item {
             id: ItemId::new(),
             property: p.id,
@@ -1152,6 +1181,7 @@ impl Api {
             sensitivity: Sensitivity::Normal,
             price: Default::default(),
             value: Default::default(),
+            family,
         };
         let me = self.store.author()?;
         let start = self.today_in(&p.time_zone)?;

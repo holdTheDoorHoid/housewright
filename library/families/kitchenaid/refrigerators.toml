@@ -1,0 +1,39 @@
+format = 1
+id = "refrigerators"
+brand = "kitchenaid"
+name = "KitchenAid refrigerators"
+category = "refrigerator"
+status = "current"
+description = "KitchenAid refrigerators with dispensers that take everydrop water filters."
+
+[[manuals]]
+kind = "support-page"
+title = "When to change the water filter"
+url = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Installation_Support/When_to_Change_the_Water_Filter"
+source = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Installation_Support/When_to_Change_the_Water_Filter"
+
+[[manuals]]
+kind = "support-page"
+title = "everydrop water filter questions (filter guide and finder)"
+url = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+source = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+
+[[facts]]
+topic = "filter"
+text = "KitchenAid's rule is a new water filter every 6 months, or when the filter status light on the control panel says so on models that have one. Slower dispenser flow means the filter is clogging and should be changed early."
+source = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Installation_Support/When_to_Change_the_Water_Filter"
+
+[[facts]]
+topic = "filter"
+text = "To find which everydrop filter fits a given refrigerator, KitchenAid points owners to its downloadable filter guide or its online Filter Finder rather than a single part number."
+source = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+
+[[sources]]
+url = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Installation_Support/When_to_Change_the_Water_Filter"
+title = "KitchenAid: when to change the water filter"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.kitchenaid.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+title = "KitchenAid: everydrop water filter questions"
+checked = 2026-11-28

@@ -1,0 +1,34 @@
+format = 1
+id = "smart-thermostat-enhanced-essential"
+brand = "ecobee"
+name = "Smart Thermostat Enhanced and Essential"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+description = "Lower-priced ecobee Wi-Fi thermostats."
+
+[[manuals]]
+kind = "product-page"
+title = "Smart Thermostat Enhanced"
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-enhanced/"
+source = "https://www.ecobee.com/"
+
+[[manuals]]
+kind = "product-page"
+title = "Smart Thermostat Essential"
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-essential/"
+source = "https://www.ecobee.com/"
+
+[[sources]]
+url = "https://www.ecobee.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-enhanced/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-essential/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28

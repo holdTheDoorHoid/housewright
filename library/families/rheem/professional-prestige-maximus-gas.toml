@@ -1,0 +1,60 @@
+format = 1
+id = "professional-prestige-maximus-gas"
+brand = "rheem"
+name = "Professional Prestige Maximus gas tank water heaters"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["PROPG*"]
+model_examples = ["PROPG75-100U RH HE EC3"]
+description = "Heavy duty power vent gas storage heater with a built-in leak sensor and two anode rods."
+
+[[manuals]]
+kind = "product-page"
+title = "Maximus heavy duty product page (documents listed on it)"
+url = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Rheem replacement parts"
+url = "https://parts.rheem.com/"
+source = "https://www.rheem.com/products/residential/water-heating/"
+
+[[facts]]
+topic = "clearance"
+text = "This model is listed with zero clearance needed at the sides and back; follow the manual for front and vent clearances."
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[[facts]]
+topic = "installation"
+text = "Gas connection is 1/2 inch NPT, water connections are 3/4 inch NPT, and the condensate drain is 3/4 inch with a built-in neutralizer. Rated for installs up to 10,100 ft elevation."
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[[facts]]
+topic = "care"
+text = "Two anode rods are fitted and the drain valve is a larger brass type for quicker draining. The page gives no service interval; the Use and Care Manual is the place to look."
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[[facts]]
+topic = "safety"
+text = "A temperature and pressure relief valve is already fitted, and the display has a leak sensor plus system health alerts."
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[warranty]
+summary = "Twelve year limited tank and parts warranty on the model listed; the full certificate is looked up by serial number."
+length = "12 years"
+source = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+
+[[sources]]
+url = "https://www.rheem.com/product/rheem-professional-prestige-maximus-heavy-duty-with-leaksense-propg75-100u-rh-he-ec3/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://parts.rheem.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/"
+checked = 2026-11-28

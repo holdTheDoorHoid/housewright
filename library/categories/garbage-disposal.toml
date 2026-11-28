@@ -1,0 +1,7 @@
+format = 1
+id = "garbage-disposal"
+name = "Garbage disposals"
+template = "garbage-disposal"
+life_safety = false
+brands = ["insinkerator", "moen", "wasteking"]
+why_brands = "Common US retail brands; InSinkErator is the long-standing market leader and Moen sells a widely stocked line. Waste King is added from its own site; KitchenAid, GE and Whirlpool disposals could not be confirmed on official pages."

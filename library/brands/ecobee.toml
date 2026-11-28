@@ -1,0 +1,14 @@
+format = 1
+id = "ecobee"
+name = "ecobee"
+aliases = ["ECOBEE", "ecobee Inc"]
+domains = ["ecobee.com"]
+website = "https://www.ecobee.com/"
+support_url = "https://www.ecobee.com/en-us/contact/"
+manual_search_url = "https://support.ecobee.com/s/?language=en_US"
+phone = "1-877-932-6233"
+note = "Phone is the toll-free number shown on the ecobee product and contact pages."
+
+[[sources]]
+url = "https://www.ecobee.com/"
+checked = 2026-11-28

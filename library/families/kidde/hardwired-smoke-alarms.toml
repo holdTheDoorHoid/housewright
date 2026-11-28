@@ -1,0 +1,75 @@
+format = 1
+id = "hardwired-smoke-alarms"
+brand = "kidde"
+name = "Kidde hardwired smoke alarms with battery backup"
+category = "smoke-alarm"
+fuel = ["hardwired"]
+status = "current"
+model_patterns = ["20SAR*", "20SA10*", "50SA10*"]
+model_examples = ["20SAR", "20SAR9V", "20SA10", "20SA10-V", "50SA10-S"]
+description = "Alarms wired to household power with a backup battery: AA, 9V or a sealed 10-year type depending on model."
+
+[[manuals]]
+kind = "product-page"
+title = "Product page for the 20SAR (AA backup)"
+url = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "English user guide for the AC-powered 20SAR (linked from the product page)"
+url = "https://brand.kidde.com/m/61163acef513f163/original/UG_DETECT_5in_AC_EN.pdf"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+
+[[manuals]]
+kind = "product-page"
+title = "Smoke alarm range with model numbers"
+url = "https://www.kidde.com/products/smoke-alarms"
+source = "https://www.kidde.com/products/smoke-alarms"
+
+[[facts]]
+topic = "battery"
+text = "The 20SAR runs on two AA backup batteries; Kidde says to swap them every 6 months or as soon as the low-battery chirp starts, and to unplug the alarm's wiring before changing them."
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+
+[[facts]]
+topic = "models"
+text = "Kidde lists hardwired versions with a 9V backup (20SAR9V), AA backup (20SAR), a 10-year backup battery (20SA10, 20SA10-V) and a sealed 10-year backup with strobe (50SA10-S)."
+source = "https://www.kidde.com/products/smoke-alarms"
+
+[warranty]
+summary = "Ten-year limited warranty shown on the 20SAR product page."
+length = "10 years"
+source = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+
+[[recalls]]
+title = "Kidde i12010S smoke and i12010SCO and KN-COSM-IBA smoke/CO hardwired alarms could fail to alert after a power outage; free replacement"
+date = 2014-09-11
+url = "https://www.cpsc.gov/Recalls/2014/Kidde-Recalls-Smoke-and-Combination-SmokeCO-Alarms"
+
+[[recalls]]
+title = "Kidde PI2010 (hardwired) and PI9010 (battery) dual-sensor smoke alarms dated 2016 Sep 10 to 2017 Oct 13: a yellow cap left on may block a sensor; free replacement"
+date = 2018-03-21
+url = "https://www.cpsc.gov/Recalls/2018/Kidde-Recalls-Dual-Sensor-Smoke-Alarms-Due-to-Risk-of-Failure-to-Alert-Consumers-to-a-Fire"
+note = "The PI2010 is the AC hardwired model that belongs here; the PI9010 is DC battery powered and has no Kidde family of its own yet, so the recall is kept on this family for both. Details confirmed in the CPSC recall database (recall 18128); the cpsc.gov page itself blocked automated fetch."
+
+[[sources]]
+url = "https://www.kidde.com/products/smoke-alarms/smoke-alarm-hardwired-with-aa-backup-battery"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/products/smoke-alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://brand.kidde.com/m/61163acef513f163/original/UG_DETECT_5in_AC_EN.pdf"
+title = "User guide (PDF, not fetched)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Recalls/2014/Kidde-Recalls-Smoke-and-Combination-SmokeCO-Alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Recalls/2018/Kidde-Recalls-Dual-Sensor-Smoke-Alarms-Due-to-Risk-of-Failure-to-Alert-Consumers-to-a-Fire"
+checked = 2026-11-28

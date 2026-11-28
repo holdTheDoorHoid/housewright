@@ -1,0 +1,31 @@
+format = 1
+id = "residential-sump-pumps"
+brand = "liberty-pumps"
+name = "Liberty residential sump pumps"
+category = "sump-pump"
+status = "current"
+description = "Liberty's wholesale-channel residential pumps; specific series (such as Pro) were not confirmed on a fetched page."
+
+[[manuals]]
+kind = "product-page"
+title = "Wholesale products"
+url = "https://www.libertypumps.com/wholesale/"
+source = "https://www.libertypumps.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Contact"
+url = "https://www.libertypumps.com/wholesale/contact-us/"
+source = "https://www.libertypumps.com/"
+
+[[sources]]
+url = "https://www.libertypumps.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.libertypumps.com/wholesale/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.libertypumps.com/wholesale/contact-us/"
+checked = 2026-11-28

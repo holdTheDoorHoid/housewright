@@ -1,0 +1,14 @@
+format = 1
+id = "maytag"
+name = "Maytag"
+aliases = ["MAYTAG"]
+parent = "Whirlpool Corporation"
+domains = ["maytag.com"]
+website = "https://www.maytag.com/"
+support_url = "https://www.maytag.com/"
+note = "maytag.com blocked automated fetching; support is per-model on Owners Center pages, so support_url is the home page."
+
+[[sources]]
+url = "https://www.maytag.com/owners-center-pdp.MVWC200BW.html"
+title = "Owners Center page for a model (URL from search results)"
+checked = 2026-11-28

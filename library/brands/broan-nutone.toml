@@ -1,0 +1,20 @@
+format = 1
+id = "broan-nutone"
+name = "Broan-NuTone"
+aliases = ["Broan", "NuTone", "BROAN", "NUTONE", "Broan-NuTone LLC"]
+parent = "Nortek Air Solutions"
+domains = ["broan-nutone.com"]
+website = "https://broan-nutone.com/en-us/"
+support_url = "https://broan-nutone.com/en-us/home/customer-service/frequently-asked-questions"
+manual_search_url = "https://broan-nutone.com/en-us/product-manuals"
+note = "Broan and NuTone are two labels of the same maker. The manual library is linked from the FAQ page and answered 200 at review. No phone number is printed on the FAQ page."
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/home/customer-service/frequently-asked-questions"
+title = "Customer service FAQ index"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/product-manuals"
+title = "Product manual library (linked from the FAQ page)"
+checked = 2026-11-28

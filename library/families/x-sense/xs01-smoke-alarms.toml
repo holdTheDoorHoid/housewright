@@ -1,0 +1,50 @@
+format = 1
+id = "xs01-smoke-alarms"
+brand = "x-sense"
+name = "X-Sense XS01 wireless smoke alarms"
+category = "smoke-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["XS01-W*"]
+model_examples = ["XS01-WR", "XS01-WX"]
+description = "Wireless smoke alarms: the interconnecting XS01-WR runs on a replaceable CR123A battery and the Wi-Fi XS01-WX on a battery rated for about a year."
+
+[[manuals]]
+kind = "support-page"
+title = "X-Sense help center"
+url = "https://www.x-sense.com/pages/support"
+source = "https://www.x-sense.com/pages/support"
+
+[[manuals]]
+kind = "product-page"
+title = "Smoke alarm range"
+url = "https://www.x-sense.com/collections/smoke-alarms"
+source = "https://www.x-sense.com/collections/smoke-alarms"
+
+[[facts]]
+topic = "battery"
+text = "X-Sense rates the XS01-WR at about five years on its replaceable 3V CR123A lithium cell and the Wi-Fi XS01-WX at about one year. Sealed-battery alarms are swapped whole once they warn of low battery or end of life."
+source = "https://www.x-sense.com/blogs/tips/smoke-detector-battery-guide"
+
+[[facts]]
+topic = "replacement"
+text = "Swap in a new alarm at its end-of-life signal or ten years from the manufacture date (usually on the back), whichever is first, or sooner if it still fails a test after troubleshooting."
+source = "https://www.x-sense.com/blogs/tips/smoke-detector-battery-guide"
+
+[[facts]]
+topic = "testing"
+text = "Test the alarms monthly, or more often if the model's manual asks. Do not pull the battery to quiet a possible fire alarm; get out and call emergency services from a safe place."
+source = "https://www.x-sense.com/blogs/tips/smoke-detector-battery-guide"
+
+[[sources]]
+url = "https://www.x-sense.com/collections/smoke-alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.x-sense.com/blogs/tips/smoke-detector-battery-guide"
+title = "Smoke detector battery guide (maker blog)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.x-sense.com/pages/support"
+checked = 2026-11-28

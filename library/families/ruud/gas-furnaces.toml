@@ -1,0 +1,51 @@
+format = 1
+id = "gas-furnaces"
+brand = "ruud"
+name = "Ruud Achiever and Ultra gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["U98MV", "U97MV", "R96T", "R972V", "R951V", "R801T"]
+description = "Ruud Endeavor Line gas furnaces in Ultra, Achiever Plus and Achiever tiers, 80 to 98 percent AFUE."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas furnaces"
+url = "https://www.ruud.com/products/hvac/gas_furnaces/"
+source = "https://www.ruud.com/products/hvac/gas_furnaces/"
+
+[[manuals]]
+kind = "support-page"
+title = "Homeowner resources"
+url = "https://www.ruud.com/homeowners/"
+source = "https://www.ruud.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty"
+url = "https://www.ruud.com/warranty/"
+source = "https://www.ruud.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "Ultra U98MV and U97MV are 97 to 98 percent AFUE, the Achiever Plus R96T is up to 96 percent and R972V is 97 percent; 80 percent units include the U802V and R801T."
+source = "https://www.ruud.com/products/hvac/gas_furnaces/"
+
+[[sources]]
+url = "https://www.ruud.com/products/hvac/gas_furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/homeowners/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/warranty/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

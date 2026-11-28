@@ -338,6 +338,7 @@ mod tests {
             sensitivity: Sensitivity::Normal,
             price: Default::default(),
             value: Default::default(),
+            family: None,
         };
         s.put(&item).unwrap();
         let pin = PlanPin {

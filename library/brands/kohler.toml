@@ -1,0 +1,14 @@
+format = 1
+id = "kohler"
+name = "Kohler"
+aliases = ["KOHLER", "Kohler Co.", "Kohler Co"]
+domains = ["kohler.com"]
+website = "https://www.kohler.com/"
+support_url = "https://www.kohler.com/en/support"
+note = "Plumbing brand. Not the same as Kohler Energy (generators). The site timed out on automated fetches, so entries are from search results."
+
+[[sources]]
+url = "https://www.kohler.com/en/support"
+checked = 2026-11-28
+unverified = true
+note = "page timed out on automated fetch; URL from search results"

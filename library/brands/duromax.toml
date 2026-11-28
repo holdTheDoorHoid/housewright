@@ -1,0 +1,14 @@
+format = 1
+id = "duromax"
+name = "DuroMax"
+aliases = ["DUROMAX", "DuroMax Power Equipment", "DuroMax Power"]
+domains = ["duromaxpower.com"]
+website = "https://www.duromaxpower.com/"
+support_url = "https://www.duromaxpower.com/pages/faq"
+phone = "+1-844-387-6629"
+note = "support_url is the FAQ page, opened at review. The site prints the phone as 1-844-DUROMAX."
+
+[[sources]]
+url = "https://www.duromaxpower.com/pages/faq"
+title = "DuroMax FAQ"
+checked = 2026-11-28

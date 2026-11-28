@@ -1,0 +1,45 @@
+format = 1
+id = "washers"
+brand = "samsung"
+name = "Samsung front-load and top-load washers"
+category = "washer"
+status = "current"
+description = "Samsung washing machines of both layouts, with a Self Clean cycle; front-loaders also have a pump filter."
+
+[[manuals]]
+kind = "support-page"
+title = "US washer support hub with manuals and model lookup"
+url = "https://www.samsung.com/us/support/home-appliances/washers/"
+source = "https://www.samsung.com/us/support/home-appliances/washers/"
+unverified = true
+note = "page not fetched; URL from search results."
+
+[[facts]]
+topic = "cleaning"
+text = "Run the Self Clean cycle roughly monthly or every 30 to 40 loads, only with an empty drum. It takes about an hour on top-loaders and up to four hours on front-loaders."
+source = "https://www.samsung.com/us/support/troubleshoot/TSG10007246/"
+
+[[facts]]
+topic = "filter"
+text = "Front-loaders have a pump filter behind a panel at the bottom front; clean it regularly because a neglected one causes odors. Top-loaders generally have no removable pump filter."
+source = "https://www.samsung.com/us/support/troubleshoot/TSG10007246/"
+
+[[facts]]
+topic = "care"
+text = "Take wet laundry out promptly, wipe the drawer, tub and door seal after loads, and leave the door open so the drum and seal air out."
+source = "https://www.samsung.com/us/support/troubleshoot/TSG10007246/"
+
+[[tasks]]
+key = "clean_drum"
+schedule = { kind = "fixed", every = "1 month" }
+note = "The maker suggests Self Clean about monthly or every 30 to 40 loads."
+source = "https://www.samsung.com/us/support/troubleshoot/TSG10007246/"
+
+[[sources]]
+url = "https://www.samsung.com/us/support/home-appliances/washers/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.samsung.com/us/support/troubleshoot/TSG10007246/"
+title = "Washer or laundry smells bad"
+checked = 2026-11-28

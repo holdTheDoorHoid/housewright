@@ -286,6 +286,7 @@ impl Device {
                     width: None,
                     height: None,
                     sensitivity: Sensitivity::Normal,
+                    source: None,
                 },
             )
             .unwrap()

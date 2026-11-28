@@ -1,0 +1,69 @@
+format = 1
+id = "residential-gas-tank"
+brand = "bradford-white"
+name = "Residential gas tank water heaters (RG, RC and URG series)"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["RG*", "URG*", "RC2*"]
+model_examples = ["RG240T6N", "RG2PV50S6N19", "URG250T6N", "RC2PV50H6N"]
+description = "Atmospheric, power vent and direct vent gas storage heaters, plus the eF high efficiency and ultra low NOx versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas water heaters listing"
+url = "https://www.bradfordwhite.com/gas-water-heaters/"
+source = "https://www.bradfordwhite.com/gas-water-heaters/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Technical documents for residential tank type gas"
+url = "https://forthepro.bradfordwhite.com/documentation/usa/residential/tank-type-gas/"
+source = "https://www.bradfordwhite.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "My Water Heater: age, model lookup and registration"
+url = "https://www.bradfordwhite.com/my-water-heater/"
+source = "https://www.bradfordwhite.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty Center"
+url = "https://warrantycenter.bradfordwhite.com/"
+source = "https://www.bradfordwhite.com/"
+
+[[facts]]
+topic = "care"
+text = "Bradford White says tanks are not self-cleaning and that its Hydrojet system does not replace periodic draining; it gives no interval, pointing to the service manual."
+source = "https://www.bradfordwhite.com/faqs/"
+
+[[facts]]
+topic = "installation"
+text = "Minimum clearances and venting rules are in the installation and operation manual for the exact model; they must also follow local code."
+source = "https://www.bradfordwhite.com/faqs/"
+
+[[sources]]
+url = "https://www.bradfordwhite.com/gas-water-heaters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://forthepro.bradfordwhite.com/documentation/usa/residential/tank-type-gas/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bradfordwhite.com/my-water-heater/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://warrantycenter.bradfordwhite.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bradfordwhite.com/faqs/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bradfordwhite.com/"
+checked = 2026-11-28

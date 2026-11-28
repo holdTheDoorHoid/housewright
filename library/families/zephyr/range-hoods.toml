@@ -1,0 +1,67 @@
+format = 1
+id = "range-hoods"
+brand = "zephyr"
+name = "Zephyr range hoods"
+category = "range-hood"
+extends = "range-hood"
+status = "current"
+description = "Zephyr wall, island and under-cabinet hoods (Sienna, Tempest, Ombra, Napoli and others) with baffle filters."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Sienna use, care and installation guide"
+url = "https://docs.zephyronline.com/docs/manuals/sienab_manual.pdf"
+source = "https://docs.zephyronline.com/docs/manuals/sienab_manual.pdf"
+note = "HEAD request at review: 200, application/pdf; contents not opened."
+
+[[facts]]
+topic = "grease filter"
+text = "Metal baffle filters never need replacing but should be cleaned about every 30 days, more with heavy cooking. Wash by hand in hot soapy water or on a low-heat dishwasher cycle."
+source = "https://docs.zephyronline.com/docs/manuals/sienab_manual.pdf"
+unverified = true
+note = "Only in PDF manuals, which reviewers may not open, and the Zephyr help center returned 403; wording came from search snippets. Check your model manual."
+
+[[facts]]
+topic = "charcoal filter"
+text = "Charcoal filters for recirculating use must not be washed. Many Zephyr hoods remind you to change them after about 120 hours of fan use; the exact figure varies by model."
+source = "https://docs.zephyronline.com/docs/manuals/napolid_manual.pdf"
+unverified = true
+note = "Only in PDF manuals, which reviewers may not open; wording came from search snippets. Unconfirmed details (Napoli 200 hours, reminder off by default) were removed at review."
+
+[[consumables]]
+name = "Charcoal filter for Sienna, Ombra and Napoli hoods"
+part = "Z0F-C091"
+for_task = "charcoal"
+source = "https://store.zephyronline.com/charcoal-filter-replacement-z0f--c091"
+unverified = true
+note = "source blocked automated fetch at review (403); part number from search results. Confirm fit for your model."
+
+[[consumables]]
+name = "Charcoal filter for some Tempest and ZRM or ZRE hoods"
+part = "Z0F-C002"
+for_task = "charcoal"
+source = "https://store.zephyronline.com/charcoal-filter-replacement-z0f--c002"
+unverified = true
+note = "source blocked automated fetch at review (403); part number from search results. Confirm fit for your model."
+
+[[sources]]
+url = "https://docs.zephyronline.com/docs/manuals/sienab_manual.pdf"
+checked = 2026-11-28
+note = "HEAD request at review: 200, application/pdf; contents not opened."
+
+[[sources]]
+url = "https://docs.zephyronline.com/docs/manuals/napolid_manual.pdf"
+checked = 2026-11-28
+note = "HEAD request at review: 200, application/pdf; contents not opened."
+
+[[sources]]
+url = "https://store.zephyronline.com/charcoal-filter-replacement-z0f--c091"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch; URL from search results."
+
+[[sources]]
+url = "https://store.zephyronline.com/charcoal-filter-replacement-z0f--c002"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch at review (403); URL from search results."

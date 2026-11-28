@@ -1,0 +1,16 @@
+format = 1
+id = "speed-queen"
+name = "Speed Queen"
+aliases = ["SPEED QUEEN", "Alliance Laundry Systems"]
+parent = "Alliance Laundry Systems"
+domains = ["speedqueen.com", "speedqueendoc.net"]
+website = "https://speedqueen.com/"
+support_url = "https://speedqueen.com/support/manuals-downloads/"
+manual_search_url = "https://speedqueen.com/support/manuals-downloads/"
+phone = "+1-800-552-5475"
+note = "Residential manuals are looked up by model number in the document portal at speedqueendoc.net, linked from the manuals page."
+
+[[sources]]
+url = "https://speedqueen.com/support/manuals-downloads/"
+title = "Manuals and downloads"
+checked = 2026-11-28

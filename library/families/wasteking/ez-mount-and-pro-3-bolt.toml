@@ -1,0 +1,58 @@
+format = 1
+id = "ez-mount-and-pro-3-bolt"
+brand = "wasteking"
+name = "Waste King residential disposals (EZ Mount and Pro 3-Bolt)"
+category = "garbage-disposal"
+status = "current"
+model_examples = ["L-111", "L-1001", "L-2600", "9910", "9920", "9930"]
+description = "The two Waste King residential disposal lines listed on the maker's residential page, plus the Whirlaway line."
+
+[[manuals]]
+kind = "product-page"
+title = "Residential disposals"
+url = "https://www.wasteking.com/residential/disposals"
+source = "https://www.wasteking.com/residential/disposals"
+
+[[manuals]]
+kind = "manual-search"
+title = "Downloads (manuals and warranty)"
+url = "https://www.wasteking.com/support/downloads"
+source = "https://www.wasteking.com/support/downloads"
+
+[[manuals]]
+kind = "support-page"
+title = "Disposal FAQ"
+url = "https://www.wasteking.com/support/faq"
+source = "https://www.wasteking.com/support/faq"
+
+[[facts]]
+topic = "jam"
+text = "For a jam, cut power at the plug or breaker first, take out the stopper and splashguard, then turn the grinding plate from underneath with a wooden spoon or a jam-clearing wrench until it spins freely."
+source = "https://www.wasteking.com/support/faq"
+
+[[facts]]
+topic = "reset"
+text = "The reset button trips when the motor overheats, often after a jam. Once the plate turns freely, press the button until it clicks and stays in."
+source = "https://www.wasteking.com/support/faq"
+
+[[facts]]
+topic = "care"
+text = "Keep out large bones, shells, corn husks, glass, plastic, metal, hot grease and caustic drain cleaner."
+source = "https://www.wasteking.com/support/faq"
+
+[[facts]]
+topic = "warranty"
+text = "Warranty length depends on the model; look up your model's warranty sheet under downloads, and hold on to the receipt to prove the purchase date."
+source = "https://www.wasteking.com/support/faq"
+
+[[sources]]
+url = "https://www.wasteking.com/residential/disposals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.wasteking.com/support/downloads"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.wasteking.com/support/faq"
+checked = 2026-11-28

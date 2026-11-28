@@ -1,0 +1,15 @@
+format = 1
+id = "panasonic"
+name = "Panasonic"
+aliases = ["PANASONIC", "Panasonic Corporation of North America"]
+parent = "Panasonic Holdings"
+domains = ["panasonic.com"]
+website = "https://help.na.panasonic.com/"
+support_url = "https://help.na.panasonic.com/"
+manual_search_url = "https://help.na.panasonic.com/manuals/"
+note = "North American support site is help.na.panasonic.com; the manuals index path was seen linked on a model page."
+
+[[sources]]
+url = "https://help.na.panasonic.com/microwave-multi-ovens/microwave-ovens/nn-sn755s/"
+title = "NN-SN755S support page, links to manuals index"
+checked = 2026-11-28

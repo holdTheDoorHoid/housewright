@@ -1,0 +1,12 @@
+format = 1
+id = "pentair"
+name = "Pentair"
+aliases = ["PENTAIR", "Pentair Residential Filtration", "OMNIFilter", "Pentair Fleck"]
+domains = ["pentair.com"]
+website = "https://www.pentair.com/en-us/"
+support_url = "https://www.pentair.com/en-us/education-support/residential/product-support.html"
+manual_search_url = "https://www.pentair.com/en-us/download-center.html"
+
+[[sources]]
+url = "https://www.pentair.com/en-us/water-solutions.html"
+checked = 2026-11-28

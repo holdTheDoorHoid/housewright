@@ -1,0 +1,58 @@
+format = 1
+id = "dehumidifiers"
+brand = "whynter"
+name = "Whynter portable dehumidifiers (RPD series)"
+category = "dehumidifier"
+status = "current"
+description = "Whynter portable dehumidifiers sold under RPD model numbers, some with a built-in pump."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "RPD-506EWP manual"
+url = "https://whynter.com/wp-content/uploads/2020/11/2020-RPD-506EWP-Manual.pdf"
+source = "https://whynter.com/wp-content/uploads/2020/11/2020-RPD-506EWP-Manual.pdf"
+note = "Checked with a HEAD request only (PDF on whynter.com); contents not read."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "RPD-551EWP manual"
+url = "https://whynter.com/wp-content/uploads/2020/11/RPD-551EWP-User-Manual.pdf"
+source = "https://whynter.com/wp-content/uploads/2020/11/RPD-551EWP-User-Manual.pdf"
+note = "Checked with a HEAD request only (PDF on whynter.com); contents not read."
+
+[[manuals]]
+kind = "support-page"
+title = "Whynter product support"
+url = "https://whynter.com/product-support/"
+source = "https://whynter.com/"
+
+[[recalls]]
+title = "About 2 million dehumidifiers sold under many brand names, including Whynter, recalled for overheating and fire hazard"
+date = 2021-08-04
+url = "https://www.cpsc.gov/Recalls/2021/two-million-dehumidifiers-with-well-known-brand-names-recalled-due-to-fire-and-burn"
+note = "The Whynter models named on the CPSC notice are RPD-302W, RPD-503SP and RPD-702WP."
+
+[[sources]]
+url = "https://whynter.com/wp-content/uploads/2020/11/2020-RPD-506EWP-Manual.pdf"
+title = "RPD-506EWP manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whynter.com/wp-content/uploads/2020/11/RPD-551EWP-User-Manual.pdf"
+title = "RPD-551EWP manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whynter.com/"
+title = "Whynter home page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whynter.com/product-support/"
+title = "Whynter product support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Recalls/2021/two-million-dehumidifiers-with-well-known-brand-names-recalled-due-to-fire-and-burn"
+title = "CPSC 2021 dehumidifier recall"
+checked = 2026-11-28

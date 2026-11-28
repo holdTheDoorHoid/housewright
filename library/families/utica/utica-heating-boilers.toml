@@ -1,0 +1,36 @@
+format = 1
+id = "utica-heating-boilers"
+brand = "utica"
+name = "Utica Heating gas and oil boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "oil"]
+status = "current"
+model_examples = ["UH15B-K", "UH16", "UH15C", "UHSW", "UHKWC"]
+description = "Utica Heating boilers: gas water and steam models plus the Keystone oil boiler."
+
+[[manuals]]
+kind = "product-page"
+title = "Utica Heating product list"
+url = "https://uticaboilers.com/products/utica-heating/"
+source = "https://uticaboilers.com/products/utica-heating/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Owner documents"
+url = "https://uticaboilers.com/owner-resources/documents/"
+source = "https://uticaboilers.com/products/utica-heating/"
+
+[[facts]]
+topic = "models"
+text = "Gas models listed are the UH15B-K, UH16 (steam), UH15C and UHSW; the oil model is the Keystone UHKWC."
+source = "https://uticaboilers.com/products/utica-heating/"
+
+[[sources]]
+url = "https://uticaboilers.com/products/utica-heating/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://uticaboilers.com/owner-resources/documents/"
+title = "Opened at review"
+checked = 2026-11-28

@@ -577,14 +577,47 @@ pub struct Item {
     /// What the household thinks it is worth now (their own estimate).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub value: Option<Money>,
+    /// The appliance library model family the person confirmed this is
+    /// (`"rheem/performance-platinum-gas"`), or [`NO_FAMILY`] when they
+    /// said none of the suggestions fit (D-149).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub family: Option<String>,
 }
 entity!(Item, Item);
+
+/// `Item.family` when the person said none of the library's suggestions
+/// fit: suggestions stop until the make or model changes.
+pub const NO_FAMILY: &str = "none";
+
+/// Whose recommendation a task follows, when its thing's model family
+/// differs from the generic template (D-150, P2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Follows {
+    /// The manufacturer's, from the appliance library.
+    Maker,
+    /// The generic template's.
+    Generic,
+}
+
+/// The person's choice between the manufacturer's and the generic
+/// recommendation for one task.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Guidance {
+    /// The family whose recommendation was offered.
+    pub family: String,
+    pub follows: Follows,
+}
 
 /// Why a task matters, and where that advice comes from (P2, P9).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Why {
     pub text: String,
     pub source: String,
+    /// The page the advice comes from, when there is one (an https link to
+    /// the manufacturer's page for manufacturer guidance).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub link: Option<String>,
 }
 
 /// Recurring (or one-off) work on an item or a place.
@@ -626,6 +659,9 @@ pub struct Task {
     pub paused: bool,
     #[serde(default)]
     pub not_applicable: bool,
+    /// Manufacturer or generic recommendation, when the person chose.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub guidance: Option<Guidance>,
 }
 entity!(Task, Task);
 
@@ -812,6 +848,10 @@ pub struct Attachment {
     pub by: Option<MemberId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub at: Option<Timestamp>,
+    /// Where the file was downloaded from, for a manual saved from the
+    /// manufacturer's site (D-151). An https link.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 entity!(Attachment, Attachment);
 

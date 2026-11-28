@@ -1,0 +1,19 @@
+format = 1
+id = "goodman"
+name = "Goodman"
+aliases = ["GOODMAN", "Goodman Manufacturing", "Goodman Manufacturing Company"]
+parent = "Daikin Comfort Technologies"
+domains = ["goodmanmfg.com"]
+website = "https://www.goodmanmfg.com/"
+support_url = "https://www.goodmanmfg.com/support/customer-service"
+manual_search_url = "https://www.goodmanmfg.com/support/literature-library"
+phone = "+1-877-254-4729"
+note = "Phone is the homeowner support line on the Goodman customer service page."
+
+[[sources]]
+url = "https://www.goodmanmfg.com/support/customer-service"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/support/literature-library"
+checked = 2026-11-28

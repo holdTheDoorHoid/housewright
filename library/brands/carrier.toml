@@ -1,0 +1,17 @@
+format = 1
+id = "carrier"
+name = "Carrier"
+aliases = ["CARRIER", "Carrier Corporation"]
+parent = "Carrier Global"
+domains = ["carrier.com"]
+website = "https://www.carrier.com/residential/en/us/"
+support_url = "https://www.carrier.com/residential/en/us/homeowner-resources/faqs/"
+manual_search_url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/homeowner-resources/faqs/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+checked = 2026-11-28

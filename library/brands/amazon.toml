@@ -1,0 +1,15 @@
+format = 1
+id = "amazon"
+name = "Amazon"
+aliases = ["AMAZON", "Amazon Smart Thermostat", "Amazon.com Services LLC"]
+domains = ["amazon.com"]
+website = "https://www.amazon.com/Amazon-Smart-Thermostat/dp/B08J4C8871"
+support_url = "https://www.amazon.com/gp/help/customer/display.html?nodeId=G5G4QAS54VUG26Z7"
+note = "Only the Amazon Smart Thermostat is covered here. Amazon pages blocked automated fetching (503) again at review on 2026-11-28; URLs come from search results and no facts are kept."
+
+[[sources]]
+url = "https://www.amazon.com/gp/help/customer/display.html?nodeId=G5G4QAS54VUG26Z7"
+title = "Amazon Smart Thermostat Installation and Wiring"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review (WebFetch 503, HEAD 405); URL from search results"

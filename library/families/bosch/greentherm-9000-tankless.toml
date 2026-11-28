@@ -1,0 +1,55 @@
+format = 1
+id = "greentherm-9000-tankless"
+brand = "bosch"
+name = "Bosch Greentherm 9000 gas tankless (T9800 and T9900)"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas"]
+status = "discontinued"
+model_examples = ["T9900i SE 199", "T9900 SE 160", "T9800 SE 199", "T9800 SEO 160"]
+description = "Bosch Home Comfort files the Greentherm 9000 under its discontinued water heating products; manuals and FAQs stay online."
+
+[[manuals]]
+kind = "product-page"
+title = "Greentherm 9000 discontinued-product page (spare parts lists, warranty)"
+url = "https://www.bosch-homecomfort.com/us/en/residential/service-support/discontinued-products/discontinued-water-heating-products/greentherm-9000/"
+source = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+
+[[manuals]]
+kind = "support-page"
+title = "Gas tankless water heaters FAQ"
+url = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+source = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Water heating manuals (T9800 and T9900 installation and operation manuals)"
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/water-heating-systems/"
+source = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/water-heating-systems/"
+
+[[facts]]
+topic = "maintenance"
+text = "Bosch's Greentherm 9000 FAQ calls for yearly upkeep: work the relief valve by hand, clean the inlet water filter and the air filter on the front of the fan, and descale the heat exchanger, mainly where the water is hard."
+source = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+
+[[facts]]
+topic = "wifi"
+text = "For the Greentherm 9000 Wi-Fi gateway swap offer, Bosch lists 1-800-283-3787; the old Bosch Water app is no longer available."
+source = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+
+[warranty]
+summary = "Bosch advertises a 15-year heat exchanger warranty and a 5-year limited parts warranty for the series."
+length = "15 years heat exchanger"
+source = "https://www.bosch-homecomfort.com/us/en/residential/service-support/discontinued-products/discontinued-water-heating-products/greentherm-9000/"
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/frequently-asked-questions/gas-tankless-water-heaters-faq/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/water-heating-systems/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/service-support/discontinued-products/discontinued-water-heating-products/greentherm-9000/"
+checked = 2026-11-28

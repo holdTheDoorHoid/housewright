@@ -1,0 +1,90 @@
+format = 1
+id = "residential-openers"
+brand = "liftmaster"
+name = "LiftMaster residential garage door openers (belt, chain, wall mount)"
+category = "garage-door-opener"
+status = "current"
+description = "LiftMaster home openers including models with battery backup and myQ connectivity."
+
+[[manuals]]
+kind = "product-page"
+title = "Residential garage door openers"
+url = "https://www.liftmaster.com/for-homes/garage-door-openers"
+source = "https://www.liftmaster.com/for-homes/garage-door-openers"
+unverified = true
+note = "URL answers 200 but the page renders by script, so its content could not be read at review."
+
+[[manuals]]
+kind = "product-page"
+title = "Openers with battery backup"
+url = "https://www.liftmaster.com/battery-backup-openers/c/battery-backup-openers"
+source = "https://www.liftmaster.com/battery-backup-openers/c/battery-backup-openers"
+
+[[manuals]]
+kind = "support-page"
+title = "How to test the safety reversal system"
+url = "https://support.partner.liftmaster.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+source = "https://support.partner.liftmaster.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+unverified = true
+note = "source blocked automated fetch at review (TLS certificate error)"
+
+[[manuals]]
+kind = "support-page"
+title = "Why the opener is beeping (battery backup status)"
+url = "https://support.partner.liftmaster.com/s/article/Why-is-the-garage-door-opener-beeping-1484145517818"
+source = "https://support.partner.liftmaster.com/s/article/Why-is-the-garage-door-opener-beeping-1484145517818"
+unverified = true
+note = "source blocked automated fetch at review (TLS certificate error)"
+
+[[facts]]
+topic = "safety"
+text = "Each month and after any adjustment, lay a board about 1.5 inches high (a 2x4 flat) under the middle of the open door and close it with the opener; it must reverse on hitting it. If it just stops, increase the down travel per the manual. If it still fails, call a trained door technician."
+source = "https://support.partner.liftmaster.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+unverified = true
+note = "source blocked automated fetch at review (TLS certificate error); matches the same article on the sister Chamberlain support site, which was read"
+
+[[facts]]
+topic = "battery"
+text = "In a power cut the backup battery can keep the opener working for up to about 24 hours."
+source = "https://www.liftmaster.com/builder-knowledge-center/offer-battery-backup"
+
+[[facts]]
+topic = "battery"
+text = "A backup battery usually lasts one to two years, depending on use. The opener's battery status light tells you when it is due for replacement."
+source = "https://www.liftmaster.com/battery-backup-garage-door-opener"
+
+[[sources]]
+url = "https://www.liftmaster.com/for-homes/garage-door-openers"
+title = "LiftMaster residential garage door openers"
+checked = 2026-11-28
+unverified = true
+note = "page renders by script; content not readable at review"
+
+[[sources]]
+url = "https://www.liftmaster.com/battery-backup-openers/c/battery-backup-openers"
+title = "LiftMaster openers with battery backup"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.liftmaster.com/builder-knowledge-center/offer-battery-backup"
+title = "LiftMaster builder knowledge centre: battery backup"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.liftmaster.com/battery-backup-garage-door-opener"
+title = "LiftMaster battery backup openers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.partner.liftmaster.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+title = "LiftMaster safety reversal test"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review (TLS certificate error)"
+
+[[sources]]
+url = "https://support.partner.liftmaster.com/s/article/Why-is-the-garage-door-opener-beeping-1484145517818"
+title = "LiftMaster beeping article"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review (TLS certificate error)"
