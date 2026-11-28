@@ -10,3 +10,4 @@ app/src-tauri/gen/schemas/
 .svelte-kit/
 test-results/
 playwright-report/
+app/dist-web/
