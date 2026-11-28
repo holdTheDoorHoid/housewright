@@ -22,7 +22,7 @@
   let info = $state<BinderInfo | null>(null);
   let error = $state<string | null>(null);
   let edition = $state<Edition>('full');
-  let includeCosts = $state(false);
+  let includeCosts = $state(true);
   let includeNotes = $state(true);
   let busy = $state<string | null>(null);
   let location = $state('');
@@ -35,7 +35,10 @@
   $effect(() => {
     void app.tick;
     void tick;
-    call('binder', {})
+    // Only the handover edition has choices; its change markers must
+    // compare with a print made with the same choices.
+    const choices = edition === 'handover' ? { include_costs: includeCosts, include_notes: includeNotes } : {};
+    call('binder', choices)
       .then((b) => {
         info = b;
         if (!locationEdited) location = b.sealed_location ?? '';
@@ -68,8 +71,7 @@
       edition,
       volume,
       only_changed: onlyChanged,
-      include_costs: includeCosts,
-      include_notes: includeNotes,
+      ...(edition === 'handover' ? { include_costs: includeCosts, include_notes: includeNotes } : {}),
     };
     try {
       await openFile('binder_pdf', args, filename(volume, onlyChanged), 'application/pdf');

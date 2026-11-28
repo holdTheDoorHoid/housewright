@@ -978,3 +978,28 @@ fn the_web_path_bundle_render_record_matches_the_native_one() {
         assert!(!b.source.contains(s), "bundle source holds {s:?}");
     }
 }
+
+#[test]
+fn handover_change_markers_follow_the_chosen_options() {
+    // Found on the emulator: a print made with different choices than the
+    // status compared with showed a section as changed straight away.
+    let mut d = demo();
+    d.api
+        .call_download(
+            "binder_pdf",
+            json!({"edition": "handover", "include_costs": true}),
+        )
+        .unwrap();
+    let same = call(&mut d.api, "binder", json!({"include_costs": true}));
+    assert_eq!(same["editions"][2]["edition"], "handover");
+    assert_eq!(same["editions"][2]["changed"], 0);
+    let other = call(&mut d.api, "binder", json!({"include_costs": false}));
+    let changed: Vec<&str> = other["editions"][2]["sections"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|s| s["changed"] == true)
+        .map(|s| s["key"].as_str().unwrap())
+        .collect();
+    assert_eq!(changed, vec!["history"]);
+}

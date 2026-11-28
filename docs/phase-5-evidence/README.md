@@ -32,4 +32,24 @@ repeated its title. Poppler prints "Syntax Error: Suspects object is
 wrong type (boolean)" for Typst's tagged PDFs; the files open and print
 normally, and Chrome's viewer shows no error.
 
-ANDROID_SECTION
+## Android emulator
+
+Android 15 emulator (`hw_api35`, x86_64), driven only through
+`~/Android/emu-adb`, 2026-11-28. The x86_64 debug APK was installed with
+`install -r` over the earlier build, so the existing household (schema 3)
+was migrated to schema 4 in place; its Today list was intact
+(`android/01-launch-after-upgrade.png`; the "System UI isn't responding"
+dialog on that first screenshot is the emulator's own, from booting
+headless).
+
+| Check | Result | Evidence |
+|---|---|---|
+| House binder screen from Home | **Pass.** Editions, section list, paper, print buttons, where the sealed volume is kept, who to call. | `android/02-binder-screen.png`, `android/03-binder-sections.png`, `android/04-sealed-place-saved.png` |
+| Main binder opens in the phone's PDF viewer | **Pass.** About 2 s from the tap to the Google PDF viewer for this household (typeset in-process, debug build). Page 1 is the emergency page; the about page shows where the sealed volume is kept. | `android/05-main-binder-in-viewer.png` |
+| Change markers | **Found a bug, fixed.** Straight after the first print, "Maintenance history" showed as changed: the screen printed the household binder without costs while the status compared with costs. The screen now sends the handover choices only for the handover edition, and the status compares with the same choices (regression test `handover_change_markers_follow_the_chosen_options`). After the fix, the stale mark from the first print was cleared by "Print the 1 changed section", which printed only History ("History 1"). | `android/06-changed-markers.png`, `android/07-reprint-changed-section-viewer.png`, `android/08-after-reprint-main-up-to-date.png` |
+| Sealed volume as its own PDF | **Pass.** `house-binder-full-SEALED.pdf`, titled "SEALED — keep in a safe place", with the recovery key placeholder page. | `android/09-sealed-volume-viewer.png` |
+| Up to date after printing both | **Pass.** "Nothing has changed since you printed it on Nov 28." | `android/10-everything-up-to-date.png` |
+
+Not checked on the emulator: the share sheet for the binder (the same
+plugin path as the Phase 4 backup), printing to a real printer, and a
+real phone.

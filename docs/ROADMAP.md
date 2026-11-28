@@ -10,7 +10,7 @@ assumption early. Status as of 2026-11-27.
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | done on branch `phase-2-app-shell` (PR #2): web verified in a browser; Android reminder proof passed on the emulator 2026-11-27 (see below) |
 | 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web (Playwright) and Android emulator walk-through pass; see below |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | built on branch `phase-4-records` (2026-11-27): Rust, web (Playwright) and Android emulator checks; see below |
-| 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; ANDROID_STATUS; see below |
+| 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; Android emulator checks pass (one bug found and fixed); see below |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | |
@@ -208,7 +208,19 @@ Built (decisions D-80 to D-88):
 - Storage schema 4 and export version 4 (`binder_print`, contractor
   `emergency`); Phase 3 exports still import and print.
 
-SIZES_TABLE
+Sizes (measured 2026-11-28):
+
+| | Before (Phase 4) | After | Change |
+|---|---|---|---|
+| Web: main WebAssembly module | 8.56 MB (3.23 MB gzip) | 9.41 MB (3.46 MB gzip) | +0.85 MB (+0.24 MB gzip): the binder's own code, without Typst |
+| Web: binder module (Typst), fetched on the first print only | none | 30.9 MB (11.6 MB gzip) | only when someone prints |
+| Web, for comparison: Typst inside the main module | | 38.3 MB (14.2 MB gzip) | +29.8 MB (+11.0 MB gzip); why it was split (D-80) |
+| Android native library (x86_64 debug, stripped) | 48.1 MB | 114.6 MB | about +66 MB in a debug build (Typst's symbols alone are about 29 MB). A release build (`opt-level = "s"`, LTO) was not measured; the web module above suggests Typst costs roughly 25 to 30 MB there too. |
+
+Making the household binder for the emulator's test household (about
+twenty things, few photos) took about 2 s on the emulator in a debug build, from
+the tap to the PDF viewer. The web's first print also fetches the 11.6 MB
+module; it was not timed separately.
 
 Verified: Rust format, clippy (native and wasm), tests (no sensitive value
 in any main volume: document model, laid-out pages and `pdftotext`

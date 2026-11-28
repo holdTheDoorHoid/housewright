@@ -28,6 +28,12 @@ const REMINDER_TASK: &str = "reprint-binder";
 pub struct BinderArgs {
     #[serde(default)]
     pub property_id: Option<String>,
+    /// The handover edition's choices, so its change markers compare
+    /// like with like.
+    #[serde(default)]
+    pub include_costs: Option<bool>,
+    #[serde(default)]
+    pub include_notes: Option<bool>,
 }
 
 #[derive(Deserialize)]
@@ -175,7 +181,16 @@ fn blank(s: Option<String>) -> Option<String> {
 impl Api {
     pub(crate) fn binder_call(&mut self, cmd: &str, a: Value) -> Option<Result<Value, ApiError>> {
         Some(match cmd {
-            "binder" => args(a).and_then(|a: BinderArgs| ok(self.binder_status(a.property_id)?)),
+            "binder" => args(a).and_then(|a: BinderArgs| {
+                let mut h = Options::for_edition(Edition::Handover);
+                if let Some(c) = a.include_costs {
+                    h.include_costs = c;
+                }
+                if let Some(n) = a.include_notes {
+                    h.include_notes = n;
+                }
+                ok(self.binder_status_with(a.property_id, h)?)
+            }),
             "set_sealed_location" => {
                 args(a).and_then(|a: TextArgs| ok(self.set_sealed_location(&a.text)?))
             }
@@ -237,6 +252,14 @@ impl Api {
     }
 
     fn binder_status(&self, property: Option<String>) -> Result<BinderOut, ApiError> {
+        self.binder_status_with(property, Options::for_edition(Edition::Handover))
+    }
+
+    fn binder_status_with(
+        &self,
+        property: Option<String>,
+        handover: Options,
+    ) -> Result<BinderOut, ApiError> {
         let pid = self.binder_property(property)?;
         let data = binder::gather(&self.store, pid, self.store.now())?;
         let prints: Vec<BinderPrint> = self
@@ -248,7 +271,12 @@ impl Api {
         let can_sealed = self.me()?.role.can_see_sensitive();
         let mut editions = Vec::new();
         for e in Edition::ALL {
-            let b = binder::build(&data, e, Options::for_edition(e));
+            let opts = if e == Edition::Handover {
+                handover
+            } else {
+                Options::for_edition(e)
+            };
+            let b = binder::build(&data, e, opts);
             let mut docs = vec![&b.main];
             if can_sealed && let Some(s) = &b.sealed {
                 docs.push(s);

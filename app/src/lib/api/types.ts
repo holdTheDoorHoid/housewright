@@ -517,7 +517,7 @@ export interface Commands {
   set_currency: [{ currency: string }, Status];
   label_sheet: [{ item_ids?: string[] }, { presets: { key: string; label: string; layout: SheetLayout }[]; stickers: Sticker[] }];
   find_label: [{ text: string }, ItemRow[]];
-  binder: [{ property_id?: string } | None, BinderInfo];
+  binder: [{ property_id?: string; include_costs?: boolean; include_notes?: boolean } | None, BinderInfo];
   set_sealed_location: [{ text: string }, BinderInfo];
   set_binder_reminder: [{ on: boolean }, BinderInfo];
   set_paper: [{ paper: Paper }, BinderInfo];
