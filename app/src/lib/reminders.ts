@@ -131,7 +131,7 @@ class AndroidReminders implements ReminderService {
   async takePendingAction() {
     try {
       const { invoke } = await this.core();
-      const r = await invoke<{ action?: string; taskId?: string }>('plugin:reminders|take_pending_action');
+      const r = await invoke<{ action?: string; taskId?: string }>('plugin:reminders|pending');
       return r.action && r.taskId ? { action: r.action, taskId: r.taskId } : null;
     } catch {
       return null;
