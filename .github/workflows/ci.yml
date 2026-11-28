@@ -30,6 +30,15 @@ jobs:
       - name: Tests
         run: cargo test --workspace --locked
 
+  deny:
+    # Security advisories and licences of every Rust dependency (deny.toml).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories licenses sources
+
   web:
     runs-on: ubuntu-latest
     defaults:

@@ -83,4 +83,23 @@ describe('Sync screen', () => {
     render(Sync);
     expect(await screen.findByText(/was removed from the household/)).toBeTruthy();
   });
+
+  it('shows device changes made elsewhere until dismissed', async () => {
+    useBackend(
+      new FakeBackend({
+        sync_status: () =>
+          status({
+            enabled: true,
+            recovery_confirmed: true,
+            notices: [{ at: null, text: '“Tablet” was added to the household by the recovery key.' }],
+          }),
+        sync_devices: () => [],
+        sync_dismiss_notices: () => status({ enabled: true, recovery_confirmed: true }),
+      }),
+    );
+    render(Sync);
+    expect(await screen.findByText(/was added to the household by the recovery key/)).toBeTruthy();
+    await fireEvent.click(screen.getByRole('button', { name: 'OK' }));
+    expect(screen.queryByTestId('notices')).toBeNull();
+  });
 });

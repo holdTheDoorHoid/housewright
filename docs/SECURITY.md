@@ -395,6 +395,21 @@ buffers holding plaintext operations are not all wiped.
 - pairing with a wrong code, with "they don't match" on either side, and
   with a middleman who has the code;
 - a member device writing in the owner's name is refused.
+- after the review (`crates/sync/tests/review.rs`): a removed device with a
+  colluding server injecting forged batches, including to a device that
+  joins later and is shown the forgeries first (H1); an owner's device
+  writing in a member's name (H1); 14 MB of big batches through a phone
+  that cannot read answers over 2 MB, a change too big to send, a stored
+  batch too big to fetch, a batch over the server's cap (H2); a forged
+  "done by" and a backdated rewrite of someone's record (M2); a stolen
+  owner's phone trying to remove the owner's devices or replace the key,
+  and notices on other devices (M3); a roster version hidden by the server
+  stopping sealing (M1); the household quota (M4); a squatted file healing
+  (L2); an unreadable batch kept (L3); a batch re-sealed after a removal
+  (L4); the owner unable to finish pairing first (L6); "stop syncing"
+  leaving no key in the database file or its log (L7). Each of the H1, H2,
+  M1 and M2 protections was switched off in turn to confirm its test then
+  fails.
 
 ### Size limits (D-100)
 
