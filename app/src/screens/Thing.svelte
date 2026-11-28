@@ -72,8 +72,13 @@
           <a href={`#/task/${d.next.id}`}><strong>{d.next.title}</strong></a>
           <div class="small muted">{dueText(d.next)}</div>
         </div>
-        <button class="primary done" onclick={() => d?.next && markDone(d.next).catch((e) => toast({ text: errorText(e) }))}
-          >Done</button
+        <!-- Not due yet: still one tap, but a quieter button, so a sticker
+             scanned just to look does not invite logging it twice. -->
+        <button
+          class="done"
+          class:primary={['due_soon', 'due', 'overdue'].includes(d.next.state)}
+          onclick={() => d?.next && markDone(d.next).catch((e) => toast({ text: errorText(e) }))}
+          >{['due_soon', 'due', 'overdue'].includes(d.next.state) ? 'Done' : 'Done now'}</button
         >
       </div>
     {/if}

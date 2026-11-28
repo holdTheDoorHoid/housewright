@@ -117,7 +117,7 @@ class RemindersPlugin(private val activity: Activity) : Plugin(activity) {
     )
 
     @Command
-    fun view_file(invoke: Invoke) {
+    fun viewFile(invoke: Invoke) {
         val args = invoke.parseArgs(FileArgs::class.java)
         try {
             val intent = Intent(Intent.ACTION_VIEW)
@@ -133,7 +133,7 @@ class RemindersPlugin(private val activity: Activity) : Plugin(activity) {
     }
 
     @Command
-    fun share_file(invoke: Invoke) {
+    fun shareFile(invoke: Invoke) {
         val args = invoke.parseArgs(FileArgs::class.java)
         try {
             val intent = Intent(Intent.ACTION_SEND)

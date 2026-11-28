@@ -10,6 +10,8 @@ mod core;
 #[cfg(target_os = "android")]
 mod android;
 
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD as B64;
 use housewright_api::ApiError;
 use serde_json::Value;
 use tauri::Manager;
@@ -39,47 +41,33 @@ async fn api(app: tauri::AppHandle, cmd: String, args: Value) -> Result<Value, A
     blocking(move || core::call(&path, &cmd, args)).await
 }
 
-/// A command with a file: the bytes are the raw request body; the command
-/// name and JSON arguments travel in headers.
+/// A command with a file. The bytes travel as base64 text: on Android the
+/// WebView cannot pass a raw request body to the app (requests go through
+/// a JSON message bridge), so raw IPC bodies do not arrive there.
 #[tauri::command]
 async fn api_upload(
     app: tauri::AppHandle,
-    request: tauri::ipc::Request<'_>,
-) -> Result<Value, ApiError> {
-    let path = db_path(&app)?;
-    let tauri::ipc::InvokeBody::Raw(bytes) = request.body() else {
-        return Err(ApiError::invalid("expected a file"));
-    };
-    let bytes = bytes.clone();
-    let header = |k: &str| {
-        request
-            .headers()
-            .get(k)
-            .and_then(|v| v.to_str().ok())
-            .map(str::to_string)
-    };
-    let cmd = header("x-cmd").ok_or_else(|| ApiError::invalid("no command"))?;
-    let args_text = header("x-args").unwrap_or_default();
-    let args_text = percent_decode(&args_text);
-    let args: Value = if args_text.is_empty() {
-        Value::Null
-    } else {
-        serde_json::from_str(&args_text).map_err(|e| ApiError::invalid(e.to_string()))?
-    };
-    blocking(move || core::with_api(&path, |api| api.call_upload(&cmd, args, &bytes))).await
-}
-
-/// A command that returns bytes, as a raw (not JSON) response.
-#[tauri::command]
-async fn api_download(
-    app: tauri::AppHandle,
     cmd: String,
     args: Value,
-) -> Result<tauri::ipc::Response, ApiError> {
+    data: String,
+) -> Result<Value, ApiError> {
+    let path = db_path(&app)?;
+    blocking(move || {
+        let bytes = B64
+            .decode(data.as_bytes())
+            .map_err(|e| ApiError::invalid(format!("the file did not arrive whole: {e}")))?;
+        core::with_api(&path, |api| api.call_upload(&cmd, args, &bytes))
+    })
+    .await
+}
+
+/// A command that returns bytes, as base64 text (see `api_upload`).
+#[tauri::command]
+async fn api_download(app: tauri::AppHandle, cmd: String, args: Value) -> Result<String, ApiError> {
     let path = db_path(&app)?;
     let bytes =
         blocking(move || core::with_api(&path, |api| api.call_download(&cmd, args))).await?;
-    Ok(tauri::ipc::Response::new(bytes))
+    Ok(B64.encode(bytes))
 }
 
 /// Write a command's bytes to a file in the app's cache folder and return
@@ -118,24 +106,6 @@ async fn save_for_viewer(
         Ok(out.to_string_lossy().to_string())
     })
     .await
-}
-
-fn percent_decode(s: &str) -> String {
-    let b = s.as_bytes();
-    let mut out = Vec::with_capacity(b.len());
-    let mut i = 0;
-    while i < b.len() {
-        if b[i] == b'%' && i + 2 < b.len() {
-            if let Ok(v) = u8::from_str_radix(&s[i + 1..i + 3], 16) {
-                out.push(v);
-                i += 3;
-                continue;
-            }
-        }
-        out.push(b[i]);
-        i += 1;
-    }
-    String::from_utf8_lossy(&out).to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

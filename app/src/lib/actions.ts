@@ -26,5 +26,8 @@ export async function markDone(card: Pick<Card, 'id' | 'title'>): Promise<void> 
 }
 
 export function errorText(e: unknown): string {
-  return e instanceof Error ? e.message : String(e);
+  if (e instanceof Error) return e.message;
+  // Tauri and plugin errors can arrive as plain objects or strings.
+  if (e && typeof e === 'object' && 'message' in e) return String((e as { message: unknown }).message);
+  return String(e);
 }

@@ -24,6 +24,7 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
+base64 = "0.22"
 housewright-api = { path = "../../crates/api" }
 housewright-core = { path = "../../crates/core" }
 housewright-media = { path = "../../crates/media" }

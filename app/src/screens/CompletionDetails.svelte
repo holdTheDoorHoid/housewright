@@ -40,6 +40,7 @@
       });
       toast({ text: 'Saved with the record.' }, 3000);
       onsaved(t);
+      onclose();
     } catch (err) {
       toast({ text: errorText(err) });
     } finally {
@@ -47,9 +48,13 @@
     }
   }
   const human = (o: string) => o.replaceAll('_', ' ');
+  /** Bring the form into view when it opens (it sits below the steps). */
+  function reveal(node: HTMLElement) {
+    node.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+  }
 </script>
 
-<form class="details" onsubmit={save} data-testid="completion-details">
+<form class="details" onsubmit={save} data-testid="completion-details" use:reveal>
   <p class="muted small">All optional. The job is already recorded.</p>
   <h3>Photo</h3>
   <Attachments

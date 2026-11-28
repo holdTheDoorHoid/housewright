@@ -26,5 +26,6 @@ All are permissive and compatible with AGPL-3.0.
 | `rten` 0.28 and its `rten-*` crates (+ `rayon`, `num_cpus`, `smallvec`, `typeid`) | running the OCR models | MIT OR Apache-2.0 |
 | `zip` 9 (+ `flate2`, `zlib-rs`, `crc32fast`) | the full backup file | MIT (zip), MIT OR Apache-2.0 (flate2), Zlib (zlib-rs) |
 | `sha2` 0.11 | content hashes of stored files | MIT OR Apache-2.0 |
+| `base64` 0.22 (Tauri app only) | file bytes across the Android WebView bridge | MIT OR Apache-2.0 |
 
 Checked with `cargo metadata` on 2026-11-27.

@@ -569,8 +569,12 @@ the app's cache folder and the reminders plugin hands it to the phone's own
 viewer (`ACTION_VIEW`) or share sheet (`ACTION_SEND`) through the existing
 FileProvider. The same plugin notices `housewright://item/...` links. The
 plugin's name now undersells it; renaming it is left for a quiet moment.
-Photos are taken or picked through the WebView's ordinary file input. On
-the web, files open in a new tab or download.
+Photos are taken or picked through the WebView's ordinary file input (on
+Android 15 this opens the system photo picker, which gives the app only the
+photo chosen). File bytes cross the Tauri bridge as base64 text, because
+Android's WebView cannot hand a raw request body to the app; this costs a
+third more bytes in memory for the moment of the transfer. On the web the
+worker passes bytes directly, and files open in a new tab or download.
 
 ## Open questions for the owner
 
