@@ -107,6 +107,7 @@ fn room(w: &World, r: usize, i: usize) -> Room {
         .get::<Room>(&w.rooms[i].to_string())
         .unwrap()
         .unwrap_or(Room {
+            outline: None,
             id: w.rooms[i],
             property: w.property,
             floor: None,
@@ -153,6 +154,7 @@ fn run(w: &mut World, a: &Action) {
             sensitive,
         } => {
             let f = Fact {
+                pin: None,
                 id: w.fact,
                 property: w.property,
                 category: "codes".into(),

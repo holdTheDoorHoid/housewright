@@ -153,7 +153,13 @@ fn emergency_section(c: &Ctx<'_>) -> Section {
     let shut = shutoff_facts(c);
     let shutoffs: Vec<(String, String)> = shut
         .iter()
-        .map(|f| (clip(&f.fact.label, 60), clip(&fact_place(c, f), 140)))
+        .map(|f| {
+            let place = match f.fact.pin.and_then(|p| crate::plans::pin_place(c.d, p)) {
+                Some(pin) => format!("{} ({pin})", clip(&fact_place(c, f), 110)),
+                None => clip(&fact_place(c, f), 140),
+            };
+            (clip(&f.fact.label, 60), place)
+        })
         .collect();
     let photos: Vec<Photo> = shut
         .iter()
@@ -943,6 +949,7 @@ pub fn main_volume(p: &Public, edition: Edition, opts: Options) -> Document {
         };
     }
     let mut body = vec![house_section(&c), facts_section(&c)];
+    body.extend(crate::plans::plan_sections(d, &shutoff_facts(&c)));
     body.extend(things_sections(&c));
     body.push(calendar_section(&c));
     body.push(history_section(&c));

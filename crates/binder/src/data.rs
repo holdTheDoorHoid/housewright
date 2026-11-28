@@ -66,6 +66,34 @@ pub struct NoteData {
     pub text: Flagged<String>,
 }
 
+/// A pin, with what the binder needs to know about its thing.
+#[derive(Clone, Debug)]
+pub struct PinData {
+    pub pin: PlanPin,
+    /// The thing's name, when the pin holds one.
+    pub item_name: Option<String>,
+}
+
+/// One floor's plan.
+#[derive(Clone, Debug)]
+pub struct FloorData {
+    pub floor: Floor,
+    pub rooms: Vec<Room>,
+    pub walls: Vec<Wall>,
+    pub openings: Vec<Opening>,
+    pub pins: Vec<PinData>,
+    pub labels: Vec<PlanLabel>,
+}
+
+impl FloorData {
+    /// Whether anything is drawn on it.
+    pub fn is_drawn(&self) -> bool {
+        self.rooms.iter().any(|r| r.outline.is_some())
+            || !self.walls.is_empty()
+            || !self.pins.is_empty()
+    }
+}
+
 /// What a redaction took out of the main volume, as counts only.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Withheld {
@@ -75,6 +103,8 @@ pub struct Withheld {
     pub item_details: usize,
     pub notes: usize,
     pub contractor_details: usize,
+    /// Floor plan pins and labels marked private, or of private things.
+    pub pins: usize,
 }
 
 impl Withheld {
@@ -84,6 +114,7 @@ impl Withheld {
             + self.item_details
             + self.notes
             + self.contractor_details
+            + self.pins
             > 0
     }
 }
@@ -106,6 +137,10 @@ pub struct HouseData {
     pub completions: Vec<CompletionData>,
     /// Notes about the house, a room or a thing: "quirks only you know".
     pub notes: Vec<NoteData>,
+    /// Floor plans, lowest floor first (only floors with something drawn).
+    pub floors: Vec<FloorData>,
+    /// How lengths and areas are written (D-06).
+    pub units: Units,
     /// Set by [`crate::redact`] on the public copy.
     pub withheld: Withheld,
     /// What the sealed volume's recovery page says (D-91).
@@ -340,7 +375,36 @@ pub fn gather(store: &Store, property: Option<PropertyId>, now: Timestamp) -> Re
         })
         .collect();
 
+    let item_names: BTreeMap<ItemId, String> = items
+        .iter()
+        .map(|i| (i.item.id, i.item.name.clone()))
+        .collect();
+    let mut floors = Vec::new();
+    for f in store.floors(property.id)? {
+        let plan = store.floor_plan(f.id)?;
+        let fd = FloorData {
+            pins: plan
+                .pins
+                .into_iter()
+                .map(|p| PinData {
+                    item_name: p.item.and_then(|i| item_names.get(&i).cloned()),
+                    pin: p,
+                })
+                .collect(),
+            floor: plan.floor,
+            rooms: plan.rooms,
+            walls: plan.walls,
+            openings: plan.openings,
+            labels: plan.labels,
+        };
+        if fd.is_drawn() {
+            floors.push(fd);
+        }
+    }
+
     Ok(HouseData {
+        floors,
+        units: household.units(),
         today,
         household_name: household.name.clone(),
         currency: household.currency().to_string(),

@@ -88,6 +88,7 @@ fn server_holds_no_plaintext() {
     let (mut a, mut b) = two_devices(&lab);
     a.room(1, "Zanzibar-pantry-1234");
     let f = Fact {
+        pin: None,
         id: FactId::new(),
         property: PropertyId(uuid::Uuid::from_u128(7)),
         category: "security".into(),

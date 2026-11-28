@@ -9,8 +9,10 @@ use crate::geom::{Point, distance};
 /// on-screen tolerance into millimetres at the current zoom).
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SnapOptions {
-    /// Grid spacing; `None` or 0 for no grid.
-    pub grid: Option<i64>,
+    /// Grid spacing in millimetres; `None` or 0 for no grid. Fractional,
+    /// so a 6-inch grid (152.4 mm) does not drift: grid points are the
+    /// nearest whole millimetre to each multiple.
+    pub grid: Option<f64>,
     /// Corners within this distance are snapped onto.
     pub endpoint_tolerance: i64,
     /// Snap the direction from the anchor to multiples of this many degrees
@@ -23,7 +25,7 @@ pub struct SnapOptions {
 impl Default for SnapOptions {
     fn default() -> Self {
         Self {
-            grid: Some(100),
+            grid: Some(100.0),
             endpoint_tolerance: 150,
             angle_step: Some(45.0),
             angle_tolerance: 6.0,
@@ -51,17 +53,13 @@ pub struct Snapped {
     pub kind: SnapKind,
 }
 
-/// The nearest multiple of `step` to `v` (ties away from zero).
-pub fn round_to(v: i64, step: i64) -> i64 {
-    if step <= 0 {
+/// The whole millimetre nearest to the multiple of `step` nearest to `v`
+/// (ties away from zero).
+pub fn round_to(v: i64, step: f64) -> i64 {
+    if step <= 0.0 || !step.is_finite() {
         return v;
     }
-    let half = step / 2;
-    if v >= 0 {
-        (v + half) / step * step
-    } else {
-        -((-v + half) / step * step)
-    }
+    ((v as f64 / step).round() * step).round() as i64
 }
 
 /// Snap `p`. `anchor` is the previous point of the wall being drawn, if any;
@@ -84,7 +82,7 @@ pub fn snap(p: Point, anchor: Option<Point>, corners: &[Point], o: &SnapOptions)
             };
         }
     }
-    let grid = o.grid.filter(|g| *g > 0);
+    let grid = o.grid.filter(|g| *g > 0.0);
     if let (Some(a), Some(step)) = (anchor, o.angle_step.filter(|s| *s > 0.0)) {
         let dx = (p.x - a.x) as f64;
         let dy = (p.y - a.y) as f64;
@@ -128,11 +126,14 @@ mod tests {
 
     #[test]
     fn rounding() {
-        assert_eq!(round_to(149, 100), 100);
-        assert_eq!(round_to(150, 100), 200);
-        assert_eq!(round_to(-149, 100), -100);
-        assert_eq!(round_to(-150, 100), -200);
-        assert_eq!(round_to(7, 0), 7);
+        assert_eq!(round_to(149, 100.0), 100);
+        assert_eq!(round_to(150, 100.0), 200);
+        assert_eq!(round_to(-149, 100.0), -100);
+        assert_eq!(round_to(-150, 100.0), -200);
+        assert_eq!(round_to(7, 0.0), 7);
+        // A 6-inch grid: 2 ft is 610 mm, 10 ft is 3048 mm, never drifting.
+        assert_eq!(round_to(600, 152.4), 610);
+        assert_eq!(round_to(3050, 152.4), 3048);
     }
 
     #[test]
@@ -156,7 +157,7 @@ mod tests {
     #[test]
     fn square_and_diagonal_directions() {
         let o = SnapOptions {
-            grid: Some(10),
+            grid: Some(10.0),
             ..SnapOptions::default()
         };
         let a = Point::new(0, 0);

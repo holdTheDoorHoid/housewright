@@ -22,6 +22,7 @@ use crate::ids::*;
 use crate::priority::PriorityClass;
 use crate::reminders::ReminderPrefs;
 use crate::schedule::{Climate, Schedule, WindowPolicy};
+pub use housewright_plan::{Point, Units};
 
 /// Normal (main binder) or sensitive (sealed volume), per D-41.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -90,10 +91,19 @@ pub enum EntityKind {
     /// fingerprint of each one's content, so the app can say what changed
     /// since (D-42, D-82).
     BinderPrint,
+    /// A wall on a floor plan (D-25). One record per wall, so two people
+    /// editing different walls merge cleanly.
+    Wall,
+    /// A door, window or gap in a wall.
+    Opening,
+    /// A pin on a floor plan: a thing, or a labelled spot (a shutoff).
+    PlanPin,
+    /// A free text label on a floor plan.
+    PlanLabel,
 }
 
 impl EntityKind {
-    pub const ALL: [EntityKind; 21] = [
+    pub const ALL: [EntityKind; 25] = [
         EntityKind::Household,
         EntityKind::Member,
         EntityKind::Property,
@@ -115,6 +125,18 @@ impl EntityKind {
         EntityKind::CompletionDetail,
         EntityKind::TemplateFields,
         EntityKind::BinderPrint,
+        EntityKind::Wall,
+        EntityKind::Opening,
+        EntityKind::PlanPin,
+        EntityKind::PlanLabel,
+    ];
+
+    /// The floor plan kinds (Phase 8, schema 6).
+    pub const PLAN: [EntityKind; 4] = [
+        EntityKind::Wall,
+        EntityKind::Opening,
+        EntityKind::PlanPin,
+        EntityKind::PlanLabel,
     ];
 
     /// The kinds that existed at schema version 1. Migration 1 creates
@@ -162,6 +184,10 @@ impl EntityKind {
             EntityKind::CompletionDetail => "completion_detail",
             EntityKind::TemplateFields => "template_fields",
             EntityKind::BinderPrint => "binder_print",
+            EntityKind::Wall => "wall",
+            EntityKind::Opening => "opening",
+            EntityKind::PlanPin => "plan_pin",
+            EntityKind::PlanLabel => "plan_label",
         }
     }
 
@@ -234,12 +260,19 @@ pub struct Household {
     /// ISO 4217 currency for costs; absent means USD (D-06).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub currency: Option<String>,
+    /// How lengths and areas are shown on floor plans; absent means feet
+    /// and inches (D-06).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub units: Option<Units>,
 }
 entity!(Household, Household);
 
 impl Household {
     pub fn currency(&self) -> &str {
         self.currency.as_deref().unwrap_or("USD")
+    }
+    pub fn units(&self) -> Units {
+        self.units.unwrap_or_default()
     }
 }
 
@@ -323,8 +356,30 @@ pub struct Floor {
     /// 0 = ground, negative = basement.
     #[serde(default)]
     pub level: i32,
+    /// A photo or PDF page of an existing plan shown dimmed behind this
+    /// floor's plan, to trace over (D-25, Stage A).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub background: Option<PlanBackground>,
 }
 entity!(Floor, Floor);
+
+/// A traced-over background: an attachment (about the floor) placed on the
+/// plan. Its top-left corner is at `at` and it is `width` millimetres wide
+/// on the plan (the height follows from the picture). One field, so a move
+/// and a resize made at once on two devices never mix.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PlanBackground {
+    pub attachment: AttachmentId,
+    pub at: Point,
+    pub width: i64,
+    /// 0 to 100.
+    #[serde(default = "default_opacity")]
+    pub opacity: u8,
+}
+
+fn default_opacity() -> u8 {
+    35
+}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Room {
@@ -333,8 +388,118 @@ pub struct Room {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub floor: Option<FloorId>,
     pub name: String,
+    /// The room's outline on its floor's plan, in millimetres. Optional:
+    /// rooms without a plan work as before (P3). One field, so concurrent
+    /// edits of the same room's shape resolve to one whole outline.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outline: Option<Vec<Point>>,
 }
 entity!(Room, Room);
+
+/// A wall: a straight segment between two points on a floor, with a
+/// thickness. Each end is its own field, so moving one end on one device
+/// and the other end on another both survive.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Wall {
+    pub id: WallId,
+    pub floor: FloorId,
+    pub a: Point,
+    pub b: Point,
+    /// Millimetres; absent means [`Wall::DEFAULT_THICKNESS`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub thickness: Option<i64>,
+}
+entity!(Wall, Wall);
+
+impl Wall {
+    /// About 4½ inches: a finished interior stud wall.
+    pub const DEFAULT_THICKNESS: i64 = 115;
+    pub fn thickness(&self) -> i64 {
+        self.thickness.unwrap_or(Self::DEFAULT_THICKNESS)
+    }
+    pub fn length(&self) -> i64 {
+        housewright_plan::distance_mm(self.a, self.b)
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum OpeningKind {
+    Door,
+    Window,
+    /// A gap with no door (an archway).
+    Gap,
+}
+
+/// Which way a door opens: hinged at the wall's `a` end or `b` end of the
+/// opening, swinging to the left or right of the wall (looking from `a`
+/// to `b`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Swing {
+    pub hinge: WallEnd,
+    pub side: Side,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WallEnd {
+    A,
+    B,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Side {
+    Left,
+    Right,
+}
+
+/// A door, window or gap on a wall: `offset` millimetres from the wall's
+/// `a` end to the near edge, `width` wide.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Opening {
+    pub id: OpeningId,
+    pub floor: FloorId,
+    pub wall: WallId,
+    pub kind: OpeningKind,
+    pub offset: i64,
+    pub width: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub swing: Option<Swing>,
+}
+entity!(Opening, Opening);
+
+/// A pin on a floor plan: a thing (`item`), or a labelled spot with no
+/// thing behind it ("Water main shutoff"). A pin may sit on a wall.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PlanPin {
+    pub id: PlanPinId,
+    pub floor: FloorId,
+    pub at: Point,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub item: Option<ItemId>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub wall: Option<WallId>,
+    /// A pin can give away where valuables are (a safe): sensitive pins,
+    /// and pins of sensitive things, stay out of the main binder (D-41).
+    #[serde(default)]
+    pub sensitivity: Sensitivity,
+}
+entity!(PlanPin, PlanPin);
+
+/// Free text on a floor plan ("Stairs down", "Crawl space hatch").
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PlanLabel {
+    pub id: PlanLabelId,
+    pub floor: FloorId,
+    pub at: Point,
+    pub text: String,
+    #[serde(default)]
+    pub sensitivity: Sensitivity,
+}
+entity!(PlanLabel, PlanLabel);
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Warranty {
@@ -634,6 +799,10 @@ pub struct Fact {
     /// The room it is about (paint colours per room).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub room: Option<RoomId>,
+    /// Where it is on the floor plan (the water main's shutoff), so the
+    /// binder's emergency page can show it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pin: Option<PlanPinId>,
 }
 entity!(Fact, Fact);
 

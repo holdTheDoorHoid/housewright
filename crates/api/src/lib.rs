@@ -11,6 +11,7 @@
 
 mod binder;
 mod dto;
+mod plan;
 mod records;
 mod sync;
 mod templates;
@@ -106,6 +107,23 @@ pub const COMMANDS: &[&str] = &[
     "contractors",
     "save_contractor",
     "delete_contractor",
+    "floors",
+    "save_floor",
+    "delete_floor",
+    "floor_plan",
+    "save_room_shape",
+    "remove_room_shape",
+    "save_walls",
+    "delete_wall",
+    "save_opening",
+    "delete_opening",
+    "save_pin",
+    "delete_pin",
+    "save_label",
+    "delete_label",
+    "set_background",
+    "set_units",
+    "plan_restore",
     "sync_status",
     "sync_check_server",
     "sync_setup",
@@ -335,9 +353,12 @@ impl Api {
                 let a: AnswerArgs = args(a)?;
                 ok(self.answer_suggestion(a)?)
             }
-            other => match self.binder_call(other, a.clone()) {
+            other => match self.plan_call(other, a.clone()) {
                 Some(r) => r,
-                None => self.records_call(other, a),
+                None => match self.binder_call(other, a.clone()) {
+                    Some(r) => r,
+                    None => self.records_call(other, a),
+                },
             },
         }
     }
@@ -496,6 +517,7 @@ impl Api {
                 me: None,
                 property: None,
                 currency: None,
+                units: None,
             });
         }
         let h = self.household()?;
@@ -503,6 +525,7 @@ impl Api {
         Ok(StatusOut {
             initialized: true,
             currency: Some(h.currency().to_string()),
+            units: Some(h.units()),
             household_name: Some(h.name),
             me: Some(Self::member_dto(&self.me()?)),
             property: p.map(|p| PropertyDto {
@@ -906,7 +929,20 @@ impl Api {
             .serial
             .as_ref()
             .is_some_and(|s| s.sensitivity == Sensitivity::Sensitive);
+        let pin = match self.store.pin_of(id)? {
+            Some(p) => self
+                .store
+                .get::<Floor>(&p.floor.to_string())?
+                .map(|f| ItemPinOut {
+                    pin_id: p.id.to_string(),
+                    floor_id: f.id.to_string(),
+                    floor_name: f.name,
+                    at: p.at,
+                }),
+            None => None,
+        };
         Ok(ItemDetail {
+            pin,
             row,
             make: item.make,
             model: item.model,
@@ -959,6 +995,7 @@ impl Api {
         }
         let p = self.first_property()?;
         let r = Room {
+            outline: None,
             id: RoomId::new(),
             property: p.id,
             floor: None,

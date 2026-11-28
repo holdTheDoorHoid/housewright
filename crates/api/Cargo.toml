@@ -9,6 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 housewright-core.workspace = true
+housewright-plan.workspace = true
 housewright-media.workspace = true
 housewright-binder.workspace = true
 housewright-sync.workspace = true

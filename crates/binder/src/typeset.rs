@@ -10,7 +10,7 @@
 
 use std::fmt::Write;
 
-use crate::doc::{Action, Block, Document, Photo, Section, Volume};
+use crate::doc::{Action, Block, Document, Drawing, Photo, Section, Volume};
 
 /// Page size.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
@@ -94,6 +94,81 @@ fn actions(a: &[Action]) -> String {
     }
     s.push(')');
     s
+}
+
+/// A drawing as Typst arguments: numbers, plus room names, areas and
+/// label texts as string literals.
+fn plan(d: &Drawing) -> String {
+    let nums = |v: &[i64]| {
+        let mut s = String::from("(");
+        for n in v {
+            let _ = write!(s, "{n}, ");
+        }
+        s.push(')');
+        s
+    };
+    let list = |items: Vec<String>| {
+        let mut s = String::from("(");
+        for i in items {
+            s.push_str(&i);
+            s.push_str(", ");
+        }
+        s.push(')');
+        s
+    };
+    let rooms = list(
+        d.rooms
+            .iter()
+            .map(|r| {
+                format!(
+                    "({}, {}, {}, {})",
+                    list(r.points.iter().map(|p| nums(p)).collect()),
+                    lit(&r.name),
+                    lit(&r.area),
+                    nums(&r.at)
+                )
+            })
+            .collect(),
+    );
+    let pins = list(
+        d.pins
+            .iter()
+            .map(|p| {
+                format!(
+                    "({}, {}, {}, {})",
+                    p.at[0],
+                    p.at[1],
+                    lit(&p.number.to_string()),
+                    p.strong
+                )
+            })
+            .collect(),
+    );
+    let labels = list(
+        d.labels
+            .iter()
+            .map(|l| format!("({}, {}, {})", l.at[0], l.at[1], lit(&l.text)))
+            .collect(),
+    );
+    format!(
+        "{}, {}, {}, {}, {}, {}, {}, {}, {}, ({}, {})",
+        d.width.max(1),
+        d.height.max(1),
+        rooms,
+        list(d.walls.iter().map(|w| nums(w)).collect()),
+        list(d.gaps.iter().map(|w| nums(w)).collect()),
+        list(d.windows.iter().map(|w| nums(w)).collect()),
+        list(
+            d.swings
+                .iter()
+                .map(|pl| list(pl.iter().map(|p| nums(p)).collect()))
+                .collect()
+        ),
+        pins,
+        labels,
+        d.bar.0.max(1),
+        lit(&d.bar.1)
+    )
 }
 
 /// The fixed part: page setup and one function per block type. Nothing in
@@ -226,6 +301,46 @@ pub const PRELUDE: &str = r##"
       enum(spacing: 0.45em, ..a.at(1))
     })))
 }
+// A floor plan, scaled to the page width (and at most 165mm tall).
+// Coordinates are plan millimetres; `s` is the length of one of them.
+#let hw-plan(pw, ph, rooms, walls, gaps, windows, swings, pins, labels, bar) = layout(size => {
+  let s = calc.min(size.width / pw, 165mm / ph)
+  let mark(x, y, body) = place(center + horizon, dx: x * s - pw * s / 2, dy: y * s - ph * s / 2, body)
+  let seg(l, st) = place(top + left, line(start: (l.at(0) * s, l.at(1) * s), end: (l.at(2) * s, l.at(3) * s), stroke: st))
+  block(breakable: false, below: 0.8em, width: 100%, align(center, box(width: pw * s, height: ph * s, {
+    for r in rooms {
+      place(top + left, polygon(fill: hw-tint, stroke: 0.4pt + hw-rule, ..r.at(0).map(p => (p.at(0) * s, p.at(1) * s))))
+    }
+    for l in walls { seg(l, (paint: hw-ink, thickness: calc.max(l.at(4) * s, 1.4pt), cap: "square")) }
+    for l in gaps { seg(l, (paint: white, thickness: calc.max(l.at(4) * s, 1.4pt) + 1pt, cap: "butt")) }
+    for l in windows { seg(l, 0.9pt + hw-ink) }
+    for pl in swings {
+      for i in range(pl.len() - 1) {
+        let a = pl.at(i)
+        let b = pl.at(i + 1)
+        seg((a.at(0), a.at(1), b.at(0), b.at(1)), 0.5pt + hw-muted)
+      }
+    }
+    for r in rooms {
+      mark(r.at(3).at(0), r.at(3).at(1), align(center, {
+        text(size: 9pt, weight: "bold", r.at(1))
+        linebreak()
+        text(size: 8pt, fill: hw-muted, r.at(2))
+      }))
+    }
+    for l in labels { mark(l.at(0), l.at(1), text(size: 8pt, style: "italic", l.at(2))) }
+    for p in pins {
+      mark(p.at(0), p.at(1), box(width: 5.4mm, height: 5.4mm, radius: 50%,
+        fill: if p.at(3) { hw-ink } else { white }, stroke: 0.9pt + hw-ink,
+        align(center + horizon, text(size: 7.5pt, weight: "bold", fill: if p.at(3) { white } else { hw-ink }, p.at(2)))))
+    }
+  })))
+  block(below: 1em, {
+    box(width: bar.at(0) * s, height: 1.6mm, stroke: 0.6pt + hw-ink, fill: hw-tint)
+    h(6pt)
+    text(size: 9pt, fill: hw-muted, bar.at(1))
+  })
+})
 // The emergency page is one page, always (D-42): if a household has
 // recorded a lot, the type gets smaller until it fits. 18mm is left for
 // the section title above it.
@@ -293,6 +408,9 @@ fn block(out: &mut String, b: &Block) {
         }
         Block::WriteIn { label } => {
             let _ = writeln!(out, "#hw-write({})", lit(label));
+        }
+        Block::Plan { drawing } => {
+            let _ = writeln!(out, "#hw-plan({})", plan(drawing));
         }
         Block::Cover {
             title,

@@ -233,6 +233,7 @@ impl Device {
 
     pub fn room(&mut self, id: u128, name: &str) {
         let r = Room {
+            outline: None,
             id: RoomId(uuid::Uuid::from_u128(id)),
             property: PropertyId(uuid::Uuid::from_u128(7)),
             floor: None,
@@ -244,6 +245,7 @@ impl Device {
     /// Like `room`, but editing a deleted room is allowed to fail.
     pub fn try_room(&mut self, id: u128, name: &str) {
         let r = Room {
+            outline: None,
             id: RoomId(uuid::Uuid::from_u128(id)),
             property: PropertyId(uuid::Uuid::from_u128(7)),
             floor: None,
@@ -261,6 +263,7 @@ impl Device {
 
     pub fn attach_photo(&mut self, bytes: &[u8]) -> Attachment {
         let r = Room {
+            outline: None,
             id: RoomId(uuid::Uuid::from_u128(99)),
             property: PropertyId(uuid::Uuid::from_u128(7)),
             floor: None,

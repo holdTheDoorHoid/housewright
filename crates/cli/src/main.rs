@@ -428,6 +428,7 @@ fn run(cli: Cli) -> Result<()> {
         Cmd::Room(RoomCmd::Add { name, property }) => {
             let p = property_or_only(&store, property.as_deref())?;
             let r = Room {
+                outline: None,
                 id: RoomId::new(),
                 property: p.id,
                 floor: None,

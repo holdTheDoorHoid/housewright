@@ -128,6 +128,44 @@ impl Public {
         });
         w.notes = before - d.notes.len();
 
+        // Floor plan pins: a private pin, a pin of a private thing, or of a
+        // thing whose whereabouts are private, would show where it is.
+        let private_place: Vec<String> = full
+            .items
+            .iter()
+            .filter(|i| {
+                i.item
+                    .location_note
+                    .as_ref()
+                    .is_some_and(|l| sensitive(l.sensitivity))
+            })
+            .map(|i| i.item.id.to_string())
+            .collect();
+        let mut hidden_pins = Vec::new();
+        for f in &mut d.floors {
+            let before = f.pins.len() + f.labels.len();
+            f.pins.retain(|p| {
+                let item = p.pin.item.map(|i| i.to_string());
+                let hide = sensitive(p.pin.sensitivity)
+                    || item.as_ref().is_some_and(|i| {
+                        hidden_items.contains(i) || private_place.contains(i)
+                    })
+                    // A pin for a thing this copy does not know about at all.
+                    || item.as_ref().is_some_and(|i| !kept.contains(i));
+                if hide {
+                    hidden_pins.push(p.pin.id);
+                }
+                !hide
+            });
+            f.labels.retain(|l| !sensitive(l.sensitivity));
+            w.pins += before - f.pins.len() - f.labels.len();
+        }
+        for f in &mut d.facts {
+            if f.fact.pin.is_some_and(|p| hidden_pins.contains(&p)) {
+                f.fact.pin = None;
+            }
+        }
+
         d.withheld = w;
         d.recovery = crate::data::Recovery::SyncOff;
         Public(d)

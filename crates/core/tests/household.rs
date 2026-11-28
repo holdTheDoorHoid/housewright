@@ -244,6 +244,7 @@ fn export_import_with_history_is_lossless() {
     let task = h.store.list::<Task>().unwrap().remove(0);
     h.store.complete_task(task.id, None, Some("done")).unwrap();
     let room = Room {
+        outline: None,
         id: RoomId::new(),
         property: h.property.id,
         floor: None,

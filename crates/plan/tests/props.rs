@@ -70,21 +70,23 @@ proptest! {
     }
 
     #[test]
-    fn grid_snapping_is_idempotent_and_close(p in pt(), g in 1i64..2000) {
+    fn grid_snapping_is_idempotent_and_close(p in pt(), g in 1.0f64..2000.0) {
         let o = SnapOptions { grid: Some(g), endpoint_tolerance: 0, angle_step: None, angle_tolerance: 0.0 };
         let s = snap(p, None, &[], &o);
         prop_assert_eq!(s.kind, SnapKind::Grid);
-        prop_assert_eq!(s.point.x % g, 0);
-        prop_assert_eq!(s.point.y % g, 0);
-        prop_assert!((s.point.x - p.x).abs() * 2 <= g);
-        prop_assert!((s.point.y - p.y).abs() * 2 <= g);
+        for (v, q) in [(s.point.x, p.x), (s.point.y, p.y)] {
+            // On the grid (to the nearest millimetre) and within half a step.
+            let k = (v as f64 / g).round();
+            prop_assert!((v as f64 - k * g).abs() <= 0.5 + 1e-9);
+            prop_assert!(((v - q).abs() as f64) <= g / 2.0 + 0.5);
+        }
         prop_assert_eq!(snap(s.point, None, &[], &o), s);
     }
 
     #[test]
     fn angle_snapping_gives_square_or_diagonal_walls(a in pt(), p in pt(), step in prop::sample::select(vec![45.0f64, 90.0])) {
         prop_assume!(a != p);
-        let o = SnapOptions { grid: Some(10), endpoint_tolerance: 0, angle_step: Some(step), angle_tolerance: 7.0 };
+        let o = SnapOptions { grid: Some(10.0), endpoint_tolerance: 0, angle_step: Some(step), angle_tolerance: 7.0 };
         let s = snap(p, Some(a), &[], &o);
         if s.kind == SnapKind::Angle && s.point != a {
             let b = bearing_deg(a, s.point);
@@ -99,7 +101,7 @@ proptest! {
 
     #[test]
     fn endpoint_snapping_lands_exactly_on_a_corner(p in pt(), c in pt()) {
-        let o = SnapOptions { grid: Some(100), endpoint_tolerance: 200, angle_step: Some(45.0), angle_tolerance: 6.0 };
+        let o = SnapOptions { grid: Some(100.0), endpoint_tolerance: 200, angle_step: Some(45.0), angle_tolerance: 6.0 };
         let s = snap(p, None, &[c], &o);
         if distance(p, c) <= 200.0 {
             prop_assert_eq!(s, Snapped { point: c, kind: SnapKind::Endpoint });

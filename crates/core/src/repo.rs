@@ -44,6 +44,7 @@ impl Store {
             name: name.to_string(),
             time_zone: time_zone.to_string(),
             currency: None,
+            units: None,
         };
         self.set_author(owner.id)?;
         self.set_meta("household_id", &household.id.to_string())?;
