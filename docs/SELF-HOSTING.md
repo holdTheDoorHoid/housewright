@@ -70,6 +70,38 @@ docker run -d --name housewright -p 127.0.0.1:8787:8787 -v hw-data:/data housewr
 
 and put Caddy in front as above.
 
+## 5. Or as a Home Assistant add-on
+
+D-26 item 4. `integrations/home-assistant/addon/housewright/` packages the
+server and the Home Assistant bridge in one add-on, with everything in the
+add-on's `/data` (so Home Assistant's backups include it):
+
+| Option | Default | Meaning |
+|---|---|---|
+| `server` | on | Run `housewright-server` on port 8787 (data in `/data/server`). |
+| `bridge` | on | Run `housewright-bridge` for the Housewright integration (data in `/data/bridge`). Its API (port 8788) is only on the add-on network; the log prints the address and token to enter in Home Assistant. |
+| `open_registration` | off | As `--open-registration`. Off: the registration token is printed in the log and kept in `/data/server/registration-token` (D-105). |
+| `household_quota_mb` | 2048 | As `--household-quota-mb`. |
+| `ssl`, `certfile`, `keyfile` | off, `fullchain.pem`, `privkey.pem` | Serve HTTPS with a certificate from Home Assistant's `/ssl` folder. Without it the server runs as `--behind-proxy`: phones need HTTPS (D-96), so put a proxy with a certificate in front (for example the NGINX Proxy Manager add-on) and use that address in the app. |
+
+The bridge reaches the server inside the add-on at
+`http://127.0.0.1:8787`; when pairing it from Home Assistant, type that as
+the sync server (or paste the pairing text from the app, which carries the
+app's address).
+
+Status: the files are written and checked for structure
+(`integrations/home-assistant/tests/test_files.py`), but the image has not
+been built or run on Home Assistant OS yet. Supervisor builds an add-on
+from its own folder, which cannot see the Rust sources, so `config.yaml`
+names a prebuilt image; building it (from the repository root) and
+publishing it are open (Q-12):
+
+```sh
+docker build -f integrations/home-assistant/addon/housewright/Dockerfile \
+  --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base-debian:bookworm \
+  -t housewright-addon .
+```
+
 ## Settings
 
 Every flag also reads an environment variable.

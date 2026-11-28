@@ -69,10 +69,11 @@ jobs:
         run: npm test
       - name: Web bundle
         run: npm run build:web
-      # The sync end-to-end test starts a real server from target/debug.
-      - name: Sync server binary
+      # The sync and Home Assistant end-to-end tests start a real server
+      # and bridge from target/debug.
+      - name: Sync server and Home Assistant bridge binaries
         working-directory: .
-        run: cargo build -p housewright-server --locked
+        run: cargo build -p housewright-server -p housewright-bridge --locked
       - name: End-to-end (Playwright, Chromium)
         run: |
           npx playwright install --with-deps chromium
@@ -110,3 +111,33 @@ jobs:
         run: |
           npm ci
           cargo tauri android build --debug --target x86_64 --apk
+
+  home-assistant:
+    # The Home Assistant integration (Python, D-117): ruff, mypy and its
+    # tests, which run against a real housewright-bridge.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/home-assistant
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Bridge and server binaries
+        working-directory: .
+        run: cargo build -p housewright-bridge -p housewright-server --locked
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Test tools
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r requirements-dev.txt
+      - name: Ruff
+        run: |
+          .venv/bin/ruff format --check .
+          .venv/bin/ruff check .
+      - name: Mypy
+        run: .venv/bin/mypy custom_components/housewright
+      - name: Tests
+        run: .venv/bin/python -m pytest -q

@@ -92,6 +92,20 @@ minutes ahead of the server's clock, and the app says "this device's clock
 looks wrong" in plain words. The changes wait on that device until its
 clock is right.
 
+**Home Assistant (Phase 7).** Home Assistant can only see your household
+through the *bridge*, a Housewright device that runs on the same machine
+(or as its add-on). The bridge is a full household member, like a family
+member's phone: it holds the household's keys and a complete copy of the
+data, in its own database on that machine. Anyone who controls the Home
+Assistant machine (an administrator account, a malicious custom
+integration or add-on, someone with the disk) can therefore read
+everything the household has, including sensitive values, by reading the
+bridge's database. Only connect Home Assistant if you trust that machine
+as much as your phone. What the bridge *passes to Home Assistant* is much
+less (see "The Home Assistant bridge" below), and it never acts as an
+owner: it cannot add or remove devices. Remove it in Sync and devices and
+it stops receiving anything new.
+
 ## Threat model
 
 | Who | Can | Cannot (by design) |
@@ -101,6 +115,8 @@ clock is right.
 | Someone who sees the pairing code (a photo of the QR) | try to join in the ten minutes before the real device | join unnoticed: the safety number would not match (see "Pairing") |
 | A removed member | keep what was already on their device; with the help of the server operator, read what other devices still seal under the old key while the server hides the removal from all of them (D-103) | read anything sealed after the other devices know of the removal; push or pull through the server; inject batches through a colluding server (refused by every device, D-99) |
 | A household member | read everything (they hold the household key); write changes in their own name, including edits and deletes of shared things (a delete is permanent on every device; only a backup brings it back) | add or remove devices; write changes, or records ("done by"), in another member's name; replace another member's records (all refused by every device, D-104) |
+| Whoever controls the Home Assistant machine (Phase 7) | read the bridge's whole copy, sensitive values included, from its database; with the bridge's API token, mark tasks done, snooze them, add readings, events and things (in the bridge's name, labelled "via Home Assistant") | act as an owner (the bridge is a member); add or remove devices; write in another member's name (`done_by` is only a label); anything after the bridge is removed |
+| A program on the Home Assistant machine without the bridge's token | reach `/api/v1/health` | read or change anything (every other route needs the token, compared in constant time); a web page in a browser cannot read answers (no CORS) |
 | A thief with an unlocked device | read everything on it; act as that device until it is removed; if an owner's: add devices, remove members' devices (everyone is told) | remove the owner's other devices or replace the recovery key without the paper (D-101); anything after removal |
 | A thief with the recovery key paper and the server address | read everything; add a device as owner; with that device and the paper, remove the owner's devices and replace the key, i.e. take the household over | do it unseen: every remaining device is told; nothing, if the owner replaced the key first |
 
@@ -466,8 +482,53 @@ skipped and counted, never fetched forever. Each household has a storage
 quota (2 GB by default) and, by default, a registration token is needed to
 create a household (D-105).
 
+### The Home Assistant bridge (D-117, D-122, D-124)
+
+`crates/bridge` is an ordinary sync client with role Member: it pairs with
+the same code and safety number (the integration's setup shows the number;
+`housewright-bridge join` prints it), keeps its device secret and key
+chain in its own `bridge.db` (folder mode 0700) exactly as the app does
+(D-95: not wrapped), and is subject to every check other devices apply.
+It refuses an owner's "another device of mine" invitation, so Home
+Assistant never gets owner powers by mistake. Completions it writes are
+its own records (`by` = the bridge, D-104); `done_by` names the person
+and is shown as "via Home Assistant".
+
+The local API listens on 127.0.0.1:8788 unless told otherwise (in the
+add-on, on the add-on network only; the port is not published). Every
+route except `/api/v1/health` needs `Authorization: Bearer <token>`; the
+token is 32 random bytes in Base32 in `api-token` (mode 0600) or
+`HW_BRIDGE_TOKEN`, and both sides are hashed with SHA-256 before a
+constant-time comparison, so neither length nor content leaks through
+timing. No CORS headers are sent. Bodies are limited to 256 KB and inputs
+with unknown fields are refused. Answers are built field by field
+(`crates/bridge/src/dto.rs`): no serial numbers, custom fields, notes,
+costs, contacts, facts, locations or attachments ever, and items marked
+sensitive (with their tasks) are left out entirely and cannot be found by
+name. Errors only repeat what was asked. `crates/bridge/tests/api.rs`
+checks the token on every route and that no sensitive value from a demo
+household (with sensitive serials, a sensitive item, a code and a contact)
+appears in any answer; the integration's diagnostics redact the token,
+the address and every name.
+
+What Home Assistant then holds: task titles and states, due dates,
+things' names, make and model, rooms, people's names, and the token in its
+config entry (Home Assistant's `.storage`, readable by anyone who controls
+Home Assistant, who could read the bridge's database anyway).
+
+Not built: TLS for the local API (it is meant for one machine or the
+add-on network), per-route scopes for the token, rate limiting, and
+rotating the token from Home Assistant (delete `api-token` and restart).
+
 ### Known weaknesses and open questions
 
+- **The Home Assistant machine holds the keys.** A bridge is a full
+  member device (see above). Encrypting its database at rest would protect
+  only against a stolen disk, not against someone who controls Home
+  Assistant (Q-14). The local API is plain HTTP: anyone who can reach it
+  and has the token can mark tasks done, so keep it on 127.0.0.1 (or the
+  add-on network). Home Assistant's own users and integrations can all
+  call the Housewright services once it is set up.
 - **Equivocation and rollback.** A malicious server can withhold the
   newest roster version or hold back batches. Each batch now carries its
   author's newest roster version and hash inside the encryption (D-103):

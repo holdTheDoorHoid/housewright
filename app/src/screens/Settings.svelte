@@ -170,6 +170,7 @@
     <p class="muted small">Off. Everything stays on this device. Turn sync on to use Housewright on more than one device or with other people.</p>
   {/if}
   <p><a class="button" href="#/sync">Sync and devices</a></p>
+  <p><a href="#/home-assistant">Connect Home Assistant</a></p>
 
   <h2>Your home</h2>
   <p class="muted small">

@@ -536,7 +536,7 @@ export interface Commands {
   sync_confirm_recovery: [None, SyncStatus];
   sync_now: [None, { report: SyncReport; status: SyncStatus }];
   sync_devices: [None, SyncDevice[]];
-  sync_invite: [{ who: 'device' | 'person'; name?: string; role?: Role }, Invitation];
+  sync_invite: [{ who: 'device' | 'person' | 'home_assistant'; name?: string; role?: Role }, Invitation];
   sync_invite_poll: [None, PairState];
   sync_invite_confirm: [{ matches: boolean }, PairState];
   sync_invite_cancel: [None, null];
@@ -596,6 +596,8 @@ export interface SyncDevice {
   this_device: boolean;
   added: string | null;
   last_seen: string | null;
+  /** The Home Assistant bridge (D-117). */
+  home_assistant: boolean;
 }
 
 export interface Invitation {

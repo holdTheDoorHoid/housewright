@@ -13,6 +13,8 @@
 | `crates/sync` | The sync client: push, pull, files, pairing, removal, recovery. `native-http` feature: the HTTP client for Android, desktop and tests. |
 | `crates/server` | `housewright-server`, the ciphertext-only relay (axum + SQLite); [SELF-HOSTING.md](SELF-HOSTING.md). |
 | `crates/cli` | The `hw` command-line tool. |
+| `crates/bridge` | `housewright-bridge`, the Home Assistant bridge: a headless household device with a token-protected local API (Phase 7, D-117). |
+| `integrations/home-assistant` | The Home Assistant integration (Python, the one exception to the language rule, D-117), its tests, blueprints and the add-on. |
 | `web/` | The API compiled to WebAssembly, with SQLite on OPFS (D-61). |
 | `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, loaded only when someone prints (D-80). |
 | `app/` | The Svelte 5 interface (`src/`), vitest tests, Playwright tests (`tests/`). |
@@ -68,6 +70,49 @@ Typst's crates are compiled optimised in dev and test builds too (as the
 OCR crates are); a debug build of the whole workspace with full debug
 information is several gigabytes, so on a small disk use
 `CARGO_PROFILE_DEV_DEBUG=0 cargo test --workspace`.
+
+## Home Assistant integration
+
+Python is used only here (D-117). Everything stays inside
+`integrations/home-assistant/`: a virtual environment in `.venv` (git
+ignores it), no global installs. The test harness
+(`pytest-homeassistant-custom-component`, pinned in `requirements-dev.txt`
+to Home Assistant 2026.10.4) needs Python 3.14; if the system has an older
+one, `uv` fetches 3.14 into the folder:
+
+```sh
+cd integrations/home-assistant
+python3 -m venv .bootstrap && .bootstrap/bin/pip install uv
+UV_PYTHON_INSTALL_DIR=$PWD/.uv-python .bootstrap/bin/uv python install 3.14
+.bootstrap/bin/uv venv --python 3.14 .venv
+.bootstrap/bin/uv pip install --python .venv/bin/python -r requirements-dev.txt
+```
+
+The tests start the real `target/debug/housewright-bridge` (with
+`housewright-bridge demo`, a sample household) on 127.0.0.1, so build it
+first; `test_files.py` also reads the server's and bridge's `--help`:
+
+```sh
+cargo build -p housewright-bridge -p housewright-server
+.venv/bin/ruff format --check . && .venv/bin/ruff check .
+.venv/bin/mypy custom_components/housewright
+.venv/bin/python -m pytest -q
+```
+
+The shapes the integration relies on are in
+`tests/fixtures/bridge-schema.json`, written by
+`UPDATE_FIXTURES=1 cargo test -p housewright-bridge --test api`; both sides
+check against it (D-126). The browser test `app/tests/ha.spec.ts` pairs a
+bridge with a household made in the browser (it starts
+`target/debug/housewright-server` and `housewright-bridge`, or
+`HW_SERVER_BIN` and `HW_BRIDGE_BIN`).
+
+To try the integration by hand without a household of your own:
+
+```sh
+cargo run -p housewright-bridge -- --data-dir /tmp/hwb demo
+cargo run -p housewright-bridge -- --data-dir /tmp/hwb serve   # token: /tmp/hwb/api-token
+```
 
 ## Web
 

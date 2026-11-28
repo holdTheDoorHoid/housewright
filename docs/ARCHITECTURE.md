@@ -40,7 +40,8 @@ lets the server stay unable to read anything (D-14).
 | `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
 | `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
 | `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, fetched only on the first print; it turns a bundle made by `web/` into a PDF (D-80). |
-| `integrations/home-assistant` | Custom integration and add-on (D-26). |
+| `crates/bridge` | `housewright-bridge`: the Home Assistant bridge, a headless member device with a token-protected local JSON API (D-117, D-122, D-124). |
+| `integrations/home-assistant` | The Home Assistant custom integration (Python glue only, D-117), its tests, blueprints and the add-on (D-26). |
 | `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
 | `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
 
@@ -207,6 +208,39 @@ recovery key: derives a recovery identity in the roster + an anchor key
   to resolve a conflict. Every receiver check uses only data every device
   sees the same way, so refusals cannot make devices diverge.
 - Full design and threat model: [SECURITY.md](SECURITY.md).
+
+## Home Assistant (Phase 7)
+
+```
+Home Assistant ── custom_components/housewright (Python glue: config flow,
+   │               coordinator polling /api/v1/snapshot, to-do, calendar,
+   │               sensors, buttons, services, sensor links, device import)
+   │  HTTP + bearer token, 127.0.0.1:8788
+   ▼
+housewright-bridge (crates/bridge, Rust) ── Api (crates/api) ── Store, op log
+   │  a member device with its own bridge.db and keys        (crates/core)
+   ▼  sync (crates/sync), exactly like a phone
+housewright-server ◄──► the household's other devices
+```
+
+- The bridge is an `Api` with a native transport plus a small axum router.
+  Reads are projections built field by field (`crates/bridge/src/dto.rs`),
+  never the core's own structures, so nothing sensitive can leak by a new
+  field. Writes go through the core (`complete_task_for`, `snooze`,
+  `record_reading`, `add_from_template`), so they are ordinary signed
+  operations that sync and show in History "via Home Assistant".
+- New in the core for it: the `triggered` schedule kind (events are
+  readings of a per-item meter named after the event, D-118),
+  `MemberKind::HomeAssistant` and `Completion.done_by` (D-122). The engine
+  stays pure.
+- The sync loop runs every 60 seconds and two seconds after a change;
+  requests to the server time out after 15 seconds so Home Assistant is
+  not kept waiting. One mutex guards the bridge, so an API call waits while
+  a sync runs.
+- The integration polls (`local_polling`, 60 seconds). Its tests run
+  against the real bridge (D-126).
+- The add-on runs the server and the bridge in one container
+  (`integrations/home-assistant/addon/`).
 
 ## Reminders
 

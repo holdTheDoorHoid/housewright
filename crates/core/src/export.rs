@@ -16,9 +16,10 @@ use crate::store::{RawEntity, Store};
 pub const EXPORT_FORMAT: &str = "housewright-export";
 /// The current export version. Version 2 (Phase 3) added the `profile` and
 /// `suggestion_answer` kinds; version 3 (Phase 4) adds `completion_detail`
-/// and `template_fields`; version 4 (Phase 5) adds `binder_print`. Older
-/// files import unchanged.
-pub const EXPORT_VERSION: u32 = 4;
+/// and `template_fields`; version 4 (Phase 5) adds `binder_print`; version 5
+/// (Phase 7) adds the `triggered` schedule, `member.kind` and
+/// `completion.done_by`. Older files import unchanged.
+pub const EXPORT_VERSION: u32 = 5;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Export {
