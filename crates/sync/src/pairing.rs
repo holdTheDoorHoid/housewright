@@ -332,6 +332,10 @@ impl SyncClient {
             if store.get::<Member>(&inv.member)?.is_none() {
                 store.put(&member)?;
             }
+            // Send the new person's record before adding their device, so
+            // it is on the server when the new device first syncs.
+            self.sync(store, blobs)?;
+            st = State::load(store)?;
         }
         for attempt in 0..2 {
             self.refresh(store, &mut st)?;
