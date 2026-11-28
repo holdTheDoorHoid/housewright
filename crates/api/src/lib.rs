@@ -20,6 +20,7 @@ use housewright_core::fields::{CustomValue, FieldType, FieldValue};
 use housewright_core::ids::*;
 use housewright_core::model::*;
 use housewright_core::priority::{self, START_SMALL_DEFAULT, TaskStatus};
+use housewright_core::profile::{Profile, starting_count};
 use housewright_core::reminders::{self, PlanInput, ReminderPrefs, ReminderText};
 use housewright_core::schedule::{Climate, Interval, Schedule, TaskState};
 use housewright_core::store::Store;
@@ -62,6 +63,12 @@ pub const COMMANDS: &[&str] = &[
     "test_reminder",
     "export",
     "import",
+    "climate_lookup",
+    "profile",
+    "onboard",
+    "starting_plan",
+    "all_suggested",
+    "answer_suggestion",
 ];
 
 /// The bundled template library, parsed once.
@@ -215,6 +222,21 @@ impl Api {
                     ),
                     json: export::to_json(&e)?,
                 })
+            }
+            "climate_lookup" => {
+                let a: ZipArgs = args(a)?;
+                ok(climate_out(&a.zip))
+            }
+            "profile" => ok(self.profile()?),
+            "onboard" => {
+                let a: OnboardArgs = args(a)?;
+                ok(self.onboard(a)?)
+            }
+            "starting_plan" => ok(self.starting_plan_out(0, None)?),
+            "all_suggested" => ok(self.all_suggested()?),
+            "answer_suggestion" => {
+                let a: AnswerArgs = args(a)?;
+                ok(self.answer_suggestion(a)?)
             }
             other => Err(ApiError::invalid(format!("unknown command '{other}'"))),
         }
@@ -459,7 +481,12 @@ impl Api {
         }
         coming_up.sort_by_key(|a| a.due);
         coming_up.truncate(5);
+        let p = self.first_property()?;
+        let suggestion = self.store.weekly_suggestion(p.id, now)?;
+        let has_profile = self.store.profile(p.id)?.is_some();
         Ok(TodayOut {
+            suggestion,
+            has_profile,
             tasks,
             coming_up,
             lapsed,
@@ -1029,6 +1056,178 @@ impl Api {
             body,
         })
     }
+}
+
+impl Api {
+    fn profile(&self) -> Result<ProfileOut, ApiError> {
+        let p = self.first_property()?;
+        let profile = self.store.profile(p.id)?;
+        let climate = profile
+            .as_ref()
+            .and_then(|x| x.zip.as_ref())
+            .and_then(|z| climate_out(&z.value));
+        Ok(ProfileOut { profile, climate })
+    }
+
+    /// Save the answers and add what they imply. The first time (nothing
+    /// switched on yet) a small starting plan is switched on; answering
+    /// again only adds things and suggestions (D-65).
+    fn onboard(&mut self, a: OnboardArgs) -> Result<StartingPlanOut, ApiError> {
+        let p = self.first_property()?;
+        let mut answers = a.profile.answers;
+        answers.insert("id".into(), json!(p.id.to_string()));
+        if let Some(z) = answers.get("zip").cloned() {
+            // Accept a bare string for convenience; store it flagged (D-41).
+            if let Some(text) = z.as_str() {
+                let text = text.trim();
+                if text.is_empty() {
+                    answers.remove("zip");
+                } else {
+                    if housewright_core::climate::parse_zip(text).is_none() {
+                        return Err(ApiError::invalid(format!(
+                            "'{text}' is not a five-digit ZIP code"
+                        )));
+                    }
+                    answers.insert(
+                        "zip".into(),
+                        json!({"value": &text[..5], "sensitivity": "normal"}),
+                    );
+                }
+            }
+        }
+        let profile: Profile = serde_json::from_value(Value::Object(answers))
+            .map_err(|e| ApiError::invalid(format!("bad answers: {e}")))?;
+        let first_time = !self
+            .store
+            .list::<Task>()?
+            .iter()
+            .any(|t| t.property == p.id && t.active);
+        let me = self.store.author()?;
+        let start = self.today_in(&p.time_zone)?;
+        let out = self
+            .store
+            .apply_profile(&profile, &self.library, me, start)?;
+        let now = self.store.now();
+        let picked = if first_time {
+            self.store
+                .switch_on_starting_plan(p.id, starting_count(&profile), now)?
+        } else {
+            vec![]
+        };
+        self.starting_plan_out(out.new_items.len(), Some(picked))
+    }
+
+    /// The switched-on tasks with their reasons. `order` puts the given
+    /// tasks first in that order (the plan just chosen).
+    fn starting_plan_out(
+        &self,
+        new_things: usize,
+        order: Option<Vec<TaskId>>,
+    ) -> Result<StartingPlanOut, ApiError> {
+        let p = self.first_property()?;
+        let me = self.store.author()?;
+        let now = self.store.now();
+        let names = self.names()?;
+        let ranked = self.store.ranked_tasks(me, now, true)?;
+        let mut on: Vec<(&Task, &TaskStatus)> = ranked
+            .iter()
+            .filter(|(t, _)| t.active && t.property == p.id)
+            .map(|(t, s)| (t, s))
+            .collect();
+        if let Some(order) = &order {
+            on.sort_by_key(|(t, _)| order.iter().position(|x| *x == t.id).unwrap_or(usize::MAX));
+        }
+        let switched_on = on
+            .iter()
+            .map(|(t, s)| self.plan_task(t, s, &names))
+            .collect();
+        let suggested_count = ranked
+            .iter()
+            .filter(|(t, s)| !t.active && t.property == p.id && s.eval.state.is_live())
+            .count();
+        let things_recorded = names.items.values().filter(|i| i.property == p.id).count();
+        let climate = self
+            .store
+            .profile(p.id)?
+            .and_then(|x| x.zip)
+            .and_then(|z| climate_out(&z.value));
+        Ok(StartingPlanOut {
+            switched_on,
+            things_recorded,
+            new_things,
+            suggested_count,
+            climate,
+        })
+    }
+
+    fn plan_task(&self, t: &Task, s: &TaskStatus, names: &Names) -> PlanTask {
+        PlanTask {
+            card: self.card(t, s, names),
+            why: t.why.as_ref().map(|w| w.text.clone()),
+            source: t.why.as_ref().map(|w| w.source.clone()),
+        }
+    }
+
+    /// "See everything we suggested": switched-off tasks, by thing.
+    fn all_suggested(&self) -> Result<Vec<SuggestedGroup>, ApiError> {
+        let me = self.store.author()?;
+        let now = self.store.now();
+        let names = self.names()?;
+        let mut groups: Vec<SuggestedGroup> = Vec::new();
+        for (t, s) in self.store.ranked_tasks(me, now, true)? {
+            if t.active || !s.eval.state.is_live() {
+                continue;
+            }
+            let item = t.item.and_then(|i| names.items.get(&i));
+            let key = t.item.map(|i| i.to_string());
+            let pt = self.plan_task(&t, &s, &names);
+            match groups.iter_mut().find(|g| g.item_id == key) {
+                Some(g) => g.tasks.push(pt),
+                None => groups.push(SuggestedGroup {
+                    item_id: key,
+                    item_name: item
+                        .map(|i| i.name.clone())
+                        .unwrap_or_else(|| "Other".into()),
+                    category: item.and_then(|i| i.category.clone()),
+                    tasks: vec![pt],
+                }),
+            }
+        }
+        Ok(groups)
+    }
+
+    fn answer_suggestion(&mut self, a: AnswerArgs) -> Result<AnswerOut, ApiError> {
+        let p = self.first_property()?;
+        let me = self.store.author()?;
+        let now = self.store.now();
+        let ids = self
+            .store
+            .answer_suggestion(p.id, &a.key, a.answer, &self.library, me, now)?;
+        let switched_on = ids
+            .into_iter()
+            .map(|id| self.card_by_id(id))
+            .collect::<Result<_, _>>()?;
+        Ok(AnswerOut { switched_on })
+    }
+}
+
+/// Look up a ZIP code and write the dates out for people.
+fn climate_out(zip: &str) -> Option<ClimateOut> {
+    let lookup = housewright_core::climate::lookup_us_zip(zip)?;
+    let day = |doy: Option<u16>| {
+        let d = Date::new(2025, 1, 1)
+            .ok()?
+            .checked_add(Span::new().days(i64::from(doy?) - 1))
+            .ok()?;
+        Some(d.strftime("%b %-d").to_string())
+    };
+    let freezes = lookup.climate.freezes();
+    Some(ClimateOut {
+        first_frost: day(lookup.climate.first_frost_doy),
+        last_frost: day(lookup.climate.last_frost_doy),
+        freezes,
+        lookup,
+    })
 }
 
 struct Names {

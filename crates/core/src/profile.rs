@@ -42,10 +42,15 @@ impl HomeType {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum BuiltEra {
+    #[serde(rename = "before_1950")]
     Before1950,
+    #[serde(rename = "1950_1979")]
     From1950To1979,
+    #[serde(rename = "1980_1999")]
     From1980To1999,
+    #[serde(rename = "2000_2019")]
     From2000To2019,
+    #[serde(rename = "2020_on")]
     From2020,
 }
 
