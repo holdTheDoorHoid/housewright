@@ -180,6 +180,30 @@ blob first, then imports the JSON exactly as an import does. "Restore" also
 accepts a plain JSON export, which brings back everything except file
 contents. The code is `crates/core/src/backup.rs`.
 
+## What is not in an export or a backup (Phase 6)
+
+Sync's keys and settings are kept in the device's database (`sync_state`,
+D-95) and are **never** written to an export or a full backup: not the
+device's key, not the household key chain, not the recovery key (which is
+not stored anywhere), not the server address. An export or backup is the
+household's data in the clear, readable without any key; keep it as safe as
+the sealed volume.
+
+How the two ways of getting data back relate:
+
+| | Full backup (ZIP) | Recovery key |
+|---|---|---|
+| What it is | A file you keep (a USB stick, a cloud drive) | 36 characters on paper (the sealed volume) |
+| Holds | Everything, readable by anyone who has the file | Nothing by itself: it unlocks the household on the sync server |
+| Needs | Nothing else | The sync server, still running, and its address |
+| Restores to | A fresh device, as a new, unsynced household (turn sync on again to share it) | A fresh device, as another owner device of the same synced household |
+| Up to date | As of the day it was made | As of the last sync of any device |
+
+A backup restored on a fresh device starts a new household history on that
+device as far as sync is concerned: its operations are pushed as that
+device's own when sync is set up on it. Restoring a backup into the same
+synced household (merging it back) is not supported.
+
 ## Compatibility
 
 New optional fields may appear in any version; readers should ignore fields

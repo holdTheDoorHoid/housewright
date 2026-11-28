@@ -1354,11 +1354,16 @@ version = "0.1.0"
 dependencies = [
  "housewright-binder",
  "housewright-core",
+ "housewright-crypto",
  "housewright-media",
+ "housewright-server",
+ "housewright-sync",
  "image",
  "jiff",
  "serde",
  "serde_json",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
@@ -1503,6 +1508,7 @@ dependencies = [
  "housewright-api",
  "housewright-core",
  "housewright-media",
+ "housewright-sync",
  "jiff",
  "js-sys",
  "rusqlite",

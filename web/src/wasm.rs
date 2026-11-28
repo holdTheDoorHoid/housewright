@@ -22,6 +22,45 @@ thread_local! {
     static API: RefCell<Option<Api>> = const { RefCell::new(None) };
 }
 
+#[wasm_bindgen]
+extern "C" {
+    /// A synchronous XMLHttpRequest, defined by the worker
+    /// (`app/src/lib/api/worker.ts`). Synchronous requests are allowed in
+    /// dedicated workers; the worker owns the database, so a sync simply
+    /// holds it for the length of the exchange (D-97).
+    #[wasm_bindgen(js_namespace = globalThis, js_name = hwHttp, catch)]
+    fn hw_http(method: &str, url: &str, headers: &str, body: &[u8]) -> Result<JsValue, JsValue>;
+}
+
+/// Sync's transport on the web.
+struct XhrTransport;
+
+impl housewright_sync::Transport for XhrTransport {
+    fn send(
+        &mut self,
+        req: housewright_sync::HttpRequest,
+    ) -> Result<housewright_sync::HttpResponse, String> {
+        let headers = serde_json::to_string(&req.headers).map_err(|e| e.to_string())?;
+        let v = hw_http(&req.method, &req.url, &headers, &req.body)
+            .map_err(|e| e.as_string().unwrap_or_else(|| "network error".into()))?;
+        let get =
+            |k: &str| js_sys::Reflect::get(&v, &JsValue::from_str(k)).unwrap_or(JsValue::UNDEFINED);
+        let status = get("status").as_f64().unwrap_or(0.0) as u16;
+        let raw = get("headers").as_string().unwrap_or_default();
+        let headers = raw
+            .split("\r\n")
+            .filter_map(|l| l.split_once(':'))
+            .map(|(k, v)| (k.trim().to_ascii_lowercase(), v.trim().to_string()))
+            .collect();
+        let body = js_sys::Uint8Array::new(&get("body")).to_vec();
+        Ok(housewright_sync::HttpResponse {
+            status,
+            headers,
+            body,
+        })
+    }
+}
+
 fn js_err(e: impl std::fmt::Display) -> JsValue {
     JsValue::from_str(&e.to_string())
 }
@@ -41,7 +80,8 @@ pub async fn open_opfs(db_name: String) -> Result<String, JsValue> {
     // Photos and documents: a second SQLite file in the same private
     // storage, beside the database (D-71).
     let blobs = SqliteBlobs::open(format!("{db_name}-blobs")).map_err(js_err)?;
-    let api = Api::with_blobs(store, Box::new(blobs)).map_err(js_err)?;
+    let mut api = Api::with_blobs(store, Box::new(blobs)).map_err(js_err)?;
+    api.set_transport(Box::new(XhrTransport));
     API.with(|a| *a.borrow_mut() = Some(api));
     Ok("opfs".into())
 }
@@ -51,7 +91,8 @@ pub async fn open_opfs(db_name: String) -> Result<String, JsValue> {
 #[wasm_bindgen]
 pub fn open_memory() -> Result<String, JsValue> {
     let store = Store::open_in_memory(Box::new(SystemClock)).map_err(js_err)?;
-    let api = Api::with_blobs(store, Box::new(MemoryBlobs::default())).map_err(js_err)?;
+    let mut api = Api::with_blobs(store, Box::new(MemoryBlobs::default())).map_err(js_err)?;
+    api.set_transport(Box::new(XhrTransport));
     API.with(|a| *a.borrow_mut() = Some(api));
     Ok("memory".into())
 }

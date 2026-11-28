@@ -12,6 +12,7 @@
 mod binder;
 mod dto;
 mod records;
+mod sync;
 mod templates;
 
 use std::collections::BTreeMap;
@@ -36,6 +37,7 @@ use serde_json::{Value, json};
 
 pub use dto::*;
 pub use records::{DOWNLOAD_COMMANDS, UPLOAD_COMMANDS};
+pub use sync::{SYNC_COMMANDS, SyncStatusOut};
 
 use housewright_core::blobs::{BlobStore, MemoryBlobs};
 use housewright_media::ocr::Ocr;
@@ -104,6 +106,23 @@ pub const COMMANDS: &[&str] = &[
     "contractors",
     "save_contractor",
     "delete_contractor",
+    "sync_status",
+    "sync_check_server",
+    "sync_setup",
+    "sync_confirm_recovery",
+    "sync_now",
+    "sync_devices",
+    "sync_invite",
+    "sync_invite_poll",
+    "sync_invite_confirm",
+    "sync_invite_cancel",
+    "sync_join",
+    "sync_join_poll",
+    "sync_join_confirm",
+    "sync_restore",
+    "sync_remove_device",
+    "sync_new_recovery_key",
+    "sync_stop",
 ];
 
 /// The bundled template library, parsed once.
@@ -124,6 +143,8 @@ pub struct Api {
     blobs: Box<dyn BlobStore>,
     ocr: Option<Ocr>,
     ocr_loader: Option<OcrLoader>,
+    /// Sync, when the platform gave a transport (Phase 6).
+    sync: Option<housewright_sync::SyncClient>,
 }
 
 fn args<T: DeserializeOwned>(v: Value) -> Result<T, ApiError> {
@@ -157,6 +178,7 @@ impl Api {
             blobs,
             ocr: None,
             ocr_loader: None,
+            sync: None,
         })
     }
 
@@ -202,6 +224,7 @@ impl Api {
                 let a: ImportArgs = args(a)?;
                 ok(self.import(&a.json)?)
             }
+            c if c.starts_with("sync_") => self.sync_call(c, a),
             _ if self.store.meta("household_id")?.is_none() => Err(ApiError {
                 code: "not_initialized".into(),
                 message: "set up a household first".into(),

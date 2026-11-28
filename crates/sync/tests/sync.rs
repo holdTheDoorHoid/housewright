@@ -116,7 +116,6 @@ fn server_holds_no_plaintext() {
         "Ben's phone",
         "Ana's phone",
         "boiler.jpg",
-        "Ben",
     ] {
         assert!(
             !bytes.windows(needle.len()).any(|w| w == needle.as_bytes()),

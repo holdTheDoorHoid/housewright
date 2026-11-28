@@ -8,6 +8,7 @@ export type Route =
   | { name: 'add' }
   | { name: 'history' }
   | { name: 'settings' }
+  | { name: 'sync' }
   | { name: 'questions'; redo: boolean }
   | { name: 'plan' }
   | { name: 'suggested' }
@@ -38,6 +39,8 @@ export function parse(hash: string): Route {
       return { name: 'history' };
     case 'settings':
       return { name: 'settings' };
+    case 'sync':
+      return { name: 'sync' };
     case 'questions':
       return { name: 'questions', redo: parts[1] === 'redo' };
     case 'plan':

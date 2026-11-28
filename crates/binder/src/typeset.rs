@@ -128,6 +128,8 @@ pub const PRELUDE: &str = r##"
 #let hw-sub(t) = block(above: 0.9em, below: 0.4em, sticky: true, text(size: 12pt, weight: "bold", t))
 #let hw-p(t) = par(t)
 #let hw-note(t) = block(text(size: 10pt, fill: hw-muted, t))
+#let hw-key(k) = align(center, block(stroke: 1.5pt, inset: 14pt, radius: 4pt, above: 16pt, below: 16pt,
+  text(size: 17pt, weight: "bold", tracking: 1.5pt, k)))
 #let hw-pairs(rows) = grid(
   columns: (32%, 1fr), column-gutter: 10pt, row-gutter: 6pt,
   ..rows.map(r => (text(fill: hw-muted, r.at(0)), r.at(1))).flatten()
@@ -255,6 +257,14 @@ fn block(out: &mut String, b: &Block) {
         Block::Note { text } => {
             let _ = writeln!(out, "#hw-note({})", lit(text));
         }
+        Block::RecoveryKey { key } => match key {
+            Some(k) => {
+                let _ = writeln!(out, "#hw-key({})", lit(k));
+            }
+            None => {
+                let _ = writeln!(out, "#hw-p({})", lit(crate::doc::RECOVERY_NOT_HERE));
+            }
+        },
         Block::Pairs { rows } => {
             let _ = writeln!(out, "#hw-pairs({})", pairs(rows));
         }

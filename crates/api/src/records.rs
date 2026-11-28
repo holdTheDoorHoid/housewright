@@ -217,10 +217,14 @@ impl Api {
                     (Some(t), true) => t.clone(),
                     _ => att.sha256.clone(),
                 };
-                self.blobs.get(&hash)?.ok_or_else(|| ApiError {
-                    code: "not_found".into(),
-                    message: "this file's contents are not on this device".into(),
-                })
+                match self.blobs.get(&hash)? {
+                    Some(b) => Ok(b),
+                    // Not here yet: fetch it from the sync server (D-97).
+                    None => self.fetch_missing_file(&hash).ok_or_else(|| ApiError {
+                        code: "not_found".into(),
+                        message: "this file's contents are not on this device yet".into(),
+                    }),
+                }
             }
             "full_backup" => Ok(backup::write(&self.store, self.blobs.as_ref())?),
             "label_sheet_pdf" => {

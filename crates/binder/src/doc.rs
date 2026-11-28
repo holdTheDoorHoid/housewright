@@ -152,6 +152,14 @@ pub enum Block {
         calls: Vec<(String, String)>,
         actions: Vec<Action>,
     },
+    /// The recovery key, large, in a box (sealed volume only, D-91). The
+    /// key itself is left out of the fingerprint, so the copy printed at
+    /// setup (with the key) and later reprints (without it) count as the
+    /// same section and nobody is nudged to replace the page with the key.
+    RecoveryKey {
+        #[serde(skip)]
+        key: Option<String>,
+    },
     /// A big title for a volume's cover.
     Cover {
         title: String,
@@ -159,6 +167,9 @@ pub enum Block {
         lines: Vec<String>,
     },
 }
+
+/// Printed in place of the key on every print but the one made at setup.
+pub const RECOVERY_NOT_HERE: &str = "The key was printed on the copy of this page made when sync was set up. Keep that copy here; this reprint does not show it.";
 
 impl Block {
     /// Every string the block would print.
@@ -203,6 +214,9 @@ impl Block {
                     out.push(a.title.clone());
                     out.extend(a.steps.iter().cloned());
                 }
+            }
+            Block::RecoveryKey { key } => {
+                out.push(key.clone().unwrap_or_else(|| RECOVERY_NOT_HERE.to_string()))
             }
             Block::Cover {
                 title,

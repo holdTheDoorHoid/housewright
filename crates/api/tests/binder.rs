@@ -490,7 +490,7 @@ fn the_sealed_volume_holds_the_sensitive_values() {
             assert!(laid.contains(&squash(s)), "{e:?} sealed volume lacks {s:?}");
         }
         assert!(laid.contains("SEALED"));
-        assert!(laid.contains("Recovery key: set up when you turn on sync"));
+        assert!(laid.contains("Sync is off, so there is no recovery key yet"));
         // Not the ordinary things.
         assert!(!laid.contains("Pale Oak"));
         save(&format!("{}-sealed.pdf", e.as_str()), &r.pdf);

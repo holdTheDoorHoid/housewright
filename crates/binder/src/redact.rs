@@ -129,6 +129,7 @@ impl Public {
         w.notes = before - d.notes.len();
 
         d.withheld = w;
+        d.recovery = crate::data::Recovery::SyncOff;
         Public(d)
     }
 }

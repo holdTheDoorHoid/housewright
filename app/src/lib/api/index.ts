@@ -9,6 +9,12 @@ export type { Backend } from './backend';
 declare const __BACKEND__: 'tauri' | 'wasm' | 'test';
 
 let backend: Backend | null = null;
+let afterWrite: ((cmd: string) => void) | null = null;
+
+/** Called after every successful command (sync uses it to notice changes). */
+export function onCommand(f: (cmd: string) => void): void {
+  afterWrite = f;
+}
 
 /** Use a given backend (tests). */
 export function useBackend(b: Backend): void {
@@ -40,7 +46,9 @@ export function currentBackend(): Backend | null {
 export async function call<C extends Command>(cmd: C, args?: Args<C>): Promise<Result<C>> {
   const b = backend ?? (await connect());
   try {
-    return (await b.call(cmd, args ?? {})) as Result<C>;
+    const r = (await b.call(cmd, args ?? {})) as Result<C>;
+    afterWrite?.(cmd);
+    return r;
   } catch (e) {
     if (e instanceof ApiFailure) throw e;
     if (e && typeof e === 'object' && 'code' in e && 'message' in e) {
@@ -66,7 +74,9 @@ export async function upload<C extends keyof UploadCommands>(
 ): Promise<UploadCommands[C][1]> {
   const b = backend ?? (await connect());
   try {
-    return (await b.upload(cmd, args ?? {}, bytes)) as UploadCommands[C][1];
+    const r = (await b.upload(cmd, args ?? {}, bytes)) as UploadCommands[C][1];
+    afterWrite?.(cmd);
+    return r;
   } catch (e) {
     throw wrap(e);
   }

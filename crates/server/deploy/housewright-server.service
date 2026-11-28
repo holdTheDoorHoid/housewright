@@ -1,0 +1,31 @@
+# systemd unit for housewright-server. See docs/SELF-HOSTING.md.
+[Unit]
+Description=Housewright sync server (stores only encrypted data)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=housewright
+Group=housewright
+ExecStart=/usr/local/bin/housewright-server
+Environment=HW_LISTEN=127.0.0.1:8787
+Environment=HW_DATA_DIR=/var/lib/housewright
+Environment=HW_BEHIND_PROXY=true
+# Optional: require a token to add a household.
+#Environment=HW_REGISTRATION_TOKEN=change-me
+StateDirectory=housewright
+Restart=on-failure
+# Hardening: the server needs only its data folder and the network.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ReadWritePaths=/var/lib/housewright
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

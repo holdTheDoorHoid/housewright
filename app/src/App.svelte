@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { connect, call, ApiFailure, type Status } from './lib/api';
+  import { connect, call, onCommand, ApiFailure, type Status } from './lib/api';
+  import { changed, startSync } from './lib/sync';
+  import Sync from './screens/Sync.svelte';
   import { app, go, refresh } from './lib/state.svelte';
   import { reminders, resync } from './lib/reminders';
   import { errorText } from './lib/actions';
@@ -36,10 +38,12 @@
     if (s.initialized) {
       resync();
       pending();
+      void startSync();
     }
   }
 
   onMount(() => {
+    onCommand(changed);
     (async () => {
       try {
         await connect();
@@ -73,7 +77,9 @@
         ? 'things'
         : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder'
           ? 'home'
-          : app.route.name,
+          : app.route.name === 'sync'
+            ? 'settings'
+            : app.route.name,
   );
 </script>
 
@@ -102,6 +108,7 @@
     {:else if app.route.name === 'add'}<AddThing />
     {:else if app.route.name === 'history'}<History />
     {:else if app.route.name === 'settings'}<Settings />
+    {:else if app.route.name === 'sync'}<Sync />
     {:else if app.route.name === 'questions'}{#key app.route.redo}<Questions redo={app.route.redo} />{/key}
     {:else if app.route.name === 'plan'}<StartingPlan />
     {:else if app.route.name === 'suggested'}<Suggested />

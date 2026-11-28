@@ -529,7 +529,86 @@ export interface Commands {
   contractors: [None, ContractorInfo[]];
   save_contractor: [ContractorInfo, ContractorInfo[]];
   delete_contractor: [{ id: string }, null];
+  // -- sync (Phase 6) --
+  sync_status: [None, SyncStatus];
+  sync_check_server: [{ server: string }, { ok: boolean; version: string; time_ms: number; registration_open: boolean }];
+  sync_setup: [{ server: string; device_name: string; registration_token?: string }, RecoveryKeyOut];
+  sync_confirm_recovery: [None, SyncStatus];
+  sync_now: [None, { report: SyncReport; status: SyncStatus }];
+  sync_devices: [None, SyncDevice[]];
+  sync_invite: [{ who: 'device' | 'person'; name?: string; role?: Role }, Invitation];
+  sync_invite_poll: [None, PairState];
+  sync_invite_confirm: [{ matches: boolean }, PairState];
+  sync_invite_cancel: [None, null];
+  sync_join: [{ server?: string; code: string; device_name: string }, PairState];
+  sync_join_poll: [None, PairState];
+  sync_join_confirm: [{ matches: boolean }, PairState];
+  sync_restore: [{ server: string; recovery_key: string; device_name: string }, Status];
+  sync_remove_device: [{ id: string }, SyncDevice[]];
+  sync_new_recovery_key: [None, RecoveryKeyOut];
+  sync_stop: [None, SyncStatus];
 }
+
+// -- sync (Phase 6) ---------------------------------------------------------
+
+export interface SyncStatus {
+  /** This build can sync at all. */
+  available: boolean;
+  enabled: boolean;
+  server: string | null;
+  role: 'owner' | 'member' | 'limited' | 'recovery' | null;
+  last_sync: string | null;
+  last_error: string | null;
+  last_error_code: string | null;
+  clock_warning: string | null;
+  clock_ahead: boolean;
+  removed: boolean;
+  pending_changes: number;
+  recovery_confirmed: boolean;
+  refused: number;
+}
+
+export interface SyncReport {
+  pushed_ops: number;
+  pulled_ops: number;
+  rejected_batches: number;
+  refused_future_ops: number;
+  files_up: number;
+  files_down: number;
+}
+
+export interface RecoveryKeyOut {
+  /** Shown once; never stored on the device. */
+  recovery_key: string;
+  status: SyncStatus;
+}
+
+export interface SyncDevice {
+  id: string;
+  name: string;
+  member: string;
+  member_name: string;
+  role: 'owner' | 'member' | 'limited';
+  this_device: boolean;
+  added: string | null;
+  last_seen: string | null;
+}
+
+export interface Invitation {
+  code: string;
+  server: string;
+  qr_text: string;
+  qr_svg: string;
+  expires: string;
+  expires_ms: number;
+}
+
+export type PairState =
+  | { state: 'waiting' }
+  | { state: 'compare'; safety_number: string; other_name: string }
+  | { state: 'waiting_for_other' }
+  | { state: 'done' }
+  | { state: 'failed'; reason: string };
 
 // -- the house binder (Phase 5) -------------------------------------------
 
@@ -602,6 +681,8 @@ export interface BinderPdfArgs {
   include_notes?: boolean;
   paper?: Paper;
   record?: boolean;
+  /** Only while it is on screen at setup: printed on the sealed volume. */
+  recovery_key?: string;
 }
 
 export type AboutKind = 'item' | 'completion' | 'fact' | 'contractor';
@@ -697,4 +778,21 @@ export const COMMANDS: Command[] = [
   'contractors',
   'save_contractor',
   'delete_contractor',
+  'sync_status',
+  'sync_check_server',
+  'sync_setup',
+  'sync_confirm_recovery',
+  'sync_now',
+  'sync_devices',
+  'sync_invite',
+  'sync_invite_poll',
+  'sync_invite_confirm',
+  'sync_invite_cancel',
+  'sync_join',
+  'sync_join_poll',
+  'sync_join_confirm',
+  'sync_restore',
+  'sync_remove_device',
+  'sync_new_recovery_key',
+  'sync_stop',
 ];

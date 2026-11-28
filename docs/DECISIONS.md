@@ -710,6 +710,103 @@ P5, P10).
 the choice is a setting on the device, not synced. The emergency page
 fits on either.
 
+## Phase 6 sync and encryption (proposed by the Phase 6 build, 2026-11-28)
+
+**D-89 Cryptographic building blocks (Proposed).** Refines D-15. Only
+mainstream audited-family crates: Ed25519 (`ed25519-dalek`), RFC 9180 HPKE
+with X25519, HKDF-SHA256 and ChaCha20-Poly1305 (`hpke`), XChaCha20-Poly1305
+(`chacha20poly1305`), HKDF and HMAC over SHA-256. Each device has its own
+Ed25519 and X25519 keys; the household has a chain of random 256-bit keys,
+one per epoch; operations and files are encrypted with XChaCha20-Poly1305
+under purpose keys derived with HKDF, random 192-bit nonces, and associated
+data binding household, epoch, device and sequence number; every batch is
+signed by its device. Refinement with reason: the household key is wrapped
+to each device with standard HPKE (which uses ChaCha20-Poly1305 with derived
+nonces) instead of our own X25519+HKDF+XChaCha composition, so a reviewer
+checks a standard with test vectors. Exact layouts: SECURITY.md.
+
+**D-90 Device-signed requests, no sessions (Proposed).** Every request is
+signed by the device over method, path, time, a random nonce and the body's
+hash; the server accepts a five-minute window and remembers nonces (in
+SQLite, so a restart does not reopen it). Chosen over challenge-response
+session tokens: nothing secret is issued or stored by the server, nothing
+leaks from logs or proxies, each request is bound to its body, and restarts
+lose nothing. No accounts, e-mail or passwords anywhere.
+
+**D-91 The recovery key (Proposed).** Refines D-15. 160 random bits written
+as nine groups of four Base32 characters (32 + a 4-character checksum); no
+word list, so no licence question. It derives a recovery identity that sits
+in the roster with owner powers (envelopes are wrapped to it; it can add a
+fresh device) and an anchor key that seals the genesis roster hash on the
+server. Shown once at setup with the warning that losing every device and
+the key loses the data; never stored on any device or the server. It is
+printed on the sealed volume's recovery page only by the print made while
+it is on screen; later prints say it was printed at setup, and the page's
+change fingerprint ignores the key, so nobody is nudged to replace the page
+that has it. "Make a new recovery key" rotates the household key and stops
+the old one.
+
+**D-92 The roster decides membership, not the server (Proposed).** The list
+of devices is a hash chain of versions, each signed by an owner device (or
+the recovery identity) listed in the previous one. Entries never change;
+removals are permanent; removing anyone starts a new epoch. Clients verify
+every step; the server applies the same checks. Member ids and roles are
+visible to the server; device names are encrypted.
+
+**D-93 The clock guard (Proposed).** Fixes the Phase 1 gap (remote clock
+drift unchecked). An operation more than five minutes ahead of the server's
+receive time is refused: by the server on push (so the sender can say
+"this device's clock looks wrong") and by every receiver. The reference is
+the server's time, never the receiver's own, because receivers with
+different clocks would otherwise accept different operations and diverge.
+A wrong clock does not stop sync; requests are signed with the corrected
+time, and the app warns when the clock is more than five minutes off.
+
+**D-94 Pairing (Proposed).** Implements D-23's adding of devices and
+people. An owner's device shows a one-time code (24 Base32 characters: a
+40-bit invitation id and an 80-bit secret the server never sees) as text and
+QR, valid ten minutes. Both devices then show a six-digit safety number,
+committed before the new device's keys are known (the ZRTP trick), and the
+person confirms on both. Then the owner's device signs a roster version
+adding the device and wraps the key chain to it. Owners and members are
+fully implemented; scanning the QR with the new device's camera is not built
+(typing the code, or pasting the QR text, works).
+
+**D-95 Keys at rest and what sync stores on the device (Proposed).** The
+device secret, key chain, verified roster and sync cursors live in a
+`sync_state` table of the app's database (schema 5), in app-private storage,
+never in an export or backup. The household data next to them was already
+unencrypted on the device, so wrapping the keys alone would add little;
+Android Keystore wrapping (and WebCrypto on the web, which helps less) is a
+TODO. Files on the device stay plain (D-71); they are encrypted for the
+server only, which is what D-17's "encrypted files" needs to mean while the
+database itself is plain.
+
+**D-96 Server addresses must be HTTPS (Proposed).** The app refuses plain
+`http://` except for this computer (`localhost`); debug builds also allow
+the Android emulator's host (`10.0.2.2`) and private networks for testing.
+Content is end-to-end encrypted regardless, but TLS hides metadata. Sync uses
+the core's own HTTP client on Android (rustls with the Mozilla roots), so
+Android's cleartext setting is not involved; release builds simply cannot
+use plain HTTP. See Q-09.
+
+**D-97 When sync runs (Proposed).** While the app is open: on start, on
+coming back to the front, three seconds after a change, every two minutes,
+and on "Sync now". Pushes are batched, sealed and saved before sending
+(resumable, idempotent); pulls are paged with a cursor. Files: thumbnails and
+files up to 4 MB come with sync, bigger ones when opened. On the web, sync
+runs in the database worker with synchronous requests. Background sync on
+Android (WorkManager) is not built: reminders never depend on it (D-18).
+
+**D-98 Limited members are limited in the interface only (Proposed).**
+D-23's "limited (sees only tasks assigned to them)" cannot be enforced with
+one household key: a limited person's device holds the key and could read
+everything. The honest, simple option for now: the existing core filter
+(limited members see only tasks they own) plus a plain note when inviting
+someone as Limited. A scoped key per assignee (only the operations of their
+tasks encrypted to it) would also need scoped items, rooms, attachments and
+history, and is left for later (Q-10).
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -728,3 +825,14 @@ fits on either.
 - **Q-07** The binder's emergency-page wording (D-81) is our own, generic
   guidance. Proposed: have it read once by someone with fire-service or
   gas-utility experience before a public release.
+- **Q-08** Should a self-hosted server be open to anyone who can reach it
+  (capped at 20 households, the default) or need a registration token by
+  default? Proposed: open with the cap, token optional, because a home
+  server is usually not reachable by strangers and a token is one more step.
+- **Q-09** Allow plain `http://` to a server on the home network
+  (192.168.x.x) in release builds? Proposed: no (D-96); self-hosters put
+  Caddy in front, as SELF-HOSTING.md shows.
+- **Q-10** Do limited members need real cryptographic limits (D-98), for
+  example a tenant on a shared phone? If so it is a project of its own.
+- **Q-11** Opt-in research data (D-32) was planned "with Phase 6"; it was
+  not built. Send it to the same sync server, or only to a project server?

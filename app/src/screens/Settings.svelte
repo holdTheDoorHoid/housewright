@@ -5,6 +5,16 @@
   import { reminders, resync, type Permission } from '../lib/reminders';
   import { saveFile } from '../lib/files';
   import { CURRENCIES } from '../lib/money';
+  import type { SyncStatus } from '../lib/api';
+  import { when } from '../lib/format';
+
+  let sync = $state<SyncStatus | null>(null);
+  $effect(() => {
+    call('sync_status').then(
+      (s) => (sync = s),
+      () => (sync = null),
+    );
+  });
 
   const DAYS: [Weekday, string][] = [
     ['monday', 'Mon'],
@@ -143,6 +153,22 @@
     {/if}
     <button class="primary" type="submit">Save reminder times</button>
   </form>
+
+  <h2>Sync</h2>
+  {#if sync && !sync.available}
+    <p class="muted small">This version of the app cannot sync.</p>
+  {:else if sync?.enabled}
+    <p class="small">
+      {#if sync.removed}This device was removed from the household and no longer syncs.
+      {:else if sync.last_error}<span class="pill attention">Not synced</span> {sync.last_error}
+      {:else if sync.last_sync}On. Last synced {when(sync.last_sync)}.
+      {:else}On.{/if}
+    </p>
+    {#if sync.clock_warning}<p class="pill attention">{sync.clock_warning}</p>{/if}
+  {:else}
+    <p class="muted small">Off. Everything stays on this device. Turn sync on to use Housewright on more than one device or with other people.</p>
+  {/if}
+  <p><a class="button" href="#/sync">Sync and devices</a></p>
 
   <h2>Your home</h2>
   <p class="muted small">
