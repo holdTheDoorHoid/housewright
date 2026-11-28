@@ -7,7 +7,10 @@ export type Route =
   | { name: 'thing'; id: string }
   | { name: 'add' }
   | { name: 'history' }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'questions'; redo: boolean }
+  | { name: 'plan' }
+  | { name: 'suggested' };
 
 export function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -26,6 +29,12 @@ export function parse(hash: string): Route {
       return { name: 'history' };
     case 'settings':
       return { name: 'settings' };
+    case 'questions':
+      return { name: 'questions', redo: parts[1] === 'redo' };
+    case 'plan':
+      return { name: 'plan' };
+    case 'suggested':
+      return { name: 'suggested' };
     default:
       return { name: 'today' };
   }

@@ -12,6 +12,9 @@
   import History from './screens/History.svelte';
   import Settings from './screens/Settings.svelte';
   import FirstRun from './screens/FirstRun.svelte';
+  import Questions from './screens/Questions.svelte';
+  import StartingPlan from './screens/StartingPlan.svelte';
+  import Suggested from './screens/Suggested.svelte';
 
   let fatal = $state<{ text: string; locked: boolean } | null>(null);
 
@@ -21,8 +24,9 @@
     else if (p?.action === 'open') go(`#/task/${p.taskId}`);
   }
 
-  function started(s: Status) {
+  function started(s: Status, fresh = false) {
     app.status = s;
+    if (fresh) go('#/questions');
     if (s.initialized) {
       resync();
       pending();
@@ -56,7 +60,11 @@
     { hash: '#/settings', name: 'settings', label: 'Settings' },
   ];
   const current = $derived(
-    app.route.name === 'task' ? 'today' : app.route.name === 'thing' || app.route.name === 'add' ? 'things' : app.route.name,
+    app.route.name === 'task' || app.route.name === 'plan' || app.route.name === 'suggested'
+      ? 'today'
+      : app.route.name === 'thing' || app.route.name === 'add'
+        ? 'things'
+        : app.route.name,
   );
 </script>
 
@@ -85,13 +93,18 @@
     {:else if app.route.name === 'add'}<AddThing />
     {:else if app.route.name === 'history'}<History />
     {:else if app.route.name === 'settings'}<Settings />
+    {:else if app.route.name === 'questions'}{#key app.route.redo}<Questions redo={app.route.redo} />{/key}
+    {:else if app.route.name === 'plan'}<StartingPlan />
+    {:else if app.route.name === 'suggested'}<Suggested />
     {/if}
   </main>
+  {#if app.route.name !== 'questions'}
   <nav aria-label="Main">
     {#each tabs as t (t.name)}
       <a href={t.hash} aria-current={current === t.name ? 'page' : undefined}>{t.label}</a>
     {/each}
   </nav>
+  {/if}
 {/if}
 
 {#if app.toast}

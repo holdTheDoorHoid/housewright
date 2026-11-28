@@ -3,6 +3,7 @@
   import { app } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import TaskRow from './TaskRow.svelte';
+  import SuggestionCard from './SuggestionCard.svelte';
 
   let today = $state<Today | null>(null);
   let error = $state<string | null>(null);
@@ -51,11 +52,22 @@
       <div class="card">
         {#if today.active_count === 0}
           <p>No tasks are switched on yet.</p>
-          <p class="muted">
-            Add a thing in your home, like a smoke alarm or water heater, and Housewright will suggest
-            a small plan.
-          </p>
-          <p><a class="button primary" href="#/add">Add a thing</a></p>
+          {#if !today.has_profile}
+            <p class="muted">
+              Answer about 10 questions about your home (about 3 minutes) and Housewright will suggest a
+              small plan. Or add a thing yourself, like a smoke alarm.
+            </p>
+            <p class="row">
+              <a class="button primary" href="#/questions">Answer the home questions</a>
+              <a class="button" href="#/add">Add a thing</a>
+            </p>
+          {:else}
+            <p class="muted">
+              Add a thing in your home, like a smoke alarm or water heater, and Housewright will suggest
+              a small plan.
+            </p>
+            <p><a class="button primary" href="#/add">Add a thing</a></p>
+          {/if}
         {:else}
           <p>Nothing needs doing right now.</p>
         {/if}
@@ -67,6 +79,9 @@
         {/each}
       </ul>
     {/if}
+    {#if today.suggestion}
+      {#key today.suggestion.key}<SuggestionCard suggestion={today.suggestion} />{/key}
+    {/if}
     {#if today.coming_up.length > 0}
       <h2>Coming up</h2>
       <ul class="stack list">
@@ -77,8 +92,8 @@
     {/if}
     {#if today.suggested_count > 0}
       <p class="muted small suggest">
-        {today.suggested_count} more suggested tasks are switched off. You can switch them on from each
-        thing when you are ready.
+        {today.suggested_count} more suggested tasks are switched off.
+        <a href="#/suggested">See everything we suggested</a>
       </p>
     {/if}
   {/if}

@@ -93,6 +93,10 @@ export interface Card {
 }
 
 export interface Today {
+  /** This week's single suggestion, if any (P3). */
+  suggestion: Suggestion | null;
+  /** Whether the home questions have been answered. */
+  has_profile: boolean;
   tasks: Card[];
   coming_up: Card[];
   lapsed: boolean;
@@ -193,6 +197,78 @@ export interface Reminder {
   body: string;
 }
 
+/** Answers to the home questions (core `Profile` without its id). Absent = not sure. */
+export interface ProfileAnswers {
+  home_type?: 'house' | 'townhouse' | 'condo' | 'apartment' | 'mobile';
+  built?: 'before_1950' | '1950_1979' | '1980_1999' | '2000_2019' | '2020_on';
+  /** Sent as a plain string; stored flagged (`{ value, sensitivity }`). */
+  zip?: string;
+  heating?: ('gas_furnace' | 'oil' | 'heat_pump' | 'electric' | 'boiler' | 'other')[];
+  cooling?: ('central_ac' | 'heat_pump' | 'window_units' | 'none')[];
+  water_heater?: 'tank_gas' | 'tank_electric' | 'tankless' | 'heat_pump';
+  water_supply?: 'city' | 'well';
+  sewer?: 'city' | 'septic';
+  features?: Record<string, boolean>;
+  smoke_alarms?: 'none' | 'one' | 'two_to_three' | 'four_or_more';
+  smoke_power?: 'battery' | 'hardwired' | 'sealed';
+  co_alarms?: 'none' | 'one' | 'two_to_three' | 'four_or_more';
+  people?: { adults?: number; children?: number; older_adults?: number; pets?: boolean };
+}
+
+export interface StoredProfile extends Omit<ProfileAnswers, 'zip'> {
+  id: string;
+  zip?: { value: string; sensitivity: 'normal' | 'sensitive' };
+}
+
+export interface ClimateInfo {
+  lookup: {
+    zip: string;
+    matched_zip: string;
+    approximate: boolean;
+    climate: { hemisphere: 'north' | 'south'; first_frost_doy?: number; last_frost_doy?: number; hard_freeze?: boolean };
+  };
+  first_frost: string | null;
+  last_frost: string | null;
+  freezes: boolean;
+}
+
+export interface PlanTask {
+  card: Card;
+  why: string | null;
+  source: string | null;
+}
+
+export interface StartingPlan {
+  switched_on: PlanTask[];
+  things_recorded: number;
+  new_things: number;
+  suggested_count: number;
+  climate: ClimateInfo | null;
+}
+
+export interface SuggestedGroup {
+  item_id: string | null;
+  item_name: string;
+  category: string | null;
+  tasks: PlanTask[];
+}
+
+export interface Suggestion {
+  key: string;
+  action:
+    | { kind: 'add_thing'; template: string; name: string; season?: string }
+    | { kind: 'switch_on'; task: string };
+  title: string;
+  body: string;
+  why: string;
+  source: string;
+  add_label: string;
+  priority: PriorityClass;
+  seasonal: boolean;
+}
+
+export type SuggestionAnswer = 'added' | 'not_for_us' | 'later';
+
 type None = Record<string, never> | undefined;
 
 /** Every command: [arguments, result]. */
@@ -246,6 +322,12 @@ export interface Commands {
   test_reminder: [{ task_id?: string; in_seconds?: number }, Reminder];
   export: [None, { filename: string; json: string }];
   import: [{ json: string }, Status];
+  climate_lookup: [{ zip: string }, ClimateInfo | null];
+  profile: [None, { profile: StoredProfile | null; climate: ClimateInfo | null }];
+  onboard: [{ profile: ProfileAnswers }, StartingPlan];
+  starting_plan: [None, StartingPlan];
+  all_suggested: [None, SuggestedGroup[]];
+  answer_suggestion: [{ key: string; answer: SuggestionAnswer }, { switched_on: Card[] }];
 }
 
 export type Command = keyof Commands;
@@ -277,4 +359,10 @@ export const COMMANDS: Command[] = [
   'test_reminder',
   'export',
   'import',
+  'climate_lookup',
+  'profile',
+  'onboard',
+  'starting_plan',
+  'all_suggested',
+  'answer_suggestion',
 ];

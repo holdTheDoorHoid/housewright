@@ -28,6 +28,8 @@ export function card(over: Partial<Card> = {}): Card {
 
 export function today(over: Partial<Today> = {}): Today {
   return {
+    suggestion: null,
+    has_profile: true,
     tasks: [card()],
     coming_up: [],
     lapsed: false,
