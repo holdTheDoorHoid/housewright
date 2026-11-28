@@ -50,6 +50,10 @@ jobs:
           cache: npm
           cache-dependency-path: app/package-lock.json
       - run: npm ci
+      # The interface imports the generated web/pkg bindings, so build the
+      # WebAssembly package before type-checking.
+      - name: WebAssembly package
+        run: npm run wasm
       - name: TypeScript and Svelte check
         run: npm run check
       - name: Unit tests (vitest)
