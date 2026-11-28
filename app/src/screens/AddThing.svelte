@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { categoryLabel } from '../lib/labels';
   import { call, type Room, type TemplateSummary, type Card } from '../lib/api';
   import { go, refresh, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
@@ -98,7 +99,7 @@
         <li>
           <button class="card pick" onclick={() => pick(t)}>
             <span class="name">{t.name}</span>
-            <span class="muted small">{t.tasks.length} tasks · {t.category ?? 'general'}</span>
+            <span class="muted small">{t.tasks.length} {t.tasks.length === 1 ? 'task' : 'tasks'} · {categoryLabel(t.category)}</span>
           </button>
         </li>
       {/each}

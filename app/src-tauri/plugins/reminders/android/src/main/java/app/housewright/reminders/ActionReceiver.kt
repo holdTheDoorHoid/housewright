@@ -18,6 +18,12 @@ class ActionReceiver : BroadcastReceiver() {
         if (intent.action != ACTION_DONE) return
         val taskId = intent.getStringExtra("taskId") ?: return
         val nid = intent.getIntExtra("notificationId", 0)
+        if (intent.getBooleanExtra("test", false)) {
+            // A test reminder only checks that buttons work; it must not log a fake completion.
+            NotificationManagerCompat.from(ctx).cancel(nid)
+            Log.i(Scheduler.TAG, "test reminder done for $taskId: nothing recorded")
+            return
+        }
         val result = goAsync()
         val app = ctx.applicationContext
         thread(name = "housewright-done") {

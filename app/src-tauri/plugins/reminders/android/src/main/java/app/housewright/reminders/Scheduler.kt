@@ -39,6 +39,7 @@ object Scheduler {
             .putExtra("title", r.optString("title"))
             .putExtra("body", r.optString("body"))
             .putExtra("kind", r.optString("kind"))
+            .putExtra("test", r.optBoolean("test", false))
 
     fun schedule(ctx: Context, r: JSONObject, code: Int) {
         val pi = PendingIntent.getBroadcast(

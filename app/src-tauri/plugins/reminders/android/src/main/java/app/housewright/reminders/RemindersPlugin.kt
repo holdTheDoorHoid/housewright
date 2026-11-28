@@ -65,6 +65,7 @@ class RemindersPlugin(private val activity: Activity) : Plugin(activity) {
             try {
                 val ctx = activity.applicationContext
                 val r = NativeCore.run(ctx, "test_reminder", JSONObject().put("in_seconds", args.inSeconds)) as JSONObject
+                r.put("test", true) // Done on a test reminder must never log a real completion
                 Scheduler.ensureChannel(ctx)
                 Scheduler.schedule(ctx, r, Scheduler.TEST_CODE)
                 invoke.resolve(JSObject(r.toString()))

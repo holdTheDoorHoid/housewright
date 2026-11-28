@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { categoryLabel } from '../lib/labels';
   import { call, type ItemDetail } from '../lib/api';
   import { app, refresh, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
@@ -40,7 +41,7 @@
     <h1>{d.row.name}</h1>
     <dl class="facts">
       {#if d.row.room_name}<dt>Room</dt><dd>{d.row.room_name}</dd>{/if}
-      {#if d.row.category}<dt>Kind</dt><dd>{d.row.category}</dd>{/if}
+      {#if d.row.category}<dt>Kind</dt><dd>{categoryLabel(d.row.category)}</dd>{/if}
       {#if d.make}<dt>Make</dt><dd>{d.make}</dd>{/if}
       {#if d.model}<dt>Model</dt><dd>{d.model}</dd>{/if}
       {#if d.installed}<dt>Installed</dt><dd>{d.installed}</dd>{/if}

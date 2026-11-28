@@ -16,7 +16,9 @@ import androidx.core.content.ContextCompat
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(ctx: Context, intent: Intent) {
         val taskId = intent.getStringExtra("taskId") ?: return
-        val title = intent.getStringExtra("title") ?: "Home maintenance"
+        val test = intent.getBooleanExtra("test", false)
+        val title = (if (test) "Test: " else "") +
+            (intent.getStringExtra("title") ?: "Home maintenance")
         val body = intent.getStringExtra("body") ?: ""
         Scheduler.ensureChannel(ctx)
         val nid = notificationId(taskId)
@@ -26,6 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent(ctx, ActionReceiver::class.java)
                 .setAction(ActionReceiver.ACTION_DONE)
                 .putExtra("taskId", taskId)
+                .putExtra("test", test)
                 .putExtra("notificationId", nid),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

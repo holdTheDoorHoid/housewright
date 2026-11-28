@@ -91,8 +91,11 @@ project:
 - Address only the emulator, by serial: `adb -s emulator-5554 ...`. Never a
   USB device.
 - Never run `adb kill-server`, and never call `lab exclusive`.
-- Agents: a permission rule in the owner's settings denies `adb` to agents.
-  Do not route around it. The owner runs the device steps by hand.
+- Agents: the owner's settings deny plain `adb` to agents. Do not route around
+  it. Instead use `~/Android/emu-adb`, an emulator-only helper the owner has
+  explicitly allowed: it fixes the port to 5038 and the target to
+  `emulator-5554`, and refuses `kill-server`, device-selection flags and
+  network/USB commands. Example: `~/Android/emu-adb shell getprop sys.boot_completed`.
 
 Create the emulator once (Android 15, x86_64, KVM):
 

@@ -1,0 +1,2 @@
+11-27 20:00:07.240  4842  4856 I housewright: done recorded from notification for 01a21fa8-0ae1-77fe-9166-bc0faf1b1ece
+11-27 20:00:07.260  4842  4856 I housewright: scheduled 2 reminders (replaced 3)

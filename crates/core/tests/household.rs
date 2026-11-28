@@ -142,6 +142,15 @@ fn start_small_switches_on_life_safety_first() {
         .ranked_tasks(h.owner.id, now(&h.clock), false)
         .unwrap();
     assert_eq!(active.len(), 5);
+    // History reads in plain words, not field names.
+    let log = audit_log(&h.store, &TimeZone::get("America/New_York").unwrap()).unwrap();
+    assert!(
+        log.iter()
+            .any(|e| e.text.starts_with("Alex switched on task '")),
+        "{:#?}",
+        log.iter().map(|e| &e.text).collect::<Vec<_>>()
+    );
+    assert!(!log.iter().any(|e| e.text.contains("changed active")));
 }
 
 #[test]
