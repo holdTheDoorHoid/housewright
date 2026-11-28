@@ -28,6 +28,7 @@ base64 = "0.22"
 housewright-api = { path = "../../crates/api" }
 housewright-core = { path = "../../crates/core" }
 housewright-media = { path = "../../crates/media" }
+housewright-sync = { path = "../../crates/sync", features = ["native-http"] }
 tauri-plugin-reminders = { path = "plugins/reminders" }
 
 [features]
@@ -77,3 +78,10 @@ krilla = { opt-level = 2 }
 rustybuzz = { opt-level = 2 }
 ttf-parser = { opt-level = 2 }
 comemo = { opt-level = 2 }
+# Sync's cryptography (D-89).
+curve25519-dalek = { opt-level = 3 }
+ed25519-dalek = { opt-level = 3 }
+x25519-dalek = { opt-level = 3 }
+chacha20 = { opt-level = 3 }
+poly1305 = { opt-level = 3 }
+sha2 = { opt-level = 3 }

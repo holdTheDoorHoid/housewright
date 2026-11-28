@@ -71,6 +71,7 @@ const MIGRATIONS: &[(i64, Migration)] = &[
     (2, migration_2),
     (3, migration_3),
     (4, migration_4),
+    (5, migration_5),
 ];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
@@ -137,11 +138,33 @@ fn migration_4(conn: &Connection) -> rusqlite::Result<()> {
     conn.execute_batch(&entity_table(EntityKind::BinderPrint))
 }
 
+/// Phase 6: sync state (D-95). `sync_state` holds this device's sync
+/// settings and keys (never exported; see docs/FILE-FORMAT.md);
+/// `sync_remote` lists the operations that arrived from other devices, so
+/// they are never pushed back.
+fn migration_5(conn: &Connection) -> rusqlite::Result<()> {
+    conn.execute_batch(
+        "CREATE TABLE sync_state (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+         CREATE TABLE sync_remote (op_id TEXT PRIMARY KEY);",
+    )
+}
+
+/// How far an operation's clock may be ahead of the reference time (the
+/// sync server's receive time) before it is refused (D-93). Five minutes
+/// absorbs ordinary clock error; anything more is a wrong clock, and
+/// accepting it would drag every device's clock into the future.
+pub const MAX_CLOCK_AHEAD_MS: u64 = 5 * 60 * 1000;
+
 /// What [`Store::apply_remote_ops`] did.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ApplyReport {
     pub applied: usize,
     pub duplicates: usize,
+    /// Refused by the clock guard ([`Store::apply_synced_ops`] only).
+    pub too_far_ahead: usize,
+    /// An op id seen before with different content, or a second record
+    /// for an id: ignored, and a sign of tampering.
+    pub conflicts: usize,
 }
 
 /// One row of an entity table.
@@ -450,10 +473,10 @@ impl Store {
         let tx = self.conn.unchecked_transaction()?;
         for op in ops {
             self.hlc = self.hlc.observe(op.hlc, now);
-            if apply_op(&tx, op)? {
-                report.applied += 1;
-            } else {
-                report.duplicates += 1;
+            match apply_op(&tx, op)? {
+                Applied::New => report.applied += 1,
+                Applied::Duplicate => report.duplicates += 1,
+                Applied::Conflict => report.conflicts += 1,
             }
         }
         tx.execute(
@@ -463,6 +486,172 @@ impl Store {
         )?;
         tx.commit()?;
         Ok(report)
+    }
+
+    /// Merge operations that came through sync. Like
+    /// [`Store::apply_remote_ops`], plus:
+    ///
+    /// * the clock guard (D-93): an op whose clock is more than
+    ///   [`MAX_CLOCK_AHEAD_MS`] past `reference_ms` is refused and counted.
+    ///   `reference_ms` must be the same for every receiver (the server's
+    ///   receive time), never this device's own clock, or devices whose
+    ///   clocks disagree would accept different ops and stop converging;
+    /// * every newly applied op is remembered as remote, so it is never
+    ///   pushed back to the server.
+    pub fn apply_synced_ops(&mut self, ops: &[Op], reference_ms: u64) -> Result<ApplyReport> {
+        let mut report = ApplyReport::default();
+        let now = self.clock.now_ms();
+        let limit = reference_ms.saturating_add(MAX_CLOCK_AHEAD_MS);
+        let tx = self.conn.unchecked_transaction()?;
+        for op in ops {
+            if op.hlc.wall_ms > limit {
+                report.too_far_ahead += 1;
+                continue;
+            }
+            self.hlc = self.hlc.observe(op.hlc, now);
+            match apply_op(&tx, op)? {
+                Applied::New => {
+                    tx.execute(
+                        "INSERT OR IGNORE INTO sync_remote (op_id) VALUES (?1)",
+                        [op.id.to_string()],
+                    )?;
+                    report.applied += 1;
+                }
+                Applied::Duplicate => report.duplicates += 1,
+                Applied::Conflict => report.conflicts += 1,
+            }
+        }
+        tx.execute(
+            "INSERT INTO meta (key, value) VALUES ('hlc', ?1)
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            [self.hlc.to_string()],
+        )?;
+        tx.commit()?;
+        Ok(report)
+    }
+
+    /// Operations made on this device (not received through sync), with
+    /// local sequence number above `after`, oldest first, at most `limit`.
+    pub fn unsynced_ops(&self, after: i64, limit: usize) -> Result<Vec<(i64, Op)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT seq, op_id, hlc, author, kind, entity_id, field, value FROM ops
+             WHERE seq > ?1 AND op_id NOT IN (SELECT op_id FROM sync_remote)
+             ORDER BY seq LIMIT ?2",
+        )?;
+        let rows = stmt.query_map(params![after, limit as i64], |r| {
+            Ok((
+                r.get::<_, i64>(0)?,
+                (
+                    r.get::<_, String>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, String>(4)?,
+                    r.get::<_, String>(5)?,
+                    r.get::<_, String>(6)?,
+                    r.get::<_, String>(7)?,
+                ),
+            ))
+        })?;
+        let mut out = Vec::new();
+        for row in rows {
+            let (seq, (id, hlc, author, kind, entity, field, value)) = row?;
+            out.push((
+                seq,
+                Op {
+                    id: id.parse().map_err(|e| Error::Invalid(format!("{e}")))?,
+                    hlc: hlc.parse().map_err(Error::Invalid)?,
+                    author: author.parse().map_err(|e| Error::Invalid(format!("{e}")))?,
+                    kind: EntityKind::parse(&kind)
+                        .ok_or_else(|| Error::Invalid(format!("unknown kind {kind}")))?,
+                    entity,
+                    field,
+                    value: serde_json::from_str(&value)?,
+                },
+            ));
+        }
+        Ok(out)
+    }
+
+    /// How many local operations above `after` still wait to be pushed.
+    pub fn unsynced_count(&self, after: i64) -> Result<u64> {
+        Ok(self.conn.query_row(
+            "SELECT COUNT(*) FROM ops WHERE seq > ?1 AND op_id NOT IN (SELECT op_id FROM sync_remote)",
+            [after],
+            |r| r.get::<_, i64>(0),
+        )? as u64)
+    }
+
+    /// This device's sync settings (D-95). Never part of an export.
+    pub fn sync_get(&self, key: &str) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row("SELECT value FROM sync_state WHERE key = ?1", [key], |r| {
+                r.get(0)
+            })
+            .optional()?)
+    }
+
+    /// Every sync-state key starting with `prefix`, sorted.
+    pub fn sync_keys(&self, prefix: &str) -> Result<Vec<String>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT key FROM sync_state WHERE substr(key, 1, length(?1)) = ?1 ORDER BY key",
+        )?;
+        let rows = stmt.query_map([prefix], |r| r.get::<_, String>(0))?;
+        Ok(rows.collect::<rusqlite::Result<Vec<_>>>()?)
+    }
+
+    /// Sync state holds the device's keys: overwritten pages are zeroed
+    /// (SQLite `secure_delete`), so an old copy of a key does not linger in
+    /// free pages (L7). Only around these writes, to keep ordinary edits
+    /// fast where storage is slow.
+    fn secure<T>(&self, f: impl FnOnce(&Connection) -> rusqlite::Result<T>) -> Result<T> {
+        self.conn.pragma_update(None, "secure_delete", "ON")?;
+        let out = f(&self.conn);
+        self.conn.pragma_update(None, "secure_delete", "OFF")?;
+        Ok(out?)
+    }
+
+    pub fn sync_set(&self, key: &str, value: &str) -> Result<()> {
+        self.secure(|c| {
+            c.execute(
+                "INSERT INTO sync_state (key, value) VALUES (?1, ?2)
+                 ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                params![key, value],
+            )
+        })?;
+        Ok(())
+    }
+
+    pub fn sync_remove(&self, key: &str) -> Result<()> {
+        self.secure(|c| c.execute("DELETE FROM sync_state WHERE key = ?1", [key]))?;
+        Ok(())
+    }
+
+    /// Forget every sync setting and key on this device ("stop syncing
+    /// here"). The household's data stays.
+    pub fn sync_forget(&self) -> Result<()> {
+        self.secure(|c| c.execute_batch("DELETE FROM sync_state;"))?;
+        // Push the zeroed pages out of the write-ahead log too.
+        let _ = self
+            .conn
+            .query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
+        Ok(())
+    }
+
+    /// Run several sync-state writes and an apply in one transaction.
+    pub fn sync_set_many(&self, pairs: &[(&str, &str)]) -> Result<()> {
+        self.secure(|c| {
+            let tx = c.unchecked_transaction()?;
+            for (k, v) in pairs {
+                tx.execute(
+                    "INSERT INTO sync_state (key, value) VALUES (?1, ?2)
+                     ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    params![k, v],
+                )?;
+            }
+            tx.commit()
+        })?;
+        Ok(())
     }
 
     // -- reading ----------------------------------------------------------
@@ -684,17 +873,49 @@ fn store_data(conn: &Connection, table: &str, id: &str, data: &Map<String, Value
     Ok(())
 }
 
-/// Apply one op. Returns false if it had been seen before. This function is the
-/// whole merge algorithm; see [`crate::oplog`] for the rules.
-fn apply_op(conn: &Connection, op: &Op) -> Result<bool> {
+/// What applying one op did.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Applied {
+    New,
+    /// Seen before, identical.
+    Duplicate,
+    /// Seen before with different content, or a second, different record
+    /// for an id that already has one. Ignored; counted as tampering.
+    Conflict,
+}
+
+/// Apply one op. This function is the whole merge algorithm; see
+/// [`crate::oplog`] for the rules.
+fn apply_op(conn: &Connection, op: &Op) -> Result<Applied> {
     let op_id = op.id.to_string();
-    let seen: bool = conn.query_row(
-        "SELECT EXISTS(SELECT 1 FROM ops WHERE op_id = ?1)",
-        [&op_id],
-        |r| r.get(0),
-    )?;
-    if seen {
-        return Ok(false);
+    let stored: Option<(String, String, String, String, String, String)> = conn
+        .query_row(
+            "SELECT hlc, author, kind, entity_id, field, value FROM ops WHERE op_id = ?1",
+            [&op_id],
+            |r| {
+                Ok((
+                    r.get(0)?,
+                    r.get(1)?,
+                    r.get(2)?,
+                    r.get(3)?,
+                    r.get(4)?,
+                    r.get(5)?,
+                ))
+            },
+        )
+        .optional()?;
+    if let Some((hlc, author, kind, entity, field, value)) = stored {
+        let same = hlc == op.hlc.to_string()
+            && author == op.author.to_string()
+            && kind == op.kind.as_str()
+            && entity == op.entity
+            && field == op.field
+            && serde_json::from_str::<Value>(&value).ok().as_ref() == Some(&op.value);
+        return Ok(if same {
+            Applied::Duplicate
+        } else {
+            Applied::Conflict
+        });
     }
     let key = op.order_key();
     let table = op.kind.as_str();
@@ -729,13 +950,24 @@ fn apply_op(conn: &Connection, op: &Op) -> Result<bool> {
             if op.kind.append_only()
                 && let Value::Object(record) = &op.value
             {
+                let mut record = record.clone();
+                record.retain(|_, v| !v.is_null());
                 let current = clock_of(conn, table, &op.entity, RECORD_FIELD)?;
-                // First writer wins for records: smallest order key.
-                if current.is_none_or(|c| OrderKey(c) > key) {
-                    let mut record = record.clone();
-                    record.retain(|_, v| !v.is_null());
-                    store_data(conn, table, &op.entity, &record)?;
-                    set_clock(conn, table, &op.entity, RECORD_FIELD, &key.0)?;
+                // A record is written once. The first one applied stays;
+                // a later, different record for the same id is ignored,
+                // whatever clock it claims, so nobody can replace someone
+                // else's record by backdating (D-104). Ids are random, so
+                // honest devices never collide.
+                match current {
+                    None => {
+                        store_data(conn, table, &op.entity, &record)?;
+                        set_clock(conn, table, &op.entity, RECORD_FIELD, &key.0)?;
+                    }
+                    Some(_) => {
+                        if load_data(conn, table, &op.entity)? != record {
+                            return Ok(Applied::Conflict);
+                        }
+                    }
                 }
             }
         }
@@ -756,5 +988,5 @@ fn apply_op(conn: &Connection, op: &Op) -> Result<bool> {
             }
         }
     }
-    Ok(true)
+    Ok(Applied::New)
 }

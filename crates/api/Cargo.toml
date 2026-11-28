@@ -11,6 +11,8 @@ rust-version.workspace = true
 housewright-core.workspace = true
 housewright-media.workspace = true
 housewright-binder.workspace = true
+housewright-sync.workspace = true
+housewright-crypto.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 jiff.workspace = true
@@ -23,3 +25,7 @@ typeset = ["housewright-binder/typeset"]
 
 [dev-dependencies]
 image.workspace = true
+housewright-sync = { workspace = true, features = ["native-http"] }
+housewright-server = { path = "../server" }
+tokio = { version = "1", features = ["rt-multi-thread"] }
+uuid.workspace = true

@@ -48,3 +48,26 @@ Checked with `cargo metadata` on 2026-11-27.
 
 All are permissive and compatible with AGPL-3.0. Checked with `cargo metadata`
 on 2026-11-28 (every crate added to `Cargo.lock` by `housewright-binder`).
+
+## Phase 6: sync and encryption
+
+| Crate | Used for | Licence |
+|---|---|---|
+| `ed25519-dalek` 3, `curve25519-dalek` 5, `x25519-dalek` 3, `ed25519` 3, `signature` | signatures, key agreement | BSD-3-Clause (dalek crates); Apache-2.0 OR MIT (`ed25519`, `signature`) |
+| `hpke` 0.15 | RFC 9180 key wrapping | MIT OR Apache-2.0 |
+| `chacha20poly1305` 0.11, `chacha20`, `poly1305`, `aead`, `cipher`, `universal-hash`, `inout`, `hybrid-array`, `crypto-common` | encryption | Apache-2.0 OR MIT |
+| `hkdf` 0.13, `hmac` 0.13 | key derivation | MIT OR Apache-2.0 |
+| `zeroize` 1.9, `subtle` 2.6, `rand_core` 0.10 | wiping secrets, constant-time helpers | Apache-2.0 OR MIT; BSD-3-Clause (`subtle`) |
+| `base64` 0.22 | wire encoding | MIT OR Apache-2.0 |
+| `axum` 0.8, `axum-server` 0.9, `tokio` 1, `hyper` 1, `tower` 0.5, `tower-http` 0.6 and their dependencies | the server | MIT |
+| `rustls` 0.23, `ring` 0.17, `webpki-roots` 1, `rustls-webpki`, `tokio-rustls` | TLS in the server and the native client | Apache-2.0 OR ISC OR MIT (rustls); Apache-2.0 AND ISC (ring); CDLA-Permissive-2.0 (webpki-roots: Mozilla's root list); ISC (rustls-webpki) |
+| `ureq` 3 | the native HTTP client (Android, desktop) | MIT OR Apache-2.0 |
+| `clap` 4 | server flags | MIT OR Apache-2.0 |
+| `url` 2 (+ `idna`, `form_urlencoded`, `percent-encoding`) | parsing server addresses (after the security review, L1) | MIT OR Apache-2.0 |
+| `tokio-util` 0.7 | streaming files from the server | MIT |
+
+All are compatible with AGPL-3.0 (CDLA-Permissive-2.0 is a permissive data
+licence for the root certificate list). No word list is bundled: the
+recovery key is Base32 (D-91). Checked against `Cargo.lock` on 2026-11-28.
+`deny.toml` lists the allowed licences; `cargo deny check` (in CI) checks
+every dependency against it and against the RustSec advisory database.

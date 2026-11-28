@@ -6,7 +6,7 @@
 
 use housewright_core::model::{AttachmentKind, EntityKind, Sensitivity};
 
-use crate::data::{FactData, HouseData, ItemData, SEALED_LOCATION_KEY, TaskData};
+use crate::data::{FactData, HouseData, ItemData, Recovery, SEALED_LOCATION_KEY, TaskData};
 use crate::doc::{Action, Block, Document, Edition, Photo, Section, Volume};
 use crate::redact::Public;
 use crate::text;
@@ -996,12 +996,37 @@ pub fn sealed_volume(d: &HouseData, edition: Edition, opts: Options) -> Option<D
     });
 
     let mut recovery = Section::new("sealed:recovery", "Recovery", "Recovery key");
-    recovery.push(Block::Para {
-        text: "Recovery key: set up when you turn on sync.".into(),
-    });
-    recovery.push(Block::Note {
-        text: "When sync is switched on, the app makes a recovery key: the only way to unlock the household's data if every device is lost. Reprint this page then, and the key will be printed here.".into(),
-    });
+    match &d.recovery {
+        Recovery::SyncOff => {
+            recovery.push(Block::Para {
+                text: "Sync is off, so there is no recovery key yet.".into(),
+            });
+            recovery.push(Block::Note {
+                text: "When sync is switched on, the app makes a recovery key: the only way to unlock the household's data if every device is lost. It is shown once, and printed on this page at that moment.".into(),
+            });
+        }
+        Recovery::KeptSeparately { server } | Recovery::Key { server, .. } => {
+            recovery.push(Block::Pairs {
+                rows: vec![("Sync server".into(), server.clone())],
+            });
+            recovery.push(Block::RecoveryKey {
+                key: match &d.recovery {
+                    Recovery::Key { key, .. } => Some(key.clone()),
+                    _ => None,
+                },
+            });
+            recovery.push(Block::Steps {
+                items: vec![
+                    "If every phone and computer with the household on it is lost, install Housewright on a new one.".into(),
+                    "Choose \"Restore with a recovery key\", type the server address above and this key.".into(),
+                    "Everything comes back. Then, on that device, remove the lost devices (Settings, Sync).".into(),
+                ],
+            });
+            recovery.push(Block::Note {
+                text: "Anyone with this key and the server address can read the household's data and add a device, so keep it as safe as the rest of this volume. Losing every device and this key means the data cannot be recovered by anyone. If the key is lost, or seen by someone who should not have it, make a new one on an owner's device (Settings, Sync, Make a new recovery key); the old one then stops working.".into(),
+            });
+        }
+    }
 
     let fact_rows = |f: &dyn Fn(&FactData) -> bool| -> Vec<(String, String)> {
         d.facts

@@ -1,0 +1,49 @@
+# cargo-deny: security advisories and licences for every Rust dependency.
+# Run: cargo deny check advisories licenses
+# (CI runs it too; see .github/workflows/ci.yml.)
+
+[graph]
+all-features = true
+
+[advisories]
+# Any advisory (vulnerability, unmaintained, unsound, yanked) fails the
+# check unless it is listed here with a reason.
+ignore = [
+    # quick-xml 0.38 (two denial-of-service bugs in XML parsing), pulled in
+    # by Typst's bibliography support (citationberg, via hayagriva) for the
+    # house binder. citationberg 0.7 requires quick-xml ^0.38, so it cannot
+    # be upgraded here. Not reachable: the binder never uses bibliographies
+    # or citation styles, and the Typst source it typesets is written by
+    # the app itself (crates/binder/src/typeset.rs), never by a user or the
+    # network. Remove when Typst moves to quick-xml >= 0.41.
+    { id = "RUSTSEC-2026-0194", reason = "Typst bibliography XML, unused by the binder; no upgrade path yet" },
+    { id = "RUSTSEC-2026-0195", reason = "Typst bibliography XML, unused by the binder; no upgrade path yet" },
+]
+
+[licenses]
+# Compatible with AGPL-3.0 (see docs/THIRD-PARTY.md).
+allow = [
+    "AGPL-3.0-only",
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unlicense",
+    "0BSD",
+    "CC0-1.0",
+    "CDLA-Permissive-2.0",
+    "BSL-1.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "allow"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

@@ -59,6 +59,10 @@ pub struct BinderPdfArgs {
     /// Record this as printed (default true). Previews pass false.
     #[serde(default)]
     pub record: Option<bool>,
+    /// The recovery key, only while it is on screen at setup: printed on
+    /// the sealed volume's recovery page (D-91). Never stored.
+    #[serde(default)]
+    pub recovery_key: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -421,7 +425,19 @@ impl Api {
             opts.include_notes = n;
         }
         let pid = self.binder_property(a.property_id)?;
-        let data = binder::gather(&self.store, pid, self.store.now())?;
+        let mut data = binder::gather(&self.store, pid, self.store.now())?;
+        if let Some(k) = a.recovery_key.as_deref() {
+            let key = housewright_crypto::recovery::RecoveryKey::parse(k)
+                .map_err(|e| ApiError::invalid(e.to_string()))?;
+            let server = match &data.recovery {
+                binder::Recovery::KeptSeparately { server } => server.clone(),
+                _ => return Err(ApiError::invalid("sync is not set up on this device")),
+            };
+            data.recovery = binder::Recovery::Key {
+                server,
+                key: key.display().to_string(),
+            };
+        }
         let b = binder::build(&data, edition, opts);
         let doc = match volume {
             Volume::Main => {

@@ -51,6 +51,27 @@ impl Store {
         Ok((household, owner))
     }
 
+    /// On a device that joined through sync: take the household that
+    /// arrived from the other devices as this database's own, acting as
+    /// `member`. Needs an empty database apart from synced operations.
+    pub fn adopt_household(&mut self, member: MemberId) -> Result<Household> {
+        if self.meta("household_id")?.is_some() {
+            return Err(Error::Invalid(
+                "this database already has a household".into(),
+            ));
+        }
+        let mut all = self.list::<Household>()?;
+        if all.len() != 1 {
+            return Err(Error::NotFound(
+                "the household's data has not arrived yet".into(),
+            ));
+        }
+        let h = all.remove(0);
+        self.set_meta("household_id", &h.id.to_string())?;
+        self.set_author(member)?;
+        Ok(h)
+    }
+
     pub fn household(&self) -> Result<Household> {
         let id = self
             .meta("household_id")?

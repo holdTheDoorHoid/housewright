@@ -2,6 +2,7 @@
   import { call, upload, type Status } from '../lib/api';
   import { readFile } from '../lib/files';
   import { errorText } from '../lib/actions';
+  import JoinHousehold from './JoinHousehold.svelte';
 
   let { ondone }: { ondone: (s: Status, fresh?: boolean) => void } = $props();
   let yourName = $state('');
@@ -10,6 +11,7 @@
   let busy = $state(false);
   let error = $state<string | null>(null);
   let importing = $state(false);
+  let other = $state<'join' | 'restore' | null>(null);
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
   async function submit(e: SubmitEvent) {
@@ -48,6 +50,9 @@
   }
 </script>
 
+{#if other}
+  <JoinHousehold mode={other} ondone={(s) => ondone(s)} onback={() => (other = null)} />
+{:else}
 <section class="first" aria-labelledby="first-h">
   <h1 id="first-h">Welcome to Housewright</h1>
   <p>
@@ -74,7 +79,10 @@
   {:else}
     <p><button class="quiet" onclick={() => (importing = true)}>I have a backup or export to restore</button></p>
   {/if}
+  <p><button class="quiet" onclick={() => (other = 'join')}>Join a household on another device</button></p>
+  <p><button class="quiet" onclick={() => (other = 'restore')}>Restore with a recovery key</button></p>
 </section>
+{/if}
 
 <style>
   .first {

@@ -42,6 +42,11 @@ pub fn with_api<T>(
         // hash (D-71).
         let blobs = DirBlobs::open(dir.join("blobs"))?;
         let mut api = Api::with_blobs(store, Box::new(blobs))?;
+        // Sync over HTTPS with rustls (D-96, D-97). Only used once sync is
+        // set up; until then nothing touches the network.
+        api.set_transport(Box::new(
+            housewright_sync::native::UreqTransport::default(),
+        ));
         #[cfg(feature = "ocr")]
         api.set_ocr_loader(Box::new(|| {
             // Bundled with the app, never downloaded (D-74).

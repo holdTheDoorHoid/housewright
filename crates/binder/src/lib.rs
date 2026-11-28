@@ -24,7 +24,7 @@ pub mod typeset;
 use std::collections::BTreeMap;
 
 pub use build::Options;
-pub use data::{HouseData, SEALED_LOCATION_KEY, gather};
+pub use data::{HouseData, Recovery, SEALED_LOCATION_KEY, gather};
 pub use doc::{Document, Edition, Volume};
 pub use redact::Public;
 pub use typeset::Paper;

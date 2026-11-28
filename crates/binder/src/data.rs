@@ -108,6 +108,20 @@ pub struct HouseData {
     pub notes: Vec<NoteData>,
     /// Set by [`crate::redact`] on the public copy.
     pub withheld: Withheld,
+    /// What the sealed volume's recovery page says (D-91).
+    pub recovery: Recovery,
+}
+
+/// The sealed volume's recovery page.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub enum Recovery {
+    /// Sync is off: there is no recovery key.
+    #[default]
+    SyncOff,
+    /// Sync is on; the key was printed once, at setup, and is not kept.
+    KeptSeparately { server: String },
+    /// The one print made while the key is on screen, at setup.
+    Key { server: String, key: String },
 }
 
 impl HouseData {
@@ -341,6 +355,14 @@ pub fn gather(store: &Store, property: Option<PropertyId>, now: Timestamp) -> Re
         completions,
         notes,
         withheld: Withheld::default(),
+        recovery: match store
+            .sync_get("config")?
+            .and_then(|c| serde_json::from_str::<serde_json::Value>(&c).ok())
+            .and_then(|v| v.get("server").and_then(|s| s.as_str()).map(str::to_string))
+        {
+            Some(server) => Recovery::KeptSeparately { server },
+            None => Recovery::SyncOff,
+        },
     })
 }
 

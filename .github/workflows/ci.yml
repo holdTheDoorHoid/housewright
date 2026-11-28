@@ -30,6 +30,15 @@ jobs:
       - name: Tests
         run: cargo test --workspace --locked
 
+  deny:
+    # Security advisories and licences of every Rust dependency (deny.toml).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories licenses sources
+
   web:
     runs-on: ubuntu-latest
     defaults:
@@ -60,6 +69,10 @@ jobs:
         run: npm test
       - name: Web bundle
         run: npm run build:web
+      # The sync end-to-end test starts a real server from target/debug.
+      - name: Sync server binary
+        working-directory: .
+        run: cargo build -p housewright-server --locked
       - name: End-to-end (Playwright, Chromium)
         run: |
           npx playwright install --with-deps chromium

@@ -18,6 +18,36 @@ import type { FromWorker, ToWorker } from './protocol';
 
 declare const self: DedicatedWorkerGlobalScope;
 
+// Sync's network transport (D-97): a synchronous request, which dedicated
+// workers allow. The core calls this through `hwHttp`; nothing else in the
+// app makes network requests to the sync server.
+(self as unknown as { hwHttp: unknown }).hwHttp = (
+  method: string,
+  url: string,
+  headersJson: string,
+  body: Uint8Array,
+): { status: number; headers: string; body: Uint8Array } => {
+  const x = new XMLHttpRequest();
+  x.open(method, url, false);
+  x.responseType = 'arraybuffer';
+  x.timeout = 60_000;
+  for (const [k, v] of JSON.parse(headersJson) as [string, string][]) {
+    if (k.toLowerCase() === 'content-type' && method === 'GET') continue;
+    x.setRequestHeader(k, v);
+  }
+  try {
+    x.send(method === 'GET' || method === 'DELETE' || body.length === 0 ? null : body.slice());
+  } catch (e) {
+    throw String((e as Error)?.message ?? e);
+  }
+  if (x.status === 0) throw 'no answer from the server';
+  return {
+    status: x.status,
+    headers: x.getAllResponseHeaders(),
+    body: new Uint8Array((x.response as ArrayBuffer | null) ?? new ArrayBuffer(0)),
+  };
+};
+
 const post = (m: FromWorker) => self.postMessage(m);
 const queue: ToWorker[] = [];
 let ready = false;

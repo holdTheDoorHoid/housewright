@@ -1,6 +1,6 @@
 # Architecture
 
-Status: proposed, 2026-11-27. Decisions referenced as D-nn are in
+Status: proposed, 2026-11-27; sync and encryption added 2026-11-28. Decisions referenced as D-nn are in
 [DECISIONS.md](DECISIONS.md).
 
 ## Shape
@@ -32,10 +32,10 @@ lets the server stay unable to read anything (D-14).
 | `crates/api` | One JSON command surface over the core, shared by the Tauri app, the WebAssembly build and Android's notification receivers (D-63). File bytes travel beside the JSON (`call_upload`, `call_download`). |
 | `crates/media` | Pixel work shared by Android and the web: photo downscaling, QR codes, the sticker sheet PDF, on-device OCR (D-72, D-74, D-75). |
 | `models/ocr` | The bundled OCR models (CC BY-SA 4.0, D-74). |
-| `crates/crypto` | Household keys, key wrapping, operation and file encryption (D-15). |
-| `crates/sync` | Operation exchange with a server; hybrid logical clocks; merge (D-13). |
+| `crates/crypto` | Device keys, the household key chain, HPKE key envelopes, encrypted signed batches and files, the roster, signed requests, pairing, the recovery key (D-15, D-89 to D-94). |
+| `crates/sync` | The sync client: push, pull, files, pairing, removal, recovery (D-97). Hybrid logical clocks and merge stay in the core. |
 | `crates/binder` | The house binder (D-40 to D-43, D-80 to D-88): gathers one property's data, redacts it for the main volume, builds the editions as a document model, typesets them with an embedded Typst (fonts compiled in, no file system or network), fingerprints sections for reprints. |
-| `crates/server` | Sync relay, share links, paid extras. |
+| `crates/server` | The sync relay: stores and relays ciphertext only (Phase 6); later share links and paid extras. |
 | `crates/cli` | A command-line front end over the core, for testing and for power users. |
 | `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
 | `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
@@ -71,7 +71,7 @@ lets the server stay unable to read anything (D-14).
   volume, printed-on date and a fingerprint per section (D-82).
 - **Attachment**: a file (manual, receipt, warranty, photo) referenced by
   content hash; the bytes live in a blob store beside the database (D-71),
-  encrypted from Phase 6.
+  encrypted on the sync server from Phase 6 (plain on the device, D-95).
 - **Completion detail**: append-only costs and completion field values added
   after Done (D-76).
 - **Template fields**: the household's own fields on a template (D-77).
@@ -183,15 +183,30 @@ Document.sections ─► fingerprint ─► track::status vs binder_print record
   to the phone's viewer through the existing plugin (D-79); on the web it
   opens in a new tab (or downloads).
 
-## Sync and encryption (summary)
+## Sync and encryption (Phase 6)
 
-Every change becomes an operation `{id, hlc, author, entity, field, value}`.
-Operations are applied to SQLite locally, encrypted with the household key, and
-sent to the server when sync is on. Merge rules: last-writer-wins per field by
-hybrid logical clock; append-only sets for completions, attachments and notes;
-tombstones for deletes. Because merging is deterministic and per-field, the user
-is never asked to resolve a conflict (anti-pattern: "an app that itself needs
-maintenance").
+```
+local change ─► op log (core) ─► unsynced_ops ─► seal batch (crypto: XChaCha20-Poly1305,
+                                                  signed Ed25519) ─► saved ─► POST /ops
+server: verify signature, clock guard, store with seq + received time (ciphertext only)
+GET /ops?after=cursor ─► per batch: roster check ─► verify ─► decrypt ─► author + clock
+                         checks ─► Store::apply_synced_ops (per-field LWW, D-13)
+attachments ─► blob name = HMAC(sha256) ─► encrypted blob PUT/GET (thumbnails eagerly)
+roster: signed hash chain of devices (who may get the key); key chain: one key per
+epoch, wrapped to each device with HPKE; removal = new roster version + new epoch
+pairing: one-time code (secret never on the server) + committed safety number
+recovery key: derives a recovery identity in the roster + an anchor key
+```
+
+- `crates/crypto` builds every byte the server stores; `crates/server` is a
+  relay that checks signatures and the roster and understands nothing else;
+  `crates/sync` is the client, behind a blocking `Transport` (ureq natively,
+  synchronous XHR in the web worker), with no threads or timers of its own.
+- The API exposes `sync_*` commands; the interface schedules syncs (D-97).
+- Merging is unchanged: deterministic per field, so the user is never asked
+  to resolve a conflict. Every receiver check uses only data every device
+  sees the same way, so refusals cannot make devices diverge.
+- Full design and threat model: [SECURITY.md](SECURITY.md).
 
 ## Reminders
 

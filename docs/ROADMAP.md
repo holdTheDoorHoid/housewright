@@ -1,7 +1,7 @@
 # Roadmap
 
 Phases are ordered so each one gives something usable and tests the riskiest
-assumption early. Status as of 2026-11-27.
+assumption early. Status as of 2026-11-28.
 
 | # | Phase | Delivers | Status |
 |---|---|---|---|
@@ -11,7 +11,7 @@ assumption early. Status as of 2026-11-27.
 | 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web (Playwright) and Android emulator walk-through pass; see below |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | built on branch `phase-4-records` (2026-11-27): Rust, web (Playwright) and Android emulator checks; see below |
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; Android emulator checks pass (one bug found and fixed); see below |
-| 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | |
+| 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | |
 | 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | |
@@ -20,7 +20,7 @@ assumption early. Status as of 2026-11-27.
 | 12 | Landlord depth | Multi-property dashboards, tenant problem reports, per-property costs | |
 
 Label scanning on the device (D-29) landed with Phase 4 on Android and the web.
-Opt-in research data (D-32) lands with Phase 6, when there is a server to send to.
+Opt-in research data (D-32) was planned with Phase 6; it was not built (Q-11).
 
 ## Phase 1 notes
 
@@ -241,3 +241,68 @@ print when there are several (the API takes a property id; the screen
 prints the first), printing manuals themselves into the binder, and
 non-Latin scripts in the binder (Lato covers Latin, Greek and Cyrillic;
 other text would print as empty boxes).
+
+
+## Phase 6 notes
+
+Built (decisions D-89 to D-98; design and threat model in
+[SECURITY.md](SECURITY.md); running a server in
+[SELF-HOSTING.md](SELF-HOSTING.md)):
+
+- **`housewright-crypto`**: device keys (Ed25519 + X25519), the household
+  key chain with epochs, HPKE key envelopes, encrypted and signed operation
+  batches (XChaCha20-Poly1305), encrypted files with keyed-hash names, the
+  signed roster hash chain, signed requests, pairing codes with a committed
+  six-digit safety number, the printable recovery key and its anchor.
+- **`housewright-server`**: one binary, axum + SQLite, stores and relays
+  only ciphertext; device-signed requests with a replay window; the roster
+  checked as clients check it; rate limits on the open endpoints; body
+  limits; TLS (rustls) or behind a proxy; a systemd unit and a Dockerfile.
+- **`housewright-sync`**: resumable push (sealed and saved before sending),
+  paged pull with every receiver check, files up and down (big ones when
+  opened), pairing, removal with key rotation, recovery-key restore and
+  replacement. **The Phase 1 clock gap is closed** (D-93): operations more
+  than five minutes ahead of the server's receive time are refused, the
+  same way on every device, and the person is told the clock looks wrong.
+- **Interface**: Settings, Sync and devices (off by default; your own
+  server; hosted "coming later"; the recovery key shown once, with a
+  confirmation and "print the sealed volume with this key"; devices with
+  last seen; add a device or person; remove; sync now; a new recovery key;
+  stop syncing here). First run: join a household, or restore with a
+  recovery key. The sealed volume's recovery page now prints the server
+  and, on the print made at setup, the key.
+- Storage schema 5 (`sync_state`, `sync_remote`); the export format is
+  unchanged (version 4): keys are never exported (FILE-FORMAT.md).
+
+Sizes (measured 2026-11-28): the web's main WebAssembly module is
+10.16 MB (3.77 MB gzip), up from 9.41 MB (3.46 MB gzip), about +0.75 MB
+for the cryptography and the sync client. The Android library gains rustls,
+ring and ureq (see `phase-6-evidence/README.md`).
+
+Verified: Rust format, clippy (native and wasm), tests including the
+security tests listed in SECURITY.md (three-device convergence property
+test with offline periods, dropped connections and server restarts; no
+plaintext in the server's files; tampering, moving, replay, forged
+authorship, removed devices, a middleman with the pairing code, the clock
+guard, recovery restore); svelte-check; vitest; Playwright on the
+production web build with a real server and two browser profiles; and the
+Android emulator paired with a browser profile
+([phase-6-evidence/README.md](phase-6-evidence/README.md)).
+
+Not built in Phase 6: background sync on Android (sync runs while the app
+is open), scanning the pairing QR with the new device's camera (the code is
+typed, or the QR text pasted), Android Keystore / WebCrypto wrapping of the
+device keys (D-95), cryptographic limits for limited members (D-98),
+detecting a server that forks or withholds roster versions, reporting gaps
+in a device's batch numbers, re-stamping changes made with a clock far
+ahead, the hosted service and opt-in research data (Phase 11, Q-11).
+
+Independent security review (2026-11-28,
+[security-reviews/2026-11-28-phase6-review.md](security-reviews/2026-11-28-phase6-review.md)):
+verdict "ship after fixes". Every finding was fixed or mitigated the same
+day (D-99 to D-105, regression tests in `crates/sync/tests/review.rs`); the
+remaining limits are listed in SECURITY.md. The reviewer's verification
+pass found new problems in the fixes (N1 to N6, L6); those were fixed too
+(D-106 to D-111, `crates/sync/tests/verify.rs`). The Android emulator pairing
+was not re-run after the fixes (not enough disk for an Android build); the
+Rust and browser tests cover the protocol changes.

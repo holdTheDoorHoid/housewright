@@ -9,6 +9,9 @@
 | `crates/media` | Photos, QR codes, the sticker PDF and on-device OCR (Phase 4). |
 | `crates/binder` | The house binder: document model, redaction, editions, Typst typesetting (Phase 5). Fonts in `crates/binder/fonts/`. |
 | `models/ocr` | The OCR models (12.2 MB, CC BY-SA 4.0); see its README. |
+| `crates/crypto` | Keys, envelopes, encrypted batches and files, the roster, signed requests, pairing, the recovery key (Phase 6; design in [SECURITY.md](SECURITY.md)). |
+| `crates/sync` | The sync client: push, pull, files, pairing, removal, recovery. `native-http` feature: the HTTP client for Android, desktop and tests. |
+| `crates/server` | `housewright-server`, the ciphertext-only relay (axum + SQLite); [SELF-HOSTING.md](SELF-HOSTING.md). |
 | `crates/cli` | The `hw` command-line tool. |
 | `web/` | The API compiled to WebAssembly, with SQLite on OPFS (D-61). |
 | `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, loaded only when someone prints (D-80). |
@@ -28,6 +31,22 @@ cargo test --workspace
 
 Do not turn on incremental compilation or set a shared `CARGO_TARGET_DIR`;
 `sccache` is the shared cache.
+
+Sync's tests (Phase 6) run the real server code in-process
+(`crates/sync/tests/common/mod.rs`) and over a real socket
+(`crates/sync/tests/http.rs`, `crates/api/tests/sync.rs`). The three-device
+property test is `cargo test -p housewright-sync --test convergence`. To try
+sync by hand:
+
+```sh
+cargo run -p housewright-server -- --listen 127.0.0.1:8787 --data-dir /tmp/hw-server
+# then in the app: Settings, Sync and devices, http://127.0.0.1:8787
+```
+
+The browser test `app/tests/sync.spec.ts` starts `target/debug/housewright-server`
+itself (build it first with `cargo build -p housewright-server`, or set
+`HW_SERVER_BIN`). The Android emulator reaches a server on the host at
+`http://10.0.2.2:8787`; only debug builds accept that address (D-96).
 
 The OCR, image and QR crates are compiled optimised even in debug and test
 builds (`[profile.dev.package]` in the workspace `Cargo.toml` and in
