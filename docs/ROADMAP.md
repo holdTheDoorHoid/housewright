@@ -13,7 +13,7 @@ assumption early. Status as of 2026-11-28.
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; Android emulator checks pass (one bug found and fixed); see below |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
-| 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | |
+| 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust and web (Playwright) checks; Android emulator check not run (disk); see below |
 | 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
 | 11 | Hosted + extras | Paid hosting, opt-in disclosure extras (email/SMS reminders, recalls), AI label reading, share links for contractors and tenants | |
@@ -355,4 +355,71 @@ nor run on Home Assistant OS; HACS and add-on store publishing (Q-12);
 push updates (the integration polls); custom Assist intents (D-125; the
 to-do list's built-in sentences were not tried with a voice pipeline);
 NFC tags; Android (nothing changed there beyond the shared interface).
+
+## Phase 8 notes
+
+Built (decisions D-130 to D-135; owner questions Q-15 to Q-17; how it fits
+in [ARCHITECTURE.md](ARCHITECTURE.md#floor-plans-phase-8); the stored
+shapes in [FILE-FORMAT.md](FILE-FORMAT.md#floor-plans-version-6)). The
+owner's appliance-library decisions (D-127 to D-129) were recorded in the
+same branch; the library is not wired into the app.
+
+- **`housewright-plan`** (`crates/plan`): pure geometry in whole
+  millimetres: shoelace areas, perimeters, wall lengths and angles,
+  polygon checks, point-in-room, label points, snapping (corners, 90° and
+  45°, a fractional grid), rooms found from walls (ends and T joints),
+  rectangles and L shapes, and lengths typed and shown in feet and inches
+  or metres. Unit tests, property tests (area and perimeter invariant
+  under moving, turning, restarting and reversing an outline; snapping
+  idempotent and close; lengths surviving format and parse), and shared
+  vectors also run by the interface's tests.
+- **Core**: new kinds `wall`, `opening`, `plan_pin`, `plan_label` (one
+  record each, so concurrent edits to different ones merge), `room.outline`
+  (one field), `floor.background`, `fact.pin`, `household.units`; schema
+  6, export version 6 (older exports and the Phase 2/3 fixtures import
+  unchanged). `core::plan`: the floor projection (forgiving about what a
+  merge leaves behind), pins that put things in rooms, deleting a wall,
+  pin or floor cleanly. Convergence property test for concurrent plan
+  edits, and a sync test of two people editing one plan offline through
+  the real server.
+- **Commands**: floors, floor_plan, save_room_shape, remove_room_shape,
+  save_walls, delete_wall, save_opening, delete_opening, save_pin,
+  delete_pin, save_label, delete_label, set_background, set_units,
+  plan_restore (undo/redo); a thing's detail carries its pin; facts carry
+  a pin link; files can be attached to a floor.
+- **Editor** (`app/src/screens/Plans.svelte`, SVG): floor switcher; Room
+  (rectangle or L by dragging, with size and area as you drag; name it or
+  pick an existing room); Walls (corner by corner, live length, direction
+  and corner angle, typed lengths, close the shape, closed spaces offered
+  as "Tap to name"); Door and Window on a wall with typed width and
+  position and a flippable swing; Pin (a thing or a named spot, private
+  option, link to a shutoff fact); Label; Move (pan, pinch, scroll zoom,
+  drag corners, room corners and pins); trace over a photo (dimmed,
+  movable, real-life width typed); undo/redo; keyboard shortcuts; every
+  item also in lists under the drawing; units setting; "Print this floor".
+  A thing's page shows a small plan with its pin, or offers to place it
+  once a floor is drawn.
+- **Binder**: one page per drawn floor (rooms with areas, walls, doors
+  with swings, windows, numbered pins, labels, scale bar), a room-area
+  table with the total, a pin legend; shutoff pins dark and named on the
+  emergency page ("Basement plan, pin 2"); private pins, pins of private
+  things and labels marked private stay out of the main volume.
+
+Verified: Rust format, clippy (native and wasm), tests (plan, core,
+convergence, sync, api including binder PDFs read back with `pdftotext`
+and looked at with `pdftoppm`); svelte-check, vitest (geometry and
+readouts against the shared vectors, the plan screen); Playwright
+(`app/tests/plans.spec.ts`): two rooms dragged and named, a pin that
+moves its thing into the kitchen, a second floor with walls tapped and
+one typed (12' 6" exactly), the closed space named, a door added, undo
+and redo, a traced picture, reload, the thing's plan thumbnail, and the
+floor printed as a PDF in the browser; a phone-sized pass. Screenshots
+and the PDF are in `docs/phase-8-evidence/`.
+
+Not built or not checked: LiDAR scanning (D-25, later); tracing over a
+PDF (photos and screenshots only, Q-17); a drawn plan snippet on the
+emergency page (Q-16); walls crossing in an X are not split into rooms;
+pinch zoom was not exercised by an automated test (mouse, wheel and
+buttons were); the Android emulator touch check was skipped because the
+disk had under 7 GB free.
 
