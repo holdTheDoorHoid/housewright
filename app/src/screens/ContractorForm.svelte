@@ -5,6 +5,7 @@
   // only inside end-to-end encrypted sync.
   import { call, type ContractorInfo, type ContractorIn } from '../lib/api';
   import { toast } from '../lib/state.svelte';
+  import { resync } from '../lib/reminders';
   import { errorText } from '../lib/actions';
 
   let {
@@ -72,6 +73,8 @@
         args.private_notes = privateNotes;
       }
       const list = await call('save_contractor', args);
+      // Licence and insurance dates decide their notices (D-138).
+      resync();
       onsaved(list, name.trim());
     } catch (err) {
       toast({ text: errorText(err) });

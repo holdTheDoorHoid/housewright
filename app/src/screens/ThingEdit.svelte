@@ -4,6 +4,7 @@
   // and leaving the box empty keeps them as they are.
   import { call, upload, type ItemDetail, type Card, type Room, type FieldDef, type WarrantyIn } from '../lib/api';
   import { app, toast } from '../lib/state.svelte';
+  import { resync } from '../lib/reminders';
   import { errorText } from '../lib/actions';
   import { readFile } from '../lib/files';
   import LabelReader, { type LabelChoice } from './LabelReader.svelte';
@@ -118,6 +119,8 @@
         ...(owner && wholePrivate !== start.sensitive ? { sensitive: wholePrivate } : {}),
         ...(owner && serialPrivate !== start.serial_sensitive ? { serial_sensitive: serialPrivate } : {}),
       });
+      // A warranty's dates decide its notices (D-140).
+      resync();
       ondone(r);
     } catch (err) {
       toast({ text: errorText(err) });

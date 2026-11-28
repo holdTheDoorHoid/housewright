@@ -1,6 +1,6 @@
 ## Default Permission
 
-Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, and open or share a file with the phone's own apps.
+Schedule reminders, send a test reminder, read a tapped notification action or sticker link, ask for notification permission, open or share a file with the phone's own apps, and hand a phone number, email address or https link to the phone.
 
 #### This default permission set includes the following:
 
@@ -9,6 +9,7 @@ Schedule reminders, send a test reminder, read a tapped notification action or s
 - `allow-pending`
 - `allow-view-file`
 - `allow-share-file`
+- `allow-open-link`
 - `allow-check-permissions`
 - `allow-request-permissions`
 
@@ -43,6 +44,32 @@ Enables the check_permissions command without any pre-configured scope.
 <td>
 
 Denies the check_permissions command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`reminders:allow-open-link`
+
+</td>
+<td>
+
+Enables the open_link command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`reminders:deny-open-link`
+
+</td>
+<td>
+
+Denies the open_link command without any pre-configured scope.
 
 </td>
 </tr>

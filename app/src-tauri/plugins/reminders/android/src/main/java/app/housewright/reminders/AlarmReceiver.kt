@@ -24,10 +24,10 @@ class AlarmReceiver : BroadcastReceiver() {
         val nid = notificationId(taskId)
         // A notice (a warranty ending, a contractor's licence lapsing) is not
         // a task: no Done or Reschedule; tapping it opens what it is about.
-        val open = intent.getStringExtra("open").orEmpty()
-        if (intent.getStringExtra("kind") == "notice" && open.isNotEmpty()) {
+        val openLink = intent.getStringExtra("open").orEmpty()
+        if (intent.getStringExtra("kind") == "notice" && openLink.isNotEmpty()) {
             val tap = PendingIntent.getActivity(
-                ctx, nid * 2, launch(ctx, "open_notice", open),
+                ctx, nid * 2, launch(ctx, "open_notice", openLink),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             val n = NotificationCompat.Builder(ctx, Scheduler.CHANNEL)
