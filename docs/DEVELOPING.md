@@ -7,6 +7,7 @@
 | `crates/core` | The core: model, schedule engine, reminders plan, storage, op log. |
 | `crates/api` | One JSON command surface over the core, used by every front end (D-63). |
 | `crates/media` | Photos, QR codes, the sticker PDF and on-device OCR (Phase 4). |
+| `crates/binder` | The house binder: document model, redaction, editions, Typst typesetting (Phase 5). Fonts in `crates/binder/fonts/`. |
 | `models/ocr` | The OCR models (12.2 MB, CC BY-SA 4.0); see its README. |
 | `crates/cli` | The `hw` command-line tool. |
 | `web/` | The API compiled to WebAssembly, with SQLite on OPFS (D-61). |
@@ -32,6 +33,21 @@ builds (`[profile.dev.package]` in the workspace `Cargo.toml` and in
 `app/src-tauri/Cargo.toml`); unoptimised, reading one label takes minutes.
 `cargo test -p housewright-media --test ocr` reads a synthetic rating plate
 with the bundled models.
+
+The house binder's end-to-end tests are in `crates/api/tests/binder.rs`.
+They check PDF text with poppler's `pdftotext` when it is installed (and
+the laid-out text from Typst always). To look at the PDFs a realistic demo
+household produces:
+
+```sh
+HW_BINDER_OUT=/tmp/binder cargo test -p housewright-api --test binder
+pdftoppm -r 60 -png /tmp/binder/full-main.pdf /tmp/binder/page
+```
+
+Typst's crates are compiled optimised in dev and test builds too (as the
+OCR crates are); a debug build of the whole workspace with full debug
+information is several gigabytes, so on a small disk use
+`CARGO_PROFILE_DEV_DEBUG=0 cargo test --workspace`.
 
 ## Web
 
