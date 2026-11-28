@@ -1,0 +1,20 @@
+[package]
+name = "housewright-binder-web"
+description = "The house binder's typesetter (Typst) compiled to WebAssembly, loaded by the web app only when someone prints"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+housewright-binder = { workspace = true, features = ["typeset"] }
+serde_json.workspace = true
+wasm-bindgen = "0.2"
+jiff = { workspace = true, features = ["js"] }
+uuid = { workspace = true, features = ["js"] }
+getrandom = { version = "0.4", features = ["wasm_js"] }

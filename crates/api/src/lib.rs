@@ -97,6 +97,7 @@ pub const COMMANDS: &[&str] = &[
     "set_sealed_location",
     "set_binder_reminder",
     "set_paper",
+    "record_binder_print",
     "notes",
     "add_note",
     "delete_note",

@@ -47,6 +47,18 @@ function run(m: ToWorker) {
       return;
     }
     post({ type: 'result', id: m.id, text: call_upload(m.cmd, m.args, m.bytes) });
+  } else if (m.kind === 'download' && m.cmd === 'binder_pdf') {
+    void binderPdf(m.args).then(
+      (bytes) => self.postMessage({ type: 'bytes', id: m.id, bytes } satisfies FromWorker, [bytes.buffer]),
+      (e) => {
+        const text = String(e?.message ?? e);
+        post({
+          type: 'result',
+          id: m.id,
+          text: text.startsWith('{') ? text : JSON.stringify({ error: { code: 'internal', message: text } }),
+        });
+      },
+    );
   } else if (m.kind === 'download') {
     try {
       const bytes = call_download(m.cmd, m.args);
@@ -57,6 +69,36 @@ function run(m: ToWorker) {
   } else {
     post({ type: 'result', id: m.id, text: call(m.cmd, m.args) });
   }
+}
+
+// The binder's typesetter (Typst) is a separate WebAssembly module of about
+// 11 MB, fetched from the app's own files the first time someone prints
+// (D-80). This module makes the bundle; that one makes the PDF; then the
+// print is recorded here.
+type BinderModule = typeof import('../../../../web-binder/pkg/housewright_binder_web.js');
+let binderLoading: Promise<BinderModule> | null = null;
+function binderModule(): Promise<BinderModule> {
+  binderLoading ??= (async () => {
+    const mod = await import('../../../../web-binder/pkg/housewright_binder_web.js');
+    await mod.default();
+    return mod;
+  })().catch((e) => {
+    binderLoading = null;
+    throw e;
+  });
+  return binderLoading;
+}
+
+async function binderPdf(argsJson: string): Promise<Uint8Array<ArrayBuffer>> {
+  const bundle = call_download('binder_bundle', argsJson);
+  const mod = await binderModule();
+  const pdf = mod.render(bundle);
+  const args = JSON.parse(argsJson || '{}') as { record?: boolean };
+  if (args.record !== false) {
+    const out = JSON.parse(call('record_binder_print', mod.receipt(bundle)));
+    if (out.error) throw new Error(JSON.stringify(out));
+  }
+  return pdf as Uint8Array<ArrayBuffer>;
 }
 
 let ocrLoading: Promise<void> | null = null;

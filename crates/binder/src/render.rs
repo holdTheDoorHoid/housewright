@@ -16,6 +16,8 @@ use typst::syntax::{FileId, RootedPath, Source, VirtualPath, VirtualRoot};
 use typst::text::{Font, FontBook};
 use typst::utils::LazyHash;
 use typst::{Library, LibraryExt, World};
+
+use crate::RenderError;
 use typst_layout::PagedDocument;
 
 /// The fonts, compiled in (SIL Open Font License 1.1; see `fonts/OFL.txt`
@@ -87,13 +89,12 @@ impl World for BinderWorld {
     }
 }
 
-/// A typeset document.
-pub struct Rendered {
-    pub pdf: Vec<u8>,
-    pub pages: usize,
-    /// The laid-out text of each page, exactly as it is drawn into the PDF
-    /// (one line per run of text). For checks and tests.
-    pub page_text: Vec<String>,
+pub use crate::Rendered;
+
+/// Typeset a bundle made by [`crate::prepare`].
+pub fn render_bundle(zip: &[u8]) -> Result<Rendered, RenderError> {
+    let b = crate::bundle::Bundle::from_zip(zip)?;
+    render(&b.source, &b.files, b.receipt.printed_on)
 }
 
 fn frame_text(f: &typst::layout::Frame, out: &mut String) {
@@ -108,10 +109,6 @@ fn frame_text(f: &typst::layout::Frame, out: &mut String) {
         }
     }
 }
-
-#[derive(Debug, thiserror::Error)]
-#[error("the binder could not be typeset: {0}")]
-pub struct RenderError(pub String);
 
 fn describe(diags: &[SourceDiagnostic]) -> String {
     diags

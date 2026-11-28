@@ -262,7 +262,7 @@ pub fn gather(store: &Store, property: Option<PropertyId>, now: Timestamp) -> Re
             item: it,
         });
     }
-    items.sort_by(|a, b| a.item.name.to_lowercase().cmp(&b.item.name.to_lowercase()));
+    items.sort_by_key(|a| a.item.name.to_lowercase());
     let mut house_tasks = Vec::new();
     for t in tasks.iter().filter(|t| t.item.is_none() && live(t)) {
         house_tasks.push(task_data(store, t.clone(), now, &tz)?);

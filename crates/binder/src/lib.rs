@@ -11,9 +11,11 @@
 //! Licensed AGPL-3.0-only.
 
 pub mod build;
+pub mod bundle;
 pub mod data;
 pub mod doc;
 pub mod redact;
+#[cfg(feature = "typeset")]
 pub mod render;
 pub mod text;
 pub mod track;
@@ -25,10 +27,23 @@ pub use build::Options;
 pub use data::{HouseData, SEALED_LOCATION_KEY, gather};
 pub use doc::{Document, Edition, Volume};
 pub use redact::Public;
-pub use render::{RenderError, Rendered};
 pub use typeset::Paper;
 
 use housewright_core::model::Sensitivity;
+
+/// The binder could not be made.
+#[derive(Debug, thiserror::Error)]
+#[error("the binder could not be typeset: {0}")]
+pub struct RenderError(pub String);
+
+/// A typeset document.
+pub struct Rendered {
+    pub pdf: Vec<u8>,
+    pub pages: usize,
+    /// The laid-out text of each page, exactly as it is drawn into the PDF
+    /// (one line per run of text). For checks and tests.
+    pub page_text: Vec<String>,
+}
 
 /// Both volumes of one edition.
 #[derive(Clone, Debug)]
@@ -132,14 +147,23 @@ pub fn check_main(full: &HouseData, main: &Document) -> Result<(), RenderError> 
     Ok(())
 }
 
-/// Typeset a document. `images` maps a photo's `file` to scaled JPEG bytes;
-/// a photo missing from it is left out.
-pub fn pdf(
+/// Everything needed to typeset `doc`: the Typst source, the photos it
+/// uses (`images` maps a photo's `file` to scaled JPEG bytes; a photo
+/// missing from it is left out) and the receipt to record.
+pub fn prepare(
     doc: &Document,
+    property: housewright_core::ids::PropertyId,
     printed: jiff::civil::Date,
     paper: Paper,
     images: &BTreeMap<String, Vec<u8>>,
-) -> Result<Rendered, RenderError> {
+) -> bundle::Bundle {
+    // Fingerprints of the document as built, before photos that could not
+    // be found are dropped, so tracking does not depend on the device.
+    let sections = doc
+        .sections
+        .iter()
+        .map(|s| (s.key.clone(), s.fingerprint()))
+        .collect();
     let mut doc = doc.clone();
     for s in &mut doc.sections {
         for b in &mut s.blocks {
@@ -153,6 +177,32 @@ pub fn pdf(
         s.blocks
             .retain(|b| !matches!(b, doc::Block::Photos { photos } if photos.is_empty()));
     }
-    let src = typeset::source(&doc, &text::date(printed), paper);
-    render::render(&src, images, printed)
+    let files = doc
+        .photo_files()
+        .into_iter()
+        .filter_map(|f| images.get(&f).map(|b| (f, b.clone())))
+        .collect();
+    bundle::Bundle {
+        source: typeset::source(&doc, &text::date(printed), paper),
+        files,
+        receipt: bundle::Receipt {
+            property,
+            edition: doc.edition.as_str().into(),
+            volume: doc.volume.as_str().into(),
+            printed_on: printed,
+            sections,
+        },
+    }
+}
+
+/// Typeset a document (in this process; needs the `typeset` feature).
+#[cfg(feature = "typeset")]
+pub fn pdf(
+    doc: &Document,
+    printed: jiff::civil::Date,
+    paper: Paper,
+    images: &BTreeMap<String, Vec<u8>>,
+) -> Result<Rendered, RenderError> {
+    let b = prepare(doc, Default::default(), printed, paper, images);
+    render::render(&b.source, &b.files, printed)
 }

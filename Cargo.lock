@@ -1106,6 +1106,19 @@ dependencies = [
  "typst",
  "typst-layout",
  "typst-pdf",
+ "zip",
+]
+
+[[package]]
+name = "housewright-binder-web"
+version = "0.1.0"
+dependencies = [
+ "getrandom",
+ "housewright-binder",
+ "jiff",
+ "serde_json",
+ "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -14,6 +14,14 @@ serde_json.workspace = true
 jiff.workspace = true
 sha2.workspace = true
 thiserror.workspace = true
-typst = "0.15.1"
-typst-pdf = "0.15.1"
-typst-layout = "0.15.1"
+zip.workspace = true
+# Typesetting (D-80). Optional so the web app's main module can build
+# binders without carrying Typst; the web typesets in a separate module
+# (`web-binder/`) loaded only when someone prints.
+typst = { version = "0.15.1", optional = true }
+typst-pdf = { version = "0.15.1", optional = true }
+typst-layout = { version = "0.15.1", optional = true }
+
+[features]
+default = ["typeset"]
+typeset = ["dep:typst", "dep:typst-pdf", "dep:typst-layout"]

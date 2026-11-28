@@ -1,6 +1,15 @@
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/cli", "crates/api", "crates/media", "crates/binder", "web", "tools/climate-build"]
+members = [
+    "crates/core",
+    "crates/cli",
+    "crates/api",
+    "crates/media",
+    "crates/binder",
+    "web",
+    "web-binder",
+    "tools/climate-build",
+]
 exclude = ["app/src-tauri"]
 
 [workspace.package]
@@ -12,9 +21,9 @@ rust-version = "1.92"
 
 [workspace.dependencies]
 housewright-core = { path = "crates/core" }
-housewright-api = { path = "crates/api" }
+housewright-api = { path = "crates/api", default-features = false }
 housewright-media = { path = "crates/media" }
-housewright-binder = { path = "crates/binder" }
+housewright-binder = { path = "crates/binder", default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"

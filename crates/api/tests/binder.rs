@@ -939,3 +939,42 @@ fn the_emergency_page_stays_one_page_when_crowded() {
     assert_eq!(a4.pages, 1, "and on A4");
     save("emergency-crowded.pdf", &r.pdf);
 }
+
+#[test]
+fn the_web_path_bundle_render_record_matches_the_native_one() {
+    // The web typesets in a separate module: bundle here, PDF there, then
+    // record the receipt. Same result as binder_pdf.
+    let mut d = demo();
+    let zip = d
+        .api
+        .call_download("binder_bundle", json!({"edition": "full"}))
+        .unwrap();
+    let st = call(&mut d.api, "binder", Value::Null);
+    assert_eq!(
+        st["editions"][1]["last_printed"],
+        Value::Null,
+        "a bundle alone is not a print"
+    );
+    let r = binder::render::render_bundle(&zip).unwrap();
+    assert!(r.pdf.starts_with(b"%PDF"));
+    assert!(r.pages > 10);
+    let receipt = binder::bundle::Bundle::from_zip(&zip).unwrap().receipt;
+    let st = call(
+        &mut d.api,
+        "record_binder_print",
+        serde_json::to_value(&receipt).unwrap(),
+    );
+    assert_eq!(st["editions"][1]["last_printed"], "2026-11-27");
+    let main: Vec<&Value> = st["editions"][1]["sections"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|s| s["volume"] == "main")
+        .collect();
+    assert!(main.iter().all(|s| s["changed"] == false));
+    // The bundle never carries a sensitive value either.
+    let b = binder::bundle::Bundle::from_zip(&zip).unwrap();
+    for s in SECRETS {
+        assert!(!b.source.contains(s), "bundle source holds {s:?}");
+    }
+}

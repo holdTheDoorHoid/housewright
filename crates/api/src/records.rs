@@ -25,6 +25,7 @@ pub const DOWNLOAD_COMMANDS: &[&str] = &[
     "full_backup",
     "label_sheet_pdf",
     "binder_pdf",
+    "binder_bundle",
 ];
 
 pub(crate) fn attachment_out(a: &Attachment) -> AttachmentOut {

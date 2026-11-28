@@ -200,6 +200,10 @@ impl Api {
                 self.store.delete(EntityKind::Note, &id.to_string())?;
                 ok(())
             }),
+            "record_binder_print" => args(a).and_then(|r: binder::bundle::Receipt| {
+                self.record_print(&r)?;
+                ok(self.binder_status(None)?)
+            }),
             "contractors" => ok(self.contractors()),
             "save_contractor" => args(a).and_then(|a: ContractorIo| ok(self.save_contractor(a)?)),
             "delete_contractor" => args(a).and_then(|a: IdArgs| {
@@ -358,7 +362,11 @@ impl Api {
         Ok(t)
     }
 
-    fn binder_pdf(&mut self, a: BinderPdfArgs) -> Result<Vec<u8>, ApiError> {
+    /// Build, check and prepare one volume for typesetting.
+    fn binder_bundle(
+        &mut self,
+        a: BinderPdfArgs,
+    ) -> Result<(binder::bundle::Bundle, bool), ApiError> {
         let edition = Edition::parse(&a.edition)
             .ok_or_else(|| ApiError::invalid(format!("no binder edition '{}'", a.edition)))?;
         let volume = match a.volume.as_deref().unwrap_or("main") {
@@ -425,28 +433,51 @@ impl Api {
             Some(p) => p,
             None => self.paper()?,
         };
-        let r = binder::pdf(&doc, data.today, paper, &images)
+        let bundle = binder::prepare(&doc, data.property.id, data.today, paper, &images);
+        Ok((bundle, a.record.unwrap_or(true)))
+    }
+
+    /// Record a print (D-82), and after the first one create the yearly
+    /// reminder, switched off (D-87).
+    fn record_print(&mut self, r: &binder::bundle::Receipt) -> Result<(), ApiError> {
+        if Edition::parse(&r.edition).is_none() || !matches!(r.volume.as_str(), "main" | "sealed") {
+            return Err(ApiError::invalid("not a binder receipt".to_string()));
+        }
+        let _: Property = self.store.fetch(&r.property.to_string())?;
+        let me = self.me()?;
+        self.store.append(&BinderPrint {
+            id: BinderPrintId::new(),
+            property: r.property,
+            edition: r.edition.clone(),
+            volume: r.volume.clone(),
+            by: me.id,
+            at: self.store.now(),
+            printed_on: r.printed_on,
+            sections: r.sections.clone(),
+        })?;
+        if self.reminder_task()?.is_none() {
+            self.make_reminder_task()?;
+        }
+        Ok(())
+    }
+
+    /// Typeset in this process (Android, desktop).
+    #[cfg(feature = "typeset")]
+    fn binder_pdf(&mut self, a: BinderPdfArgs) -> Result<Vec<u8>, ApiError> {
+        let (bundle, record) = self.binder_bundle(a)?;
+        let r = binder::render::render(&bundle.source, &bundle.files, bundle.receipt.printed_on)
             .map_err(|e| ApiError::internal(e.to_string()))?;
-        if a.record.unwrap_or(true) {
-            self.store.append(&BinderPrint {
-                id: BinderPrintId::new(),
-                property: data.property.id,
-                edition: edition.as_str().into(),
-                volume: volume.as_str().into(),
-                by: me.id,
-                at: self.store.now(),
-                printed_on: data.today,
-                sections: doc
-                    .sections
-                    .iter()
-                    .map(|s| (s.key.clone(), s.fingerprint()))
-                    .collect(),
-            })?;
-            if self.reminder_task()?.is_none() {
-                self.make_reminder_task()?;
-            }
+        if record {
+            self.record_print(&bundle.receipt)?;
         }
         Ok(r.pdf)
+    }
+
+    #[cfg(not(feature = "typeset"))]
+    fn binder_pdf(&mut self, _a: BinderPdfArgs) -> Result<Vec<u8>, ApiError> {
+        Err(ApiError::invalid(
+            "this build typesets the binder in its separate module: use binder_bundle".to_string(),
+        ))
     }
 
     /// Photos for a document, shrunk for print (D-85).
@@ -622,6 +653,10 @@ impl Api {
     ) -> Option<Result<Vec<u8>, ApiError>> {
         match cmd {
             "binder_pdf" => Some(args(a).and_then(|a: BinderPdfArgs| self.binder_pdf(a))),
+            "binder_bundle" => Some(args(a).and_then(|a: BinderPdfArgs| {
+                let (b, _) = self.binder_bundle(a)?;
+                b.to_zip().map_err(|e| ApiError::internal(e.to_string()))
+            })),
             _ => None,
         }
     }
