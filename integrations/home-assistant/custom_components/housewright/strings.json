@@ -1,0 +1,192 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect the Housewright bridge",
+        "description": "The bridge is a small Housewright program that runs next to Home Assistant (or as its add-on). Enter its address and the token it printed when it first started (also in its data folder as api-token).",
+        "data": {
+          "url": "Bridge address",
+          "token": "Bridge token"
+        }
+      },
+      "pair": {
+        "title": "Add the bridge to your household",
+        "description": "This bridge is not in a household yet. In the Housewright app, open Settings, Sync and devices, Add a device or person, and choose Home Assistant. Type the code it shows here. The sync server is only needed if you type the code without it. {error}",
+        "data": {
+          "server": "Sync server address (optional)",
+          "code": "Code from the app"
+        }
+      },
+      "compare": {
+        "title": "Compare the numbers",
+        "description": "The bridge shows **{safety_number}**. Check that the Housewright app shows the same six digits. If they differ, leave this unticked: someone may be in between.",
+        "data": {
+          "matches": "The numbers match"
+        }
+      },
+      "finish": {
+        "title": "Finish in the app",
+        "description": "Now tap \"They match\" in the Housewright app, then press Submit here."
+      },
+      "reauth_confirm": {
+        "title": "New bridge token",
+        "description": "The bridge did not accept the saved token. Enter the token from the bridge's data folder (api-token).",
+        "data": {
+          "token": "Bridge token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach the bridge at that address. Check that it is running.",
+      "invalid_auth": "The bridge did not accept that token.",
+      "not_a_bridge": "Something answered at that address, but it is not a Housewright bridge.",
+      "pairing_failed": "Pairing did not work. Get a new code in the app and try again.",
+      "not_finished": "The app has not finished yet. Tap \"They match\" in the app, then press Submit again."
+    },
+    "abort": {
+      "already_configured": "This bridge is already set up.",
+      "reauth_successful": "The new token works.",
+      "pairing_stopped": "Pairing stopped. Nothing was added. {error}"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Housewright",
+        "menu_options": {
+          "settings": "Settings",
+          "import_devices": "Add Home Assistant devices to Housewright",
+          "link_meter": "Send a sensor's number to a meter",
+          "link_event": "Report an event when a sensor changes",
+          "remove_links": "Remove sensor links"
+        }
+      },
+      "settings": {
+        "title": "Settings",
+        "data": {
+          "scan_interval": "How often to check for changes",
+          "default_member": "Who \"Mark done\" is recorded for"
+        },
+        "data_description": {
+          "default_member": "Leave empty to record it as done via Home Assistant, with no person named."
+        }
+      },
+      "import_devices": {
+        "title": "Add devices",
+        "description": "These devices look like things Housewright has maintenance plans for, and are not in Housewright yet. Each one you pick is added with its tasks as suggestions; switch on the ones you want in the app.",
+        "data": {
+          "devices": "Devices"
+        }
+      },
+      "imported": {
+        "title": "Added",
+        "description": "Added: {added}. Their tasks are waiting as suggestions in the app."
+      },
+      "link_meter": {
+        "title": "Send a sensor's number to a meter",
+        "description": "For example, an HVAC runtime-hours sensor or a washer cycle counter. The bridge keeps at most one reading every 30 minutes.",
+        "data": {
+          "entity_id": "Sensor",
+          "target": "Meter"
+        }
+      },
+      "link_event": {
+        "title": "Report an event",
+        "description": "For example, a leak sensor under the water heater, or a smoke alarm's low-battery sensor. When the entity turns to the state below, Housewright is told, and the matching task becomes due.",
+        "data": {
+          "entity_id": "Entity",
+          "item": "Thing",
+          "event": "Event",
+          "on": "State that means it happened"
+        }
+      },
+      "remove_links": {
+        "title": "Remove sensor links",
+        "data": {
+          "links": "Links to remove"
+        }
+      }
+    },
+    "abort": {
+      "no_devices": "No new devices look like things Housewright knows about.",
+      "no_meters": "None of your things in Housewright has a meter yet (a washing machine's loads, for example).",
+      "no_items": "There are no things in Housewright yet.",
+      "bridge_error": "The bridge said: {error}"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "summary": {
+        "name": "Tasks ready to do",
+        "state_attributes": {
+          "next_task": { "name": "Next task" },
+          "next_due": { "name": "Next due" }
+        }
+      },
+      "task_state": {
+        "state": {
+          "ok": "OK",
+          "due_soon": "Due soon",
+          "due": "Due",
+          "overdue": "Past due",
+          "snoozed": "Snoozed",
+          "paused": "Paused"
+        }
+      }
+    },
+    "button": {
+      "mark_done": { "name": "Mark done" }
+    },
+    "todo": {
+      "maintenance": { "name": "Maintenance" }
+    },
+    "calendar": {
+      "maintenance": { "name": "Maintenance" }
+    }
+  },
+  "exceptions": {
+    "no_household": { "message": "No Housewright household is set up." },
+    "which_household": { "message": "More than one Housewright household is set up; say which with config_entry_id." }
+  },
+  "services": {
+    "complete": {
+      "name": "Mark a task done",
+      "description": "Records a task as done in Housewright.",
+      "fields": {
+        "task": { "name": "Task", "description": "The task's id or exact title." },
+        "member": { "name": "Who did it", "description": "A person in the household, by name or id. Empty: recorded via Home Assistant." },
+        "config_entry_id": { "name": "Household", "description": "Only needed with more than one." }
+      }
+    },
+    "snooze": {
+      "name": "Snooze a task",
+      "description": "Moves a task to a later day.",
+      "fields": {
+        "task": { "name": "Task", "description": "The task's id or exact title." },
+        "until": { "name": "Until", "description": "The day it is due again." },
+        "days": { "name": "Days", "description": "Or: this many days from today." },
+        "config_entry_id": { "name": "Household", "description": "Only needed with more than one." }
+      }
+    },
+    "add_meter_reading": {
+      "name": "Add a meter reading",
+      "description": "Records a reading, such as runtime hours or loads washed, for a usage-based task.",
+      "fields": {
+        "item": { "name": "Thing", "description": "The thing's id or exact name." },
+        "meter": { "name": "Meter", "description": "The meter's key or name, for example loads." },
+        "value": { "name": "Value", "description": "The meter's total, or the amount to add." },
+        "delta": { "name": "Add to the last reading", "description": "Add the value instead of setting the total (one more cycle)." },
+        "config_entry_id": { "name": "Household", "description": "Only needed with more than one." }
+      }
+    },
+    "report_event": {
+      "name": "Report an event",
+      "description": "Tells Housewright that something happened to a thing, such as a leak or a low battery. Tasks that follow that event become due.",
+      "fields": {
+        "item": { "name": "Thing", "description": "The thing's id or exact name." },
+        "event": { "name": "Event", "description": "leak, battery_low, or another lowercase name." },
+        "config_entry_id": { "name": "Household", "description": "Only needed with more than one." }
+      }
+    }
+  }
+}

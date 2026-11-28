@@ -1,0 +1,19 @@
+configuration:
+  server:
+    name: Run the sync server
+    description: Keep the household's encrypted data here so your devices can sync. It cannot read the data.
+  bridge:
+    name: Run the bridge for Home Assistant
+    description: A Housewright device that the Housewright integration talks to. It holds the household's keys.
+  open_registration:
+    name: Let anyone add a household
+    description: Off by default. When off, setting up sync needs the registration token printed in the log.
+  household_quota_mb:
+    name: Space per household (MB)
+  ssl:
+    name: Use HTTPS
+    description: Serve the sync server over HTTPS with the certificate below (from the /ssl folder).
+  certfile:
+    name: Certificate file
+  keyfile:
+    name: Private key file

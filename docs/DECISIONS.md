@@ -964,6 +964,104 @@ parallel uploads cannot both pass. Shrinking a copy is always allowed.
 holds *more* batches from the device than the removal names (only fewer is
 excused), so it cannot reopen the removal race.
 
+## Phase 7 Home Assistant (2026-11-28)
+
+**D-117 Home Assistant through a Rust bridge and a small Python
+integration (Owner, 2026-11-28).** Home Assistant gets a small Python
+custom integration (installable via HACS), confined to
+`integrations/home-assistant/`, that talks to a Rust "bridge" over a local
+HTTP/JSON API. All Housewright logic stays in Rust; Python is only Home
+Assistant glue. This is the one exception to the language rule in
+CLAUDE.md. Because sync is end-to-end encrypted (D-14), Home Assistant can
+only see data through a Housewright device that holds keys: the bridge.
+
+**D-118 Triggered schedules (Proposed).** Completes D-20's "on a sensor
+event". A new schedule kind, `triggered` with an event name (`leak`,
+`battery_low`; lowercase letters, digits, underscores). It is quiet until
+the event is reported on the task's item; then it is due that day and
+past due three days later; doing it quiets it until the next event. Each
+event is stored as a reading of the item's meter whose key is the event
+name, so no new record kind, file format or sync change was needed, and
+the engine stays pure. Five templates gained such tasks (smoke and CO
+alarms after a low-battery alert; washer, dishwasher and tank water
+heater after a leak alert).
+
+**D-119 An event switches on its suggested task (Proposed).** When an
+event arrives for an item whose matching triggered tasks are all only
+suggestions (P3), the bridge switches them on, since a sensor reporting it
+is a clear sign the household wants it. Paused or "not for us" tasks stay
+as they are. The same event on the same item within ten minutes counts
+once.
+
+**D-120 Devices from Home Assistant become things with suggested tasks
+(Proposed).** The options flow lists Home Assistant devices whose name or
+model matches a template (a short keyword table, then template names);
+devices with no match (lights, phones) are not offered. Picked devices
+become items with make, model and the area as the room; their tasks are
+suggestions, switched on in the app. Home Assistant's device id is not
+stored; a device already recorded under the same name, make and model is
+skipped.
+
+**D-121 Meter readings from Home Assistant (Proposed).** Automatic pushes
+(sensor links) are throttled by the bridge: an unchanged value is
+skipped, and at most one reading per meter is stored every 30 minutes
+(the latest value is sent again after each poll, so the last one is not
+lost). Every stored reading syncs to every device for good, so this
+bounds growth to under 50 a day per meter. A value lower than the last is
+taken as a counter that restarted from zero and keeps counting up.
+`delta` adds to the last reading (one more washer cycle). Refines the
+engine: a usage task's baseline is the meter at the reference *instant*
+(the last completion, or the start of the day counted from), not the
+latest reading on that date, so readings taken on the start day count.
+
+**D-122 The bridge is a member device that records for people
+(Proposed).** The bridge joins with role Member (never Owner: it refuses
+an owner's "another device of mine" code) and a member record whose kind
+is `home_assistant`, made by the owner choosing "Home Assistant" when
+adding a device. Completions it records keep `by` = the bridge's member
+(D-104 forbids writing in another member's name); a new optional field
+`done_by` names the person it was done for. History and the completion
+list say "Ana marked ... done, via Home Assistant", or "Recorded ..., via
+Home Assistant" when no person was named. `done_by` is only the bridge's
+word, like any member's claim about who did a chore.
+
+**D-123 Home Assistant needs sync (Proposed).** Answers the brief's
+question. The bridge joins a household through a sync server like any
+device; there is no "bridge is the only device" mode for real use,
+because the household would then live only on the Home Assistant
+machine, with no app to look at it and the Home Assistant machine as the
+owner. Households not syncing yet can use the add-on as their server.
+`housewright-bridge demo` makes a sample household with no sync, for
+trying the integration and for tests only.
+
+**D-124 The bridge's local API (Proposed).** HTTP/JSON on 127.0.0.1:8788
+by default (configurable; a warning is printed for anything else). Every
+route except `/api/v1/health` needs `Authorization: Bearer <token>`: 32
+random bytes in Base32, made on first start and kept in the data folder
+(`api-token`, mode 0600), or given in `HW_BRIDGE_TOKEN`; compared as
+SHA-256 hashes in constant time. No CORS headers, bodies up to 256 KB,
+inputs with unknown fields refused. Responses are built field by field:
+task titles, states, due windows, items' names, rooms, make and model,
+meters, and people's names. Never: serial numbers, custom fields, notes,
+costs, contacts, facts, locations, attachments, or anything on an item
+marked sensitive (such items and their tasks do not exist as far as the
+API is concerned). Polling, not push: `iot_class: local_polling`, every
+60 seconds by default (15 at least).
+
+**D-125 Assist through the to-do list for now (Proposed).** The
+"Maintenance" to-do list works with Home Assistant's built-in list
+intents (what is on a list, check an item off), so no custom intents or
+sentences were written. Dedicated intents ("what maintenance is due") are
+left for later.
+
+**D-126 The Python tests run against the real bridge (Proposed).** The
+integration's tests start `housewright-bridge` (with the demo household)
+on 127.0.0.1 in a fixture instead of a fake. A Rust test writes the keys
+of every response object to
+`integrations/home-assistant/tests/fixtures/bridge-schema.json` and fails
+when they change; a Python test checks the running bridge against the
+same file.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -992,3 +1090,19 @@ excused), so it cannot reopen the removal race.
   example a tenant on a shared phone? If so it is a project of its own.
 - **Q-11** Opt-in research data (D-32) was planned "with Phase 6"; it was
   not built. Send it to the same sync server, or only to a project server?
+- **Q-12** Publishing the Home Assistant pieces. HACS installs an
+  integration only from a repository whose root holds `custom_components/`
+  (or from a release zip), and Home Assistant's add-on store reads
+  `repository.yaml` from a repository's root and needs built images.
+  Proposed: a small public repository (for example
+  `housewright-home-assistant`) that CI fills from
+  `integrations/home-assistant/` on each release, plus add-on images on
+  GitHub's container registry. Needs the owner's accounts and go-ahead.
+- **Q-13** May a task be marked done from Home Assistant without naming a
+  person (it then shows "via Home Assistant")? Proposed: yes, with an
+  option to name a default person.
+- **Q-14** Should the bridge's database and keys be encrypted at rest on
+  the Home Assistant machine (for example with a passphrase kept in Home
+  Assistant)? Proposed: not now; it would protect against a stolen disk
+  but not against someone who controls Home Assistant, which is the
+  realistic threat (see SECURITY.md).

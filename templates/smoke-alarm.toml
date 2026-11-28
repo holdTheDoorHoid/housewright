@@ -85,3 +85,18 @@ steps = [
 ]
 why = "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
 source = "common manufacturer guidance"
+
+[[tasks]]
+key = "battery_alert"
+title = "Change the smoke alarm battery after a low-battery alert"
+priority = "life_safety"
+schedule = { kind = "triggered", event = "battery_low" }
+minutes = 5
+steps = [
+  "Have the right replacement battery ready.",
+  "Twist or slide the alarm off its base.",
+  "Swap the battery, matching the + and - marks.",
+  "Refit the alarm and press the test button.",
+]
+why = "An alarm with a flat battery cannot warn anyone, and the chirping is easy to ignore."
+source = "NFPA guidance"

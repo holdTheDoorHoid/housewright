@@ -366,6 +366,19 @@ pub enum Schedule {
     },
     /// One-off: a single due date.
     OneOff { due: Date },
+    /// Triggered: due when an event is reported on the task's item (a leak
+    /// sensor, a low battery), usually by Home Assistant (D-26, D-118).
+    /// Quiet until then. Each event is a reading of the item's meter whose
+    /// key is the event name.
+    Triggered { event: String },
+}
+
+/// Event names: lowercase letters, digits and underscores, at most 40.
+pub fn valid_event_name(s: &str) -> bool {
+    !s.is_empty()
+        && s.len() <= 40
+        && s.bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_')
 }
 
 fn one() -> u8 {
@@ -410,6 +423,9 @@ impl Schedule {
                 None => format!("every {threshold} {meter}"),
             },
             Schedule::OneOff { due } => format!("once, on {due}"),
+            Schedule::Triggered { event } => {
+                format!("when {} is reported", event.replace('_', " "))
+            }
         }
     }
 
@@ -445,6 +461,13 @@ impl Schedule {
                 }
             }
             Schedule::OneOff { .. } => {}
+            Schedule::Triggered { event } => {
+                if !valid_event_name(event) {
+                    return Err(format!(
+                        "triggered: event '{event}' should be lowercase letters, digits and underscores"
+                    ));
+                }
+            }
         }
         Ok(())
     }
@@ -465,6 +488,7 @@ impl Schedule {
             Schedule::Seasonal { .. } => 365,
             Schedule::Usage { or_every, .. } => or_every.map_or(90, |i| i.approx_days()),
             Schedule::OneOff { .. } => 0,
+            Schedule::Triggered { .. } => 365,
         }
     }
 
@@ -503,6 +527,11 @@ impl Schedule {
             Schedule::OneOff { .. } => WindowPolicy {
                 lead_days: 7,
                 grace_days: 7,
+            },
+            // Due the day the event comes in; overdue three days later.
+            Schedule::Triggered { .. } => WindowPolicy {
+                lead_days: 0,
+                grace_days: 3,
             },
         }
     }
@@ -733,8 +762,17 @@ pub fn evaluate(input: &ScheduleInput<'_>, now: Timestamp, tz: &TimeZone) -> Eva
             ..
         } => {
             let reference = last_done.or(input.assumed_last_done).unwrap_or(input.start);
+            // The baseline is the meter at the last completion (to the
+            // instant), or at the start of the day counted from.
+            let ref_at = last_done_at.or_else(|| {
+                reference
+                    .at(0, 0, 0, 0)
+                    .to_zoned_datetime(tz.clone())
+                    .ok()
+                    .map(|z| z.timestamp())
+            });
             let (u_state, u_window, progress) =
-                usage_eval(input.readings, *threshold, reference, policy, today, tz);
+                usage_eval(input.readings, *threshold, ref_at, policy, today, tz);
             eval.usage = progress;
             let usage_side = (u_state, u_window);
             match or_every {
@@ -743,6 +781,26 @@ pub fn evaluate(input: &ScheduleInput<'_>, now: Timestamp, tz: &TimeZone) -> Eva
                     more_urgent(usage_side, cal)
                 }
                 None => usage_side,
+            }
+        }
+        Schedule::Triggered { .. } => {
+            // The latest event since the last completion (or ever, if never
+            // done). Readings are events; their values do not matter.
+            let fired = input
+                .readings
+                .iter()
+                .filter(|r| last_done_at.is_none_or(|l| r.at > l))
+                .map(|r| r.at)
+                .max();
+            match fired {
+                Some(at) => {
+                    let (mut s, w) = by_date(policy.around(civil_date(at, tz)), today);
+                    if s.urgency() < TaskState::Due.urgency() {
+                        s = TaskState::Due;
+                    }
+                    (s, w)
+                }
+                None => (TaskState::Scheduled, None),
             }
         }
         periodic => {
@@ -814,7 +872,7 @@ fn more_urgent(
 fn usage_eval(
     readings: &[ReadingInput],
     threshold: f64,
-    reference: Date,
+    reference: Option<Timestamp>,
     policy: WindowPolicy,
     today: Date,
     tz: &TimeZone,
@@ -828,11 +886,10 @@ fn usage_eval(
     if rs.is_empty() {
         return (TaskState::Scheduled, None, None);
     }
-    // Baseline: the latest reading on or before the reference date, else the
-    // first reading after it.
-    let base_idx = rs
-        .iter()
-        .rposition(|r| r.0 <= reference)
+    // Baseline: the latest reading at or before the reference instant,
+    // else the first reading after it.
+    let base_idx = reference
+        .and_then(|at| rs.iter().rposition(|r| r.1 <= at))
         .unwrap_or_default();
     let (base_date, _, base_value) = rs[base_idx];
     let after = &rs[base_idx..];

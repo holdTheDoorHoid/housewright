@@ -268,11 +268,31 @@ impl Role {
     }
 }
 
+/// What a member is: a person, or the Home Assistant bridge (D-117), a
+/// headless device that records readings and events and marks tasks done
+/// on people's behalf.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MemberKind {
+    #[default]
+    Person,
+    HomeAssistant,
+}
+
+impl MemberKind {
+    pub fn is_person(&self) -> bool {
+        *self == MemberKind::Person
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Member {
     pub id: MemberId,
     pub name: String,
     pub role: Role,
+    /// Left out of files for people, so older files read the same.
+    #[serde(default, skip_serializing_if = "MemberKind::is_person")]
+    pub kind: MemberKind,
     /// Phone or email; flagged because it is personal.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contact: Option<Flagged<String>>,
@@ -455,6 +475,11 @@ pub struct Completion {
     /// If set, this record cancels an earlier completion (logged in error).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub voids: Option<CompletionId>,
+    /// Who did the work, when another device recorded it for them (Home
+    /// Assistant, D-117). `by` stays the recording device's member (D-104);
+    /// this is that device's word for who did it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub done_by: Option<MemberId>,
 }
 entity!(Completion, Completion);
 

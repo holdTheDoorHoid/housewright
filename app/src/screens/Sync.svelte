@@ -36,7 +36,7 @@
   let wroteItDown = $state(false);
 
   // Adding a device or person.
-  let adding = $state<'choose' | 'device' | 'person' | null>(null);
+  let adding = $state<'choose' | 'device' | 'person' | 'home_assistant' | null>(null);
   let personName = $state('');
   let personRole = $state<Role>('member');
   let invite = $state<Invitation | null>(null);
@@ -133,7 +133,7 @@
     busy = false;
   }
 
-  async function startInvite(who: 'device' | 'person') {
+  async function startInvite(who: 'device' | 'person' | 'home_assistant') {
     error = null;
     try {
       invite = await call(
@@ -339,7 +339,7 @@
         {#each devices as d (d.id)}
           <li class="card">
             <div>
-              <strong>{d.name}</strong>{#if d.this_device} <span class="pill">this device</span>{/if}
+              <strong>{d.name}</strong>{#if d.this_device} <span class="pill">this device</span>{/if}{#if d.home_assistant} <span class="pill">Home Assistant bridge</span>{/if}
               <p class="small muted">
                 {d.member_name} · {roleText[d.role] ?? d.role}
                 {#if d.last_seen} · last seen {when(d.last_seen)}{/if}
@@ -363,7 +363,9 @@
             <p class="row">
               <button onclick={() => { adding = 'device'; startInvite('device'); }}>Another device of mine</button>
               <button onclick={() => (adding = 'person')}>Someone else in my home</button>
+              <button onclick={() => { adding = 'home_assistant'; startInvite('home_assistant'); }}>Home Assistant</button>
             </p>
+            <p class="muted small"><a href="#/home-assistant">How connecting Home Assistant works</a></p>
           {:else if adding === 'person'}
             <form onsubmit={(e) => { e.preventDefault(); startInvite('person'); }}>
               <label for="pn">Their name</label>
@@ -388,7 +390,11 @@
         <div class="card pairing">
           {#if pair?.state === 'waiting'}
             <h2>On the new device</h2>
-            <p>Open Housewright, choose “Join a household on another device”, and enter:</p>
+            {#if adding === 'home_assistant'}
+              <p>In Home Assistant, add the Housewright integration. When it asks for a code, enter:</p>
+            {:else}
+              <p>Open Housewright, choose “Join a household on another device”, and enter:</p>
+            {/if}
             <div class="qr" aria-hidden="true">{@html invite.qr_svg}</div>
             <p class="small">Server: <strong>{invite.server}</strong></p>
             <p class="code" data-testid="pair-code">{invite.code}</p>

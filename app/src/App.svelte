@@ -3,6 +3,7 @@
   import { connect, call, onCommand, ApiFailure, type Status } from './lib/api';
   import { changed, startSync } from './lib/sync';
   import Sync from './screens/Sync.svelte';
+  import HomeAssistant from './screens/HomeAssistant.svelte';
   import { app, go, refresh } from './lib/state.svelte';
   import { reminders, resync } from './lib/reminders';
   import { errorText } from './lib/actions';
@@ -77,7 +78,7 @@
         ? 'things'
         : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder'
           ? 'home'
-          : app.route.name === 'sync'
+          : app.route.name === 'sync' || app.route.name === 'home-assistant'
             ? 'settings'
             : app.route.name,
   );
@@ -109,6 +110,7 @@
     {:else if app.route.name === 'history'}<History />
     {:else if app.route.name === 'settings'}<Settings />
     {:else if app.route.name === 'sync'}<Sync />
+    {:else if app.route.name === 'home-assistant'}<HomeAssistant />
     {:else if app.route.name === 'questions'}{#key app.route.redo}<Questions redo={app.route.redo} />{/key}
     {:else if app.route.name === 'plan'}<StartingPlan />
     {:else if app.route.name === 'suggested'}<Suggested />

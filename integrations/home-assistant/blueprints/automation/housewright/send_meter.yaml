@@ -1,0 +1,39 @@
+blueprint:
+  name: Housewright - send a meter reading
+  description: >
+    Send a counter or runtime sensor (HVAC runtime hours, washer cycles) to
+    a Housewright meter, at most once an hour. Usage-based tasks (such as
+    "Run a washer cleaning cycle every 40 loads") become due when the
+    meter has gone up enough. The integration's options can do the same
+    without an automation ("Send a sensor's number to a meter").
+  domain: automation
+  input:
+    sensor:
+      name: Sensor
+      selector:
+        entity:
+          domain: [sensor, counter, input_number]
+    item:
+      name: Thing in Housewright
+      selector:
+        text:
+    meter:
+      name: Meter
+      description: The meter's key, for example loads or runtime_hours.
+      selector:
+        text:
+triggers:
+  - trigger: time_pattern
+    minutes: 5
+conditions:
+  - condition: template
+    value_template: "{{ states(input_sensor) | is_number }}"
+variables:
+  input_sensor: !input sensor
+actions:
+  - action: housewright.add_meter_reading
+    data:
+      item: !input item
+      meter: !input meter
+      value: "{{ states(input_sensor) | float }}"
+mode: single

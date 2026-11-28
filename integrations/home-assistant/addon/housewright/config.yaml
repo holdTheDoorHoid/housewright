@@ -1,0 +1,39 @@
+name: Housewright
+version: "0.1.0"
+slug: housewright
+description: >-
+  Housewright's sync server (it stores only encrypted data) and the bridge
+  the Housewright integration talks to.
+url: https://github.com/holdTheDoorHoid/housewright/tree/main/integrations/home-assistant
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: services
+boot: auto
+# The image is built from the repository root by CI (see README.md):
+# Supervisor builds an add-on from its own folder, which cannot see the
+# Rust sources.
+image: "ghcr.io/holdthedoorhoid/housewright-addon-{arch}"
+map:
+  - ssl:ro
+ports:
+  8787/tcp: 8787
+ports_description:
+  8787/tcp: Sync server for your phones and browsers
+options:
+  server: true
+  bridge: true
+  open_registration: false
+  household_quota_mb: 2048
+  ssl: false
+  certfile: fullchain.pem
+  keyfile: privkey.pem
+schema:
+  server: bool
+  bridge: bool
+  open_registration: bool
+  household_quota_mb: int(64,100000)
+  ssl: bool
+  certfile: str
+  keyfile: str

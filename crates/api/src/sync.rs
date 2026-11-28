@@ -105,7 +105,7 @@ struct KeyOut {
 
 #[derive(Deserialize)]
 struct InviteArgs {
-    /// `device` (another device of mine) or `person`.
+    /// `device` (another device of mine), `person`, or `home_assistant`.
     who: String,
     #[serde(default)]
     name: Option<String>,
@@ -168,6 +168,8 @@ struct DeviceOut {
     d: DeviceInfo,
     added: Option<String>,
     last_seen: Option<String>,
+    /// The device is the Home Assistant bridge (D-117).
+    home_assistant: bool,
 }
 
 fn unavailable() -> ApiError {
@@ -187,6 +189,11 @@ impl Api {
     /// and desktop; synchronous XHR in the web worker).
     pub fn set_transport(&mut self, t: Box<dyn Transport>) {
         self.sync = Some(SyncClient::new(t));
+    }
+
+    /// The sync client, when the platform gave a transport.
+    pub fn sync_client(&self) -> Option<&SyncClient> {
+        self.sync.as_ref()
     }
 
     pub(crate) fn sync_status(&self) -> Result<SyncStatusOut, ApiError> {
@@ -342,6 +349,13 @@ impl Api {
                     .map(|d| DeviceOut {
                         added: ts(d.added_ms),
                         last_seen: ts(d.last_seen_ms),
+                        home_assistant: store
+                            .get::<housewright_core::model::Member>(&d.member)
+                            .ok()
+                            .flatten()
+                            .is_some_and(|m| {
+                                m.kind == housewright_core::model::MemberKind::HomeAssistant
+                            }),
                         d,
                     })
                     .collect::<Vec<_>>())
@@ -353,6 +367,10 @@ impl Api {
                     "person" => Invitee::NewPerson {
                         name: a.name.unwrap_or_default(),
                         role: a.role.unwrap_or(Role::Member),
+                    },
+                    // The Home Assistant bridge (D-117): a member device.
+                    "home_assistant" => Invitee::HomeAssistant {
+                        name: a.name.unwrap_or_default(),
                     },
                     w => return Err(ApiError::invalid(format!("unknown invitee '{w}'"))),
                 };

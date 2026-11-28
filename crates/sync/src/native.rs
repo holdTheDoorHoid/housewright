@@ -11,8 +11,16 @@ pub struct UreqTransport {
 
 impl Default for UreqTransport {
     fn default() -> Self {
+        Self::with_timeout(Duration::from_secs(60))
+    }
+}
+
+impl UreqTransport {
+    /// With a shorter limit per request (the Home Assistant bridge, which
+    /// must not keep Home Assistant waiting on an unreachable server).
+    pub fn with_timeout(timeout: Duration) -> Self {
         let agent = ureq::Agent::config_builder()
-            .timeout_global(Some(Duration::from_secs(60)))
+            .timeout_global(Some(timeout))
             .http_status_as_error(false)
             .build()
             .into();

@@ -185,6 +185,9 @@ pub fn schedule(s: &Schedule) -> String {
             }
         }
         Schedule::OneOff { due } => format!("Once, on {}", date(*due)),
+        Schedule::Triggered { event } => {
+            format!("When a {} alert comes in", event.replace('_', " "))
+        }
     }
 }
 

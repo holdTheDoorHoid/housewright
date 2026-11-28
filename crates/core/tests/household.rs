@@ -219,6 +219,7 @@ fn limited_members_see_only_their_tasks() {
         id: MemberId::new(),
         name: "Sam".into(),
         role: Role::Limited,
+        kind: Default::default(),
         contact: None,
         reminders: None,
     };

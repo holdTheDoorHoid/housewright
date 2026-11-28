@@ -35,6 +35,7 @@ impl Store {
             id: MemberId::new(),
             name: owner_name.to_string(),
             role: Role::Owner,
+            kind: MemberKind::Person,
             contact: None,
             reminders: None,
         };
@@ -107,8 +108,10 @@ impl Store {
     /// The meter a usage task reads: the one with the schedule's key on the
     /// task's item.
     pub fn meter_for(&self, task: &Task) -> Result<Option<Meter>> {
-        let schedule::Schedule::Usage { meter, .. } = &task.schedule else {
-            return Ok(None);
+        let meter = match &task.schedule {
+            schedule::Schedule::Usage { meter, .. } => meter,
+            schedule::Schedule::Triggered { event } => event,
+            _ => return Ok(None),
         };
         let Some(item) = task.item else {
             return Ok(None);
@@ -220,7 +223,22 @@ impl Store {
         at: Option<Timestamp>,
         notes: Option<&str>,
     ) -> Result<Completion> {
+        self.complete_task_for(task, at, notes, None)
+    }
+
+    /// Record a completion on someone's behalf (Home Assistant, D-117):
+    /// `by` is this device's member, `done_by` the person named.
+    pub fn complete_task_for(
+        &mut self,
+        task: TaskId,
+        at: Option<Timestamp>,
+        notes: Option<&str>,
+        done_by: Option<MemberId>,
+    ) -> Result<Completion> {
         let _: Task = self.fetch(&task.to_string())?;
+        if let Some(m) = done_by {
+            let _: Member = self.fetch(&m.to_string())?;
+        }
         let c = Completion {
             id: CompletionId::new(),
             task,
@@ -232,6 +250,7 @@ impl Store {
             contractor: None,
             attachments: vec![],
             voids: None,
+            done_by: done_by.filter(|m| Some(*m) != self.author().ok()),
         };
         self.append(&c)?;
         Ok(c)
@@ -258,6 +277,7 @@ impl Store {
             contractor: None,
             attachments: vec![],
             voids: Some(completion),
+            done_by: None,
         };
         self.append(&c)?;
         Ok(c)

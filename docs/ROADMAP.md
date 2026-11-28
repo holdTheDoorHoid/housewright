@@ -12,7 +12,7 @@ assumption early. Status as of 2026-11-28.
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | built on branch `phase-4-records` (2026-11-27): Rust, web (Playwright) and Android emulator checks; see below |
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | built on branch `phase-5-binder` (2026-11-28): all four editions (D-42 brought forward from Phase 9), Rust and web (Playwright) checks; Android emulator checks pass (one bug found and fixed); see below |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
-| 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | |
+| 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | |
 | 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
@@ -306,3 +306,53 @@ pass found new problems in the fixes (N1 to N6, L6); those were fixed too
 (D-106 to D-111, `crates/sync/tests/verify.rs`). The Android emulator pairing
 was not re-run after the fixes (not enough disk for an Android build); the
 Rust and browser tests cover the protocol changes.
+
+## Phase 7 notes
+
+Built (decisions D-117 to D-126; owner questions Q-12 to Q-14; how it
+fits in [ARCHITECTURE.md](ARCHITECTURE.md#home-assistant-phase-7); what
+Home Assistant can see in [SECURITY.md](SECURITY.md); setup in
+[integrations/home-assistant/README.md](../integrations/home-assistant/README.md)):
+
+- **`housewright-bridge`** (`crates/bridge`): a headless household member
+  device. Pairs with the app's code and safety number (from Home
+  Assistant's setup, or `housewright-bridge join`), refuses an owner's
+  device code, keeps its own SQLite and keys, syncs every minute and soon
+  after changes. Local JSON API on 127.0.0.1:8788 with a bearer token
+  (constant-time compare): status, snapshot, tasks, items, members,
+  complete (for a named person), snooze, meter readings (throttled,
+  delta, counter restarts), events, device match and import, pairing,
+  sync. `housewright-bridge demo` makes a sample household for trying it.
+- **Core**: the `triggered` schedule kind (D-118) with leak and
+  low-battery tasks in five templates; `MemberKind::HomeAssistant` and
+  `Completion.done_by` (D-122); History says "via Home Assistant"; usage
+  baselines at the reference instant (D-121). Export version 5.
+- **Integration** (`integrations/home-assistant/custom_components/housewright`):
+  config flow with pairing and reauth, a Maintenance to-do list and
+  calendar, a state sensor per task, a "Tasks ready to do" summary
+  sensor, "Mark done" buttons, four services, options for the poll
+  interval and default person, device import, sensor links to meters and
+  events, diagnostics with redaction; two blueprints; `hacs.json`.
+- **Add-on** (`integrations/home-assistant/addon/`): server and bridge in
+  one container, data in `/data`, registration token on.
+- **App**: "Home Assistant" when adding a device or person; the bridge
+  marked "Home Assistant bridge" in the device list; a "Connect Home
+  Assistant" page (from Settings and from Sync and devices).
+
+Verified: Rust format, clippy (native and wasm), cargo deny, tests
+(bridge: token on every route, nothing sensitive in any answer, every
+path, pairing and convergence with an app device through the real
+server); Python: ruff, mypy, 22 tests with Home Assistant's own test
+harness against the real bridge; a smoke start of a real Home Assistant
+2026.10.4 core loading the integration (23 entities); svelte-check,
+vitest; Playwright (`app/tests/ha.spec.ts`): a household made in the
+browser pairs the bridge, the bridge completes a task for Ana and sends
+meter readings, and the browser's History shows "via Home Assistant" and
+the usage task comes due.
+
+Not built or not checked: the add-on image was not built (no Docker here)
+nor run on Home Assistant OS; HACS and add-on store publishing (Q-12);
+push updates (the integration polls); custom Assist intents (D-125; the
+to-do list's built-in sentences were not tried with a voice pipeline);
+NFC tags; Android (nothing changed there beyond the shared interface).
+

@@ -9,6 +9,7 @@ members = [
     "crates/crypto",
     "crates/server",
     "crates/sync",
+    "crates/bridge",
     "web",
     "web-binder",
     "tools/climate-build",

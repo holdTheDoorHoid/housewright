@@ -873,3 +873,108 @@ fn schedule_json_round_trip() {
     .unwrap();
     assert_eq!(j, r#"{"kind":"floating","every":"3 months"}"#);
 }
+
+// --- triggered (D-118) -------------------------------------------------------
+
+fn leak() -> Schedule {
+    Schedule::Triggered {
+        event: "leak".into(),
+    }
+}
+
+#[test]
+fn triggered_is_quiet_until_an_event() {
+    let c = Case::new(leak(), date(2026, 1, 1));
+    let e = c.eval(date(2026, 6, 1));
+    assert_eq!(e.state, TaskState::Scheduled);
+    assert_eq!(e.window, None);
+}
+
+#[test]
+fn triggered_event_makes_it_due_then_overdue_then_done_quiets_it() {
+    let mut c = Case::new(leak(), date(2026, 1, 1));
+    c.readings.push((date(2026, 3, 10), 1.0));
+    let e = c.eval(date(2026, 3, 10));
+    assert_eq!(e.state, TaskState::Due);
+    assert_eq!(due(&e), date(2026, 3, 10));
+    assert_eq!(c.eval(date(2026, 3, 14)).state, TaskState::Overdue);
+    // Done after the event: quiet again.
+    let c = c.done(date(2026, 3, 11));
+    assert_eq!(c.eval(date(2026, 3, 20)).state, TaskState::Scheduled);
+    // A new event after the completion fires it again.
+    let mut c = c;
+    c.readings.push((date(2026, 4, 2), 2.0));
+    let e = c.eval(date(2026, 4, 2));
+    assert_eq!(e.state, TaskState::Due);
+    assert_eq!(due(&e), date(2026, 4, 2));
+}
+
+#[test]
+fn triggered_events_before_the_last_completion_do_not_count() {
+    let mut c = Case::new(leak(), date(2026, 1, 1)).done(date(2026, 3, 1));
+    c.readings.push((date(2026, 2, 1), 1.0));
+    assert_eq!(c.eval(date(2026, 3, 5)).state, TaskState::Scheduled);
+}
+
+#[test]
+fn triggered_paused_stays_paused_and_names_are_checked() {
+    let mut c = Case::new(leak(), date(2026, 1, 1));
+    c.readings.push((date(2026, 3, 10), 1.0));
+    c.paused = true;
+    assert_eq!(c.eval(date(2026, 3, 10)).state, TaskState::Paused);
+    assert!(leak().validate().is_ok());
+    assert!(
+        Schedule::Triggered {
+            event: "Leak Detected".into()
+        }
+        .validate()
+        .is_err()
+    );
+    assert_eq!(leak().describe(), "when leak is reported");
+}
+
+#[test]
+fn usage_counts_readings_taken_on_the_start_day() {
+    // Two readings on the day the task starts: the first is the baseline
+    // (D-121), so 45 runtime hours on a threshold of 40 is due.
+    let tz = ny();
+    let noon = at(date(2026, 3, 1), &tz);
+    let readings = [
+        ReadingInput {
+            at: noon,
+            value: 10.0,
+        },
+        ReadingInput {
+            at: noon + jiff::SignedDuration::from_hours(2),
+            value: 55.0,
+        },
+    ];
+    let s = Schedule::Usage {
+        meter: "runtime_hours".into(),
+        threshold: 40.0,
+        or_every: None,
+    };
+    let input = ScheduleInput {
+        schedule: &s,
+        window: None,
+        start: date(2026, 3, 1),
+        assumed_last_done: None,
+        completions: &[],
+        snoozes: &[],
+        readings: &readings,
+        climate: &Climate::default(),
+        paused: false,
+        not_applicable: false,
+    };
+    let e = evaluate(&input, noon + jiff::SignedDuration::from_hours(3), &tz);
+    assert_eq!(e.usage.unwrap().used, 45.0);
+    assert_eq!(e.state, TaskState::Due);
+    // Done at 15:00: a reading taken before that is the new baseline.
+    let done = [noon + jiff::SignedDuration::from_hours(3)];
+    let input = ScheduleInput {
+        completions: &done,
+        ..input
+    };
+    let e = evaluate(&input, noon + jiff::SignedDuration::from_hours(4), &tz);
+    assert_eq!(e.usage.unwrap().used, 0.0);
+}

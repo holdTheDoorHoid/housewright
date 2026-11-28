@@ -448,6 +448,29 @@ impl Api {
         }
     }
 
+    /// Who did it, as people read it: "Ana", or "Ana, via Home Assistant"
+    /// when the bridge recorded it for her (D-117).
+    fn done_by_name(&self, c: &Completion, names: &Names) -> String {
+        let name = |m: &MemberId| {
+            names
+                .members
+                .get(m)
+                .cloned()
+                .unwrap_or_else(|| "someone".into())
+        };
+        let via_ha = self
+            .store
+            .get::<Member>(&c.by.to_string())
+            .ok()
+            .flatten()
+            .is_some_and(|m| m.kind == MemberKind::HomeAssistant);
+        match (via_ha, &c.done_by) {
+            (true, Some(m)) => format!("{}, via Home Assistant", name(m)),
+            (true, None) => "Home Assistant".into(),
+            (false, _) => name(&c.by),
+        }
+    }
+
     fn card_by_id(&self, id: TaskId) -> Result<Card, ApiError> {
         let t: Task = self.store.fetch(&id.to_string())?;
         let s = self.store.task_status(&t, self.store.now())?;
@@ -644,11 +667,7 @@ impl Api {
                 task_id: t.id.to_string(),
                 task_title: t.title.clone(),
                 at: c.at,
-                by_name: names
-                    .members
-                    .get(&c.by)
-                    .cloned()
-                    .unwrap_or_else(|| "someone".into()),
+                by_name: self.done_by_name(c, names),
                 notes: texts,
                 voided: voided.contains(&c.id),
             });

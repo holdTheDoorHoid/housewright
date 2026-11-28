@@ -1,0 +1,33 @@
+[package]
+name = "housewright-bridge"
+description = "Housewright bridge for Home Assistant: a headless household device with a small local API"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "housewright-bridge"
+path = "src/main.rs"
+
+[dependencies]
+housewright-api.workspace = true
+housewright-core.workspace = true
+housewright-crypto.workspace = true
+housewright-sync = { workspace = true, features = ["native-http"] }
+serde.workspace = true
+serde_json.workspace = true
+jiff.workspace = true
+clap.workspace = true
+sha2.workspace = true
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "sync", "time"] }
+tower-http = { version = "0.6", features = ["limit"] }
+subtle = "2"
+
+[dev-dependencies]
+housewright-server = { path = "../server" }
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+uuid.workspace = true

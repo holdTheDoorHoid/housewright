@@ -1,4 +1,4 @@
-# Housewright export format (version 4)
+# Housewright export format (version 5)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -66,14 +66,14 @@ Required fields are in **bold**.
 | Kind | Fields |
 |---|---|
 | `household` | **id**, **name**, **time_zone** (IANA), currency (ISO 4217; absent means USD) |
-| `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), contact (wrapped), reminders `{quiet_hours: {start, end}, maintenance_window: {days, start, end}}` (times as `"HH:MM:SS"`, days as weekday names; D-59) |
+| `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), kind (version 5: `home_assistant` for the Home Assistant bridge, D-122; absent for people), contact (wrapped), reminders `{quiet_hours: {start, end}, maintenance_window: {days, start, end}}` (times as `"HH:MM:SS"`, days as weekday names; D-59) |
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy, hard_freeze}`, address (wrapped) |
 | `floor` | **id**, **property**, **name**, level |
 | `room` | **id**, **property**, **name**, floor |
 | `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, provider, transferable, reference (wrapped)}`, location_note (wrapped), template, extra_fields, custom, sensitivity |
 | `template` | the template, exactly as in `templates/README.md` |
 | `task` | **id**, **property**, **title**, **owner** (member id), **priority**, **schedule**, **start** (date), item, room, window, steps, why `{text, source}`, minutes, completion_fields, template `{template, task}`, active, paused, not_applicable |
-| `completion` | **id**, **task**, **by**, **at**, notes (wrapped), cost, values, contractor, attachments, voids |
+| `completion` | **id**, **task**, **by**, **at**, notes (wrapped), cost, values, contractor, attachments, voids, done_by (version 5: the member it was done for, when `by` is the Home Assistant bridge) |
 | `snooze` | **id**, **task**, **by**, **at**, **until** (date), reason |
 | `meter` | **id**, **key**, **name**, **unit**, item |
 | `meter_reading` | **id**, **meter**, **at**, **value**, **by** |
@@ -89,7 +89,9 @@ Required fields are in **bold**.
 
 `schedule` uses the same shapes as templates, plus two that only a real house
 can have: `{"kind": "one_off", "due": "2027-03-01"}` and an `anchor` date on
-`fixed`. Field definitions (`extra_fields`, `completion_fields`) use the template
+`fixed`. Version 5 adds `{"kind": "triggered", "event": "leak"}` (also in
+templates, D-118): due when the event is reported on the task's item; each
+event is a `meter_reading` of that item's meter whose `key` is the event. Field definitions (`extra_fields`, `completion_fields`) use the template
 field shape. Custom values (`custom`, `values`) map a field key to:
 
 ```json
@@ -226,3 +228,8 @@ removes one, or adds a new kind bumps `version`.
   `emergency` field on `contractor`. Version 1, 2 and 3 files import
   unchanged (the Phase 3 fixture is also printed as a binder in
   `crates/api/tests/binder.rs`).
+- **Version 5** (Phase 7) added the `triggered` schedule kind, `kind` on
+  `member` and `done_by` on `completion` (Home Assistant, D-118, D-122).
+  Version 1 to 4 files import unchanged. A version 4 program refuses a
+  version 5 file; it would also fail to read a triggered task arriving by
+  sync, so every device in a household should run the Phase 7 version.

@@ -1,0 +1,13 @@
+{
+  "domain": "housewright",
+  "name": "Housewright",
+  "codeowners": ["@holdTheDoorHoid"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/holdTheDoorHoid/housewright/blob/main/integrations/home-assistant/README.md",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/holdTheDoorHoid/housewright/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

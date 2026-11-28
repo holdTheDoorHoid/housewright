@@ -71,3 +71,26 @@ licence for the root certificate list). No word list is bundled: the
 recovery key is Base32 (D-91). Checked against `Cargo.lock` on 2026-11-28.
 `deny.toml` lists the allowed licences; `cargo deny check` (in CI) checks
 every dependency against it and against the RustSec advisory database.
+
+## Phase 7: Home Assistant
+
+The bridge (`crates/bridge`) adds no new Rust crates: it uses `axum`,
+`tokio`, `tower-http`, `subtle`, `sha2`, `clap` and `ureq`, all listed
+above.
+
+The Home Assistant integration has **no runtime dependencies** of its own
+(`manifest.json` has `"requirements": []`); it uses only what Home
+Assistant ships (`aiohttp`, its helpers). Development only, never
+shipped, installed in `integrations/home-assistant/.venv`:
+
+| Package | Used for | Licence |
+|---|---|---|
+| `pytest-homeassistant-custom-component` 0.13.375 (brings `homeassistant` 2026.10.4, `pytest` and plugins) | the integration's tests | MIT (harness); Apache-2.0 (Home Assistant) |
+| `ruff` | formatting and lint | MIT |
+| `mypy` | type checks | MIT |
+| `uv` (in `.bootstrap`, to fetch Python 3.14 when the system's is older) | setting up the venv | MIT OR Apache-2.0 |
+
+The add-on image (`integrations/home-assistant/addon/housewright/Dockerfile`)
+starts from Home Assistant's Debian base image (Apache-2.0) and installs
+`jq` (MIT) to read its options.
+

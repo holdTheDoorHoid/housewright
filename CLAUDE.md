@@ -6,8 +6,12 @@ marked *Owner* may not be changed without the owner.
 
 ## Rules
 
-- Rust for the core, server and CLI. The interface is Svelte (TypeScript) inside
-  Tauri 2; that is the only other language. Do not add another without asking.
+- Rust for the core, server, CLI and the Home Assistant bridge. The interface
+  is Svelte (TypeScript) inside Tauri 2. The one exception (D-117, Owner): the
+  Home Assistant integration in `integrations/home-assistant/` is Python, and
+  only Home Assistant glue: every Housewright rule lives in Rust (the bridge,
+  `crates/bridge`), and the integration only calls the bridge's local API.
+  Do not add any other language without asking.
 - Do not re-enable incremental compilation; `sccache` is the shared cache.
   Do not point worktrees at a shared `CARGO_TARGET_DIR`.
 - One task, one branch, one git worktree:

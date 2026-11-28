@@ -12,3 +12,11 @@ test-results/
 playwright-report/
 app/dist-web/
 web-binder/pkg/
+integrations/home-assistant/.venv/
+integrations/home-assistant/.bootstrap/
+integrations/home-assistant/.uv-python/
+integrations/home-assistant/.uv-cache/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/

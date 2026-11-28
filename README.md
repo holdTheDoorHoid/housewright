@@ -48,6 +48,7 @@ server stores only data it cannot read.
 - [Design principles](docs/DESIGN-PRINCIPLES.md): how we keep people using it
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Home Assistant](integrations/home-assistant/README.md): the integration, the bridge and the add-on
 - Research: [competitor survey](docs/research/competitor-survey.md),
   [human factors review](docs/research/human-factors-review.md)
 

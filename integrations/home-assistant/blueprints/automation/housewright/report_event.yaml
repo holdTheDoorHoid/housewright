@@ -1,0 +1,42 @@
+blueprint:
+  name: Housewright - report an event when a sensor turns on
+  description: >
+    When a leak sensor, a low-battery sensor or any entity turns to the
+    chosen state, tell Housewright that the event happened to a thing.
+    Tasks on that thing that follow the event (for example "Check the
+    water heater after a leak alert") become due. Housewright treats the
+    same event within ten minutes as one.
+  domain: automation
+  input:
+    sensor:
+      name: Sensor
+      selector:
+        entity:
+          domain: [binary_sensor, sensor, input_boolean]
+    item:
+      name: Thing in Housewright
+      description: Its exact name, as in the app (for example Tank water heater).
+      selector:
+        text:
+    event:
+      name: Event
+      default: leak
+      selector:
+        select:
+          custom_value: true
+          options: [leak, battery_low]
+    on_state:
+      name: State that means it happened
+      default: "on"
+      selector:
+        text:
+triggers:
+  - trigger: state
+    entity_id: !input sensor
+    to: !input on_state
+actions:
+  - action: housewright.report_event
+    data:
+      item: !input item
+      event: !input event
+mode: single

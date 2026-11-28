@@ -36,6 +36,7 @@ fn completion(task: u128) -> Completion {
         contractor: None,
         attachments: vec![],
         voids: None,
+        done_by: None,
     }
 }
 
