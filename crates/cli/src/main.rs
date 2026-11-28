@@ -414,6 +414,7 @@ fn run(cli: Cli) -> Result<()> {
                     },
                     first_frost_doy,
                     last_frost_doy,
+                    hard_freeze: None,
                 },
             };
             store.put(&p)?;

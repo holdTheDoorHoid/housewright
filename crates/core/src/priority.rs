@@ -4,7 +4,7 @@ use jiff::Timestamp;
 use jiff::civil::Date;
 use serde::{Deserialize, Serialize};
 
-use crate::ids::TaskId;
+use crate::ids::{ItemId, TaskId};
 use crate::schedule::{Evaluation, TaskState};
 
 /// Priority classes, most important first. The derived order is the ranking.
@@ -83,6 +83,93 @@ pub fn start_small(plan: &[TaskStatus], n: usize) -> Vec<TaskId> {
         .collect();
     rank(&mut live);
     live.into_iter().take(n).map(|t| t.task).collect()
+}
+
+/// One suggested task, as the starting-plan chooser sees it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct StartCandidate {
+    pub status: TaskStatus,
+    /// The thing it belongs to, so the first tasks cover different things.
+    pub item: Option<ItemId>,
+    /// Typical days between occurrences ([`crate::schedule::Schedule::period_days`]).
+    pub period_days: u32,
+    /// Order within a class, lower first (D-66): 0 for the smoke and CO
+    /// alarms, which protect the people rather than the house; 1 for things
+    /// where water, fire or gas do the damage (plumbing, appliances, heating,
+    /// electrical); 2 for the outside and the structure.
+    pub hint: u8,
+}
+
+/// Tasks that come round at most this often count as routine. Routine tasks
+/// make better first tasks than once-a-decade replacements (D-66).
+pub const ROUTINE_MAX_DAYS: u32 = 366;
+
+/// P3 after onboarding: the `n` tasks to switch on first (D-66).
+///
+/// - Life safety first, then property loss, efficiency, cosmetic; within
+///   a class, by `hint` (alarms, then water, fire and gas risks, then the
+///   outside of the house).
+/// - Within a class, routine tasks (yearly or more often) before long-cycle
+///   ones, then the usual urgency and due-date order, then the more
+///   frequent task (a monthly test before a yearly battery swap).
+/// - At most one task per thing until every thing has had its turn, so the
+///   plan is not five smoke-alarm jobs.
+/// - One place is kept for the most important property-loss task (the
+///   riskiest water or fire item, human-factors review section 7) when life
+///   safety tasks would otherwise fill every place.
+pub fn starting_plan(cands: &[StartCandidate], n: usize) -> Vec<TaskId> {
+    let mut live: Vec<&StartCandidate> = cands
+        .iter()
+        .filter(|c| c.status.eval.state.is_live())
+        .collect();
+    live.sort_by(|a, b| {
+        a.status
+            .priority
+            .cmp(&b.status.priority)
+            .then(a.hint.cmp(&b.hint))
+            .then((a.period_days > ROUTINE_MAX_DAYS).cmp(&(b.period_days > ROUTINE_MAX_DAYS)))
+            .then(
+                b.status
+                    .eval
+                    .state
+                    .urgency()
+                    .cmp(&a.status.eval.state.urgency()),
+            )
+            .then(cmp_due(a.status.due(), b.status.due()))
+            .then(a.period_days.cmp(&b.period_days))
+            .then(a.status.title.cmp(&b.status.title))
+            .then(a.status.task.cmp(&b.status.task))
+    });
+    let has_loss = live
+        .iter()
+        .any(|c| c.status.priority == PriorityClass::PropertyLoss);
+    let mut picked: Vec<TaskId> = Vec::new();
+    let mut used_items: Vec<ItemId> = Vec::new();
+    let mut have_loss = false;
+    for c in &live {
+        if picked.len() >= n {
+            break;
+        }
+        if c.item.is_some_and(|i| used_items.contains(&i)) {
+            continue;
+        }
+        let is_loss = c.status.priority == PriorityClass::PropertyLoss;
+        if has_loss && !have_loss && !is_loss && picked.len() + 1 == n {
+            continue;
+        }
+        have_loss |= is_loss;
+        picked.push(c.status.task);
+        used_items.extend(c.item);
+    }
+    for c in &live {
+        if picked.len() >= n {
+            break;
+        }
+        if !picked.contains(&c.status.task) {
+            picked.push(c.status.task);
+        }
+    }
+    picked
 }
 
 /// P10: after a lapse, show "these matter most", not the whole overdue pile.
@@ -239,6 +326,92 @@ mod tests {
             .collect();
         assert_eq!(names, ["co", "smoke", "gutters", "filter", "coils"]);
         assert!(start_small(&plan, 0).is_empty());
+    }
+
+    fn cand(
+        title: &str,
+        p: PriorityClass,
+        item: Option<ItemId>,
+        period_days: u32,
+        state: TaskState,
+    ) -> StartCandidate {
+        StartCandidate {
+            status: st(title, p, state, Some(date(2026, 12, 1))),
+            item,
+            period_days,
+            hint: 1,
+        }
+    }
+
+    fn titles(plan: &[StartCandidate], ids: &[TaskId]) -> Vec<String> {
+        ids.iter()
+            .map(|id| {
+                plan.iter()
+                    .find(|c| &c.status.task == id)
+                    .unwrap()
+                    .status
+                    .title
+                    .clone()
+            })
+            .collect()
+    }
+
+    #[test]
+    fn starting_plan_life_safety_first_one_per_thing_routine_first() {
+        use PriorityClass::*;
+        let smoke = Some(ItemId::new());
+        let co = Some(ItemId::new());
+        let wh = Some(ItemId::new());
+        let washer = Some(ItemId::new());
+        let filter = Some(ItemId::new());
+        let plan = vec![
+            cand("smoke replace", LifeSafety, smoke, 3650, TaskState::Due),
+            cand("smoke battery", LifeSafety, smoke, 365, TaskState::Due),
+            cand("smoke test", LifeSafety, smoke, 30, TaskState::Due),
+            cand("co test", LifeSafety, co, 30, TaskState::Due),
+            cand("wh relief valve", LifeSafety, wh, 365, TaskState::Scheduled),
+            cand(
+                "washer hoses",
+                PropertyLoss,
+                washer,
+                180,
+                TaskState::Scheduled,
+            ),
+            cand("filter", Efficiency, filter, 90, TaskState::Overdue),
+            cand("na", LifeSafety, None, 30, TaskState::NotApplicable),
+        ];
+        let three = titles(&plan, &starting_plan(&plan, 3));
+        // Two life-safety things, then the place kept for water damage.
+        assert_eq!(three, ["co test", "smoke test", "washer hoses"]);
+        let five = titles(&plan, &starting_plan(&plan, 5));
+        assert_eq!(
+            five,
+            [
+                "co test",
+                "smoke test",
+                "wh relief valve",
+                "washer hoses",
+                "filter"
+            ]
+        );
+        // Long-cycle replacements never come before the routine test.
+        assert!(!five.contains(&"smoke replace".to_string()));
+        // With more places than things, the second pass fills in order.
+        let all = titles(&plan, &starting_plan(&plan, 7));
+        assert_eq!(all.len(), 7);
+        assert_eq!(all[5], "smoke battery");
+    }
+
+    #[test]
+    fn starting_plan_without_property_loss_uses_every_place() {
+        use PriorityClass::*;
+        let plan = vec![
+            cand("a", LifeSafety, Some(ItemId::new()), 30, TaskState::Due),
+            cand("b", LifeSafety, Some(ItemId::new()), 30, TaskState::Due),
+            cand("c", Efficiency, Some(ItemId::new()), 30, TaskState::Due),
+        ];
+        assert_eq!(titles(&plan, &starting_plan(&plan, 2)), ["a", "b"]);
+        assert!(starting_plan(&[], 4).is_empty());
     }
 
     #[test]

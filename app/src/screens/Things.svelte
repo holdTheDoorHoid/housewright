@@ -3,6 +3,7 @@
   import { app } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import { shortDate } from '../lib/format';
+  import { categoryLabel } from '../lib/labels';
 
   let items = $state<ItemRow[] | null>(null);
   let error = $state<string | null>(null);
@@ -18,7 +19,7 @@
   const groups = $derived.by(() => {
     const m = new Map<string, ItemRow[]>();
     for (const i of items ?? []) {
-      const k = (by === 'room' ? i.room_name : i.category) ?? (by === 'room' ? 'No room yet' : 'Other');
+      const k = by === 'room' ? (i.room_name ?? 'No room yet') : i.category ? categoryLabel(i.category) : 'Other';
       m.set(k, [...(m.get(k) ?? []), i]);
     }
     return [...m.entries()].sort(([a], [b]) => a.localeCompare(b));

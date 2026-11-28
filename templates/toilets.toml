@@ -1,0 +1,55 @@
+format = 1
+id = "toilets"
+name = "Toilets"
+kind = "generic"
+category = "plumbing"
+description = "The toilets in the house."
+
+[[fields]]
+key = "count"
+label = "Number of toilets"
+type = "number"
+
+[[tasks]]
+key = "dye_test"
+title = "Dye-test the toilets for silent leaks"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 20
+steps = [
+  "Put a few drops of food colouring in each toilet tank.",
+  "Wait about 15 minutes without flushing.",
+  "If colour shows in the bowl, the flapper is leaking and should be replaced.",
+  "Flush afterwards so the dye does not stain.",
+]
+why = "A leaking flapper can waste a lot of water without making a sound."
+source = "EPA guidance"
+
+[[tasks]]
+key = "valves"
+title = "Check the toilet fill valve and shutoff"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 15
+steps = [
+  "Flush and watch the tank refill: it should stop by itself below the overflow tube.",
+  "If water keeps running into the overflow, adjust or replace the fill valve.",
+  "Turn the shutoff valve behind the toilet off and on again to keep it working.",
+  "Check the supply line and valve for drips; replace a worn plastic supply line with a braided one.",
+]
+why = "A working shutoff stops an overflow fast, and a running fill valve wastes water all day."
+source = "common plumber guidance"
+
+[[tasks]]
+key = "base"
+title = "Check the toilet bases for leaks and rocking"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Gently push the toilet side to side: it should not move.",
+  "Look and feel for damp, staining or soft flooring around the base.",
+  "If it rocks or leaks, stop using it and call a plumber or reset it on a new wax ring.",
+]
+why = "A slow leak under a toilet quietly rots the subfloor."
+source = "common plumber guidance"

@@ -1,0 +1,134 @@
+format = 1
+id = "furnace"
+name = "Furnace"
+kind = "generic"
+category = "heating_cooling"
+description = "A forced-air furnace that heats the house through ducts, burning gas or oil, or electric."
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "choice"
+options = ["gas", "oil", "electric"]
+
+[[fields]]
+key = "installed_on"
+label = "Furnace installed on"
+type = "date"
+
+[[tasks]]
+key = "service_gas"
+title = "Book the yearly furnace service"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 90
+when = { field = "fuel", equals = "gas" }
+steps = [
+  "Hire a licensed heating technician to service the gas furnace before the cold weather.",
+  "Ask them to check the burners, heat exchanger, gas connections and venting.",
+  "Ask them to test for carbon monoxide around the furnace.",
+  "Clear the area around the furnace so they can reach it.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A yearly check catches cracked heat exchangers and vent problems that can leak carbon monoxide."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service_oil"
+title = "Book the yearly furnace service"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 120
+when = { field = "fuel", equals = "oil" }
+steps = [
+  "Hire a licensed oil heating technician to service the furnace before the cold weather.",
+  "Ask them to clean or replace the oil filter and nozzle and adjust the burner.",
+  "Ask them to check the heat exchanger, chimney connection and draft.",
+  "Clear the area around the furnace so they can reach it.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Oil burners build up soot quickly; a yearly service keeps them burning cleanly and venting safely."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service_electric"
+title = "Book a furnace check-up"
+priority = "efficiency"
+schedule = { kind = "floating", every = "2 years" }
+minutes = 60
+when = { field = "fuel", equals = "electric" }
+steps = [
+  "Hire a licensed heating technician to look over the electric furnace.",
+  "Ask them to check the heating elements, wiring connections and blower.",
+  "Clear the area around the furnace so they can reach it.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Loose connections and a worn blower waste electricity and can leave you without heat on a cold night."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "autumn_startup"
+title = "Start up the furnace for the heating season"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 15
+steps = [
+  "Check the air filter and replace it if it is dirty.",
+  "Make sure supply and return vents in each room are open and not blocked by furniture.",
+  "Clear stored items at least a few feet away from the furnace.",
+  "Turn the thermostat to heat and raise it a few degrees.",
+  "Check warm air comes from the vents within a few minutes; if not, call a technician.",
+]
+why = "Finding a problem on a mild day is easier than on the first freezing night."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "vent_check_gas"
+title = "Look over the furnace vent pipe"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+when = { field = "fuel", equals = "gas" }
+steps = [
+  "Look at the vent pipe from the furnace to where it leaves the house.",
+  "Check joints are connected and the pipe is not sagging, rusted or holed.",
+  "Outside, check the vent outlet is not blocked by snow, leaves or nests.",
+  "Make sure there is a working carbon monoxide alarm nearby.",
+  "If anything looks loose or damaged, do not use the furnace until a technician checks it.",
+]
+why = "A disconnected or blocked vent can send carbon monoxide into the house instead of outside."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "vent_check_oil"
+title = "Look over the furnace flue pipe"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+when = { field = "fuel", equals = "oil" }
+steps = [
+  "Look at the flue pipe from the furnace to the chimney.",
+  "Check joints are connected and the pipe is not sagging, rusted or holed.",
+  "Look for soot marks around the furnace or pipe joints.",
+  "Make sure there is a working carbon monoxide alarm nearby.",
+  "If you see soot or a loose pipe, do not use the furnace until a technician checks it.",
+]
+why = "Soot or a loose flue is an early sign that exhaust, including carbon monoxide, is not leaving properly."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "oil_tank"
+title = "Check the oil tank and lines for leaks"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+when = { field = "fuel", equals = "oil" }
+steps = [
+  "Look over the tank for rust, wet spots, dents or weeping seams.",
+  "Check the floor or ground under the tank and the oil line for stains.",
+  "Check the tank's legs are sound and it is standing level.",
+  "Check the fill and vent pipes outside are capped and clear.",
+  "If you find a leak or heavy rust, call your oil supplier or a tank installer.",
+]
+why = "A slow oil leak is costly to clean up and can contaminate soil and water."
+source = "EPA guidance"

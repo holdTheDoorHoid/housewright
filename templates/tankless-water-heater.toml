@@ -1,0 +1,66 @@
+format = 1
+id = "tankless-water-heater"
+name = "Tankless water heater"
+kind = "generic"
+category = "plumbing"
+description = "An on-demand (tankless) water heater, gas or electric."
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "choice"
+options = ["gas", "electric"]
+
+[[fields]]
+key = "hard_water"
+label = "Hard water at this house"
+type = "yes_no"
+
+[[tasks]]
+key = "descale"
+title = "Descale the tankless water heater"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 90
+steps = [
+  "If you are not comfortable doing this, book a plumber instead; many offer it as a routine visit.",
+  "Switch off power to the unit at its breaker, and for gas units also turn off the gas valve.",
+  "Close the hot and cold isolation valves under the unit.",
+  "Connect a small pump and hoses to the service ports and circulate the descaling solution the manual names.",
+  "Flush with clean water, close the service ports, reopen the valves and restore power and gas.",
+  "If you have hard water, ask about doing this more often.",
+]
+why = "Mineral scale coats the heat exchanger, cutting hot water flow and efficiency, especially with hard water."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "inlet_screen"
+title = "Clean the tankless water heater inlet filter"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 20
+steps = [
+  "Switch off power to the unit, and for gas units also turn off the gas valve.",
+  "Close the cold water isolation valve and open a hot tap to relieve pressure.",
+  "Unscrew the inlet filter screen at the cold water connection.",
+  "Rinse it under running water and brush off debris.",
+  "Refit it, reopen the valve, check for drips, and restore power and gas.",
+]
+why = "A clogged inlet screen reduces flow and can trigger error codes or lukewarm water."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "vent_service"
+title = "Book a yearly check of the gas water heater venting"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 60
+when = { field = "fuel", equals = "gas" }
+steps = [
+  "Hire a licensed plumber or gas technician to check the unit.",
+  "Ask them to check the vent pipe, combustion air intake and gas connections.",
+  "Ask them to check the burner and clean the combustion fan if needed.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A blocked or loose vent on a gas heater can let carbon monoxide into the house."
+source = "common manufacturer guidance"

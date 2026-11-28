@@ -2,7 +2,7 @@
   import { call, type Status } from '../lib/api';
   import { errorText } from '../lib/actions';
 
-  let { ondone }: { ondone: (s: Status) => void } = $props();
+  let { ondone }: { ondone: (s: Status, fresh?: boolean) => void } = $props();
   let yourName = $state('');
   let propertyName = $state('Home');
   let householdName = $state('');
@@ -23,6 +23,7 @@
           household_name: householdName,
           time_zone: timeZone,
         }),
+        true,
       );
     } catch (err) {
       error = errorText(err);
@@ -47,20 +48,23 @@
 
 <section class="first" aria-labelledby="first-h">
   <h1 id="first-h">Welcome to Housewright</h1>
-  <p>Three quick questions to get started. That is all for now.</p>
+  <p>
+    First, your name and what you call your home. Then about 10 questions about the house, about
+    3 minutes in all. Every question can be skipped.
+  </p>
   <p class="muted small">
     Everything stays on this device. There is no account and nothing is sent anywhere.
   </p>
   <form onsubmit={submit}>
-    <label for="you">1. Your name</label>
+    <label for="you">Your name</label>
     <input id="you" bind:value={yourName} autocomplete="given-name" required />
-    <label for="home">2. What do you call this home?</label>
+    <label for="home">What do you call this home?</label>
     <input id="home" bind:value={propertyName} required />
-    <label for="hh">3. Household name <span class="muted">(optional)</span></label>
+    <label for="hh">Household name <span class="muted">(optional)</span></label>
     <input id="hh" bind:value={householdName} placeholder={yourName ? `${yourName}'s household` : 'The Smiths'} />
     <p class="muted small">Time zone: {timeZone}</p>
     {#if error}<p role="alert">{error}</p>{/if}
-    <button class="primary wide" type="submit" disabled={busy}>Start</button>
+    <button class="primary wide" type="submit" disabled={busy}>Next: the home questions</button>
   </form>
   {#if importing}
     <label for="imp">Choose a Housewright export file</label>

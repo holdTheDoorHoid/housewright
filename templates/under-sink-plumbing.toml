@@ -1,0 +1,36 @@
+format = 1
+id = "under-sink-plumbing"
+name = "Pipes under sinks"
+kind = "generic"
+category = "plumbing"
+description = "The supply lines, shutoff valves and drains under every sink."
+
+[[tasks]]
+key = "look"
+title = "Look under every sink for leaks"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 15
+steps = [
+  "Empty or move what is stored under each sink so you can see.",
+  "Run the tap for a minute and watch the drain and supply joints for drips.",
+  "Feel the cabinet floor for damp and look for stains, swelling or mould.",
+  "Tighten a dripping drain nut by hand; call a plumber for anything else.",
+]
+why = "Small leaks under sinks go unnoticed for months and ruin cabinets and floors."
+source = "common plumber guidance"
+
+[[tasks]]
+key = "supply_lines"
+title = "Check the sink supply lines and shutoff valves"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 20
+steps = [
+  "Check each flexible supply line for bulges, kinks, rust or cracks.",
+  "Replace plain plastic or rubber lines with braided stainless lines.",
+  "Turn each shutoff valve off and on again to keep it from seizing.",
+  "If a valve is stuck or leaks, do not force it; call a plumber.",
+]
+why = "Supply lines are under constant pressure, and a burst line floods fast."
+source = "common plumber guidance"

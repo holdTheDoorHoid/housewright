@@ -1,0 +1,1413 @@
+{
+  "format": "housewright-export",
+  "version": 1,
+  "exported_at": "2026-11-27T17:00:00Z",
+  "household_id": "01a21fbc-5525-7748-b411-300518dc63c3",
+  "entities": {
+    "household": [
+      {
+        "id": "01a21fbc-5525-7748-b411-300518dc63c3",
+        "data": {
+          "id": "01a21fbc-5525-7748-b411-300518dc63c3",
+          "name": "Testers",
+          "time_zone": "America/New_York"
+        }
+      }
+    ],
+    "member": [
+      {
+        "id": "01a21fbc-5525-7748-b411-3004a135aa31",
+        "data": {
+          "id": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "name": "Alex",
+          "role": "owner"
+        }
+      }
+    ],
+    "property": [
+      {
+        "id": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+        "data": {
+          "climate": {
+            "first_frost_doy": 300,
+            "hemisphere": "north"
+          },
+          "id": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "name": "Home",
+          "time_zone": "America/New_York"
+        }
+      }
+    ],
+    "room": [
+      {
+        "id": "01a21fbc-55cf-775f-a930-3344ea657958",
+        "data": {
+          "id": "01a21fbc-55cf-775f-a930-3344ea657958",
+          "name": "Hall",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+        }
+      }
+    ],
+    "item": [
+      {
+        "id": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+        "data": {
+          "category": "safety",
+          "custom": {
+            "power": {
+              "sensitivity": "normal",
+              "value": {
+                "type": "choice",
+                "value": "battery"
+              }
+            }
+          },
+          "id": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+          "name": "Hall alarm",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "room": "01a21fbc-55cf-775f-a930-3344ea657958",
+          "sensitivity": "normal",
+          "template": "smoke-alarm"
+        }
+      }
+    ],
+    "template": [
+      {
+        "id": "smoke-alarm",
+        "data": {
+          "category": "safety",
+          "description": "A battery or hardwired smoke alarm.",
+          "fields": [
+            {
+              "key": "power",
+              "label": "Power",
+              "options": [
+                "battery",
+                "sealed_10_year",
+                "hardwired_battery_backup"
+              ],
+              "sensitivity": "normal",
+              "type": "choice"
+            },
+            {
+              "key": "manufactured",
+              "label": "Date of manufacture (on the back)",
+              "sensitivity": "normal",
+              "type": "date"
+            },
+            {
+              "key": "battery_type",
+              "label": "Battery type",
+              "sensitivity": "normal",
+              "type": "text"
+            }
+          ],
+          "format": 1,
+          "id": "smoke-alarm",
+          "kind": "generic",
+          "name": "Smoke alarm",
+          "tasks": [
+            {
+              "completion_fields": [
+                {
+                  "key": "result",
+                  "label": "Result",
+                  "options": [
+                    "pass",
+                    "fail"
+                  ],
+                  "sensitivity": "normal",
+                  "type": "choice"
+                }
+              ],
+              "key": "test",
+              "minutes": 2,
+              "priority": "life_safety",
+              "schedule": {
+                "every": "1 month",
+                "kind": "fixed"
+              },
+              "source": "NFPA guidance",
+              "steps": [
+                "Tell everyone at home you are about to test the alarm.",
+                "Press and hold the test button until the alarm sounds.",
+                "If it stays silent or sounds weak, replace the battery and test again.",
+                "If it still fails, replace the alarm."
+              ],
+              "title": "Test the smoke alarm",
+              "why": "A working alarm gives you the minutes you need to get out in a fire."
+            },
+            {
+              "key": "battery",
+              "minutes": 5,
+              "priority": "life_safety",
+              "schedule": {
+                "every": "1 year",
+                "kind": "fixed"
+              },
+              "source": "NFPA guidance",
+              "steps": [
+                "Have the right replacement battery ready.",
+                "Twist or slide the alarm off its base.",
+                "Swap the battery, matching the + and - marks.",
+                "Refit the alarm and press the test button."
+              ],
+              "title": "Replace the smoke alarm battery",
+              "when": {
+                "equals": "battery",
+                "field": "power"
+              },
+              "why": "A low battery is the most common reason an alarm fails when it is needed."
+            },
+            {
+              "key": "replace",
+              "minutes": 20,
+              "priority": "life_safety",
+              "schedule": {
+                "every": "10 years",
+                "kind": "floating"
+              },
+              "source": "NFPA guidance",
+              "steps": [
+                "Check the date of manufacture on the back of the alarm.",
+                "Buy a replacement of the same type (and the same connector if hardwired).",
+                "For a hardwired alarm, switch off its circuit at the breaker first.",
+                "Fit the new alarm, restore power and press the test button.",
+                "Write the install date on the new alarm."
+              ],
+              "title": "Replace the smoke alarm (ten-year life)",
+              "why": "Smoke sensors wear out; alarms are meant to be replaced about every ten years."
+            },
+            {
+              "key": "clean",
+              "minutes": 5,
+              "priority": "life_safety",
+              "schedule": {
+                "every": "6 months",
+                "kind": "fixed"
+              },
+              "source": "common manufacturer guidance",
+              "steps": [
+                "Use the soft brush attachment of a vacuum.",
+                "Gently vacuum the vents around the alarm cover.",
+                "Do not paint over or cover the alarm.",
+                "Press the test button afterwards."
+              ],
+              "title": "Vacuum the smoke alarm vents",
+              "why": "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
+            }
+          ]
+        }
+      }
+    ],
+    "task": [
+      {
+        "id": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+        "data": {
+          "active": false,
+          "completion_fields": [
+            {
+              "key": "result",
+              "label": "Result",
+              "options": [
+                "pass",
+                "fail"
+              ],
+              "sensitivity": "normal",
+              "type": "choice"
+            }
+          ],
+          "id": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+          "item": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+          "minutes": 2,
+          "not_applicable": false,
+          "owner": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "paused": false,
+          "priority": "life_safety",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "schedule": {
+            "every": "1 month",
+            "kind": "fixed"
+          },
+          "start": "2026-11-27",
+          "steps": [
+            "Tell everyone at home you are about to test the alarm.",
+            "Press and hold the test button until the alarm sounds.",
+            "If it stays silent or sounds weak, replace the battery and test again.",
+            "If it still fails, replace the alarm."
+          ],
+          "template": {
+            "task": "test",
+            "template": "smoke-alarm"
+          },
+          "title": "Test the smoke alarm",
+          "why": {
+            "source": "NFPA guidance",
+            "text": "A working alarm gives you the minutes you need to get out in a fire."
+          }
+        }
+      },
+      {
+        "id": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+        "data": {
+          "active": true,
+          "id": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+          "item": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+          "minutes": 5,
+          "not_applicable": false,
+          "owner": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "paused": false,
+          "priority": "life_safety",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "schedule": {
+            "every": "1 year",
+            "kind": "fixed"
+          },
+          "start": "2026-11-27",
+          "steps": [
+            "Have the right replacement battery ready.",
+            "Twist or slide the alarm off its base.",
+            "Swap the battery, matching the + and - marks.",
+            "Refit the alarm and press the test button."
+          ],
+          "template": {
+            "task": "battery",
+            "template": "smoke-alarm"
+          },
+          "title": "Replace the smoke alarm battery",
+          "why": {
+            "source": "NFPA guidance",
+            "text": "A low battery is the most common reason an alarm fails when it is needed."
+          }
+        }
+      },
+      {
+        "id": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+        "data": {
+          "active": true,
+          "id": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+          "item": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+          "minutes": 20,
+          "not_applicable": false,
+          "owner": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "paused": false,
+          "priority": "life_safety",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "schedule": {
+            "every": "10 years",
+            "kind": "floating"
+          },
+          "start": "2026-11-27",
+          "steps": [
+            "Check the date of manufacture on the back of the alarm.",
+            "Buy a replacement of the same type (and the same connector if hardwired).",
+            "For a hardwired alarm, switch off its circuit at the breaker first.",
+            "Fit the new alarm, restore power and press the test button.",
+            "Write the install date on the new alarm."
+          ],
+          "template": {
+            "task": "replace",
+            "template": "smoke-alarm"
+          },
+          "title": "Replace the smoke alarm (ten-year life)",
+          "why": {
+            "source": "NFPA guidance",
+            "text": "Smoke sensors wear out; alarms are meant to be replaced about every ten years."
+          }
+        }
+      },
+      {
+        "id": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+        "data": {
+          "active": false,
+          "id": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+          "item": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+          "minutes": 5,
+          "not_applicable": false,
+          "owner": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "paused": false,
+          "priority": "life_safety",
+          "property": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+          "schedule": {
+            "every": "6 months",
+            "kind": "fixed"
+          },
+          "start": "2026-11-27",
+          "steps": [
+            "Use the soft brush attachment of a vacuum.",
+            "Gently vacuum the vents around the alarm cover.",
+            "Do not paint over or cover the alarm.",
+            "Press the test button afterwards."
+          ],
+          "template": {
+            "task": "clean",
+            "template": "smoke-alarm"
+          },
+          "title": "Vacuum the smoke alarm vents",
+          "why": {
+            "source": "common manufacturer guidance",
+            "text": "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
+          }
+        }
+      }
+    ],
+    "completion": [
+      {
+        "id": "01a21fbc-56e3-728c-8ddc-415307e7d602",
+        "data": {
+          "at": "2026-11-27T17:00:00Z",
+          "by": "01a21fbc-5525-7748-b411-3004a135aa31",
+          "id": "01a21fbc-56e3-728c-8ddc-415307e7d602",
+          "notes": {
+            "sensitivity": "normal",
+            "value": "ok"
+          },
+          "task": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+          "values": {}
+        }
+      }
+    ]
+  },
+  "operations": [
+    {
+      "id": "01a21fbc-5554-735a-a451-68d4f9dfe1d8",
+      "hlc": "000001a21ce06e00.00000000",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "household",
+      "entity": "01a21fbc-5525-7748-b411-300518dc63c3",
+      "field": "id",
+      "value": "01a21fbc-5525-7748-b411-300518dc63c3"
+    },
+    {
+      "id": "01a21fbc-5554-735a-a451-68d5877f80a1",
+      "hlc": "000001a21ce06e00.00000001",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "household",
+      "entity": "01a21fbc-5525-7748-b411-300518dc63c3",
+      "field": "name",
+      "value": "Testers"
+    },
+    {
+      "id": "01a21fbc-5554-735a-a451-68d64ac41ca1",
+      "hlc": "000001a21ce06e00.00000002",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "household",
+      "entity": "01a21fbc-5525-7748-b411-300518dc63c3",
+      "field": "time_zone",
+      "value": "America/New_York"
+    },
+    {
+      "id": "01a21fbc-5564-71bb-80c9-b0fd669408ce",
+      "hlc": "000001a21ce06e00.00000003",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "member",
+      "entity": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "field": "id",
+      "value": "01a21fbc-5525-7748-b411-3004a135aa31"
+    },
+    {
+      "id": "01a21fbc-5564-71bb-80c9-b0fe9b03953a",
+      "hlc": "000001a21ce06e00.00000004",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "member",
+      "entity": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "field": "name",
+      "value": "Alex"
+    },
+    {
+      "id": "01a21fbc-5564-71bb-80c9-b0ff83edbae5",
+      "hlc": "000001a21ce06e00.00000005",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "member",
+      "entity": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "field": "role",
+      "value": "owner"
+    },
+    {
+      "id": "01a21fbc-5592-74c0-8cf4-97865fc963c6",
+      "hlc": "000001a21df31680.00000000",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "property",
+      "entity": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+      "field": "climate",
+      "value": {
+        "first_frost_doy": 300,
+        "hemisphere": "north"
+      }
+    },
+    {
+      "id": "01a21fbc-5592-74c0-8cf4-9787c4057f3e",
+      "hlc": "000001a21df31680.00000001",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "property",
+      "entity": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+      "field": "id",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-5592-74c0-8cf4-97880afbc1b3",
+      "hlc": "000001a21df31680.00000002",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "property",
+      "entity": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+      "field": "name",
+      "value": "Home"
+    },
+    {
+      "id": "01a21fbc-5592-74c0-8cf4-97898d1d9c47",
+      "hlc": "000001a21df31680.00000003",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "property",
+      "entity": "01a21fbc-5592-74c0-8cf4-978542112ad6",
+      "field": "time_zone",
+      "value": "America/New_York"
+    },
+    {
+      "id": "01a21fbc-55cf-775f-a930-334507c535e2",
+      "hlc": "000001a21df31680.00000004",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "room",
+      "entity": "01a21fbc-55cf-775f-a930-3344ea657958",
+      "field": "id",
+      "value": "01a21fbc-55cf-775f-a930-3344ea657958"
+    },
+    {
+      "id": "01a21fbc-55cf-775f-a930-3346bfb12b77",
+      "hlc": "000001a21df31680.00000005",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "room",
+      "entity": "01a21fbc-55cf-775f-a930-3344ea657958",
+      "field": "name",
+      "value": "Hall"
+    },
+    {
+      "id": "01a21fbc-55cf-775f-a930-3347f5d335cf",
+      "hlc": "000001a21df31680.00000006",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "room",
+      "entity": "01a21fbc-55cf-775f-a930-3344ea657958",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc8d02afe3b9",
+      "hlc": "000001a21df31680.00000007",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "category",
+      "value": "safety"
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc8e50b708bf",
+      "hlc": "000001a21df31680.00000008",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "description",
+      "value": "A battery or hardwired smoke alarm."
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc8fb063d996",
+      "hlc": "000001a21df31680.00000009",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "fields",
+      "value": [
+        {
+          "key": "power",
+          "label": "Power",
+          "options": [
+            "battery",
+            "sealed_10_year",
+            "hardwired_battery_backup"
+          ],
+          "sensitivity": "normal",
+          "type": "choice"
+        },
+        {
+          "key": "manufactured",
+          "label": "Date of manufacture (on the back)",
+          "sensitivity": "normal",
+          "type": "date"
+        },
+        {
+          "key": "battery_type",
+          "label": "Battery type",
+          "sensitivity": "normal",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc90a1a6d966",
+      "hlc": "000001a21df31680.0000000a",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "format",
+      "value": 1
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc91a7a613a9",
+      "hlc": "000001a21df31680.0000000b",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "id",
+      "value": "smoke-alarm"
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc92f5b0cf48",
+      "hlc": "000001a21df31680.0000000c",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "kind",
+      "value": "generic"
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc93d0b67856",
+      "hlc": "000001a21df31680.0000000d",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "name",
+      "value": "Smoke alarm"
+    },
+    {
+      "id": "01a21fbc-5607-72ea-b419-dc94137a0454",
+      "hlc": "000001a21df31680.0000000e",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "template",
+      "entity": "smoke-alarm",
+      "field": "tasks",
+      "value": [
+        {
+          "completion_fields": [
+            {
+              "key": "result",
+              "label": "Result",
+              "options": [
+                "pass",
+                "fail"
+              ],
+              "sensitivity": "normal",
+              "type": "choice"
+            }
+          ],
+          "key": "test",
+          "minutes": 2,
+          "priority": "life_safety",
+          "schedule": {
+            "every": "1 month",
+            "kind": "fixed"
+          },
+          "source": "NFPA guidance",
+          "steps": [
+            "Tell everyone at home you are about to test the alarm.",
+            "Press and hold the test button until the alarm sounds.",
+            "If it stays silent or sounds weak, replace the battery and test again.",
+            "If it still fails, replace the alarm."
+          ],
+          "title": "Test the smoke alarm",
+          "why": "A working alarm gives you the minutes you need to get out in a fire."
+        },
+        {
+          "key": "battery",
+          "minutes": 5,
+          "priority": "life_safety",
+          "schedule": {
+            "every": "1 year",
+            "kind": "fixed"
+          },
+          "source": "NFPA guidance",
+          "steps": [
+            "Have the right replacement battery ready.",
+            "Twist or slide the alarm off its base.",
+            "Swap the battery, matching the + and - marks.",
+            "Refit the alarm and press the test button."
+          ],
+          "title": "Replace the smoke alarm battery",
+          "when": {
+            "equals": "battery",
+            "field": "power"
+          },
+          "why": "A low battery is the most common reason an alarm fails when it is needed."
+        },
+        {
+          "key": "replace",
+          "minutes": 20,
+          "priority": "life_safety",
+          "schedule": {
+            "every": "10 years",
+            "kind": "floating"
+          },
+          "source": "NFPA guidance",
+          "steps": [
+            "Check the date of manufacture on the back of the alarm.",
+            "Buy a replacement of the same type (and the same connector if hardwired).",
+            "For a hardwired alarm, switch off its circuit at the breaker first.",
+            "Fit the new alarm, restore power and press the test button.",
+            "Write the install date on the new alarm."
+          ],
+          "title": "Replace the smoke alarm (ten-year life)",
+          "why": "Smoke sensors wear out; alarms are meant to be replaced about every ten years."
+        },
+        {
+          "key": "clean",
+          "minutes": 5,
+          "priority": "life_safety",
+          "schedule": {
+            "every": "6 months",
+            "kind": "fixed"
+          },
+          "source": "common manufacturer guidance",
+          "steps": [
+            "Use the soft brush attachment of a vacuum.",
+            "Gently vacuum the vents around the alarm cover.",
+            "Do not paint over or cover the alarm.",
+            "Press the test button afterwards."
+          ],
+          "title": "Vacuum the smoke alarm vents",
+          "why": "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
+        }
+      ]
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98ea2fb556a4",
+      "hlc": "000001a21df31680.0000000f",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "category",
+      "value": "safety"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98eb77726fc7",
+      "hlc": "000001a21df31680.00000010",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "custom",
+      "value": {
+        "power": {
+          "sensitivity": "normal",
+          "value": {
+            "type": "choice",
+            "value": "battery"
+          }
+        }
+      }
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98ec50b13459",
+      "hlc": "000001a21df31680.00000011",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "id",
+      "value": "01a21fbc-5607-72ea-b419-dc88b45dcfbf"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98edec8efdf0",
+      "hlc": "000001a21df31680.00000012",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "name",
+      "value": "Hall alarm"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98ee93ffc874",
+      "hlc": "000001a21df31680.00000013",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98ef598019f8",
+      "hlc": "000001a21df31680.00000014",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "room",
+      "value": "01a21fbc-55cf-775f-a930-3344ea657958"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98f0cbd07751",
+      "hlc": "000001a21df31680.00000015",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "sensitivity",
+      "value": "normal"
+    },
+    {
+      "id": "01a21fbc-5623-71e5-950b-98f176a7f7ec",
+      "hlc": "000001a21df31680.00000016",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "item",
+      "entity": "01a21fbc-5607-72ea-b419-dc88b45dcfbf",
+      "field": "template",
+      "value": "smoke-alarm"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e03c490c1b0",
+      "hlc": "000001a21df31680.00000017",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "active",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e04c4cc2e4b",
+      "hlc": "000001a21df31680.00000018",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "completion_fields",
+      "value": [
+        {
+          "key": "result",
+          "label": "Result",
+          "options": [
+            "pass",
+            "fail"
+          ],
+          "sensitivity": "normal",
+          "type": "choice"
+        }
+      ]
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e056ac1e4c0",
+      "hlc": "000001a21df31680.00000019",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "id",
+      "value": "01a21fbc-5607-72ea-b419-dc899fc4e625"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0620cfed16",
+      "hlc": "000001a21df31680.0000001a",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "item",
+      "value": "01a21fbc-5607-72ea-b419-dc88b45dcfbf"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0798d0781a",
+      "hlc": "000001a21df31680.0000001b",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "minutes",
+      "value": 2
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e088202691b",
+      "hlc": "000001a21df31680.0000001c",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "not_applicable",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e097e76ab81",
+      "hlc": "000001a21df31680.0000001d",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "owner",
+      "value": "01a21fbc-5525-7748-b411-3004a135aa31"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0afcb1d1b1",
+      "hlc": "000001a21df31680.0000001e",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "paused",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0b9b05eec2",
+      "hlc": "000001a21df31680.0000001f",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "priority",
+      "value": "life_safety"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0cdba11729",
+      "hlc": "000001a21df31680.00000020",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0d065b96ec",
+      "hlc": "000001a21df31680.00000021",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "schedule",
+      "value": {
+        "every": "1 month",
+        "kind": "fixed"
+      }
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0eefa9a5c8",
+      "hlc": "000001a21df31680.00000022",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "start",
+      "value": "2026-11-27"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e0f5b8866e7",
+      "hlc": "000001a21df31680.00000023",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "steps",
+      "value": [
+        "Tell everyone at home you are about to test the alarm.",
+        "Press and hold the test button until the alarm sounds.",
+        "If it stays silent or sounds weak, replace the battery and test again.",
+        "If it still fails, replace the alarm."
+      ]
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e1030ab44bf",
+      "hlc": "000001a21df31680.00000024",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "template",
+      "value": {
+        "task": "test",
+        "template": "smoke-alarm"
+      }
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e11e380c313",
+      "hlc": "000001a21df31680.00000025",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "title",
+      "value": "Test the smoke alarm"
+    },
+    {
+      "id": "01a21fbc-5636-7553-b28c-1e127f42a7d9",
+      "hlc": "000001a21df31680.00000026",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+      "field": "why",
+      "value": {
+        "source": "NFPA guidance",
+        "text": "A working alarm gives you the minutes you need to get out in a fire."
+      }
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a60eea5b1bc",
+      "hlc": "000001a21df31680.00000027",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "active",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a61877787ad",
+      "hlc": "000001a21df31680.00000028",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "id",
+      "value": "01a21fbc-5607-72ea-b419-dc8a4f5c7068"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a624585bf72",
+      "hlc": "000001a21df31680.00000029",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "item",
+      "value": "01a21fbc-5607-72ea-b419-dc88b45dcfbf"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a63889bd51b",
+      "hlc": "000001a21df31680.0000002a",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "minutes",
+      "value": 5
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a64144724aa",
+      "hlc": "000001a21df31680.0000002b",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "not_applicable",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a65077944e2",
+      "hlc": "000001a21df31680.0000002c",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "owner",
+      "value": "01a21fbc-5525-7748-b411-3004a135aa31"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a66a4476b15",
+      "hlc": "000001a21df31680.0000002d",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "paused",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a678d8ab0bd",
+      "hlc": "000001a21df31680.0000002e",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "priority",
+      "value": "life_safety"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a682de0a580",
+      "hlc": "000001a21df31680.0000002f",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a69edc52e95",
+      "hlc": "000001a21df31680.00000030",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "schedule",
+      "value": {
+        "every": "1 year",
+        "kind": "fixed"
+      }
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a6a01fa5058",
+      "hlc": "000001a21df31680.00000031",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "start",
+      "value": "2026-11-27"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a6b155dc840",
+      "hlc": "000001a21df31680.00000032",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "steps",
+      "value": [
+        "Have the right replacement battery ready.",
+        "Twist or slide the alarm off its base.",
+        "Swap the battery, matching the + and - marks.",
+        "Refit the alarm and press the test button."
+      ]
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a6c4ea21973",
+      "hlc": "000001a21df31680.00000033",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "template",
+      "value": {
+        "task": "battery",
+        "template": "smoke-alarm"
+      }
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a6de3fd7040",
+      "hlc": "000001a21df31680.00000034",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "title",
+      "value": "Replace the smoke alarm battery"
+    },
+    {
+      "id": "01a21fbc-5647-712e-8409-7a6e9f274cde",
+      "hlc": "000001a21df31680.00000035",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "why",
+      "value": {
+        "source": "NFPA guidance",
+        "text": "A low battery is the most common reason an alarm fails when it is needed."
+      }
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdf90cefc39c",
+      "hlc": "000001a21df31680.00000036",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "active",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdfa941a8e1c",
+      "hlc": "000001a21df31680.00000037",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "id",
+      "value": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdfb853560c2",
+      "hlc": "000001a21df31680.00000038",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "item",
+      "value": "01a21fbc-5607-72ea-b419-dc88b45dcfbf"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdfcfec6f340",
+      "hlc": "000001a21df31680.00000039",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "minutes",
+      "value": 20
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdfdad3c6c65",
+      "hlc": "000001a21df31680.0000003a",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "not_applicable",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdfe1dd9fb29",
+      "hlc": "000001a21df31680.0000003b",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "owner",
+      "value": "01a21fbc-5525-7748-b411-3004a135aa31"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-bdff3f4b9a3a",
+      "hlc": "000001a21df31680.0000003c",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "paused",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be00fe351334",
+      "hlc": "000001a21df31680.0000003d",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "priority",
+      "value": "life_safety"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be0120671b7e",
+      "hlc": "000001a21df31680.0000003e",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be026082344c",
+      "hlc": "000001a21df31680.0000003f",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "schedule",
+      "value": {
+        "every": "10 years",
+        "kind": "floating"
+      }
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be03c3780077",
+      "hlc": "000001a21df31680.00000040",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "start",
+      "value": "2026-11-27"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be043b48f0ad",
+      "hlc": "000001a21df31680.00000041",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "steps",
+      "value": [
+        "Check the date of manufacture on the back of the alarm.",
+        "Buy a replacement of the same type (and the same connector if hardwired).",
+        "For a hardwired alarm, switch off its circuit at the breaker first.",
+        "Fit the new alarm, restore power and press the test button.",
+        "Write the install date on the new alarm."
+      ]
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be05f10103b1",
+      "hlc": "000001a21df31680.00000042",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "template",
+      "value": {
+        "task": "replace",
+        "template": "smoke-alarm"
+      }
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be06b05c4217",
+      "hlc": "000001a21df31680.00000043",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "title",
+      "value": "Replace the smoke alarm (ten-year life)"
+    },
+    {
+      "id": "01a21fbc-565c-730e-aa56-be072a497bba",
+      "hlc": "000001a21df31680.00000044",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "why",
+      "value": {
+        "source": "NFPA guidance",
+        "text": "Smoke sensors wear out; alarms are meant to be replaced about every ten years."
+      }
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-72811a5c2478",
+      "hlc": "000001a21df31680.00000045",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "active",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-72826a85c0f9",
+      "hlc": "000001a21df31680.00000046",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "id",
+      "value": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7283d65d417f",
+      "hlc": "000001a21df31680.00000047",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "item",
+      "value": "01a21fbc-5607-72ea-b419-dc88b45dcfbf"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7284ea29fe08",
+      "hlc": "000001a21df31680.00000048",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "minutes",
+      "value": 5
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-72853b2ac9ab",
+      "hlc": "000001a21df31680.00000049",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "not_applicable",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7286025bfe94",
+      "hlc": "000001a21df31680.0000004a",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "owner",
+      "value": "01a21fbc-5525-7748-b411-3004a135aa31"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7287830fda83",
+      "hlc": "000001a21df31680.0000004b",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "paused",
+      "value": false
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7288678b3330",
+      "hlc": "000001a21df31680.0000004c",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "priority",
+      "value": "life_safety"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-7289134ccc31",
+      "hlc": "000001a21df31680.0000004d",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "property",
+      "value": "01a21fbc-5592-74c0-8cf4-978542112ad6"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728a702fa983",
+      "hlc": "000001a21df31680.0000004e",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "schedule",
+      "value": {
+        "every": "6 months",
+        "kind": "fixed"
+      }
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728bb332dcbe",
+      "hlc": "000001a21df31680.0000004f",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "start",
+      "value": "2026-11-27"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728cf8b071b6",
+      "hlc": "000001a21df31680.00000050",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "steps",
+      "value": [
+        "Use the soft brush attachment of a vacuum.",
+        "Gently vacuum the vents around the alarm cover.",
+        "Do not paint over or cover the alarm.",
+        "Press the test button afterwards."
+      ]
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728d3274d9da",
+      "hlc": "000001a21df31680.00000051",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "template",
+      "value": {
+        "task": "clean",
+        "template": "smoke-alarm"
+      }
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728e596ba206",
+      "hlc": "000001a21df31680.00000052",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "title",
+      "value": "Vacuum the smoke alarm vents"
+    },
+    {
+      "id": "01a21fbc-566f-7549-bc61-728f933c9cf4",
+      "hlc": "000001a21df31680.00000053",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8c9b2a71ae",
+      "field": "why",
+      "value": {
+        "source": "common manufacturer guidance",
+        "text": "Dust in the sensing chamber causes false alarms, which tempt people to disable alarms."
+      }
+    },
+    {
+      "id": "01a21fbc-5699-7075-9e79-e36a64531c27",
+      "hlc": "000001a21df31680.00000054",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8ba5fd0c41",
+      "field": "active",
+      "value": true
+    },
+    {
+      "id": "01a21fbc-56b8-75d8-8133-bbe04840177d",
+      "hlc": "000001a21df31680.00000055",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "task",
+      "entity": "01a21fbc-5607-72ea-b419-dc8a4f5c7068",
+      "field": "active",
+      "value": true
+    },
+    {
+      "id": "01a21fbc-56e3-728c-8ddc-4154e7f3ade1",
+      "hlc": "000001a21df31680.00000056",
+      "author": "01a21fbc-5525-7748-b411-3004a135aa31",
+      "kind": "completion",
+      "entity": "01a21fbc-56e3-728c-8ddc-415307e7d602",
+      "field": "$record",
+      "value": {
+        "at": "2026-11-27T17:00:00Z",
+        "by": "01a21fbc-5525-7748-b411-3004a135aa31",
+        "id": "01a21fbc-56e3-728c-8ddc-415307e7d602",
+        "notes": {
+          "sensitivity": "normal",
+          "value": "ok"
+        },
+        "task": "01a21fbc-5607-72ea-b419-dc899fc4e625",
+        "values": {}
+      }
+    }
+  ]
+}

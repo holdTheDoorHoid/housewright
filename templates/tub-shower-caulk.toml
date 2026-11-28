@@ -1,0 +1,37 @@
+format = 1
+id = "tub-shower-caulk"
+name = "Tub and shower caulk and grout"
+kind = "generic"
+category = "plumbing"
+description = "The caulk and grout around bathtubs and showers."
+
+[[tasks]]
+key = "inspect"
+title = "Inspect the tub and shower caulk and grout"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Look along every caulk line for cracks, gaps, peeling or black mould underneath.",
+  "Check grout lines for cracks or missing pieces.",
+  "Press on tiles near the tub: they should not move or sound hollow.",
+  "Note anything that needs recaulking or regrouting.",
+]
+why = "Water that gets behind tiles or the tub edge rots the wall and floor without showing."
+source = "common contractor guidance"
+
+[[tasks]]
+key = "recaulk"
+title = "Recaulk the tub or shower"
+priority = "property_loss"
+schedule = { kind = "floating", every = "3 years" }
+minutes = 120
+steps = [
+  "Cut and scrape out all the old caulk with a plastic scraper or caulk tool.",
+  "Clean the joint, kill any mould, and let it dry fully, ideally overnight.",
+  "Run a steady bead of bathroom silicone caulk along the joint.",
+  "Smooth it with a wet finger or tool and wipe off the excess.",
+  "Leave the shower unused for as long as the caulk label says.",
+]
+why = "Fresh caulk on a dry, clean joint keeps water out of the wall."
+source = "common contractor guidance"

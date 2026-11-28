@@ -4,11 +4,14 @@
 use std::collections::BTreeMap;
 
 use housewright_core::Error;
+use housewright_core::climate::ClimateLookup;
 use housewright_core::fields::FieldDef;
 use housewright_core::model::Role;
 use housewright_core::priority::PriorityClass;
+use housewright_core::profile::Profile;
 use housewright_core::reminders::{PlannedReminder, ReminderKind, ReminderPrefs};
 use housewright_core::schedule::TaskState;
+use housewright_core::suggest::{Answer, Suggestion};
 use jiff::Timestamp;
 use jiff::civil::Date;
 use serde::{Deserialize, Serialize};
@@ -229,6 +232,10 @@ pub struct WelcomeBackOut {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct TodayOut {
+    /// This week's single suggestion (P3), if any.
+    pub suggestion: Option<Suggestion>,
+    /// Whether the home questions have been answered (or skipped) yet.
+    pub has_profile: bool,
     /// Due soon, due and overdue, most important first.
     pub tasks: Vec<Card>,
     /// The next few scheduled tasks, soonest first.
@@ -372,4 +379,82 @@ impl From<PlannedReminder> for ReminderOut {
 pub struct ExportOut {
     pub filename: String,
     pub json: String,
+}
+
+#[derive(Deserialize)]
+pub struct ZipArgs {
+    pub zip: String,
+}
+
+#[derive(Deserialize)]
+pub struct OnboardArgs {
+    /// The answers. `id` may be left out: it is always the property's id.
+    pub profile: ProfileIn,
+}
+
+/// A profile as the interface sends it (no id).
+#[derive(Deserialize)]
+pub struct ProfileIn {
+    #[serde(flatten)]
+    pub answers: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Deserialize)]
+pub struct AnswerArgs {
+    pub key: String,
+    pub answer: Answer,
+}
+
+/// Climate from a ZIP code, with dates written out for people.
+#[derive(Clone, Debug, Serialize)]
+pub struct ClimateOut {
+    pub lookup: ClimateLookup,
+    /// "Nov 17", or null where frost is not normal.
+    pub first_frost: Option<String>,
+    pub last_frost: Option<String>,
+    /// Whether hard freezes are normal (outdoor pipes need winterising).
+    pub freezes: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ProfileOut {
+    pub profile: Option<Profile>,
+    pub climate: Option<ClimateOut>,
+}
+
+/// A switched-on or suggested task with its reason (P2, P9).
+#[derive(Clone, Debug, Serialize)]
+pub struct PlanTask {
+    pub card: Card,
+    pub why: Option<String>,
+    pub source: Option<String>,
+}
+
+/// "Your starting plan".
+#[derive(Clone, Debug, Serialize)]
+pub struct StartingPlanOut {
+    /// The tasks that are switched on, most important first.
+    pub switched_on: Vec<PlanTask>,
+    /// How many things are recorded for the home ("Your home, so far").
+    pub things_recorded: usize,
+    /// Things added by this answer (0 when the questions are answered again
+    /// and nothing new came up).
+    pub new_things: usize,
+    /// Suggested tasks that are still switched off.
+    pub suggested_count: usize,
+    pub climate: Option<ClimateOut>,
+}
+
+/// Every suggested (switched-off) task, grouped by thing.
+#[derive(Clone, Debug, Serialize)]
+pub struct SuggestedGroup {
+    pub item_id: Option<String>,
+    pub item_name: String,
+    pub category: Option<String>,
+    pub tasks: Vec<PlanTask>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct AnswerOut {
+    pub switched_on: Vec<Card>,
 }

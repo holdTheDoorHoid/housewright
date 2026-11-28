@@ -1,0 +1,57 @@
+format = 1
+id = "central-ac"
+name = "Central air conditioner"
+kind = "generic"
+category = "heating_cooling"
+description = "A split central air conditioner with an outdoor condenser unit."
+
+[[fields]]
+key = "installed_on"
+label = "AC installed on"
+type = "date"
+
+[[tasks]]
+key = "condenser"
+title = "Clean around the outdoor AC unit"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Switch off power at the outdoor disconnect box or the AC breaker.",
+  "Clear leaves, grass and debris from around and on top of the unit.",
+  "Gently rinse the fins from the inside out with a garden hose, not a pressure washer.",
+  "Trim plants back so there is clear space on all sides.",
+  "Restore power and run the AC to check it starts.",
+]
+why = "Dirt on the outdoor coil makes the AC run longer and cool less."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "condensate"
+title = "Check the AC condensate drain"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "summer" }
+minutes = 10
+steps = [
+  "Find the condensate drain line and pan at the indoor unit.",
+  "Check the pan is not holding water and the line is not clogged.",
+  "Check the drain outlet outside or at the floor drain is dripping in use.",
+  "If the pan is full, switch the AC off and call a technician.",
+]
+why = "A blocked drain line can overflow and damage ceilings or floors."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service"
+title = "Book the pre-season AC service"
+priority = "efficiency"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 90
+steps = [
+  "Hire a licensed HVAC technician to service the AC before hot weather.",
+  "Ask them to check refrigerant, electrical connections, coils and the blower.",
+  "Ask them to clean the drain line and check the thermostat.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A pre-season check finds problems before the first heat wave, when technicians are busiest."
+source = "US DOE guidance"

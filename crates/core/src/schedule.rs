@@ -195,8 +195,8 @@ pub enum Hemisphere {
     South,
 }
 
-/// The climate inputs seasonal schedules need. Phase 1 takes them as given; a
-/// later phase derives them from a zip code.
+/// The climate inputs seasonal schedules need. Given directly, or looked up
+/// from a US ZIP code (`crate::climate`, D-64).
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Climate {
     #[serde(default)]
@@ -207,6 +207,17 @@ pub struct Climate {
     /// Average last spring frost, as a day of year in a non-leap year (1-365).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_frost_doy: Option<u16>,
+    /// Whether a hard freeze (28 °F / -2 °C) happens in a typical year, so
+    /// outdoor pipes need winterising. `None` = unknown (assume yes).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hard_freeze: Option<bool>,
+}
+
+impl Climate {
+    /// False only when the climate data says hard freezes are not normal here.
+    pub fn freezes(&self) -> bool {
+        self.hard_freeze != Some(false)
+    }
 }
 
 /// Named seasonal windows. Meteorological seasons (whole months), flipped for
@@ -436,6 +447,33 @@ impl Schedule {
             Schedule::OneOff { .. } => {}
         }
         Ok(())
+    }
+
+    /// Roughly how many days between occurrences: used to prefer routine
+    /// tasks over once-a-decade ones when choosing a starting plan.
+    pub fn period_days(&self) -> u32 {
+        match self {
+            Schedule::Fixed { every, .. } | Schedule::Floating { every } => every.approx_days(),
+            Schedule::NthWeekday { months, .. } => {
+                365 / if months.is_empty() {
+                    12
+                } else {
+                    months.len() as u32
+                }
+            }
+            Schedule::MonthsOfYear { months, .. } => 365 / months.len().max(1) as u32,
+            Schedule::Seasonal { .. } => 365,
+            Schedule::Usage { or_every, .. } => or_every.map_or(90, |i| i.approx_days()),
+            Schedule::OneOff { .. } => 0,
+        }
+    }
+
+    /// The season of a seasonal schedule.
+    pub fn season(&self) -> Option<Season> {
+        match self {
+            Schedule::Seasonal { season } => Some(*season),
+            _ => None,
+        }
     }
 
     /// The default due window for this schedule.

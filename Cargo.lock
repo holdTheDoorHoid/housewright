@@ -348,6 +348,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "housewright-climate-build"
+version = "0.1.0"
+dependencies = [
+ "housewright-core",
+]
+
+[[package]]
 name = "housewright-core"
 version = "0.1.0"
 dependencies = [

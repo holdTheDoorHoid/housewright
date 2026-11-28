@@ -1,0 +1,65 @@
+format = 1
+id = "fire-extinguisher"
+name = "Fire extinguisher"
+kind = "generic"
+category = "safety"
+description = "A portable home fire extinguisher."
+
+[[fields]]
+key = "location"
+label = "Where it is"
+type = "text"
+
+[[fields]]
+key = "manufactured"
+label = "Date of manufacture (on the label)"
+type = "date"
+
+[[tasks]]
+key = "check"
+title = "Check the fire extinguisher"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 2
+steps = [
+  "Check the pressure gauge needle is in the green zone.",
+  "Check the pin and tamper seal are in place.",
+  "Look for dents, rust, leaks or a cracked hose.",
+  "Make sure it hangs where it is easy to reach and nothing blocks it.",
+  "If anything is wrong, replace it or have it serviced.",
+]
+why = "An extinguisher only helps if it is charged, intact and within reach."
+source = "NFPA guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["ok", "needs_replacing"] },
+]
+
+[[tasks]]
+key = "know"
+title = "Show everyone where the extinguisher is and how to use it"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Show everyone at home where each extinguisher is.",
+  "Explain the steps: pull the pin, aim at the base of the fire, squeeze, sweep.",
+  "Remind them to use it only on a small fire and to get out first if it is spreading.",
+  "Make sure everyone knows to call the fire department even if the fire seems out.",
+]
+why = "In a fire there is no time to read the label; knowing where it is and how it works saves seconds."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "replace"
+title = "Replace or service the fire extinguisher"
+priority = "life_safety"
+schedule = { kind = "floating", every = "10 years" }
+minutes = 20
+steps = [
+  "Check the label for its service or replacement interval and the date of manufacture.",
+  "Replace a disposable extinguisher when the label says, or after any use.",
+  "Have a rechargeable one serviced by a fire equipment company as the label says.",
+  "Take the old one to a fire equipment company or hazardous waste site; ask how to dispose of it.",
+]
+why = "Extinguishers lose pressure and seals age; many disposable ones need replacing after about 10 to 12 years."
+source = "NFPA guidance"

@@ -1,0 +1,64 @@
+format = 1
+id = "roof"
+name = "Roof"
+kind = "generic"
+category = "structure"
+description = "The roof covering, flashing and roof penetrations."
+
+[[fields]]
+key = "material"
+label = "Roof material"
+type = "text"
+
+[[fields]]
+key = "installed_on"
+label = "Roof installed on"
+type = "date"
+
+[[tasks]]
+key = "spring_look"
+title = "Look over the roof from the ground"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 20
+steps = [
+  "Stay on the ground; do not climb onto the roof.",
+  "Walk round the house with binoculars and look for missing, cracked or curled shingles.",
+  "Look at flashing around chimneys, vents and skylights for gaps or rust.",
+  "Look for moss, sagging areas or granules piling up at gutter outlets.",
+  "If anything looks wrong, book a roofer.",
+]
+why = "Spotting roof damage early from the ground is far cheaper than repairing a leak inside."
+source = "common roofer guidance"
+
+[[tasks]]
+key = "autumn_look"
+title = "Look over the roof before winter"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 20
+steps = [
+  "Stay on the ground; do not climb onto the roof.",
+  "With binoculars, look for missing shingles, lifted edges and damaged flashing.",
+  "Check that tree branches are not touching or hanging over the roof.",
+  "Check inside the top floor ceilings for new stains.",
+  "If anything looks wrong, book a roofer before the weather turns.",
+]
+why = "Winter storms and ice turn small roof gaps into leaks."
+source = "common roofer guidance"
+
+[[tasks]]
+key = "inspection"
+title = "Book a professional roof inspection"
+priority = "property_loss"
+schedule = { kind = "floating", every = "3 years" }
+minutes = 60
+steps = [
+  "Hire a licensed, insured roofer to inspect the roof.",
+  "Also book one after any big storm with hail or high winds.",
+  "Ask them to check the covering, flashing, vents and roof edges.",
+  "Ask for photos of anything they find.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "A roofer can see wear up close that is invisible from the ground."
+source = "common roofer guidance"

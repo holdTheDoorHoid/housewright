@@ -1,0 +1,57 @@
+format = 1
+id = "heat-pump"
+name = "Heat pump"
+kind = "generic"
+category = "heating_cooling"
+description = "An air-source heat pump for heating and cooling. The air filter is a separate item (HVAC air filter)."
+
+[[fields]]
+key = "installed_on"
+label = "Heat pump installed on"
+type = "date"
+
+[[tasks]]
+key = "outdoor_clear"
+title = "Clear around the outdoor heat pump unit"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 15
+steps = [
+  "Switch the system off at the thermostat before working near the unit.",
+  "Clear leaves, grass, and debris from around and on top of the unit.",
+  "Trim plants back so there is clear space on all sides.",
+  "In winter, keep snow and ice off and away from the unit; do not chip at the coils.",
+  "Switch the system back on.",
+]
+why = "The outdoor unit needs free airflow; a blocked coil heats and cools poorly and uses more power."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "service"
+title = "Book the yearly heat pump service"
+priority = "efficiency"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 90
+steps = [
+  "Hire a licensed HVAC technician to service the heat pump.",
+  "Ask them to check refrigerant, electrical connections, coils and the defrost controls.",
+  "Ask them to check the indoor blower and ducts for leaks.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Regular professional service keeps a heat pump efficient and catches problems before they fail."
+source = "US DOE guidance"
+
+[[tasks]]
+key = "condensate"
+title = "Check the heat pump condensate drain"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "6 months" }
+minutes = 10
+steps = [
+  "Find the indoor unit's condensate drain line and drain pan.",
+  "Check the pan is not holding water and shows no rust or overflow.",
+  "Check the line runs freely to its drain or pump.",
+  "If the pan is full or the line is clogged, switch the system off and call a technician.",
+]
+why = "A clogged drain can overflow and soak ceilings or floors."
+source = "common manufacturer guidance"

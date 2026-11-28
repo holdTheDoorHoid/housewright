@@ -1,0 +1,57 @@
+format = 1
+id = "fireplace"
+name = "Fireplace and chimney"
+kind = "generic"
+category = "heating_cooling"
+description = "A wood-burning fireplace and its chimney."
+
+[[fields]]
+key = "last_swept"
+label = "Chimney last swept"
+type = "date"
+
+[[tasks]]
+key = "inspection"
+title = "Book the yearly chimney inspection"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "summer" }
+minutes = 90
+steps = [
+  "Hire a certified chimney sweep to inspect the chimney and sweep it if needed.",
+  "Ask them to check for creosote, cracks in the flue liner, and blockages.",
+  "Ask them to check the chimney cap and crown on the roof.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Chimneys should be inspected every year; creosote buildup and cracks are common causes of chimney fires."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "preseason"
+title = "Check the damper and screen before the season"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 15
+steps = [
+  "With a flashlight, check the damper opens and closes fully.",
+  "Look up the flue for nests, debris or daylight blocked by something.",
+  "Check the fire screen or glass doors are intact and close properly.",
+  "Make sure the smoke and carbon monoxide alarms nearby work.",
+  "Keep rugs, furniture and kindling at a safe distance from the hearth.",
+]
+why = "A stuck damper fills the room with smoke, and a good screen keeps sparks off the floor."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "ashes"
+title = "Clear out ashes safely"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 15
+steps = [
+  "Wait until the fire has been out for at least a day.",
+  "Shovel the ashes into a metal container with a tight lid.",
+  "Put the container outside on bare ground, well away from the house, deck and anything that burns.",
+  "Leave it there for several days before emptying it.",
+]
+why = "Ashes stay hot long after a fire seems out, and can start a fire in a bin or garage."
+source = "NFPA guidance"

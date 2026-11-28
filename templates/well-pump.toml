@@ -1,0 +1,78 @@
+format = 1
+id = "well-pump"
+name = "Well and pressure tank"
+kind = "generic"
+category = "plumbing"
+description = "A private water well with its pump and pressure tank."
+
+[[fields]]
+key = "last_tested"
+label = "Water last tested"
+type = "date"
+
+[[fields]]
+key = "pressure_range"
+label = "Normal pressure range"
+type = "text"
+help = "For example the cut-in and cut-out pressures on the pressure switch label."
+
+[[tasks]]
+key = "water_test"
+title = "Test the well water"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 30
+steps = [
+  "Get a sampling kit from a state-certified testing lab (your local health department can name one).",
+  "Ask for at least bacteria, nitrates and anything your health department says is common locally.",
+  "Collect the sample exactly as the lab's instructions say.",
+  "Return it within the time the lab gives.",
+  "If any result is above the limit, ask the health department or lab what to do next.",
+]
+why = "Private wells are the owner's to test; regular testing catches contamination you cannot see or taste."
+source = "EPA guidance"
+
+[[tasks]]
+key = "pressure_tank"
+title = "Check the pressure tank and gauge"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 10
+steps = [
+  "Run a tap and watch the pressure gauge as the pump cycles.",
+  "Check the pressure stays in the normal range and the pump does not switch on and off rapidly.",
+  "Look for rust, damp or drips around the tank and fittings.",
+  "If the pump short-cycles or the pressure drifts, call a well contractor.",
+]
+why = "A pump that cycles rapidly wears out early, often because the pressure tank has lost its air charge."
+source = "common well contractor guidance"
+
+[[tasks]]
+key = "wellhead"
+title = "Inspect the wellhead"
+priority = "life_safety"
+schedule = { kind = "seasonal", season = "autumn" }
+minutes = 10
+steps = [
+  "Check the well cap is firmly fitted, not cracked and its seal is intact.",
+  "Check the casing stands above the ground and the ground slopes away from it.",
+  "Keep fertiliser, chemicals and pet waste well away from the well.",
+  "If the cap is damaged or loose, replace it or call a well contractor.",
+]
+why = "A damaged cap lets insects, surface water and contaminants into your drinking water."
+source = "EPA guidance"
+
+[[tasks]]
+key = "inspection"
+title = "Book a well system inspection"
+priority = "property_loss"
+schedule = { kind = "floating", every = "5 years" }
+minutes = 120
+steps = [
+  "Hire a licensed well contractor to inspect the well.",
+  "Ask them to check the pump, pressure tank, wiring and water flow.",
+  "Ask them to check the casing and cap for damage.",
+  "Note what they found and keep the report with the well records.",
+]
+why = "A periodic inspection finds wear before the pump fails and leaves you without water."
+source = "common well contractor guidance"

@@ -1,0 +1,66 @@
+format = 1
+id = "generator"
+name = "Standby or portable generator"
+kind = "generic"
+category = "electrical"
+description = "A permanently installed standby generator or a portable generator."
+
+[[fields]]
+key = "type"
+label = "Type"
+type = "choice"
+options = ["standby", "portable"]
+
+[[fields]]
+key = "fuel"
+label = "Fuel"
+type = "text"
+
+[[tasks]]
+key = "exercise_standby"
+title = "Check the standby generator exercised"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+when = { field = "type", equals = "standby" }
+steps = [
+  "Check the generator's display or app shows its last self-exercise ran without errors.",
+  "If it does not self-exercise, run it as the manual says.",
+  "Clear leaves, snow and plants from around the enclosure and vents.",
+  "If it shows a fault, call the installer or a qualified generator technician.",
+]
+why = "A generator that has not run in months may not start in an outage."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "service_standby"
+title = "Book the yearly standby generator service"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 120
+when = { field = "type", equals = "standby" }
+steps = [
+  "Hire a qualified generator technician or the installer to service the generator.",
+  "Ask them to change the oil and filters, and check the spark plugs and battery.",
+  "Ask them to test the transfer switch.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Oil, filters and the starting battery wear out even when the generator rarely runs."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "portable_setup"
+title = "Check the generator setup and fuel"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "3 months" }
+minutes = 30
+when = { field = "type", equals = "portable" }
+steps = [
+  "Plan where it will run: only outdoors, far from doors, windows and vents, never in a garage, basement or porch.",
+  "Make sure there are working carbon monoxide alarms in the house.",
+  "Run it outdoors for a few minutes with a small load to check it starts.",
+  "Check the oil level and use fresh fuel or fuel stabiliser.",
+  "Check you have heavy-duty outdoor extension cords; never plug it into a house outlet.",
+]
+why = "Portable generators make carbon monoxide quickly; where it runs matters more than anything else."
+source = "CPSC guidance"

@@ -1,0 +1,63 @@
+format = 1
+id = "septic-system"
+name = "Septic system"
+kind = "generic"
+category = "plumbing"
+description = "A septic tank and drain field for a house not on a sewer."
+
+[[fields]]
+key = "tank_location"
+label = "Where the tank lid is"
+type = "text"
+
+[[fields]]
+key = "last_pumped"
+label = "Tank last pumped"
+type = "date"
+
+[[tasks]]
+key = "inspect_pump"
+title = "Book a septic inspection and pumping"
+priority = "property_loss"
+schedule = { kind = "floating", every = "3 years" }
+minutes = 120
+steps = [
+  "Hire a licensed septic professional to inspect the system.",
+  "Ask them to measure the sludge and scum layers and pump the tank if needed.",
+  "Ask them to check the baffles, filter and drain field for signs of trouble.",
+  "Mark where the tank lid is so it is easy to find next time.",
+  "Keep the service report with your house records.",
+]
+why = "Inspecting about every three years and pumping when needed keeps solids out of the drain field, which is costly to replace."
+source = "EPA guidance"
+
+[[tasks]]
+key = "drain_field"
+title = "Walk the septic drain field"
+priority = "property_loss"
+schedule = { kind = "seasonal", season = "spring" }
+minutes = 15
+steps = [
+  "Walk over the drain field and look for soggy ground, standing water or a sewage smell.",
+  "Make sure nobody parks or drives over the tank or drain field.",
+  "Keep trees and large shrubs away; their roots can block the pipes.",
+  "Point roof downspouts and other runoff away from the field.",
+  "If you find wet spots or smells, call a septic professional.",
+]
+why = "Heavy weight, roots and extra water are the usual ways a drain field gets damaged."
+source = "EPA guidance"
+
+[[tasks]]
+key = "habits"
+title = "Review septic-friendly water habits"
+priority = "property_loss"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 10
+steps = [
+  "Fix any running toilets or dripping taps.",
+  "Spread out laundry loads over the week instead of doing them all at once.",
+  "Flush only toilet paper; no wipes, grease, medicines or chemicals.",
+  "Remind everyone at home what should not go down the drains.",
+]
+why = "Too much water at once or the wrong things flushed can overload the tank and clog the field."
+source = "EPA guidance"

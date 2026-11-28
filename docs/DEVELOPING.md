@@ -11,6 +11,7 @@
 | `app/` | The Svelte 5 interface (`src/`), vitest tests, Playwright tests (`tests/`). |
 | `app/src-tauri` | Tauri 2 shell for Android (and desktop). Outside the Cargo workspace. |
 | `app/src-tauri/plugins/reminders` | Android reminders: alarms, notification buttons, boot receiver (D-62). |
+| `tools/climate-build` | Rebuilds `crates/core/data/us-zip-climate.bin`; see [DATA-SOURCES.md](DATA-SOURCES.md). |
 
 ## Rust checks
 

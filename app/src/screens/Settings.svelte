@@ -123,6 +123,13 @@
     <button class="primary" type="submit">Save reminder times</button>
   </form>
 
+  <h2>Your home</h2>
+  <p class="muted small">
+    Answer the home questions again if something changed, or to fill in what you skipped. This only adds
+    things and suggestions; nothing you already have is changed or removed.
+  </p>
+  <p><a class="button" href="#/questions/redo">Redo the home questions</a></p>
+
   <h2>Your data</h2>
   <p class="muted small">Stored {currentBackend()?.storage() ?? 'on this device'}.</p>
   <p class="muted small">

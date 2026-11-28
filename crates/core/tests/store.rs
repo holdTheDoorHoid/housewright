@@ -186,13 +186,13 @@ fn file_store_persists_hlc_author_and_schema() {
         s.set_author(MemberId(Uuid::from_u128(4))).unwrap();
         s.put(&room("Hall")).unwrap();
         hlc = s.hlc();
-        assert_eq!(s.schema_version().unwrap(), 1);
+        assert_eq!(s.schema_version().unwrap(), 2);
     }
     let s = Store::open(&path).unwrap();
     assert_eq!(s.hlc(), hlc);
     assert_eq!(s.author().unwrap(), MemberId(Uuid::from_u128(4)));
     assert_eq!(s.list::<Room>().unwrap().len(), 1);
-    assert_eq!(s.schema_version().unwrap(), 1);
+    assert_eq!(s.schema_version().unwrap(), 2);
     drop(s);
     std::fs::remove_dir_all(dir).ok();
 }
@@ -211,4 +211,68 @@ fn incomplete_remote_entities_read_as_absent() {
     assert!(b.list::<Room>().unwrap().is_empty());
     b.apply_remote_ops(&ops).unwrap();
     assert!(b.get::<Room>(&room("").id.to_string()).unwrap().is_some());
+}
+
+#[test]
+fn a_schema_1_database_is_migrated_to_2() {
+    use housewright_core::profile::Profile;
+    let conn = rusqlite::Connection::open_in_memory().unwrap();
+    let mut sql = String::from(
+        "CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
+         INSERT INTO schema_migrations VALUES (1, '2026-11-27T00:00:00Z');
+         CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+         CREATE TABLE ops (seq INTEGER PRIMARY KEY AUTOINCREMENT, op_id TEXT NOT NULL UNIQUE,
+             order_key TEXT NOT NULL, hlc TEXT NOT NULL, author TEXT NOT NULL, kind TEXT NOT NULL,
+             entity_id TEXT NOT NULL, field TEXT NOT NULL, value TEXT NOT NULL);
+         CREATE TABLE field_clock (kind TEXT NOT NULL, entity_id TEXT NOT NULL, field TEXT NOT NULL,
+             order_key TEXT NOT NULL, PRIMARY KEY (kind, entity_id, field));",
+    );
+    for k in EntityKind::SCHEMA_V1 {
+        sql.push_str(&format!(
+            "CREATE TABLE {} (id TEXT PRIMARY KEY, data TEXT NOT NULL DEFAULT '{{}}', deleted INTEGER NOT NULL DEFAULT 0);",
+            k.as_str()
+        ));
+    }
+    conn.execute_batch(&sql).unwrap();
+    let clock = ManualClock::new(1_000);
+    let mut s = Store::with_connection(conn, Box::new(clock)).unwrap();
+    assert_eq!(s.schema_version().unwrap(), 2);
+    s.set_author(MemberId(Uuid::from_u128(4))).unwrap();
+    let p = Profile::empty(PropertyId(Uuid::from_u128(9)));
+    s.put(&p).unwrap();
+    assert_eq!(s.list::<Profile>().unwrap(), vec![p]);
+}
+
+#[test]
+fn a_batch_commits_together_or_not_at_all() {
+    let clock = ManualClock::new(1_000);
+    let mut s = store(5, &clock);
+    s.batch(|s| {
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(11)),
+            ..room("A")
+        })?;
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(12)),
+            ..room("B")
+        })
+    })
+    .unwrap();
+    assert_eq!(s.list::<Room>().unwrap().len(), 2);
+    let r = s.batch(|s| {
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(13)),
+            ..room("C")
+        })?;
+        Err::<(), _>(housewright_core::Error::Invalid("stop".into()))
+    });
+    assert!(r.is_err());
+    assert_eq!(s.list::<Room>().unwrap().len(), 2);
+    let ops = s.ops().unwrap().len();
+    s.put(&Room {
+        id: RoomId(Uuid::from_u128(14)),
+        ..room("D")
+    })
+    .unwrap();
+    assert!(s.ops().unwrap().len() > ops);
 }

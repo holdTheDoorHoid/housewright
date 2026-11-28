@@ -1,0 +1,82 @@
+format = 1
+id = "electrical-panel"
+name = "Electrical panel, GFCI and AFCI"
+kind = "generic"
+category = "electrical"
+description = "The main breaker panel and the GFCI outlets and AFCI breakers that protect the circuits."
+
+[[fields]]
+key = "location"
+label = "Where the panel is"
+type = "text"
+
+[[fields]]
+key = "has_afci"
+label = "Has AFCI breakers"
+type = "yes_no"
+
+[[tasks]]
+key = "gfci_test"
+title = "Test the GFCI outlets"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 15
+steps = [
+  "Find each GFCI outlet (the ones with test and reset buttons), usually in kitchens, bathrooms, garage and outside.",
+  "Plug a lamp or night light into it and switch it on.",
+  "Press test: the light should go out.",
+  "Press reset: the light should come back on.",
+  "If it does not cut the power, stop using that outlet and call a licensed electrician.",
+]
+why = "A GFCI cuts power in a fraction of a second if current leaks to ground, which protects against shock near water."
+source = "CPSC guidance"
+completion_fields = [
+  { key = "result", label = "Result", type = "choice", options = ["all_pass", "some_fail"] },
+]
+
+[[tasks]]
+key = "afci_test"
+title = "Test the AFCI breakers"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 month" }
+minutes = 10
+when = { field = "has_afci", equals = "yes" }
+steps = [
+  "Check the breaker label or manual for how often to test (often monthly).",
+  "Press the test button on each AFCI breaker: it should trip to off.",
+  "Switch it fully off and then back on to reset it.",
+  "If a breaker will not trip or will not reset, call a licensed electrician.",
+]
+why = "AFCI breakers cut power when they sense arcing in wiring, a common start of electrical fires."
+source = "common manufacturer guidance"
+
+[[tasks]]
+key = "panel_clear"
+title = "Keep the electrical panel clear and labelled"
+priority = "life_safety"
+schedule = { kind = "fixed", every = "1 year" }
+minutes = 20
+steps = [
+  "Never remove the panel cover yourself; only open the small door to the breakers.",
+  "Clear boxes and storage from in front of the panel so it can be reached quickly.",
+  "Check every breaker has a clear label saying what it controls; fix any that are missing.",
+  "Look for scorch marks, a burning smell, buzzing or warm breakers; if you find any, call a licensed electrician.",
+]
+why = "In an emergency you need to reach and identify the right breaker fast."
+source = "NFPA guidance"
+
+[[tasks]]
+key = "inspection"
+title = "Book an electrical safety inspection"
+priority = "life_safety"
+schedule = { kind = "floating", every = "10 years" }
+minutes = 120
+steps = [
+  "Hire a licensed electrician to inspect the panel and wiring.",
+  "Do not open the panel cover yourself; leave that to the electrician.",
+  "Ask them to check the panel, breakers, grounding and any old or aluminium wiring.",
+  "Ask whether GFCI or AFCI protection should be added anywhere.",
+  "Note what they found and anything they recommend fixing.",
+]
+why = "Wiring and panels age; an inspection finds loose connections and overloaded circuits before they cause a fire."
+source = "US Fire Administration guidance"

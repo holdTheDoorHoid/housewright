@@ -92,20 +92,97 @@ fields, meters and tasks, with the child's entries replacing any with the same
 `key` and adding new ones. Chains (model -> generic -> category) are allowed;
 cycles are an error.
 
-## The starter set
+## The library
 
 | File | Covers |
 |---|---|
+| **Safety** | |
 | `smoke-alarm.toml` | Monthly test, battery, cleaning, ten-year replacement |
 | `co-alarm.toml` | Monthly test, battery, end-of-life replacement |
+| `fire-extinguisher.toml` | Monthly gauge and seal check, show everyone, replace per the label |
+| **Heating and cooling** | |
 | `hvac-air-filter.toml` | Furnace / HVAC filter |
+| `furnace.toml` | Book yearly service (gas, oil), check-up (electric), autumn start-up, vent check, oil tank |
+| `boiler.toml` | Book yearly service by fuel, pressure gauge, bleed radiators (hot water), leaks |
+| `heat-pump.toml` | Clear outdoor unit, book yearly service, condensate drain |
+| `central-ac.toml` | Clean outdoor condenser, condensate drain, book pre-season service |
+| `window-ac.toml` | Wash filter in season, clean coils, check it is secure, winter storage |
+| `fireplace.toml` | Book yearly chimney inspection, damper and screen, safe ash disposal |
+| `wood-stove.toml` | Book yearly inspection, door gasket and stovepipe, safe ash disposal |
+| `dehumidifier.toml` | Filter, bucket or drain hose, coils and humidity setting |
+| **Plumbing** | |
 | `water-heater.toml` | Flush, relief valve, anode, gas flue (gas only) |
+| `tankless-water-heater.toml` | Descale, inlet filter, book vent check (gas only) |
+| `heat-pump-water-heater.toml` | Air filter, condensate drain, relief valve, flush |
+| `well-pump.toml` | Yearly water test, pressure tank, wellhead, book inspection |
+| `septic-system.toml` | Book inspection and pumping, drain field walk, water habits |
+| `water-softener.toml` | Salt level and bridges, brine tank clean |
+| `whole-house-water-filter.toml` | Cartridge replacement, housing O-ring |
+| `main-water-shutoff.toml` | Exercise the valve, label it and show everyone |
+| `toilets.toml` | Dye test, fill and shutoff valves, base |
+| `under-sink-plumbing.toml` | Look for leaks, supply lines and shutoff valves |
+| `tub-shower-caulk.toml` | Inspect caulk and grout, recaulk |
+| `sump-pump.toml` | Test, spring pit clean, backup battery (if fitted) |
+| **Appliances** | |
 | `washing-machine.toml` | Supply hoses, cleaning cycle (usage-based) |
 | `clothes-dryer.toml` | Lint screen, vent duct, outside flap |
 | `refrigerator.toml` | Coils, water filter (if fitted), door seals |
+| `dishwasher.toml` | Filter, spray arms, hoses and leaks |
+| `garbage-disposal.toml` | Safe cleaning, what not to put down it |
+| `range-hood.toml` | Degrease filter, charcoal filter (if recirculating), fan and light |
+| **Electrical** | |
+| `electrical-panel.toml` | GFCI test, AFCI test (if fitted), panel clear and labelled, book inspection |
+| `generator.toml` | Standby: exercise check, book service; portable: safe setup and fuel |
+| `solar-panels.toml` | Monitoring check, look from the ground, book inspection |
+| **Exterior** | |
 | `gutters.toml` | Autumn clean, spring check |
-| `sump-pump.toml` | Test, spring pit clean, backup battery (if fitted) |
 | `hose-bibs.toml` | Winterise before first frost, turn on after last frost |
+| `garage-door-opener.toml` | Safety reverse test, lubricate, book spring check |
+| `exterior-siding.toml` | Spring and autumn walk-round, repaint or repair |
+| `deck.toml` | Spring inspection, reseal (wood), clean (composite) |
+| `windows-doors.toml` | Weatherstripping, locks, escape windows |
+| **Structure** | |
+| `roof.toml` | Look from the ground spring and autumn, book inspection |
+| `attic.toml` | Autumn inspection, check after heavy rain |
+| `crawlspace.toml` | Inspection, vents and access (if vented) |
+| **Yard** | |
+| `lawn-mower.toml` | Blade, oil (gas), clean and store for winter |
+| `irrigation.toml` | Spring start-up, winterise, book backflow test |
+| `pool.toml` | Weekly water test, filter, fence and gate, open or close for the season |
+
+### Categories
+
+`category` must be one of: `safety`, `heating_cooling`, `plumbing`,
+`appliances`, `electrical`, `exterior`, `structure`, `yard` (D-68). The test
+`template_quality` in `crates/core/tests/templates.rs` holds the list and the
+labels people see; `app/src/lib/labels.ts` must match it.
+
+### Quality rules (checked by the test)
+
+- 3 to 7 steps, each a real sentence; the critical safety step first
+  ("Switch off power at the breaker", "Unplug it").
+- `why` is one sentence of at most 200 characters; `source` names the kind
+  of source. No URLs, no percentages, no invented statistics or part numbers.
+- An interval between a week and ten years, and `minutes`.
+- A job that is risky for a non-professional (gas appliances, panel
+  internals, roofs, chimneys, garage door springs, septic pumping) is a
+  reminder to book: the title starts with "Book" and the first step says whom
+  to hire.
+
+### Intervals that are judgement, not a named guideline
+
+These were set by the template author from general practice and are worth a
+second look by someone with trade experience: electric furnace and boiler
+check-up (2 years), garage door spring check (2 years), professional roof
+inspection (3 years), recaulking (3 years), solar inspection (5 years), well
+inspection (5 years), exterior repaint (7 years), deck reseal (2 years),
+electrical inspection (10 years), fire extinguisher replacement (10 years,
+steps defer to the label), fireplace ash clear-out (monthly) and wood stove
+ash clear-out (2 weeks) which depend on use, furnace vent checks (6 months),
+whole-house filter cartridge (6 months; steps defer to the maker). The window
+AC filter uses fixed northern-hemisphere months (June to September), and pool
+water testing is weekly all year with a first step to skip it while the pool
+is closed, because the format has no "weekly in season" schedule yet.
 
 Template text licensing is an open question for the owner (Q-02; proposed
 CC BY 4.0).

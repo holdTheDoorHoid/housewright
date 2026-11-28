@@ -65,3 +65,42 @@ describe('Today', () => {
     expect(screen.getByRole('link', { name: 'Add a thing' })).toBeTruthy();
   });
 });
+
+describe('Today suggestion card', () => {
+  it('shows one suggestion with Add, Not for us and Later', async () => {
+    const s = {
+      key: 'ask:hose-bibs',
+      action: { kind: 'add_thing' as const, template: 'hose-bibs', name: 'Outdoor hose taps' },
+      title: 'Do you have outdoor taps?',
+      body: 'If so, winterise them before the first frost.',
+      why: 'Water left in the pipe can freeze.',
+      source: 'common plumber guidance',
+      add_label: 'Yes, add it',
+      priority: 'property_loss' as const,
+      seasonal: true,
+    };
+    let answered = false;
+    const fake = new FakeBackend({
+      today: () => today({ suggestion: answered ? null : s }),
+      answer_suggestion: () => {
+        answered = true;
+        return { switched_on: [card({ title: 'Winterise the outdoor hose taps' })] };
+      },
+    });
+    useBackend(fake);
+    render(Today);
+    expect(await screen.findByText('Do you have outdoor taps?')).toBeTruthy();
+    expect(screen.getAllByTestId('suggestion')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Not for us' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Later' })).toBeTruthy();
+    await fireEvent.click(screen.getByRole('button', { name: 'Yes, add it' }));
+    await waitFor(() => expect(fake.calls.find((c) => c.cmd === 'answer_suggestion')!.args).toEqual({ key: 'ask:hose-bibs', answer: 'added' }));
+    await waitFor(() => expect(app.toast?.text).toContain('Winterise the outdoor hose taps'));
+  });
+
+  it('before the home questions, offers them', async () => {
+    useBackend(new FakeBackend({ today: () => today({ tasks: [], active_count: 0, has_profile: false }) }));
+    render(Today);
+    expect(await screen.findByRole('link', { name: 'Answer the home questions' })).toBeTruthy();
+  });
+});

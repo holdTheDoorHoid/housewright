@@ -257,3 +257,112 @@ fn call_json_wraps_results_and_errors() {
     let err: Value = serde_json::from_str(&a.call_json("status", "{not json")).unwrap();
     assert_eq!(err["error"]["code"], "invalid");
 }
+
+fn philly_answers() -> Value {
+    json!({
+        "home_type": "house",
+        "built": "before_1950",
+        "zip": "19103",
+        "heating": ["gas_furnace"],
+        "cooling": ["central_ac"],
+        "water_heater": "tank_gas",
+        "water_supply": "city",
+        "sewer": "city",
+        "features": {"basement": true, "sump_pump": true, "washer": true, "dryer": true, "pool": false},
+        "smoke_alarms": "two_to_three",
+        "smoke_power": "battery",
+        "co_alarms": "one",
+        "people": {"adults": 2, "pets": true}
+    })
+}
+
+#[test]
+fn questionnaire_to_starting_plan_to_today() {
+    let (mut a, _) = setup();
+    let today = call(&mut a, "today", Value::Null);
+    assert_eq!(today["has_profile"], false);
+
+    let c = call(&mut a, "climate_lookup", json!({"zip": "19103"}));
+    assert_eq!(c["freezes"], true);
+    assert!(c["first_frost"].as_str().unwrap().starts_with("Nov"));
+    let phx = call(&mut a, "climate_lookup", json!({"zip": "85004"}));
+    assert_eq!(phx["freezes"], false);
+    assert!(call(&mut a, "climate_lookup", json!({"zip": "00000"})).is_null());
+
+    let plan = call(&mut a, "onboard", json!({"profile": philly_answers()}));
+    let on = plan["switched_on"].as_array().unwrap();
+    assert_eq!(on.len(), 4);
+    assert_eq!(on[0]["card"]["title"], "Test the CO alarm");
+    assert_eq!(on[0]["card"]["priority"], "life_safety");
+    assert!(
+        on.iter()
+            .all(|t| t["why"].is_string() && t["source"].is_string())
+    );
+    let things = plan["things_recorded"].as_u64().unwrap();
+    assert!(things >= 12, "{things}");
+    assert_eq!(plan["new_things"].as_u64().unwrap(), things);
+    assert!(plan["suggested_count"].as_u64().unwrap() > 20);
+    assert_eq!(plan["climate"]["freezes"], true);
+
+    // Today shows only the switched-on tasks, plus one suggestion card.
+    let today = call(&mut a, "today", Value::Null);
+    assert_eq!(today["has_profile"], true);
+    assert_eq!(today["active_count"], 4);
+    assert!(today["suggestion"]["key"].is_string());
+
+    // The full list is there if wanted, grouped by thing.
+    let all = call(&mut a, "all_suggested", Value::Null);
+    let groups = all.as_array().unwrap();
+    assert!(groups.len() >= 10);
+    assert!(
+        groups
+            .iter()
+            .flat_map(|g| g["tasks"].as_array().unwrap())
+            .all(|t| t["card"]["active"] == false)
+    );
+
+    // Answer the weekly suggestion; then nothing more this week.
+    let key = today["suggestion"]["key"].as_str().unwrap().to_string();
+    let out = call(
+        &mut a,
+        "answer_suggestion",
+        json!({"key": key, "answer": "added"}),
+    );
+    assert_eq!(out["switched_on"].as_array().unwrap().len(), 1);
+    assert!(call(&mut a, "today", Value::Null)["suggestion"].is_null());
+
+    // Redo the questions: nothing is switched off or deleted, and
+    // nothing new is switched on.
+    let before = call(&mut a, "starting_plan", Value::Null)["things_recorded"]
+        .as_u64()
+        .unwrap();
+    let mut more = philly_answers();
+    more["features"]["pool"] = json!(true);
+    let again = call(&mut a, "onboard", json!({"profile": more}));
+    assert_eq!(again["new_things"], 1);
+    assert_eq!(again["switched_on"].as_array().unwrap().len(), 5);
+    assert_eq!(again["things_recorded"].as_u64().unwrap(), before + 1);
+    let p = call(&mut a, "profile", Value::Null);
+    assert_eq!(p["profile"]["features"]["pool"], true);
+    assert_eq!(p["profile"]["zip"]["value"], "19103");
+    assert_eq!(p["profile"]["zip"]["sensitivity"], "normal");
+    // The starting plan screen can be shown again.
+    let sp = call(&mut a, "starting_plan", Value::Null);
+    assert_eq!(sp["switched_on"].as_array().unwrap().len(), 5);
+}
+
+#[test]
+fn onboarding_with_every_question_skipped() {
+    let (mut a, _) = setup();
+    let plan = call(&mut a, "onboard", json!({"profile": {}}));
+    // Things every home has, a few tasks on, and the smoke alarm question first.
+    assert!(plan["things_recorded"].as_u64().unwrap() >= 5);
+    let on = plan["switched_on"].as_array().unwrap().len();
+    assert!((3..=5).contains(&on), "{on}");
+    let today = call(&mut a, "today", Value::Null);
+    assert_eq!(today["suggestion"]["key"], "ask:smoke-alarm");
+    let e = a
+        .call("onboard", json!({"profile": {"zip": "12"}}))
+        .unwrap_err();
+    assert_eq!(e.code, "invalid");
+}
