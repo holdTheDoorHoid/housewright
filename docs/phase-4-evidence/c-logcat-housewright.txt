@@ -1,0 +1,26 @@
+--------- beginning of main
+11-27 21:01:50.000  3139  3139 I housewright: rescheduling after android.intent.action.BOOT_COMPLETED
+11-27 21:01:51.264  3139  3194 I housewright: scheduled 2 reminders (replaced 2)
+11-27 21:19:31.144  4249  4518 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 21:19:31.151  4249  4518 I housewright: scheduled 0 reminders (replaced 0)
+11-27 22:38:47.224  4249  4249 I housewright: rescheduling after android.intent.action.TIME_SET
+11-27 22:38:47.375  4249  4859 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:38:48.056  4249  4859 I housewright: scheduled 3 reminders (replaced 0)
+11-27 22:45:40.128  5140  5140 I housewright: rescheduling after android.intent.action.MY_PACKAGE_REPLACED
+11-27 22:45:41.900  5140  5198 I housewright: scheduled 3 reminders (replaced 3)
+11-27 22:45:57.016  5140  5295 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:45:57.098  5140  5295 I housewright: scheduled 3 reminders (replaced 3)
+11-27 22:46:31.035  5140  5140 I housewright: sticker link for item 01a21ff5-7fc0-7329-a93e-a01232efa575
+11-27 22:46:45.319  5140  5441 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:46:45.343  5140  5441 I housewright: scheduled 2 reminders (replaced 3)
+11-27 22:53:03.695  5833  5833 I housewright: sticker link for item 01a21ff5-7fc0-7329-a93e-a01232efa575
+11-27 22:53:03.765  5833  5833 I housewright: rescheduling after android.intent.action.MY_PACKAGE_REPLACED
+11-27 22:53:04.933  5833  5896 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:53:05.051  5833  5896 I housewright: scheduled 2 reminders (replaced 2)
+11-27 22:53:16.735  5833  5980 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:53:16.739  5833  5980 I housewright: scheduled 2 reminders (replaced 2)
+11-27 22:55:18.441  5833  5833 I housewright: sticker link for item 01a21ff5-7f24-7242-a25e-3bb4ef30cb95
+11-27 23:00:21.283  6917  6917 I housewright: rescheduling after android.intent.action.MY_PACKAGE_REPLACED
+11-27 23:00:21.635  6917  6968 I housewright: scheduled 2 reminders (replaced 2)
+11-27 23:00:30.093  6917  7052 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 23:00:30.117  6917  7052 I housewright: scheduled 2 reminders (replaced 2)

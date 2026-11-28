@@ -1,0 +1,7 @@
+Starting: Intent { act=android.intent.action.VIEW dat=housewright://item/... }
+Warning: Activity not started, its current task has been brought to the front
+11-27 22:45:40.128  5140  5140 I housewright: rescheduling after android.intent.action.MY_PACKAGE_REPLACED
+11-27 22:45:41.900  5140  5198 I housewright: scheduled 3 reminders (replaced 3)
+11-27 22:45:57.016  5140  5295 I housewright: housewright_app_lib::android: native reminder_plan: ok
+11-27 22:45:57.098  5140  5295 I housewright: scheduled 3 reminders (replaced 3)
+11-27 22:46:31.035  5140  5140 I housewright: sticker link for item 01a21ff5-7fc0-7329-a93e-a01232efa575

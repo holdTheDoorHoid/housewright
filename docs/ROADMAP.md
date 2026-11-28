@@ -152,12 +152,13 @@ Sizes (measured 2026-11-27):
 |---|---|---|---|
 | Web: WebAssembly core | 4.30 MB (1.62 MB gzip) | 8.56 MB (3.22 MB gzip) | +4.26 MB (+1.60 MB gzip), mostly the OCR runtime |
 | Web: OCR models, fetched on first label read only | none | 12.2 MB (11.4 MB gzip) | +12.2 MB, only when used |
-| Android x86_64 debug APK | see `phase-4-evidence/README.md` | | |
+| Android native library (x86_64 debug, stripped) | not rebuilt | 48.1 MB | about +18 MB: 12.2 MB models + about 5.8 MB of library code (estimate; see `phase-4-evidence/README.md`) |
 
 Timings: reading the synthetic rating plate took about 3 s natively (test
 build, optimised dependencies), about 16 s in Chrome the first time
-(including fetching and loading the 12 MB of models), and see the evidence
-README for the emulator.
+(including fetching and loading the 12 MB of models), and about 24 s on the
+Android emulator in a debug build (first use, including loading the
+models).
 
 Verified: Rust format, clippy (native and wasm), tests (blob dedupe and
 garbage collection, photo downscaling, ZIP round trip, QR encode/decode,
