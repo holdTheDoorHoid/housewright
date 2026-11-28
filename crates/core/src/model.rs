@@ -74,10 +74,37 @@ pub enum EntityKind {
     Attachment,
     Note,
     Fact,
+    /// The answers to the home questions (one per property).
+    Profile,
+    /// Append-only answer to a weekly suggestion (Add / Not for us / Later).
+    SuggestionAnswer,
 }
 
 impl EntityKind {
-    pub const ALL: [EntityKind; 16] = [
+    pub const ALL: [EntityKind; 18] = [
+        EntityKind::Household,
+        EntityKind::Member,
+        EntityKind::Property,
+        EntityKind::Floor,
+        EntityKind::Room,
+        EntityKind::Item,
+        EntityKind::Template,
+        EntityKind::Task,
+        EntityKind::Completion,
+        EntityKind::Snooze,
+        EntityKind::Meter,
+        EntityKind::MeterReading,
+        EntityKind::Contractor,
+        EntityKind::Attachment,
+        EntityKind::Note,
+        EntityKind::Fact,
+        EntityKind::Profile,
+        EntityKind::SuggestionAnswer,
+    ];
+
+    /// The kinds that existed at schema version 1. Migration 1 creates
+    /// exactly these tables; later kinds get theirs from later migrations.
+    pub const SCHEMA_V1: [EntityKind; 16] = [
         EntityKind::Household,
         EntityKind::Member,
         EntityKind::Property,
@@ -115,6 +142,8 @@ impl EntityKind {
             EntityKind::Attachment => "attachment",
             EntityKind::Note => "note",
             EntityKind::Fact => "fact",
+            EntityKind::Profile => "profile",
+            EntityKind::SuggestionAnswer => "suggestion_answer",
         }
     }
 
@@ -131,13 +160,17 @@ impl EntityKind {
                 | EntityKind::MeterReading
                 | EntityKind::Attachment
                 | EntityKind::Note
+                | EntityKind::SuggestionAnswer
         )
     }
 
     /// Whether a tombstone may hide this kind. Completions are never deleted;
     /// a mistaken one is voided by a later completion record instead.
     pub fn deletable(self) -> bool {
-        !matches!(self, EntityKind::Completion | EntityKind::Snooze)
+        !matches!(
+            self,
+            EntityKind::Completion | EntityKind::Snooze | EntityKind::SuggestionAnswer
+        )
     }
 }
 
@@ -147,10 +180,12 @@ pub trait Entity: Serialize + DeserializeOwned {
     fn entity_id(&self) -> String;
 }
 
+/// Implements [`Entity`] for a struct with an `id` field.
+#[macro_export]
 macro_rules! entity {
     ($t:ty, $kind:ident) => {
-        impl Entity for $t {
-            const KIND: EntityKind = EntityKind::$kind;
+        impl $crate::model::Entity for $t {
+            const KIND: $crate::model::EntityKind = $crate::model::EntityKind::$kind;
             fn entity_id(&self) -> String {
                 self.id.to_string()
             }

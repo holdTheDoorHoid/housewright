@@ -11,12 +11,15 @@ pub mod fields;
 pub mod hlc;
 pub mod ids;
 pub mod model;
+pub mod onboard;
 pub mod oplog;
 pub mod priority;
+pub mod profile;
 pub mod reminders;
 pub mod repo;
 pub mod schedule;
 pub mod store;
+pub mod suggest;
 pub mod template;
 
 pub use error::{Error, Result};

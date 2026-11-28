@@ -77,6 +77,8 @@ define_id!(
     NoteId,
     /// A home facts sheet entry.
     FactId,
+    /// An answer to a weekly suggestion.
+    SuggestionAnswerId,
     /// An operation in the operation log.
     OpId,
 );

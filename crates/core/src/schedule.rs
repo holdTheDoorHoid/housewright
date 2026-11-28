@@ -449,6 +449,33 @@ impl Schedule {
         Ok(())
     }
 
+    /// Roughly how many days between occurrences: used to prefer routine
+    /// tasks over once-a-decade ones when choosing a starting plan.
+    pub fn period_days(&self) -> u32 {
+        match self {
+            Schedule::Fixed { every, .. } | Schedule::Floating { every } => every.approx_days(),
+            Schedule::NthWeekday { months, .. } => {
+                365 / if months.is_empty() {
+                    12
+                } else {
+                    months.len() as u32
+                }
+            }
+            Schedule::MonthsOfYear { months, .. } => 365 / months.len().max(1) as u32,
+            Schedule::Seasonal { .. } => 365,
+            Schedule::Usage { or_every, .. } => or_every.map_or(90, |i| i.approx_days()),
+            Schedule::OneOff { .. } => 0,
+        }
+    }
+
+    /// The season of a seasonal schedule.
+    pub fn season(&self) -> Option<Season> {
+        match self {
+            Schedule::Seasonal { season } => Some(*season),
+            _ => None,
+        }
+    }
+
     /// The default due window for this schedule.
     pub fn default_window(&self) -> WindowPolicy {
         match self {

@@ -186,13 +186,13 @@ fn file_store_persists_hlc_author_and_schema() {
         s.set_author(MemberId(Uuid::from_u128(4))).unwrap();
         s.put(&room("Hall")).unwrap();
         hlc = s.hlc();
-        assert_eq!(s.schema_version().unwrap(), 1);
+        assert_eq!(s.schema_version().unwrap(), 2);
     }
     let s = Store::open(&path).unwrap();
     assert_eq!(s.hlc(), hlc);
     assert_eq!(s.author().unwrap(), MemberId(Uuid::from_u128(4)));
     assert_eq!(s.list::<Room>().unwrap().len(), 1);
-    assert_eq!(s.schema_version().unwrap(), 1);
+    assert_eq!(s.schema_version().unwrap(), 2);
     drop(s);
     std::fs::remove_dir_all(dir).ok();
 }

@@ -66,7 +66,7 @@ impl WallClock for ManualClock {
 type Migration = fn(&Connection) -> rusqlite::Result<()>;
 
 /// Versioned schema migrations, applied in order, each exactly once.
-const MIGRATIONS: &[(i64, Migration)] = &[(1, migration_1)];
+const MIGRATIONS: &[(i64, Migration)] = &[(1, migration_1), (2, migration_2)];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
     let mut sql = String::from(
@@ -92,15 +92,28 @@ fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
              PRIMARY KEY (kind, entity_id, field)
          );",
     );
-    for kind in EntityKind::ALL {
-        sql.push_str(&format!(
-            "CREATE TABLE {t} (
-                 id TEXT PRIMARY KEY,
-                 data TEXT NOT NULL DEFAULT '{{}}',
-                 deleted INTEGER NOT NULL DEFAULT 0
-             );",
-            t = kind.as_str()
-        ));
+    for kind in EntityKind::SCHEMA_V1 {
+        sql.push_str(&entity_table(kind));
+    }
+    conn.execute_batch(&sql)
+}
+
+fn entity_table(kind: EntityKind) -> String {
+    format!(
+        "CREATE TABLE {t} (
+             id TEXT PRIMARY KEY,
+             data TEXT NOT NULL DEFAULT '{{}}',
+             deleted INTEGER NOT NULL DEFAULT 0
+         );",
+        t = kind.as_str()
+    )
+}
+
+/// Phase 3: the home profile and suggestion answers (D-65).
+fn migration_2(conn: &Connection) -> rusqlite::Result<()> {
+    let mut sql = String::new();
+    for kind in [EntityKind::Profile, EntityKind::SuggestionAnswer] {
+        sql.push_str(&entity_table(kind));
     }
     conn.execute_batch(&sql)
 }
