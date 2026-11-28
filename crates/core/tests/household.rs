@@ -211,6 +211,7 @@ fn limited_members_see_only_their_tasks() {
         name: "Sam".into(),
         role: Role::Limited,
         contact: None,
+        reminders: None,
     };
     h.store.put(&kid).unwrap();
     let mut t = h.store.list::<Task>().unwrap().remove(0);

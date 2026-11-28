@@ -12,6 +12,7 @@ pub mod ids;
 pub mod model;
 pub mod oplog;
 pub mod priority;
+pub mod reminders;
 pub mod repo;
 pub mod schedule;
 pub mod store;

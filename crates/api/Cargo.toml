@@ -1,0 +1,14 @@
+[package]
+name = "housewright-api"
+description = "One command surface over the Housewright core, shared by the Tauri app and the WebAssembly build"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+housewright-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+jiff.workspace = true
