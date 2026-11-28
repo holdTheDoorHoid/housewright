@@ -23,6 +23,7 @@
   import Labels from './screens/Labels.svelte';
   import Scan from './screens/Scan.svelte';
   import Binder from './screens/Binder.svelte';
+  import Plans from './screens/Plans.svelte';
 
   let fatal = $state<{ text: string; locked: boolean } | null>(null);
 
@@ -76,7 +77,7 @@
       ? 'today'
       : app.route.name === 'thing' || app.route.name === 'add' || app.route.name === 'scan'
         ? 'things'
-        : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder'
+        : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder' || app.route.name === 'plans'
           ? 'home'
           : app.route.name === 'sync' || app.route.name === 'home-assistant'
             ? 'settings'
@@ -119,6 +120,7 @@
     {:else if app.route.name === 'labels'}<Labels />
     {:else if app.route.name === 'scan'}<Scan />
     {:else if app.route.name === 'binder'}<Binder />
+    {:else if app.route.name === 'plans'}{#key `${app.route.floor}/${app.route.place}`}<Plans floorId={app.route.floor} pinId={app.route.pin} placeItem={app.route.place} />{/key}
     {/if}
   </main>
   {#if app.route.name !== 'questions'}

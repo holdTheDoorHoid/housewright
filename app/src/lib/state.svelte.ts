@@ -17,7 +17,8 @@ export type Route =
   | { name: 'costs' }
   | { name: 'labels' }
   | { name: 'scan' }
-  | { name: 'binder' };
+  | { name: 'binder' }
+  | { name: 'plans'; floor: string | null; pin: string | null; place: string | null };
 
 export function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -60,6 +61,10 @@ export function parse(hash: string): Route {
       return { name: 'scan' };
     case 'binder':
       return { name: 'binder' };
+    case 'plans':
+      // #/plans, #/plans/<floor>, #/plans/<floor>/pin/<pin>, #/plans/place/<thing>
+      if (parts[1] === 'place') return { name: 'plans', floor: null, pin: null, place: parts[2] ?? null };
+      return { name: 'plans', floor: parts[1] ?? null, pin: parts[2] === 'pin' ? (parts[3] ?? null) : null, place: null };
     default:
       return { name: 'today' };
   }
