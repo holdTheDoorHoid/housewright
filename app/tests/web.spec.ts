@@ -12,40 +12,42 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   await expect(page.getByRole('heading', { name: 'Welcome to Housewright' })).toBeVisible();
   await expect(page.getByText('about 10 questions about the house, about 3 minutes')).toBeVisible();
   await page.getByLabel('Your name').fill('Alex');
-  await page.getByRole('button', { name: 'Next: the home questions' }).click();
+  await page.getByRole('button', { name: 'Next: the home questions', exact: true }).click();
 
   // One question per screen, with progress, Back and Not sure.
   await expect(page.getByText('Question 1 of 10')).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0);
-  await page.getByRole('button', { name: 'A house' }).click();
+  await page.getByRole('button', { name: 'A house', exact: true }).click();
   await expect(page.getByText('Question 2 of 10')).toBeVisible();
-  await page.getByRole('group', { name: 'How many smoke alarms?' }).getByRole('button', { name: '2 or 3' }).click();
-  await page.getByRole('button', { name: 'Battery' }).click();
-  await page.getByRole('group', { name: 'How many carbon monoxide (CO) alarms?' }).getByRole('button', { name: 'One' }).click();
-  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('group', { name: 'How many smoke alarms?' }).getByRole('button', { name: '2 or 3', exact: true }).click();
+  await page.getByRole('button', { name: 'Battery', exact: true }).click();
+  await page.getByRole('group', { name: 'How many carbon monoxide (CO) alarms?' }).getByRole('button', { name: 'One', exact: true }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(page.getByText('Question 3 of 10')).toBeVisible();
   await page.getByRole('button', { name: /Gas furnace/ }).click();
-  await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'A gas tank' }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await page.getByRole('button', { name: 'A gas tank', exact: true }).click();
   await expect(page.getByText('Question 5 of 10')).toBeVisible();
-  await page.getByLabel('ZIP code').fill('19103');
-  await page.getByLabel('ZIP code').blur();
+  await page.getByRole('textbox', { name: 'ZIP code' }).fill('19103');
+  await page.getByRole('textbox', { name: 'ZIP code' }).blur();
   await expect(page.getByTestId('climate')).toContainText('Average first frost around Nov');
-  await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'Not sure' }).click(); // water and sewer
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await page.getByRole('button', { name: 'Not sure', exact: true }).click(); // water and sewer
   await expect(page.getByText('Question 7 of 10')).toBeVisible();
-  await page.getByRole('button', { name: 'Basement' }).click();
-  await page.getByRole('button', { name: 'Sump pump' }).click();
-  await page.getByRole('button', { name: 'Washing machine' }).click();
-  await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'Not sure' }).click(); // cooling
-  await page.getByRole('button', { name: 'Not sure' }).click(); // built
+  await page.getByRole('button', { name: 'Basement', exact: true }).click();
+  await page.getByRole('button', { name: 'Sump pump', exact: true }).click();
+  await page.getByRole('button', { name: 'Washing machine', exact: true }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await page.getByRole('button', { name: 'Not sure', exact: true }).click(); // cooling
+  await page.getByRole('button', { name: 'Not sure', exact: true }).click(); // built
   await expect(page.getByText('Question 10 of 10')).toBeVisible();
-  await page.getByRole('button', { name: 'More adults' }).click();
-  await page.getByRole('button', { name: 'Show my plan' }).click();
+  await page.getByRole('button', { name: 'More adults', exact: true }).click();
+  const t0 = Date.now();
+  await page.getByRole('button', { name: 'Show my plan', exact: true }).click();
 
   // The starting plan: a few tasks with why and source, honest progress.
-  await expect(page.getByRole('heading', { name: 'Your starting plan' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your starting plan' })).toBeVisible({ timeout: 30_000 });
+  console.log(`onboard took ${Date.now() - t0} ms`);
   const planned = page.getByTestId('plan-task');
   await expect(planned).toHaveCount(4);
   await expect(planned.first()).toContainText('Test the CO alarm');
@@ -62,14 +64,14 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   await expect(rows.first()).toBeVisible();
   expect(await rows.count()).toBeLessThanOrEqual(4);
   await expect(page.getByTestId('suggestion')).toHaveCount(1);
-  await page.getByTestId('suggestion').getByRole('button', { name: 'Later' }).click();
+  await page.getByTestId('suggestion').getByRole('button', { name: 'Later', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('ask again in a few weeks');
   await expect(page.getByTestId('suggestion')).toHaveCount(0);
 
   // See everything we suggested: switched off, grouped by thing.
   await page.getByRole('link', { name: 'See everything we suggested' }).click();
   await expect(page.getByRole('heading', { name: 'Everything we suggested' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Furnace/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^Furnace\s*·/ })).toBeVisible();
   await page.getByRole('link', { name: 'Today', exact: true }).click();
 
   // One-tap Done from Today.
@@ -108,12 +110,12 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   // Redo the home questions only adds.
   await page.getByRole('link', { name: 'Settings', exact: true }).click();
   await page.getByRole('link', { name: 'Redo the home questions' }).click();
-  await expect(page.getByRole('button', { name: 'A house' })).toHaveAttribute('aria-pressed', 'true');
-  for (let i = 1; i <= 6; i++) await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByRole('button', { name: 'A house', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  for (let i = 1; i <= 6; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(page.getByText('Question 7 of 10')).toBeVisible();
-  await page.getByRole('button', { name: 'Pool' }).click();
-  for (let i = 7; i <= 9; i++) await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'Show my plan' }).click();
+  await page.getByRole('button', { name: 'Pool', exact: true }).click();
+  for (let i = 7; i <= 9; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await page.getByRole('button', { name: 'Show my plan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Your answers are saved' })).toBeVisible();
   await expect(page.getByText('1 new thing was added')).toBeVisible();
   await expect(page.getByTestId('plan-task').first()).toBeVisible();

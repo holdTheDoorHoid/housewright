@@ -8,7 +8,7 @@ assumption early. Status as of 2026-11-27.
 | 0 | Foundations | Interview, decision log, research, architecture | done |
 | 1 | Core | Rust domain model, schedule engine (all kinds), SQLite storage, operation log, CLI, tests | done (merged 2026-11-27, PR #1); see below |
 | 2 | App shell | Tauri 2 + Svelte on Android and web; items, tasks, one-tap completion; **prove local notifications with actions on Android** | done on branch `phase-2-app-shell` (PR #2): web verified in a browser; Android reminder proof passed on the emulator 2026-11-27 (see below) |
-| 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | |
+| 3 | Onboarding + templates | 10-question questionnaire, generic template set, prioritisation (life safety first), start-small activation | built on branch `phase-3-onboarding` (2026-11-27): Rust, web and Android emulator checks pass; see below |
 | 4 | Records | Photos and documents, custom fields, home facts sheet, QR labels, costs | |
 | 5 | House binder v1 | Typst binder: emergency page, main volume, sealed volume, change tracking for reprints | |
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | |
@@ -70,3 +70,34 @@ Not built in Phase 2: photos ("Done + photo" waits for attachments in
 Phase 4), the weekly digest (P5), adding a calendar entry when rescheduling
 (P6), reminders on the web when the page is closed (Phase 11), iOS
 (Phase 10), and the full questionnaire (Phase 3).
+
+
+## Phase 3 notes
+
+Built (decisions D-64 to D-69):
+
+- **Home questions**: name and home name, then ten questions, one per
+  screen, each skippable ("Not sure"), with progress and Back. Answers are a
+  `Profile` entity per property, through the operation log. "Redo the home
+  questions" in Settings only adds.
+- **Starting plan**: everything the answers imply is recorded with its tasks
+  switched off; four tasks are switched on (five with children or older
+  adults), alarms first, one per thing, routine before long-cycle, one place
+  for the top water or fire task. The screen shows each task's why and
+  source and "Your home, so far: N things recorded"; the full list is one tap
+  away but never the landing page.
+- **One suggestion a week** on Today (Add / Not for us / Later), seasonal via
+  the existing windows; "Not for us" is permanent.
+- **Climate from ZIP, offline**: a 199 KB table of NOAA 1991-2020 frost dates
+  and hard-freeze flags for every US ZCTA, built reproducibly by
+  `tools/climate-build` from public domain data ([DATA-SOURCES.md](DATA-SOURCES.md)).
+- **Templates**: 45 generic templates in eight fixed categories, with a
+  quality test.
+- Storage schema 2 and export version 2; Phase 2 exports still import
+  (tested with a fixture written by the Phase 2 code).
+
+Not built in Phase 3: room-by-room walks with label photos (D-24's second
+half; Phase 4 with attachments), editing a thing's template fields after
+onboarding (for example a boiler whose fuel was not known), a "weekly in
+season" schedule kind, frost dates for places outside the US, and correcting
+the looked-up frost dates by hand in the interface.

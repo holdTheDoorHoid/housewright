@@ -242,3 +242,37 @@ fn a_schema_1_database_is_migrated_to_2() {
     s.put(&p).unwrap();
     assert_eq!(s.list::<Profile>().unwrap(), vec![p]);
 }
+
+#[test]
+fn a_batch_commits_together_or_not_at_all() {
+    let clock = ManualClock::new(1_000);
+    let mut s = store(5, &clock);
+    s.batch(|s| {
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(11)),
+            ..room("A")
+        })?;
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(12)),
+            ..room("B")
+        })
+    })
+    .unwrap();
+    assert_eq!(s.list::<Room>().unwrap().len(), 2);
+    let r = s.batch(|s| {
+        s.put(&Room {
+            id: RoomId(Uuid::from_u128(13)),
+            ..room("C")
+        })?;
+        Err::<(), _>(housewright_core::Error::Invalid("stop".into()))
+    });
+    assert!(r.is_err());
+    assert_eq!(s.list::<Room>().unwrap().len(), 2);
+    let ops = s.ops().unwrap().len();
+    s.put(&Room {
+        id: RoomId(Uuid::from_u128(14)),
+        ..room("D")
+    })
+    .unwrap();
+    assert!(s.ops().unwrap().len() > ops);
+}

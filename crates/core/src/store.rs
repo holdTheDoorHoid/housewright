@@ -148,6 +148,8 @@ pub struct Store {
     hlc: Hlc,
     clock: Box<dyn WallClock>,
     author: Option<MemberId>,
+    /// Inside [`Store::batch`]: changes join the open transaction.
+    in_batch: bool,
 }
 
 impl Store {
@@ -175,6 +177,7 @@ impl Store {
             hlc: Hlc::ZERO,
             clock,
             author: None,
+            in_batch: false,
         };
         store.migrate()?;
         if let Some(h) = store.meta("hlc")? {
@@ -277,6 +280,17 @@ impl Store {
 
     /// Apply a batch of locally created ops in one transaction.
     fn commit_local(&mut self, ops: &[Op]) -> Result<()> {
+        if self.in_batch {
+            for op in ops {
+                apply_op(&self.conn, op)?;
+            }
+            self.conn.execute(
+                "INSERT INTO meta (key, value) VALUES ('hlc', ?1)
+                 ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                [self.hlc.to_string()],
+            )?;
+            return Ok(());
+        }
         let tx = self.conn.unchecked_transaction()?;
         for op in ops {
             apply_op(&tx, op)?;
@@ -288,6 +302,29 @@ impl Store {
         )?;
         tx.commit()?;
         Ok(())
+    }
+
+    /// Run `f` as one database transaction: every change it makes is written
+    /// together, or none is if it fails. Much faster than one transaction per
+    /// change where storage is slow (the browser's OPFS). Not nestable.
+    pub fn batch<T>(&mut self, f: impl FnOnce(&mut Store) -> Result<T>) -> Result<T> {
+        if self.in_batch {
+            return f(self);
+        }
+        self.conn.execute_batch("BEGIN IMMEDIATE")?;
+        self.in_batch = true;
+        let out = f(self);
+        self.in_batch = false;
+        match out {
+            Ok(v) => {
+                self.conn.execute_batch("COMMIT")?;
+                Ok(v)
+            }
+            Err(e) => {
+                let _ = self.conn.execute_batch("ROLLBACK");
+                Err(e)
+            }
+        }
     }
 
     /// Create or update an ordinary (last-writer-wins) entity. Emits one op per

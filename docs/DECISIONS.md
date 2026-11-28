@@ -427,6 +427,14 @@ task with its why, its source and when it is due, the line "Your home, so
 far: N things recorded", the frost dates used, and a link to "See everything
 we suggested" (never the landing page).
 
+**D-70 Batched writes (Proposed).** Refines D-51. `Store::batch` runs a
+group of changes in one SQLite transaction: all are written or none. Every
+change is still its own operation with its own clock stamp, so merging is
+unchanged. Onboarding (twenty-odd things and their tasks, several hundred
+operations), answering a suggestion and adding a thing use it. Without it,
+the first onboarding took about 20 seconds in the browser on a loaded
+machine, because OPFS makes each separate transaction slow.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store

@@ -897,7 +897,9 @@ impl Api {
         };
         let me = self.store.author()?;
         let start = self.today_in(&p.time_zone)?;
-        let tasks = self.store.add_item_from_template(&item, &t, me, start)?;
+        let tasks = self
+            .store
+            .batch(|s| s.add_item_from_template(&item, &t, me, start))?;
         let names = self.names()?;
         let now = self.store.now();
         let mut cards = Vec::new();
@@ -1104,16 +1106,19 @@ impl Api {
             .any(|t| t.property == p.id && t.active);
         let me = self.store.author()?;
         let start = self.today_in(&p.time_zone)?;
-        let out = self
-            .store
-            .apply_profile(&profile, &self.library, me, start)?;
         let now = self.store.now();
-        let picked = if first_time {
-            self.store
-                .switch_on_starting_plan(p.id, starting_count(&profile), now)?
-        } else {
-            vec![]
-        };
+        let library = &self.library;
+        // One transaction: twenty things and their tasks are hundreds of
+        // changes, which is slow one by one on the web's storage.
+        let (out, picked) = self.store.batch(|s| {
+            let out = s.apply_profile(&profile, library, me, start)?;
+            let picked = if first_time {
+                s.switch_on_starting_plan(p.id, starting_count(&profile), now)?
+            } else {
+                vec![]
+            };
+            Ok((out, picked))
+        })?;
         self.starting_plan_out(out.new_items.len(), Some(picked))
     }
 
@@ -1200,9 +1205,10 @@ impl Api {
         let p = self.first_property()?;
         let me = self.store.author()?;
         let now = self.store.now();
+        let library = &self.library;
         let ids = self
             .store
-            .answer_suggestion(p.id, &a.key, a.answer, &self.library, me, now)?;
+            .batch(|s| s.answer_suggestion(p.id, &a.key, a.answer, library, me, now))?;
         let switched_on = ids
             .into_iter()
             .map(|id| self.card_by_id(id))
