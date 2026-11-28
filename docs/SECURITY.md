@@ -477,6 +477,17 @@ create a household (D-105).
   the device that made it, after it was made) is not detected, and a
   restoring device trusts the newest roster the server shows it (it is
   warned only if a later batch names a newer one).
+- **After "OK", a signer's claims only raise notices.** To stop a stolen
+  owner phone pausing sync forever, each device pauses sending at most once
+  per signing device (D-115). After the person presses OK, a later roster
+  change that this signer reports but the server hides is shown only as a
+  notice, not a pause. Take those notices seriously: check the device list
+  on an owner's device. A stolen owner phone can still add new owner
+  devices (each announced on every device), and each of those can pause
+  sending once.
+- **A failed sync during pairing drops the invitation.** If the sync the
+  owner's device runs while confirming a new device fails, start pairing
+  again.
 - **No forward secrecy within an epoch.** Keys change only when someone is
   removed. Whoever compromises a current device gets every epoch's key and
   can read the whole history, including old files the server still holds.

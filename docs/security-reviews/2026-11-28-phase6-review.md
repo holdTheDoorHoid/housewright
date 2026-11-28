@@ -577,3 +577,25 @@ These need either a code fix or an honest rewrite.
 - `restore: true` on a fresh removal re-opens the L3a race (owner-only).
 - With the paper lost and no owner device left, members stay in `epoch_ahead` waiting for good (documented).
 - `put_blob` still reads the quota (`usage()` with `SUM`) and writes in separate steps, so two parallel uploads can both pass the check.
+
+---
+
+## Final check (ddfb9cd, 30b0bc7, e3bfc0e)
+
+**Verdict: ship.** Nothing of Medium or higher remains.
+
+- **Q1: fixed.** My q1 test now shows one pause, then sending continues after the OK (`fork=false` on later rounds).
+  - A same-number claim must pass `verify_next` from version − 1.
+  - Its signer must be a manager in the newest verified roster.
+  - An OK'd signer never pauses sending again.
+  - The attacker can't reset this. A new device id needs a published roster version that adds it: every device is told, and removing an owner device needs the paper anyway. This is documented as "set up again".
+- **Q2: fixed.** My q2 test: overwriting your own copy at the quota now gets 507. The difference is charged, and the check and write happen under the database lock.
+- **Restore race: fixed.** With `restore`, a removal is refused if the server holds *more* batches from that device than the removal names.
+- **Pairing reorder (e3bfc0e).** The member record is pushed by the owner in the current epoch before the device is added. Nothing new leaks, and the H1 chain rules and M2 authorship rules are unchanged.
+- **Tests.** All sync tests pass (including `review` 12, `verify` 8, `verify2` 8), plus my q1/q2.
+
+### Low (one line each)
+
+- A stolen owner phone can add new owner devices (visible notices), each of which can pause sending once.
+- Once a signer is OK'd, a real roster the server hides is no longer flagged by pausing when that signer reports it, only by a notice. Worth one line in SECURITY.md.
+- If the pre-pairing `sync()` fails, `invite_confirm` drops the open invitation, and the person has to start pairing again.
