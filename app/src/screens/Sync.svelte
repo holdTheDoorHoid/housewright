@@ -107,10 +107,15 @@
   }
 
   async function newKey() {
-    if (!confirm('Make a new recovery key? The old one stops working straight away.')) return;
+    // The current key confirms it, so a stolen phone cannot lock the
+    // owner out (D-101).
+    const current = prompt(
+      'Making a new recovery key needs the current one (it is in the sealed volume of the house binder). Type it here. The old key stops working straight away.',
+    );
+    if (!current) return;
     busy = true;
     try {
-      const r = await call('sync_new_recovery_key');
+      const r = await call('sync_new_recovery_key', { recovery_key: current });
       recoveryKey = r.recovery_key;
       status = r.status;
     } catch (err) {
@@ -151,7 +156,7 @@
   async function checkInvite() {
     try {
       const p = await call('sync_invite_poll');
-      if (p.state !== 'waiting') stopPolling();
+      if (p.state === 'done' || p.state === 'failed' || (p.state === 'compare' && p.other_confirmed)) stopPolling();
       pair = p;
     } catch (err) {
       // Offline for a moment: keep trying quietly.
@@ -184,7 +189,15 @@
   }
 
   async function remove(d: SyncDevice) {
-    if (
+    let recovery_key: string | undefined;
+    if (d.role === 'owner') {
+      // Removing an owner's device needs the recovery key (D-101).
+      const k = prompt(
+        `Removing “${d.name}”, an owner's device, needs the household's recovery key (it is in the sealed volume of the house binder). Type it here. The device stops syncing straight away and cannot read anything added from now on.`,
+      );
+      if (!k) return;
+      recovery_key = k;
+    } else if (
       !confirm(
         `Remove “${d.name}”? It stops syncing straight away and cannot read anything added from now on. What is already on it stays there.`,
       )
@@ -192,7 +205,7 @@
       return;
     busy = true;
     try {
-      devices = await call('sync_remove_device', { id: d.id });
+      devices = await call('sync_remove_device', { id: d.id, recovery_key });
       toast({ text: `Removed “${d.name}”. The household key was changed.` }, 5000);
     } catch (err) {
       toast({ text: errorText(err) });
@@ -267,11 +280,8 @@
           <input id="srv" bind:value={server} placeholder="https://housewright.example.org" inputmode="url" autocomplete="url" required />
           <label for="dev">Name for this device</label>
           <input id="dev" bind:value={deviceName} required />
-          <details>
-            <summary class="small">The server asked for a registration token</summary>
-            <label for="tok">Registration token</label>
-            <input id="tok" bind:value={token} autocomplete="off" />
-          </details>
+          <label for="tok">Registration token <span class="muted">(printed by the server when it starts)</span></label>
+          <input id="tok" bind:value={token} autocomplete="off" />
           <button class="primary wide" type="submit" disabled={busy}>{busy ? 'Setting up…' : 'Turn on sync'}</button>
         </form>
       </div>
@@ -284,6 +294,17 @@
     <p>This device was removed from the household, so it no longer syncs. What is already here stays on this device.</p>
     <p><button onclick={stop}>Forget the sync settings on this device</button></p>
   {:else}
+    {#if status.notices.length > 0}
+      <div class="card" role="status" data-testid="notices">
+        <h2>Changes to your household's devices</h2>
+        <ul>
+          {#each status.notices as n, i (i)}<li class="small">{n.text}{#if n.at} <span class="muted">({when(n.at)})</span>{/if}</li>{/each}
+        </ul>
+        <p class="small muted">If you don't recognise one of these, remove that device and make a new recovery key.</p>
+        <button onclick={async () => (status = await call('sync_dismiss_notices'))}>OK</button>
+      </div>
+    {/if}
+    {#each status.warnings as w (w)}<p class="pill attention">{w}</p>{/each}
     <div class="card" aria-live="polite">
       <p>
         <strong>Sync is on</strong> with <span class="small">{status.server}</span>.
@@ -372,11 +393,17 @@
             <p class="muted small">Waiting for the other device…</p>
           {:else if pair?.state === 'compare'}
             <h2>Check the number</h2>
-            <p>“{pair.other_name}” wants to join. Its screen should show this number:</p>
+            <p>A device called “{pair.other_name}” wants to join. Its screen should show this number:</p>
             <p class="safety" data-testid="safety-number">{pair.safety_number}</p>
-            <p class="muted small">If the numbers are different, something is interfering: choose “They don't match” and nothing is shared.</p>
+            <p class="small">
+              Only say yes if the new device shows this same number. If it shows an error or a different number,
+              say no: nothing is shared.
+            </p>
+            {#if !pair.other_confirmed}
+              <p class="muted small" data-testid="waiting-new-device">Waiting for the new device to say the numbers match…</p>
+            {/if}
             <p class="row">
-              <button class="primary" onclick={() => answer(true)} disabled={busy}>They match</button>
+              <button class="primary" onclick={() => answer(true)} disabled={busy || !pair.other_confirmed}>They match</button>
               <button onclick={() => answer(false)} disabled={busy}>They don't match</button>
             </p>
           {:else if pair?.state === 'done'}

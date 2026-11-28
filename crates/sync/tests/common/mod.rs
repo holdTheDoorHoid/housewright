@@ -21,6 +21,7 @@ use tower::ServiceExt;
 pub const URL: &str = "http://127.0.0.1:1";
 
 pub struct Lab {
+    pub quota: std::sync::atomic::AtomicU64,
     pub dir: PathBuf,
     pub rt: Arc<tokio::runtime::Runtime>,
     pub app: Arc<Mutex<Router>>,
@@ -40,6 +41,7 @@ impl Lab {
                 .unwrap(),
         );
         let lab = Lab {
+            quota: std::sync::atomic::AtomicU64::new(u64::MAX),
             dir,
             rt,
             app: Arc::new(Mutex::new(Router::new())),
@@ -57,6 +59,10 @@ impl Lab {
         let mut cfg = Config::new(&self.dir);
         let c = self.clock.clone();
         cfg.clock = Arc::new(move || c.now_ms());
+        let q = self.quota.load(Ordering::SeqCst);
+        if q != u64::MAX {
+            cfg.quota_bytes = q;
+        }
         *self.app.lock().unwrap() = housewright_server::router(AppState::open(cfg).unwrap());
     }
 
@@ -66,6 +72,7 @@ impl Lab {
             app: self.app.clone(),
             online,
             fail_after: Arc::new(AtomicUsize::new(usize::MAX)),
+            max_response: Arc::new(AtomicUsize::new(usize::MAX)),
             log: self.log.clone(),
         }
     }
@@ -78,6 +85,7 @@ impl Lab {
         let online = Arc::new(AtomicBool::new(true));
         let t = self.transport(online.clone());
         let fail_after = t.fail_after.clone();
+        let max_response = t.max_response.clone();
         Device {
             name: name.into(),
             store: Store::open_in_memory(Box::new(clock.clone())).unwrap(),
@@ -85,6 +93,7 @@ impl Lab {
             client: SyncClient::new(Box::new(t)),
             online,
             fail_after,
+            max_response,
             clock,
         }
     }
@@ -115,6 +124,8 @@ pub struct LabTransport {
     online: Arc<AtomicBool>,
     /// Fail (as if the connection dropped) after this many more requests.
     pub fail_after: Arc<AtomicUsize>,
+    /// Refuse answers bigger than this (a small phone's limit).
+    pub max_response: Arc<AtomicUsize>,
     log: Arc<Mutex<Vec<HttpRequest>>>,
 }
 
@@ -131,7 +142,11 @@ impl Transport for LabTransport {
             self.fail_after.store(left - 1, Ordering::SeqCst);
         }
         self.log.lock().unwrap().push(req.clone());
-        send_to(&self.rt, &self.app.lock().unwrap().clone(), req)
+        let r = send_to(&self.rt, &self.app.lock().unwrap().clone(), req)?;
+        if r.body.len() > self.max_response.load(Ordering::SeqCst) {
+            return Err("response too large".into());
+        }
+        Ok(r)
     }
 }
 
@@ -182,6 +197,7 @@ pub struct Device {
     pub client: SyncClient,
     pub online: Arc<AtomicBool>,
     pub fail_after: Arc<AtomicUsize>,
+    pub max_response: Arc<AtomicUsize>,
     pub clock: ManualClock,
 }
 

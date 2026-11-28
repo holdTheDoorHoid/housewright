@@ -20,6 +20,8 @@ function status(over: Partial<SyncStatus> = {}): SyncStatus {
     pending_changes: 0,
     recovery_confirmed: false,
     refused: 0,
+    notices: [],
+    warnings: [],
     ...over,
   };
 }

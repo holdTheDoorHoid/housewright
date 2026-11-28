@@ -1,6 +1,7 @@
 # Security: sync and encryption
 
-Status: Phase 6, 2026-11-28. Written for the owner first (plain language),
+Status: Phase 6, 2026-11-28; revised the same day after the independent
+review ([security-reviews/2026-11-28-phase6-review.md](security-reviews/2026-11-28-phase6-review.md)). Written for the owner first (plain language),
 then for a reviewer (exact constructions and byte layouts). Decisions are
 D-89 to D-98 in [DECISIONS.md](DECISIONS.md). Code: `crates/crypto` (every
 primitive and format), `crates/sync` (the client), `crates/server` (the
@@ -40,29 +41,47 @@ people's and devices' names, the household's name, the address.
 **Adding a device or person.** An owner's device shows a code (and a QR
 code). The new device types it. The code is good once, for ten minutes, and
 is not the household's key: it only lets the two devices talk privately
-through the server. Both screens then show the same six-digit number; the
-person checks they match. If someone were interfering, the numbers would
-differ and nothing would be shared.
+through the server. Both screens then show the same six-digit number. The
+new device's person says "they match" first; only then can the owner say
+yes. If someone were interfering, the numbers would differ and nothing
+would be shared, provided the people actually compare them: the owner's
+screen says to say no if the new device shows an error or another number.
 
 **Removing a device or person.** An owner removes it from the device list.
 The server stops serving it at once, and the household gets a new key, so
-the removed device cannot read anything added afterwards. What was already
-on that device stays on it: removing cannot reach into a phone and delete
-data, and nothing can.
+the removed device cannot read anything added afterwards, and cannot write
+anything new: every device refuses its batches except the ones it really
+sent before removal. Two honest limits: what was already on that device
+stays on it (removing cannot reach into a phone and delete data); and if
+the person removed also controls the sync server, the server could keep
+the removal from your other devices for a while. Devices notice when
+another device knows of a newer device list than the server gives them,
+and then stop sending changes until it arrives (D-103), but a server that
+hides it from every device at once is not detected. Removing an owner's
+device needs the recovery key (D-101). Every device shows a notice when a
+device is added or removed elsewhere.
 
 **The recovery key** is shown once when sync is set up, and can be printed
 on the sealed volume of the house binder. It is the only way to get the
 household back if every device is lost. Housewright does not keep a copy,
 on the device or the server. **If every device and the recovery key are
-lost, the data is gone; nobody can recover it.** If the paper is lost or
-seen by the wrong person, make a new recovery key (Settings, Sync and
-devices); the old one stops working.
+lost, the data is gone; nobody can recover it.** It is also the
+household's master key: whoever holds it can read everything, add a device
+and, with that device, remove the others. If the paper is seen by the wrong
+person, make a new recovery key at once (Settings, Sync and devices; this
+needs the current key), check the device list and remove anything unknown.
+If the paper is lost (not stolen), the owner cannot make a new one without
+it: make a full backup, stop syncing, and set sync up again (a new
+household on the server; other devices pair again).
 
 **A stolen phone.** If it is unlocked (or its lock is weak), the thief can
 see everything on it, as with any app: the household's data is stored on
 the device so the app works offline. Remove that phone from another
-device's device list as soon as you can: it then gets nothing new. Use a
-screen lock. (Encrypting the database on the phone would not help against a
+device's device list as soon as you can (this needs the recovery key if
+it was an owner's phone): it then gets nothing new. A stolen owner's phone
+can add devices and remove members' devices, but it cannot remove the
+owner's other devices or replace the recovery key without the paper; every
+device is told about what it does. Use a screen lock. (Encrypting the database on the phone would not help against a
 thief who can unlock the phone, because the app has to be able to open it.)
 
 **Wrong clocks.** Changes carry the time they were made. A device whose
@@ -76,13 +95,13 @@ clock is right.
 
 | Who | Can | Cannot (by design) |
 |---|---|---|
-| Server operator, or anyone who copies the server's disk | see the metadata above; delete or withhold data (denial of service); replay old data it holds | read any household content; change content undetected; add a device to a household; impersonate a device; make devices accept an operation from outside the household; move data between households or key epochs |
+| Server operator, or anyone who copies the server's disk | see the metadata above; delete or withhold data, including hiding a new device list from every device at once (denial of service, and delayed removals); replay old data it holds; make chosen devices refuse a batch by lying about receive times | read any household content; change content undetected; add a device to a household; impersonate a device; make devices accept an operation from outside the household, or a second batch under a device's used number; move data between households or key epochs |
 | Network attacker (no TLS, or broken TLS) | the same as the operator, plus see who talks to which server | the same as the operator: TLS protects metadata only, the content is end-to-end encrypted anyway |
 | Someone who sees the pairing code (a photo of the QR) | try to join in the ten minutes before the real device | join unnoticed: the safety number would not match (see "Pairing") |
-| A removed member | keep what was already on their device | read anything added after removal; push or pull through the server |
-| A household member (not owner) | read everything (they hold the household key); write changes in their own name | add or remove devices; write changes in another member's name (refused by every device) |
-| A thief with an unlocked device | read everything on it; act as that device until it is removed | anything after removal |
-| A thief with the recovery key paper and the server address | read everything; add a device as owner | anything after the owner makes a new recovery key |
+| A removed member | keep what was already on their device; with the help of the server operator, read what other devices still seal under the old key while the server hides the removal from all of them (D-103) | read anything sealed after the other devices know of the removal; push or pull through the server; inject batches through a colluding server (refused by every device, D-99) |
+| A household member | read everything (they hold the household key); write changes in their own name, including edits and deletes of shared things (a delete is permanent on every device; only a backup brings it back) | add or remove devices; write changes, or records ("done by"), in another member's name; replace another member's records (all refused by every device, D-104) |
+| A thief with an unlocked device | read everything on it; act as that device until it is removed; if an owner's: add devices, remove members' devices (everyone is told) | remove the owner's other devices or replace the recovery key without the paper (D-101); anything after removal |
+| A thief with the recovery key paper and the server address | read everything; add a device as owner; with that device and the paper, remove the owner's devices and replace the key, i.e. take the household over | do it unseen: every remaining device is told; nothing, if the owner replaced the key first |
 
 Out of scope for Phase 6: a compromised device operating system, attacks
 on the app's update channel, side channels on the device, and a server that
@@ -183,11 +202,25 @@ in order (`SyncClient::accept`):
    (so a batch cannot be moved to another household, epoch, device or
    sequence number; it would fail to decrypt even if an insider re-signed it);
 4. every operation's clock ≤ `max_wall_ms` ≤ server receive time + 5 min;
-5. unless the author device is an owner's, every operation's `author` is
-   the member the device belongs to.
+5. every operation's `author`, and the `by` of every record, is the member
+   the device belongs to (owners included); the only exception is history
+   from before sync was set up (operations older than the genesis roster),
+   sent once by the founding device.
 
-A batch that fails is skipped by every device the same way (the checks use
-only data every device sees identically), so devices still converge.
+Before those content checks, the chain rules (D-99): each device's batches
+form a hash chain (`prev` in the signed header and the AAD). A receiver
+accepts a device's batch only as the next link after the last one it
+accepted from it, and refuses any second batch under a number already used
+(counted as tampering). A removed device's batches are held until the
+whole chain ending at the `last_hash` recorded in the roster is present,
+then applied in order; anything else from it is refused.
+
+A batch that fails is skipped by every device the same way as long as the
+server shows every device the same batches in the same order (an honest
+server does; a server that reorders or equivocates can make devices
+disagree, see "Known weaknesses"). An authentic batch this version cannot
+read (from a newer app) is kept and retried after an update, never
+dropped.
 Operations then go through `Store::apply_synced_ops`, which repeats the
 clock guard per operation and records them as received (never pushed back).
 
@@ -203,8 +236,11 @@ crash or dropped connection sends the same bytes; the server deduplicates by
 - Content: `"HWB1" ‖ u32be(epoch) ‖ nonce(24) ‖ XChaCha20-Poly1305(blob key of epoch, nonce, pad(bytes, 4096), aad)`,
   `aad = transcript("housewright/v1/blob", space, name, u32be(epoch))`.
 - After decrypting, the receiver checks SHA-256 of the plaintext against
-  the hash in the attachment operation (which is signed and encrypted), so
-  a file cannot be swapped even by a member.
+  the hash in the attachment record (signed, encrypted, written once and
+  bound to its author, D-104), so a file cannot be swapped by the server.
+  A member can still attach a different file of their own; they cannot
+  change someone else's attachment. A file that fails the check is deleted
+  from the server so a device holding the real one uploads it again.
 - Photos' thumbnails and files up to 4 MB are fetched during sync; larger
   ones when opened.
 - Files on the device stay as they were in Phase 4 (plain files in app
@@ -360,18 +396,42 @@ buffers holding plaintext operations are not all wiped.
   with a middleman who has the code;
 - a member device writing in the owner's name is refused.
 
+### Size limits (D-100)
+
+The server refuses a batch over 1 MiB of ciphertext; clients keep batches
+under 512 KiB and keep a single change too large to send on the device
+(said plainly). Pull pages stop at 8 MB; a client that cannot read a page
+asks for fewer batches, down to one; a stored batch over the limit is
+skipped and counted, never fetched forever. Each household has a storage
+quota (2 GB by default) and, by default, a registration token is needed to
+create a household (D-105).
+
 ### Known weaknesses and open questions
 
-- **Equivocation and rollback.** A malicious server can show different
-  devices different roster versions or withhold the newest one (a fork), or
-  hold back batches. Devices detect breaks in the chain but not a consistent
-  fork. A device that was offline through a removal could keep sealing new
-  changes under the old epoch if the server hid the newer roster; the
-  removed device could then read them. Fix later: devices gossip roster
-  hashes inside encrypted batches (the next batch from any member would
-  expose a fork). Not built.
-- **Withheld batches**: per-device sequence numbers would let receivers
-  notice gaps; they are tracked (`seen`) but gaps are not yet reported.
+- **Equivocation and rollback.** A malicious server can withhold the
+  newest roster version or hold back batches. Each batch now carries its
+  author's newest roster version and hash inside the encryption (D-103):
+  a device that sees a version it cannot get stops sealing, and a
+  different hash for a version it has is flagged as a fork. What remains:
+  a server that hides a version from every device at once (including from
+  the device that made it, after it was made) is not detected, and a
+  restoring device trusts the newest roster the server shows it (it is
+  warned only if a later batch names a newer one).
+- **No forward secrecy within an epoch.** Keys change only when someone is
+  removed. Whoever compromises a current device gets every epoch's key and
+  can read the whole history, including old files the server still holds.
+- **Recovery key = master key** (see the threat table). The cosignature
+  rule (D-101) stops a stolen phone; it cannot stop someone who has the
+  paper. Notices on every device make a takeover visible, not impossible.
+- **Deletes are permanent.** Any member's delete wins over every edit on
+  every device; only a backup brings the thing back.
+- **Record conflicts are first-applied wins** (D-104). Honest devices
+  never collide (record ids are random); an attacker who could guess an id
+  before it was sent, or a server that reorders batches, could make devices
+  disagree about one record. A file import replays history in clock order
+  and could choose differently in that (attack-only) case.
+- **Withheld batches**: a gap in a device's chain is refused (and counted),
+  not yet explained to the person.
 - **Metadata** listed above is visible to the server, including the time of
   each batch's newest change (`max_wall_ms`).
 - **Limited members are limited only in the interface** (D-98): their
@@ -386,8 +446,9 @@ buffers holding plaintext operations are not all wiped.
 - **The PDF with the recovery key**, printed at setup, passes through the
   platform's viewer (Android keeps it in the app's cache until the next
   shared file replaces it; the browser in a blob URL until the tab closes).
-- **No quota** per household on the server yet; `--max-households` caps
-  households and requests are size-limited.
+- **Server robustness**: SQLite sits behind one lock; heavy handlers run
+  on blocking threads and files are streamed, but a very busy server would
+  want a connection pool.
 - **Server restored from an old backup**: devices' cursors would be ahead of
   it; they would miss nothing they already have, but batches acknowledged
   after the backup would be gone from the server (devices still hold them

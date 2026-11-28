@@ -1473,7 +1473,9 @@ dependencies = [
  "rustls",
  "serde",
  "serde_json",
+ "subtle",
  "tokio",
+ "tokio-util",
  "tower",
  "tower-http",
 ]
@@ -1496,6 +1498,7 @@ dependencies = [
  "tokio",
  "tower",
  "ureq",
+ "url",
  "uuid",
  "zeroize",
 ]

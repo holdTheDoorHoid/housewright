@@ -312,7 +312,7 @@ fn a_removed_device_cannot_pull_or_read_new_data() {
         .id;
     let old_chain = device_chain(&b);
     a.client
-        .remove_device(&mut a.store, &mut a.blobs, &b_id)
+        .remove_device(&mut a.store, &mut a.blobs, &b_id, None)
         .unwrap();
     assert_eq!(
         device_chain(&a).current_epoch(),
@@ -392,11 +392,14 @@ fn recovery_key_restores_everything_on_a_fresh_device() {
         .unwrap();
     fresh
         .client
-        .remove_device(&mut fresh.store, &mut fresh.blobs, &lost.id)
+        .remove_device(&mut fresh.store, &mut fresh.blobs, &lost.id, Some(&key))
         .unwrap();
     assert!(matches!(a.try_sync(), Err(SyncError::Removed)));
     // A replaced recovery key stops working.
-    let new_key = fresh.client.new_recovery_key(&mut fresh.store).unwrap();
+    let new_key = fresh
+        .client
+        .new_recovery_key(&mut fresh.store, &key)
+        .unwrap();
     let mut again = lab.device("Again");
     assert!(
         again

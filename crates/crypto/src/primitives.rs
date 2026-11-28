@@ -147,7 +147,8 @@ pub fn unpad(padded: &[u8]) -> Result<Vec<u8>> {
         .try_into()
         .map_err(|_| bad())?;
     let len = u32::from_be_bytes(len_bytes) as usize;
-    let body = padded.get(4..4 + len).ok_or_else(bad)?;
+    let end = len.checked_add(4).ok_or_else(bad)?;
+    let body = padded.get(4..end).ok_or_else(bad)?;
     Ok(body.to_vec())
 }
 

@@ -807,6 +807,65 @@ someone as Limited. A scoped key per assignee (only the operations of their
 tasks encrypted to it) would also need scoped items, rooms, attachments and
 history, and is left for later (Q-10).
 
+## Phase 6 security review fixes (proposed 2026-11-28)
+
+After the independent review
+([security-reviews/2026-11-28-phase6-review.md](security-reviews/2026-11-28-phase6-review.md)).
+
+**D-99 Each device's batches form a hash chain (Proposed).** Fixes H1.
+Every batch names the hash of its device's previous batch, inside the
+signed header and the AAD. Receivers accept only the next link, and refuse
+a second batch under a used number everywhere, not only on the server.
+Removing a device records the hash of its last batch; that device's batches
+are held until the chain ending there is complete, so a removed device and
+a colluding server cannot add anything. Nobody, owners included, writes
+operations in another member's name; the founding device's history from
+before sync is the one exception.
+
+**D-100 Size limits that cannot wedge sync (Proposed).** Fixes H2. The
+server refuses batches over 1 MiB of ciphertext and pages pulls by bytes
+(8 MB) as well as count; clients halve the page size when a page cannot be
+read, skip (and count) a stored batch too big to send, and keep a single
+change too big to send on the device with a calm notice.
+
+**D-101 Destructive device changes need the recovery key (Proposed).**
+Answers M3. A roster version that removes an owner's device or replaces the
+recovery key must carry a second signature by the current recovery identity
+(the person types the recovery key); the recovery identity itself may only
+add devices. Enforced by every client and the server. Every device shows a
+notice for each device added or removed elsewhere. Chosen over a cool-off
+window (which needs trustworthy time and more machinery) because it stops a
+stolen phone outright. Remaining risk, documented: the paper is the master
+key; a lost (not stolen) paper cannot be replaced, and the way out is a
+backup and a fresh sync setup. Revisit with platform unlock (biometric/PIN)
+before these actions when Keystore wrapping lands.
+
+**D-102 The new device confirms first (Proposed).** Fixes L6. The new
+device sends a sealed "numbers match" before the owner's device can add it;
+the owner's screen names the device and says to say no if the new device
+shows an error or another number.
+
+**D-103 Roster gossip (Proposed).** Answers M1. Each sealed batch carries
+its author's newest roster version and hash. A device that sees a version
+the server will not give it stops sealing new changes (RosterHidden) and
+says so; a different hash for a version it has is flagged as a fork.
+Restoring devices get the same check from the batches they pull. Not
+covered: a server hiding a version from every device at once.
+
+**D-104 Records are written once and bound to their author (Proposed).**
+Fixes M2; refines D-52. A record's `by` must be the writing device's
+member, and a second record for an id that already has one is ignored
+(first applied wins, whatever clock it claims) and counted as tampering,
+as is an op id reused with different content. Honest devices never collide
+because record and op ids are random.
+
+**D-105 The server needs a registration token by default (Proposed).**
+Answers Q-08 provisionally (the owner may revisit). The server makes a
+token on first start, keeps it in its data folder and prints it;
+`--open-registration` turns it off. Each household has a storage quota
+(2 GB by default), and the rate limiter counts IPv6 by /64, keeps at most
+10,000 addresses, and has a global bucket per purpose.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -825,10 +884,9 @@ history, and is left for later (Q-10).
 - **Q-07** The binder's emergency-page wording (D-81) is our own, generic
   guidance. Proposed: have it read once by someone with fire-service or
   gas-utility experience before a public release.
-- **Q-08** Should a self-hosted server be open to anyone who can reach it
-  (capped at 20 households, the default) or need a registration token by
-  default? Proposed: open with the cap, token optional, because a home
-  server is usually not reachable by strangers and a token is one more step.
+- **Q-08** Should a self-hosted server be open to anyone who can reach it,
+  or need a registration token by default? Provisionally answered by D-105
+  (token on by default, after the security review); the owner may revisit.
 - **Q-09** Allow plain `http://` to a server on the home network
   (192.168.x.x) in release builds? Proposed: no (D-96); self-hosters put
   Caddy in front, as SELF-HOSTING.md shows.

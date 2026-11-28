@@ -40,6 +40,7 @@ pub const SYNC_COMMANDS: &[&str] = &[
     "sync_remove_device",
     "sync_new_recovery_key",
     "sync_stop",
+    "sync_dismiss_notices",
 ];
 
 /// These work before a household exists on this device.
@@ -69,6 +70,17 @@ pub struct SyncStatusOut {
     pub pending_changes: u64,
     pub recovery_confirmed: bool,
     pub refused: u64,
+    /// Changes to the household's devices made elsewhere (M3).
+    pub notices: Vec<NoticeOut>,
+    /// Plain words when something needs attention (a hidden or forked
+    /// device list, changes too big to send, batches too big to fetch).
+    pub warnings: Vec<String>,
+}
+
+#[derive(Serialize)]
+pub struct NoticeOut {
+    pub at: Option<String>,
+    pub text: String,
 }
 
 #[derive(Deserialize)]
@@ -122,6 +134,19 @@ struct JoinArgs {
     server: String,
     code: String,
     device_name: String,
+}
+
+#[derive(Deserialize)]
+struct RemoveArgs {
+    id: String,
+    #[serde(default)]
+    recovery_key: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct KeyArgs {
+    #[serde(default)]
+    recovery_key: String,
 }
 
 #[derive(Deserialize)]
@@ -195,6 +220,33 @@ impl Api {
             },
             recovery_confirmed: st.recovery_confirmed,
             refused: st.rejected_batches + st.refused_future_ops,
+            notices: st
+                .notices
+                .iter()
+                .map(|n| NoticeOut {
+                    at: ts(Some(n.at_ms)),
+                    text: n.text.clone(),
+                })
+                .collect(),
+            warnings: {
+                let mut w = Vec::new();
+                if st.fork {
+                    w.push("The sync server showed this device a different history of the household's devices than another device saw. Changes made here are kept on this device. Check who runs the server.".to_string());
+                }
+                if st.unsent_too_large > 0 {
+                    w.push(format!(
+                        "{} change(s) were too large to send and stay on this device only.",
+                        st.unsent_too_large
+                    ));
+                }
+                if st.skipped_too_large > 0 {
+                    w.push(format!(
+                        "{} batch(es) on the server were too large to fetch and were skipped.",
+                        st.skipped_too_large
+                    ));
+                }
+                w
+            },
         })
     }
 
@@ -353,18 +405,28 @@ impl Api {
                 ok(self.status()?)
             }
             "sync_remove_device" => {
-                let a: IdArgs = args(a)?;
+                let a: RemoveArgs = args(a)?;
                 let c = self.sync.as_mut().ok_or_else(unavailable)?;
-                c.remove_device(&mut self.store, self.blobs.as_mut(), &a.id)?;
+                c.remove_device(
+                    &mut self.store,
+                    self.blobs.as_mut(),
+                    &a.id,
+                    a.recovery_key.as_deref(),
+                )?;
                 self.sync_call("sync_devices", Value::Null)
             }
             "sync_new_recovery_key" => {
+                let a: KeyArgs = args(a)?;
                 let c = self.sync.as_mut().ok_or_else(unavailable)?;
-                let key = c.new_recovery_key(&mut self.store)?;
+                let key = c.new_recovery_key(&mut self.store, &a.recovery_key)?;
                 ok(KeyOut {
                     recovery_key: key.to_string(),
                     status: self.sync_status()?,
                 })
+            }
+            "sync_dismiss_notices" => {
+                SyncClient::dismiss_notices(&self.store)?;
+                ok(self.sync_status()?)
             }
             "sync_stop" => {
                 let store = &self.store;

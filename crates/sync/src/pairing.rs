@@ -17,6 +17,7 @@ use housewright_core::blobs::BlobStore;
 use housewright_core::ids::MemberId;
 use housewright_core::model::{Member, Role};
 use housewright_core::store::Store;
+use housewright_crypto::batch::ZERO_HASH;
 use housewright_crypto::encoding::{hex, unhex_array};
 use housewright_crypto::pairing::{PairingCode, Part, commitment, safety_number};
 use housewright_crypto::primitives::random;
@@ -80,6 +81,9 @@ pub enum PairState {
     Waiting,
     /// Compare this number with the other screen.
     Compare {
+        /// The new device has said its number matches (D-102). The owner's
+        /// "yes" only counts after that.
+        other_confirmed: bool,
         safety_number: String,
         other_name: String,
     },
@@ -213,7 +217,7 @@ impl SyncClient {
                 self.invite = None;
                 Ok(PairState::Failed { reason: "The other device said the numbers did not match, so nothing was shared. Start again.".into() })
             }
-            "joined" | "revealed" => {
+            "joined" | "revealed" | "confirmed" => {
                 if inv.joiner.is_none() {
                     let sealed = s
                         .request
@@ -245,7 +249,14 @@ impl SyncClient {
                 }
                 let inv = self.invite.as_ref().expect("still open");
                 let j = inv.joiner.as_ref().expect("set above");
+                let other_confirmed = s.state == "confirmed"
+                    && s.confirm
+                        .as_deref()
+                        .and_then(|c| inv.code.open(Part::Confirm, c).ok())
+                        .as_deref()
+                        == Some(b"numbers match".as_slice());
                 Ok(PairState::Compare {
+                    other_confirmed,
                     safety_number: safety_number(&id, &inv.r, &st.secret.public(), &j.device),
                     other_name: j.label.clone(),
                 })
@@ -280,6 +291,23 @@ impl SyncClient {
                 reason: "Cancelled. Nothing was shared with the other device.".into(),
             });
         }
+        // The new device must have said "they match" first (D-102).
+        let path = format!("/v1/s/{}/invitations/{id}", st.config.space);
+        let state: InvitationState =
+            from_json(&self.call(store, &server, Some(&st.secret), "GET", &path, vec![])?)?;
+        let confirmed = state.state == "confirmed"
+            && state
+                .confirm
+                .as_deref()
+                .and_then(|c| inv.code.open(Part::Confirm, c).ok())
+                .as_deref()
+                == Some(b"numbers match".as_slice());
+        if !confirmed {
+            self.invite = Some(inv);
+            return Err(SyncError::Invalid(
+                "Wait until the new device has said the numbers match too.".into(),
+            ));
+        }
         let joiner = inv
             .joiner
             .clone()
@@ -312,7 +340,7 @@ impl SyncClient {
                 label: seal_label(&chain, latest.space, joiner.device.id, &joiner.label)?,
             });
             next.sort();
-            match self.publish_roster(store, &mut st, next, &chain, None, Some(id.clone())) {
+            match self.publish_roster(store, &mut st, next, &chain, None, Some(id.clone()), None) {
                 Ok(()) => break,
                 Err(SyncError::Server { code, .. }) if code == "conflict" && attempt == 0 => {
                     continue;
@@ -466,6 +494,7 @@ impl SyncClient {
         let j = self.join.as_ref().expect("still joining");
         if !j.confirmed {
             return Ok(PairState::Compare {
+                other_confirmed: false,
                 safety_number: safety_number(
                     &j.code.invitation_id(),
                     j.r.as_ref().expect("set above"),
@@ -506,7 +535,16 @@ impl SyncClient {
         if j.r.is_none() {
             return Ok(PairState::Waiting);
         }
-        j.confirmed = true;
+        if !j.confirmed {
+            let confirm = j.code.seal(Part::Confirm, b"numbers match")?;
+            let path = format!("/v1/invitations/{}/confirm", j.code.invitation_id());
+            let server = j.server.clone();
+            let body = serde_json::to_vec(&JoinConfirm { confirm }).expect("serialises");
+            self.call(store, &server, None, "POST", &path, body)?;
+            if let Some(j) = self.join.as_mut() {
+                j.confirmed = true;
+            }
+        }
         self.join_poll(store, blobs)
     }
 
@@ -575,7 +613,8 @@ impl SyncClient {
             push_cursor: 0,
             next_device_seq: 1,
             pending: None,
-            seen: Default::default(),
+            heads: Default::default(),
+            own_head: ZERO_HASH.to_string(),
             status: SyncStatus {
                 recovery_confirmed: true,
                 ..Default::default()

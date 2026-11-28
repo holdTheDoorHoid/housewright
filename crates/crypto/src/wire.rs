@@ -96,7 +96,12 @@ pub struct Pulled {
     /// When the server received it (its own clock): the clock guard's
     /// reference, the same for every receiver (D-93).
     pub received_ms: u64,
-    pub batch: SealedBatch,
+    /// Absent when the stored batch is larger than the server will send
+    /// (`oversize`); the client skips it and says so (D-100).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch: Option<SealedBatch>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub oversize: bool,
 }
 
 /// `GET /v1/s/{space}/ops?after=S&limit=L`
@@ -153,12 +158,22 @@ pub struct JoinRequest {
     pub request: Vec<u8>,
 }
 
+/// `POST /v1/invitations/{id}/confirm`: the new device says the numbers
+/// match (sealed with the pairing code, D-102).
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct JoinConfirm {
+    #[serde(with = "b64_vec")]
+    pub confirm: Vec<u8>,
+}
+
 /// `GET /v1/s/{space}/invitations/{id}` (owners).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InvitationState {
     pub state: String,
     #[serde(default, skip_serializing_if = "Option::is_none", with = "opt_b64")]
     pub request: Option<Vec<u8>>,
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "opt_b64")]
+    pub confirm: Option<Vec<u8>>,
 }
 
 /// `POST /v1/s/{space}/invitations/{id}/reveal` (owners).
@@ -190,6 +205,16 @@ pub struct Offer {
     pub commit: String,
     pub household_name: String,
     pub expires_ms: u64,
+}
+
+/// What a sealed batch holds (D-103): the author's newest known roster
+/// version and its hash (so devices notice a roster the server is hiding
+/// from them), then the operations.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct BatchBody {
+    pub roster_version: u64,
+    pub roster_hash: String,
+    pub ops: serde_json::Value,
 }
 
 /// Inside the sealed join request.

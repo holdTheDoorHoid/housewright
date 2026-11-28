@@ -10,7 +10,7 @@ use axum::extract::{ConnectInfo, FromRequestParts, Path, Query, State};
 use axum::http::request::Parts;
 use axum::http::{HeaderMap, Method, StatusCode, Uri};
 use axum::response::{IntoResponse, Response};
-use housewright_crypto::batch::{SealedBatch, verify_batch};
+use housewright_crypto::batch::{MAX_BATCH_CT, SealedBatch, ZERO_HASH, batch_hash, verify_batch};
 use housewright_crypto::roster::{
     DeviceRole, RosterBody, SignedRoster, verify_genesis, verify_next,
 };
@@ -23,6 +23,13 @@ use serde::Deserialize;
 use crate::{ApiErr, AppState, Authed, authenticate, device_of, load_device};
 
 type R<T> = Result<T, ApiErr>;
+
+/// SQLite and file work runs off the async worker threads (L5).
+async fn blocking<T: Send + 'static>(f: impl FnOnce() -> R<T> + Send + 'static) -> R<T> {
+    tokio::task::spawn_blocking(f)
+        .await
+        .map_err(|_| internal())?
+}
 
 /// The client's address, for rate limiting.
 pub struct ClientIp(pub String);
@@ -152,10 +159,24 @@ pub async fn create_space(
     headers: HeaderMap,
     body: Bytes,
 ) -> R<StatusCode> {
+    blocking(move || create_space_sync(State(s), ip, method, uri, headers, body)).await
+}
+
+fn create_space_sync(
+    State(s): State<AppState>,
+    ip: ClientIp,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<StatusCode> {
     s.limit("create", &ip.0)?;
     let req: CreateSpace = json(&body)?;
     if let Some(token) = &s.cfg().registration_token
-        && req.registration_token.as_deref() != Some(token.as_str())
+        && !bool::from(subtle::ConstantTimeEq::ct_eq(
+            req.registration_token.as_deref().unwrap_or("").as_bytes(),
+            token.as_bytes(),
+        ))
     {
         return Err(ApiErr::forbidden(
             "this server needs a registration token to add a household",
@@ -271,6 +292,17 @@ pub async fn update_roster(
     headers: HeaderMap,
     body: Bytes,
 ) -> R<StatusCode> {
+    blocking(move || update_roster_sync(State(s), Path(space), method, uri, headers, body)).await
+}
+
+fn update_roster_sync(
+    State(s): State<AppState>,
+    Path(space): Path<String>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<StatusCode> {
     let space = space_id(&space)?;
     let me = device_of(&s, &method, &uri, &headers, &body, space)?;
     need_manager(&me)?;
@@ -324,6 +356,34 @@ pub async fn update_roster(
             return Err(ApiErr::bad("an envelope is missing"));
         }
     }
+    // A removal must name the device's real last batch (L3a): if it has
+    // sent more since the remover last synced, the remover must catch up.
+    for r in &next.removed {
+        if prev.find_removed(r.entry.device.id).is_some() {
+            continue;
+        }
+        let stored: Option<(i64, String)> = conn
+            .query_row(
+                "SELECT device_seq, data FROM batches WHERE space = ?1 AND device = ?2 ORDER BY device_seq DESC LIMIT 1",
+                params![space.to_string(), r.entry.device.id.to_string()],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .optional()?;
+        let (seq, hash) = match stored {
+            Some((seq, data)) => {
+                let b: SealedBatch = serde_json::from_str(&data).map_err(|_| internal())?;
+                (seq as u64, batch_hash(&b).map_err(|_| internal())?)
+            }
+            None => (0, ZERO_HASH.to_string()),
+        };
+        if seq != r.last_seq || hash != r.last_hash {
+            return Err(ApiErr::new(
+                StatusCode::CONFLICT,
+                "removal_stale",
+                "that device sent changes since this device last synced; sync and try again",
+            ));
+        }
+    }
     let recovery_changed =
         prev.recovery().map(|r| r.device.id) != next.recovery().map(|r| r.device.id);
     if recovery_changed != req.anchor.is_some() {
@@ -374,7 +434,7 @@ pub async fn update_roster(
     if let Some(inv) = &req.invitation {
         // Pairing finished: keep only the state, drop the sealed messages.
         tx.execute(
-            "UPDATE invitations SET state = 'accepted', offer = X'', request = NULL, reveal = NULL
+            "UPDATE invitations SET state = 'accepted', offer = X'', request = NULL, reveal = NULL, confirm = NULL
              WHERE id = ?1 AND space = ?2",
             params![inv, space.to_string()],
         )?;
@@ -414,6 +474,17 @@ pub async fn push_ops(
     headers: HeaderMap,
     body: Bytes,
 ) -> R<Json<PushResult>> {
+    blocking(move || push_ops_sync(State(s), Path(space), method, uri, headers, body)).await
+}
+
+fn push_ops_sync(
+    State(s): State<AppState>,
+    Path(space): Path<String>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<Json<PushResult>> {
     let space = space_id(&space)?;
     let me = device_of(&s, &method, &uri, &headers, &body, space)?;
     if me.role == DeviceRole::Recovery {
@@ -434,6 +505,13 @@ pub async fn push_ops(
         if h.epoch > epoch {
             return Err(ApiErr::bad(
                 "a batch uses a key epoch the household does not have",
+            ));
+        }
+        if b.ct.len() > MAX_BATCH_CT {
+            return Err(ApiErr::new(
+                StatusCode::PAYLOAD_TOO_LARGE,
+                "too_large",
+                "a batch is larger than the server accepts",
             ));
         }
         verify_batch(b, &public).map_err(|_| ApiErr::bad("a batch signature did not verify"))?;
@@ -474,8 +552,45 @@ pub async fn push_ops(
             |r| r.get(0),
         )?;
         if reused {
-            return Err(ApiErr::conflict(
+            return Err(ApiErr::new(
+                StatusCode::CONFLICT,
+                "seq_reused",
                 "this device already sent a different batch with that number",
+            ));
+        }
+        // Each device's batches form a hash chain (D-99).
+        let prev_hash =
+            if h.device_seq <= 1 {
+                Some(ZERO_HASH.to_string())
+            } else {
+                let data: Option<String> = tx
+                .query_row(
+                    "SELECT data FROM batches WHERE space = ?1 AND device = ?2 AND device_seq = ?3",
+                    params![space.to_string(), me.id.to_string(), (h.device_seq - 1) as i64],
+                    |r| r.get(0),
+                )
+                .optional()?;
+                match data {
+                    Some(d) => {
+                        let pb: SealedBatch = serde_json::from_str(&d).map_err(|_| internal())?;
+                        Some(batch_hash(&pb).map_err(|_| internal())?)
+                    }
+                    None => None,
+                }
+            };
+        if prev_hash.as_deref() != Some(h.prev.as_str()) {
+            return Err(ApiErr::new(
+                StatusCode::CONFLICT,
+                "chain",
+                "this batch does not follow the device's previous batch",
+            ));
+        }
+        let data = serde_json::to_string(b).map_err(|_| internal())?;
+        if usage(&tx, space)? + data.len() as u64 > s.cfg().quota_bytes {
+            return Err(ApiErr::new(
+                StatusCode::INSUFFICIENT_STORAGE,
+                "quota",
+                "this household has used all the space this server allows",
             ));
         }
         let seq: i64 = tx.query_row(
@@ -493,7 +608,7 @@ pub async fn push_ops(
                 me.id.to_string(),
                 h.device_seq as i64,
                 now as i64,
-                serde_json::to_string(b).map_err(|_| internal())?
+                data
             ],
         )?;
         accepted.push(Accepted {
@@ -506,6 +621,19 @@ pub async fn push_ops(
 }
 
 pub async fn pull_ops(
+    State(s): State<AppState>,
+    Path(space): Path<String>,
+    Query(q): Query<After>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<Json<PullOps>> {
+    blocking(move || pull_ops_sync(State(s), Path(space), Query(q), method, uri, headers, body))
+        .await
+}
+
+fn pull_ops_sync(
     State(s): State<AppState>,
     Path(space): Path<String>,
     Query(q): Query<After>,
@@ -534,19 +662,57 @@ pub async fn pull_ops(
             ))
         },
     )?;
+    // Pages stop at a byte budget as well as a count (D-100), so no
+    // answer is ever too large for a client to read.
     let mut batches = Vec::new();
+    let mut bytes = 0usize;
+    let mut more = false;
     for r in rows {
         let (seq, received, data) = r?;
+        if batches.len() as u64 >= limit || (bytes > 0 && bytes + data.len() > PAGE_BYTES) {
+            more = true;
+            break;
+        }
+        if data.len() > MAX_STORED_BATCH {
+            batches.push(Pulled {
+                seq: seq as u64,
+                received_ms: received as u64,
+                batch: None,
+                oversize: true,
+            });
+            continue;
+        }
+        bytes += data.len();
         let batch: SealedBatch = serde_json::from_str(&data).map_err(|_| internal())?;
         batches.push(Pulled {
             seq: seq as u64,
             received_ms: received as u64,
-            batch,
+            batch: Some(batch),
+            oversize: false,
         });
     }
-    let more = batches.len() as u64 > limit;
-    batches.truncate(limit as usize);
     Ok(Json(PullOps { batches, more }))
+}
+
+/// Bytes of batch data per pull page.
+const PAGE_BYTES: usize = 8 * 1024 * 1024;
+/// A stored batch's JSON can be at most this (base64 of the largest
+/// ciphertext plus the header); anything bigger is never sent.
+const MAX_STORED_BATCH: usize = MAX_BATCH_CT * 4 / 3 + 4096;
+
+/// Bytes a household stores (batches and files).
+fn usage(conn: &Connection, space: SpaceId) -> R<u64> {
+    let b: i64 = conn.query_row(
+        "SELECT COALESCE(SUM(length(data)), 0) FROM batches WHERE space = ?1",
+        [space.to_string()],
+        |r| r.get(0),
+    )?;
+    let f: i64 = conn.query_row(
+        "SELECT COALESCE(SUM(size), 0) FROM blobs WHERE space = ?1",
+        [space.to_string()],
+        |r| r.get(0),
+    )?;
+    Ok((b + f) as u64)
 }
 
 fn blob_name_ok(n: &str) -> bool {
@@ -556,6 +722,17 @@ fn blob_name_ok(n: &str) -> bool {
 }
 
 pub async fn missing_blobs(
+    State(s): State<AppState>,
+    Path(space): Path<String>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<Json<BlobNames>> {
+    blocking(move || missing_blobs_sync(State(s), Path(space), method, uri, headers, body)).await
+}
+
+fn missing_blobs_sync(
     State(s): State<AppState>,
     Path(space): Path<String>,
     method: Method,
@@ -586,6 +763,17 @@ pub async fn missing_blobs(
 
 pub async fn put_blob(
     State(s): State<AppState>,
+    Path(path): Path<(String, String)>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<StatusCode> {
+    blocking(move || put_blob_sync(State(s), Path(path), method, uri, headers, body)).await
+}
+
+fn put_blob_sync(
+    State(s): State<AppState>,
     Path((space, name)): Path<(String, String)>,
     method: Method,
     uri: Uri,
@@ -606,9 +794,20 @@ pub async fn put_blob(
         eprintln!("housewright-server: file storage error: {}", e.kind());
         internal()
     };
+    if !path.exists() && usage(&s.db(), space)? + body.len() as u64 > s.cfg().quota_bytes {
+        return Err(ApiErr::new(
+            StatusCode::INSUFFICIENT_STORAGE,
+            "quota",
+            "this household has used all the space this server allows",
+        ));
+    }
     std::fs::create_dir_all(dir).map_err(io)?;
     if !path.exists() {
-        let tmp = dir.join(format!(".{name}.tmp"));
+        // A unique temporary name: two uploads at once never mix (L2).
+        let rnd = housewright_crypto::encoding::hex(
+            &housewright_crypto::primitives::random::<8>().map_err(|_| internal())?,
+        );
+        let tmp = dir.join(format!(".{name}.{rnd}.tmp"));
         std::fs::write(&tmp, &body).map_err(io)?;
         std::fs::rename(&tmp, &path).map_err(io)?;
     }
@@ -632,10 +831,42 @@ pub async fn get_blob(
     if !blob_name_ok(&name) {
         return Err(ApiErr::not_found());
     }
-    match std::fs::read(s.blob_path(space, &name)) {
-        Ok(b) => Ok(([("content-type", "application/octet-stream")], b).into_response()),
+    // Streamed from the file, not read into memory (L5).
+    match tokio::fs::File::open(s.blob_path(space, &name)).await {
+        Ok(f) => {
+            let body = axum::body::Body::from_stream(tokio_util::io::ReaderStream::new(f));
+            Ok(([("content-type", "application/octet-stream")], body).into_response())
+        }
         Err(_) => Err(ApiErr::not_found()),
     }
+}
+
+/// `DELETE /v1/s/{space}/blobs/{name}`: a device found this file does not
+/// match its hash (it was damaged, or someone uploaded garbage under its
+/// name first). Removing it lets a device that has the real file upload
+/// it again on its next sync (L2).
+pub async fn delete_blob(
+    State(s): State<AppState>,
+    Path((space, name)): Path<(String, String)>,
+    method: Method,
+    uri: Uri,
+    headers: HeaderMap,
+    body: Bytes,
+) -> R<StatusCode> {
+    blocking(move || {
+        let space = space_id(&space)?;
+        let me = device_of(&s, &method, &uri, &headers, &body, space)?;
+        if me.role == DeviceRole::Recovery || !blob_name_ok(&name) {
+            return Err(ApiErr::forbidden("not allowed"));
+        }
+        let _ = std::fs::remove_file(s.blob_path(space, &name));
+        s.db().execute(
+            "DELETE FROM blobs WHERE space = ?1 AND name = ?2",
+            params![space.to_string(), name],
+        )?;
+        Ok(StatusCode::OK)
+    })
+    .await
 }
 
 pub async fn list_devices(
@@ -740,6 +971,7 @@ struct InvRow {
     offer: Vec<u8>,
     request: Option<Vec<u8>>,
     reveal: Option<Vec<u8>>,
+    confirm: Option<Vec<u8>>,
     state: String,
 }
 
@@ -749,7 +981,7 @@ fn load_invitation(conn: &Connection, id: &str, now: u64) -> R<InvRow> {
     }
     purge_invitations(conn, now)?;
     conn.query_row(
-        "SELECT space, offer, request, reveal, state FROM invitations WHERE id = ?1",
+        "SELECT space, offer, request, reveal, confirm, state FROM invitations WHERE id = ?1",
         [id],
         |r| {
             Ok(InvRow {
@@ -757,7 +989,8 @@ fn load_invitation(conn: &Connection, id: &str, now: u64) -> R<InvRow> {
                 offer: r.get(1)?,
                 request: r.get(2)?,
                 reveal: r.get(3)?,
-                state: r.get(4)?,
+                confirm: r.get(4)?,
+                state: r.get(5)?,
             })
         },
     )
@@ -811,6 +1044,31 @@ pub async fn join_invitation(
     Ok(StatusCode::OK)
 }
 
+/// The new device says the numbers match (sealed; D-102). The owner's
+/// device only finishes after this.
+pub async fn confirm_invitation(
+    State(s): State<AppState>,
+    ip: ClientIp,
+    Path(id): Path<String>,
+    body: Bytes,
+) -> R<StatusCode> {
+    s.limit("pair", &ip.0)?;
+    let req: JoinConfirm = json(&body)?;
+    if req.confirm.len() > 1024 {
+        return Err(ApiErr::bad("too large"));
+    }
+    let conn = s.db();
+    let inv = load_invitation(&conn, &id, s.now())?;
+    if inv.state != "revealed" {
+        return Err(ApiErr::conflict("not ready to confirm"));
+    }
+    conn.execute(
+        "UPDATE invitations SET confirm = ?2, state = 'confirmed' WHERE id = ?1 AND state = 'revealed'",
+        params![id, req.confirm],
+    )?;
+    Ok(StatusCode::OK)
+}
+
 pub async fn abort_invitation(
     State(s): State<AppState>,
     ip: ClientIp,
@@ -848,6 +1106,7 @@ pub async fn invitation_state(
     Ok(Json(InvitationState {
         state: inv.state,
         request: inv.request,
+        confirm: inv.confirm,
     }))
 }
 

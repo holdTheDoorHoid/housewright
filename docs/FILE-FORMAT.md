@@ -140,8 +140,10 @@ To rebuild state from operations (the merge rules, D-13):
 3. For an ordinary field, the latest operation in that order wins.
 4. For `$record` (completion, snooze, meter_reading, attachment, note,
    suggestion_answer, completion_detail, binder_print), the
-   record is the whole `value`; if two records claim one id, the earliest in
-   that order wins.
+   record is the whole `value`, written once: if a second, different record
+   claims an id that already has one, it is ignored (D-104). A reader
+   rebuilding state should keep the first record it applies; replaying in
+   clock order is what the app's import does.
 5. `$deleted` marks the entity deleted forever; later edits do not bring it
    back. Completions, snoozes, suggestion answers, completion details and
    binder prints cannot be deleted; such operations are ignored. Attachments can be.

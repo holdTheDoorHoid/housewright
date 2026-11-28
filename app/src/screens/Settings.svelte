@@ -165,6 +165,7 @@
       {:else}On.{/if}
     </p>
     {#if sync.clock_warning}<p class="pill attention">{sync.clock_warning}</p>{/if}
+    {#if sync.notices.length > 0}<p class="pill attention">Your household's devices changed: see Sync and devices.</p>{/if}
   {:else}
     <p class="muted small">Off. Everything stays on this device. Turn sync on to use Housewright on more than one device or with other people.</p>
   {/if}

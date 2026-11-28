@@ -57,6 +57,8 @@ pub struct Config {
     /// When set, creating a household needs this token.
     pub registration_token: Option<String>,
     pub max_households: u64,
+    /// Bytes one household may store (batches and files).
+    pub quota_bytes: u64,
     pub clock: Clock,
 }
 
@@ -67,6 +69,7 @@ impl Config {
             behind_proxy: false,
             registration_token: None,
             max_households: 20,
+            quota_bytes: 2 * 1024 * 1024 * 1024,
             clock: system_clock(),
         }
     }
@@ -114,6 +117,13 @@ impl AppState {
         self.0.blob_dir.join(space.to_string()).join(name)
     }
 
+    pub fn purge_nonces(&self) {
+        let now = self.now();
+        let _ = self
+            .db()
+            .execute("DELETE FROM nonces WHERE expires_ms < ?1", [now as i64]);
+    }
+
     pub(crate) fn limit(&self, bucket: &'static str, ip: &str) -> Result<(), ApiErr> {
         let now = self.now();
         let mut l = self.0.limiter.lock().unwrap_or_else(|e| e.into_inner());
@@ -158,11 +168,14 @@ fn init_db(conn: &Connection) -> rusqlite::Result<()> {
          CREATE TABLE IF NOT EXISTS invitations (
              id TEXT PRIMARY KEY, space TEXT NOT NULL, created_by TEXT NOT NULL,
              expires_ms INTEGER NOT NULL, offer BLOB NOT NULL, request BLOB, reveal BLOB,
-             state TEXT NOT NULL);
+             confirm BLOB, state TEXT NOT NULL);
          CREATE TABLE IF NOT EXISTS nonces (
              device TEXT NOT NULL, nonce TEXT NOT NULL, expires_ms INTEGER NOT NULL,
              PRIMARY KEY (device, nonce));",
-    )
+    )?;
+    // Added after the first Phase 6 build.
+    let _ = conn.execute("ALTER TABLE invitations ADD COLUMN confirm BLOB", []);
+    Ok(())
 }
 
 /// An error as the client sees it: a status and `{"error": {...}}`.
@@ -336,9 +349,7 @@ pub(crate) fn authenticate(
         ));
     }
     // Replay protection: each nonce once per device within the window.
-    if now.is_multiple_of(64) {
-        conn.execute("DELETE FROM nonces WHERE expires_ms < ?1", [now as i64])?;
-    }
+    // (Expired nonces are deleted by a timer; see `serve`.)
     let fresh = conn.execute(
         "INSERT OR IGNORE INTO nonces (device, nonce, expires_ms) VALUES (?1, ?2, ?3)",
         params![
@@ -413,7 +424,10 @@ pub fn router(state: AppState) -> Router {
         .allow_headers(tower_http::cors::Any)
         .expose_headers([axum::http::HeaderName::from_static(H_SERVER_TIME)]);
     let blobs = Router::new()
-        .route("/v1/s/{space}/blobs/{name}", put(put_blob).get(get_blob))
+        .route(
+            "/v1/s/{space}/blobs/{name}",
+            put(put_blob).get(get_blob).delete(delete_blob),
+        )
         .layer(DefaultBodyLimit::max(MAX_BLOB));
     Router::new()
         .route("/v1/health", get(health))
@@ -435,6 +449,7 @@ pub fn router(state: AppState) -> Router {
         .route("/v1/invitations/{id}", get(view_invitation))
         .route("/v1/invitations/{id}/join", post(join_invitation))
         .route("/v1/invitations/{id}/abort", post(abort_invitation))
+        .route("/v1/invitations/{id}/confirm", post(confirm_invitation))
         .route("/v1/recovery", get(recovery))
         .layer(DefaultBodyLimit::max(MAX_BODY))
         .merge(blobs)
@@ -468,6 +483,15 @@ pub enum Listen {
 
 /// Run until Ctrl-C or SIGTERM.
 pub async fn serve(state: AppState, base_path: &str, listen: Listen) -> Result<(), String> {
+    // Expired nonces go once a minute (L5).
+    let st = state.clone();
+    tokio::spawn(async move {
+        let mut t = tokio::time::interval(std::time::Duration::from_secs(60));
+        loop {
+            t.tick().await;
+            st.purge_nonces();
+        }
+    });
     let app = app(state, base_path).into_make_service_with_connect_info::<SocketAddr>();
     let handle = axum_server::Handle::new();
     let h2 = handle.clone();
@@ -512,6 +536,28 @@ async fn shutdown_signal() {
         _ = ctrl_c => {},
         _ = term => {},
     }
+}
+
+/// The registration token kept in the data folder, made on first use
+/// (16 random bytes as Base32). Only the owner of the folder can read it.
+pub fn stored_token(data_dir: &Path) -> Result<String, String> {
+    std::fs::create_dir_all(data_dir).map_err(|e| format!("data folder: {e}"))?;
+    let p = data_dir.join("registration-token");
+    if let Ok(t) = std::fs::read_to_string(&p) {
+        let t = t.trim().to_string();
+        if !t.is_empty() {
+            return Ok(t);
+        }
+    }
+    let raw = housewright_crypto::primitives::random::<15>().map_err(|e| e.to_string())?;
+    let t = housewright_crypto::encoding::group(&housewright_crypto::encoding::base32(&raw), 4);
+    std::fs::write(&p, format!("{t}\n")).map_err(|e| format!("writing the token: {e}"))?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let _ = std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o600));
+    }
+    Ok(t)
 }
 
 /// For tests: the data directory's files, to check they hold no plaintext.

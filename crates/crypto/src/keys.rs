@@ -364,7 +364,7 @@ impl KeyChain {
         let bad = || CryptoError::Malformed("bad key chain".into());
         let n =
             u32::from_be_bytes(b.get(..4).ok_or_else(bad)?.try_into().map_err(|_| bad())?) as usize;
-        if n == 0 || b.len() != 4 + 32 * n {
+        if n == 0 || n.checked_mul(32).and_then(|x| x.checked_add(4)) != Some(b.len()) {
             return Err(bad());
         }
         let keys = b[4..]

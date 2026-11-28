@@ -10,9 +10,10 @@
 //!   wins per field. "Later" is the total order [`OrderKey`]: HLC, then author
 //!   id, then op id. A JSON `null` value clears the field.
 //! * **`$record`** on append-only kinds (completions, snoozes, meter readings,
-//!   attachments, notes): the whole record, written once. If two different
-//!   records ever claim the same id (a bug), the one with the *smallest*
-//!   order key wins everywhere, so replicas still agree.
+//!   attachments, notes): the whole record, written once. A later, different
+//!   record for an id that already has one is ignored, whatever clock it
+//!   claims (D-104), so nobody can replace someone else's record by
+//!   backdating. Ids are random, so honest devices never collide.
 //! * **`$deleted`**: a tombstone. Deletes win over every edit, before or after
 //!   (an edit cannot resurrect a deleted entity). Completions and snoozes cannot
 //!   be deleted; such ops are logged but have no effect.

@@ -86,6 +86,10 @@ pub struct RemovedEntry {
     pub removed_in: u64,
     /// Batches from this device numbered above this are refused by everyone.
     pub last_seq: u64,
+    /// The hash of its batch number `last_seq` (64 zeros if none): the end
+    /// of its batch chain. Only batches on the chain that ends here are
+    /// accepted from it, so it cannot write anything new (D-99).
+    pub last_hash: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -112,6 +116,26 @@ pub struct SignedRoster {
     pub signer: DeviceId,
     #[serde(with = "b64_64")]
     pub sig: [u8; 64],
+    /// A second signature by the recovery identity of the previous
+    /// version, needed to remove an owner's device or replace the recovery
+    /// key (D-101): the person must type the recovery key.
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "opt_sig")]
+    pub cosig: Option<[u8; 64]>,
+}
+
+mod opt_sig {
+    use serde::{Deserialize, Deserializer, Serializer};
+    pub fn serialize<S: Serializer>(v: &Option<[u8; 64]>, s: S) -> Result<S::Ok, S::Error> {
+        match v {
+            Some(b) => s.serialize_str(&crate::encoding::b64(b)),
+            None => s.serialize_none(),
+        }
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Option<[u8; 64]>, D::Error> {
+        let o: Option<String> = Option::deserialize(d)?;
+        o.map(|s| crate::encoding::unb64_array(&s).map_err(serde::de::Error::custom))
+            .transpose()
+    }
 }
 
 const ZERO_HASH: &str = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -128,18 +152,28 @@ impl SignedRoster {
             body: bytes,
             signer: signer.id(),
             sig,
+            cosig: None,
         })
+    }
+
+    /// Add the recovery identity's second signature (D-101).
+    pub fn cosign(&mut self, recovery: &DeviceSecret) {
+        self.cosig = Some(recovery.sign(&transcript("housewright/v1/roster-cosig", &[&self.body])));
     }
 
     pub fn parse(&self) -> Result<RosterBody> {
         serde_json::from_slice(&self.body).map_err(|e| CryptoError::Malformed(e.to_string()))
     }
 
-    /// `SHA-256(transcript("housewright/v1/roster-hash", body, signer, sig))`, hex.
+    /// `SHA-256(transcript("housewright/v1/roster-hash", body, signer, sig, cosig or empty))`, hex.
     pub fn hash(&self) -> String {
+        let cosig: &[u8] = match &self.cosig {
+            Some(c) => c,
+            None => &[],
+        };
         hex(&sha256(&transcript(
             "housewright/v1/roster-hash",
-            &[&self.body, &self.signer.0, &self.sig],
+            &[&self.body, &self.signer.0, &self.sig, cosig],
         )))
     }
 
@@ -259,6 +293,12 @@ pub fn verify_next(
         .ok_or_else(|| bad("not signed by an owner"))?;
     next.check_sig(&signer.device)?;
     check_devices(&n)?;
+    if n.removed
+        .iter()
+        .any(|r| r.last_hash.len() != 64 || r.last_hash.bytes().any(|b| !b.is_ascii_hexdigit()))
+    {
+        return Err(bad("bad removal record"));
+    }
 
     let old: BTreeMap<DeviceId, &RemovedEntry> = prev
         .removed
@@ -295,6 +335,35 @@ pub fn verify_next(
         {
             return Err(bad("bad new device"));
         }
+    }
+    // D-101: the recovery identity may only add devices; removing an
+    // owner's device or the recovery identity needs the recovery key's
+    // second signature.
+    let removed_now: Vec<&RemovedEntry> = n
+        .removed
+        .iter()
+        .filter(|r| !old.contains_key(&r.entry.device.id))
+        .collect();
+    if signer.role == DeviceRole::Recovery
+        && (!removed_now.is_empty()
+            || n.recovery().map(|r| r.device.id) != prev.recovery().map(|r| r.device.id))
+    {
+        return Err(bad("the recovery key can only add a device"));
+    }
+    if removed_now
+        .iter()
+        .any(|r| matches!(r.entry.role, DeviceRole::Owner | DeviceRole::Recovery))
+    {
+        let rec = prev.recovery().ok_or_else(|| bad("no recovery identity"))?;
+        let cosig = next
+            .cosig
+            .ok_or_else(|| bad("removing an owner's device needs the recovery key"))?;
+        rec.device
+            .verify(
+                &transcript("housewright/v1/roster-cosig", &[&next.body]),
+                &cosig,
+            )
+            .map_err(|_| bad("the recovery key's confirmation did not verify"))?;
     }
     let epoch_ok = if newly_removed > 0 {
         n.epoch == prev.epoch + 1
@@ -421,6 +490,7 @@ mod tests {
             entry: removed,
             removed_in: 3,
             last_seq: 7,
+            last_hash: ZERO_HASH.into(),
         });
         b3.epoch = 1;
         let by_member = SignedRoster::sign(&b3, &phone).unwrap();
@@ -443,6 +513,65 @@ mod tests {
         b4.sort();
         let s4 = SignedRoster::sign(&b4, &owner).unwrap();
         assert!(verify_next(&s3, &b3, &s4).is_err());
+    }
+
+    #[test]
+    fn removing_an_owner_needs_the_recovery_key_and_recovery_only_adds() {
+        let owner = DeviceSecret::generate().unwrap();
+        let other = DeviceSecret::generate().unwrap();
+        let rec = DeviceSecret::generate().unwrap();
+        let space = SpaceId::random().unwrap();
+        let mut gb = RosterBody {
+            v: 1,
+            space,
+            version: 1,
+            epoch: 0,
+            prev: ZERO_HASH.into(),
+            genesis: String::new(),
+            devices: vec![
+                entry(&owner, DeviceRole::Owner, 1),
+                entry(&other, DeviceRole::Owner, 1),
+                entry(&rec, DeviceRole::Recovery, 1),
+            ],
+            removed: vec![],
+            made_ms: 1,
+        };
+        gb.sort();
+        let g = SignedRoster::sign(&gb, &owner).unwrap();
+        let mut b2 = gb.successor(&g, 2);
+        let i = b2
+            .devices
+            .iter()
+            .position(|e| e.device.id == other.id())
+            .unwrap();
+        let e = b2.devices.remove(i);
+        b2.removed.push(RemovedEntry {
+            entry: e,
+            removed_in: 2,
+            last_seq: 0,
+            last_hash: ZERO_HASH.into(),
+        });
+        b2.epoch = 1;
+        // A stolen phone alone cannot remove the other owner device.
+        let mut s2 = SignedRoster::sign(&b2, &owner).unwrap();
+        assert!(verify_next(&g, &gb, &s2).is_err());
+        // With the recovery key's second signature it can.
+        s2.cosign(&rec);
+        verify_next(&g, &gb, &s2).unwrap();
+        // A wrong second signature fails.
+        let mut s2x = SignedRoster::sign(&b2, &owner).unwrap();
+        s2x.cosign(&other);
+        assert!(verify_next(&g, &gb, &s2x).is_err());
+        // The recovery identity itself may not remove anyone, even co-signed.
+        let mut s2r = SignedRoster::sign(&b2, &rec).unwrap();
+        s2r.cosign(&rec);
+        assert!(verify_next(&g, &gb, &s2r).is_err());
+        // But it may add a device (a restore).
+        let fresh = DeviceSecret::generate().unwrap();
+        let mut b3 = gb.successor(&g, 2);
+        b3.devices.push(entry(&fresh, DeviceRole::Owner, 2));
+        b3.sort();
+        verify_next(&g, &gb, &SignedRoster::sign(&b3, &rec).unwrap()).unwrap();
     }
 
     #[test]

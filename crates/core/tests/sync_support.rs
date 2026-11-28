@@ -119,3 +119,67 @@ fn sync_state_and_adopting_a_household() {
     assert_eq!(joined.household().unwrap().id, h.id, "data stays");
     let _ = Hlc::ZERO;
 }
+
+#[test]
+fn a_backdated_record_cannot_replace_an_existing_one() {
+    use housewright_core::hlc::Hlc;
+    use housewright_core::oplog::{Op, RECORD_FIELD};
+    use jiff::Timestamp;
+    let clock = ManualClock::new(1_800_000_000_000);
+    let mut a = store(1, &clock);
+    let note = Note {
+        id: NoteId::new(),
+        about: EntityRef {
+            kind: EntityKind::Room,
+            id: "r".into(),
+        },
+        text: Flagged {
+            value: "the real note".into(),
+            sensitivity: Sensitivity::Normal,
+        },
+        by: MemberId(Uuid::from_u128(1)),
+        at: Timestamp::from_second(1_800_000_000).unwrap(),
+    };
+    a.append(&note).unwrap();
+    let original = a.ops().unwrap();
+    // Another member sends a record with the same id and a clock of zero.
+    let mut forged_value = serde_json::to_value(&note).unwrap();
+    forged_value["text"]["value"] = "rewritten".into();
+    forged_value["by"] = MemberId(Uuid::from_u128(2)).to_string().into();
+    let forged = Op {
+        id: OpId::new(),
+        hlc: Hlc {
+            wall_ms: 0,
+            counter: 0,
+        },
+        author: MemberId(Uuid::from_u128(2)),
+        kind: EntityKind::Note,
+        entity: note.id.to_string(),
+        field: RECORD_FIELD.into(),
+        value: forged_value,
+    };
+    // In either order, on any device, the first record stays.
+    let mut b = store(3, &clock);
+    b.apply_synced_ops(&original, 1_800_000_000_000).unwrap();
+    let r = b
+        .apply_synced_ops(std::slice::from_ref(&forged), 1_800_000_000_000)
+        .unwrap();
+    assert_eq!(r.conflicts, 1);
+    let r = a
+        .apply_synced_ops(std::slice::from_ref(&forged), 1_800_000_000_000)
+        .unwrap();
+    assert_eq!(r.conflicts, 1);
+    for s in [&a, &b] {
+        let n: Note = s.fetch(&note.id.to_string()).unwrap();
+        assert_eq!(n.text.value, "the real note");
+    }
+    // An op id reused with different content is counted, not applied.
+    let mut reused = original[0].clone();
+    reused.value = serde_json::json!({"other": true});
+    assert_eq!(
+        b.apply_synced_ops(&[reused], 1_800_000_000_000)
+            .unwrap()
+            .conflicts,
+        1
+    );
+}

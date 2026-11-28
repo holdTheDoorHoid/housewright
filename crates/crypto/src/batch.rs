@@ -4,8 +4,11 @@
 //!
 //! * header (plaintext, the server needs it): format version, space,
 //!   epoch, a random 128-bit batch id, the device id, the device's own
-//!   sequence number for the batch, the largest operation clock in the
-//!   batch (`max_wall_ms`, used by the clock guard, D-93), and the nonce.
+//!   sequence number for the batch, the hash of the device's previous
+//!   batch (`prev`: each device's batches form a hash chain, so a removed
+//!   device cannot slip in new batches under old numbers; D-99), the
+//!   largest operation clock in the batch (`max_wall_ms`, used by the clock
+//!   guard, D-93), and the nonce.
 //! * `aad = transcript("housewright/v1/batch", every header field)`.
 //! * `ct = XChaCha20-Poly1305(ops key of the epoch, nonce, pad(plaintext,
 //!   256), aad)`, so a batch cannot be moved to another household, epoch,
@@ -18,12 +21,18 @@ use serde::{Deserialize, Serialize};
 
 use crate::encoding::{hex, unhex_array};
 use crate::keys::{Purpose, b64_64, b64_vec};
+use crate::primitives::sha256;
 use crate::primitives::{
     NONCE_LEN, open_with_nonce, pad, random, seal_with_nonce, transcript, unpad,
 };
 use crate::{CryptoError, DeviceId, DevicePublic, DeviceSecret, KeyChain, Result, SpaceId};
 
 pub const BATCH_PAD: usize = 256;
+/// The largest ciphertext a batch may have (D-100). Clients keep batches
+/// well under it; the server refuses anything bigger.
+pub const MAX_BATCH_CT: usize = 1024 * 1024;
+/// The hash a device's first batch names as `prev`.
+pub const ZERO_HASH: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BatchHeader {
@@ -34,6 +43,9 @@ pub struct BatchHeader {
     pub batch_id: String,
     pub device: DeviceId,
     pub device_seq: u64,
+    /// [`batch_hash`] of this device's previous batch (hex); 64 zeros for
+    /// its first.
+    pub prev: String,
     pub max_wall_ms: u64,
     #[serde(with = "b64_vec")]
     pub nonce: Vec<u8>,
@@ -54,6 +66,7 @@ pub fn new_batch_id() -> Result<String> {
 
 fn aad(h: &BatchHeader) -> Result<Vec<u8>> {
     let id: [u8; 16] = unhex_array(&h.batch_id)?;
+    let prev: [u8; 32] = unhex_array(&h.prev)?;
     Ok(transcript(
         "housewright/v1/batch",
         &[
@@ -63,6 +76,7 @@ fn aad(h: &BatchHeader) -> Result<Vec<u8>> {
             &id,
             &h.device.0,
             &h.device_seq.to_be_bytes(),
+            &prev,
             &h.max_wall_ms.to_be_bytes(),
             &h.nonce,
         ],
@@ -73,13 +87,25 @@ fn sig_input(h: &BatchHeader, ct: &[u8]) -> Result<Vec<u8>> {
     Ok(transcript("housewright/v1/batch-sig", &[&aad(h)?, ct]))
 }
 
+/// `SHA-256(transcript("housewright/v1/batch-hash", aad, ct))`, hex: what
+/// the next batch of the same device names as `prev`. The server can
+/// compute it too (it has the header and the ciphertext).
+pub fn batch_hash(b: &SealedBatch) -> Result<String> {
+    Ok(hex(&sha256(&transcript(
+        "housewright/v1/batch-hash",
+        &[&aad(&b.header)?, &b.ct],
+    ))))
+}
+
 /// Encrypt and sign `plaintext` under the chain's current epoch.
+#[allow(clippy::too_many_arguments)]
 pub fn seal_batch(
     device: &DeviceSecret,
     chain: &KeyChain,
     space: SpaceId,
     batch_id: String,
     device_seq: u64,
+    prev: &str,
     max_wall_ms: u64,
     plaintext: &[u8],
 ) -> Result<SealedBatch> {
@@ -92,6 +118,7 @@ pub fn seal_batch(
         batch_id,
         device: device.id(),
         device_seq,
+        prev: prev.to_string(),
         max_wall_ms,
         nonce: nonce.to_vec(),
     };
@@ -111,6 +138,9 @@ pub fn verify_batch(b: &SealedBatch, author: &DevicePublic) -> Result<()> {
     }
     if b.header.nonce.len() != NONCE_LEN {
         return Err(CryptoError::Malformed("bad nonce".into()));
+    }
+    if b.ct.len() > MAX_BATCH_CT {
+        return Err(CryptoError::Rejected("batch too large".into()));
     }
     author.verify(&sig_input(&b.header, &b.ct)?, &b.sig)
 }
@@ -146,7 +176,17 @@ mod tests {
         let d = DeviceSecret::generate().unwrap();
         let c = KeyChain::generate().unwrap();
         let s = SpaceId::random().unwrap();
-        let b = seal_batch(&d, &c, s, new_batch_id().unwrap(), 1, 1000, b"[ops]").unwrap();
+        let b = seal_batch(
+            &d,
+            &c,
+            s,
+            new_batch_id().unwrap(),
+            1,
+            ZERO_HASH,
+            1000,
+            b"[ops]",
+        )
+        .unwrap();
         (d, c, s, b)
     }
 
@@ -170,6 +210,13 @@ mod tests {
         let mut t = b.clone();
         t.sig[0] ^= 1;
         assert_eq!(open_batch(&t, s, &c, &p), Err(CryptoError::Signature));
+        // The chain link is signed and authenticated too.
+        let mut t = b.clone();
+        t.header.prev = "11".repeat(32);
+        assert_eq!(open_batch(&t, s, &c, &p), Err(CryptoError::Signature));
+        t.sig = d.sign(&sig_input(&t.header, &t.ct).unwrap());
+        assert_eq!(open_batch(&t, s, &c, &p), Err(CryptoError::Decrypt));
+        assert_ne!(batch_hash(&t).unwrap(), batch_hash(&b).unwrap());
         // Another device's key.
         let other = DeviceSecret::generate().unwrap();
         assert!(open_batch(&b, s, &c, &other.public()).is_err());
@@ -194,7 +241,7 @@ mod tests {
         t.sig = d.sign(&sig_input(&t.header, &t.ct).unwrap());
         assert_eq!(open_batch(&t, s, &c2, &p), Err(CryptoError::Decrypt));
         // A receiver without the epoch's key cannot read it.
-        let later = seal_batch(&d, &c2, s, new_batch_id().unwrap(), 2, 1, b"x").unwrap();
+        let later = seal_batch(&d, &c2, s, new_batch_id().unwrap(), 2, ZERO_HASH, 1, b"x").unwrap();
         assert!(open_batch(&later, s, &c, &p).is_err());
     }
 }

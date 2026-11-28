@@ -123,6 +123,7 @@ pub const COMMANDS: &[&str] = &[
     "sync_remove_device",
     "sync_new_recovery_key",
     "sync_stop",
+    "sync_dismiss_notices",
 ];
 
 /// The bundled template library, parsed once.

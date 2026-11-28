@@ -74,6 +74,8 @@ pub enum SyncError {
     ClockAhead,
     #[error("this device was removed from the household")]
     Removed,
+    #[error("another device knows a newer list of the household's devices")]
+    RosterHidden,
     #[error("sync is not set up on this device")]
     NotSetUp,
     #[error("{0}")]
@@ -93,6 +95,7 @@ impl SyncError {
             SyncError::ClockSkew { .. } => "clock_skew",
             SyncError::ClockAhead => "clock_ahead",
             SyncError::Removed => "removed",
+            SyncError::RosterHidden => "roster_hidden",
             SyncError::NotSetUp => "not_set_up",
             SyncError::Invalid(_) => "invalid",
             SyncError::Crypto(_) => "security",
@@ -111,6 +114,7 @@ impl SyncError {
             ),
             SyncError::ClockAhead => "This device's clock was set ahead of the real time when some changes were made. Those changes will wait on this device until its clock is right; check the date and time in this device's settings.".into(),
             SyncError::Removed => "This device was removed from the household, so it no longer syncs. What is already here stays on this device.".into(),
+            SyncError::RosterHidden => "Another of your devices has a newer list of the household's devices than the sync server is giving this one. To be safe, changes made here stay on this device until that list arrives. If this lasts, the server may be misbehaving: check who runs it.".into(),
             SyncError::NotSetUp => "Sync is not set up on this device.".into(),
             SyncError::Server { code, message, .. } => match code.as_str() {
                 "rate_limited" => "Too many tries in a short time. Wait a minute and try again.".into(),
@@ -149,37 +153,46 @@ pub type Result<T> = std::result::Result<T, SyncError>;
 /// Check a server address (D-96): HTTPS, or plain HTTP only to this
 /// computer (and, in debug builds only, to the Android emulator's host
 /// address and private networks). Returns it without a trailing slash.
-pub fn check_server_url(url: &str) -> Result<String> {
-    let url = url.trim().trim_end_matches('/');
+pub fn check_server_url(text: &str) -> Result<String> {
+    let text = text.trim().trim_end_matches('/');
     let bad = || {
         SyncError::Invalid(
             "That doesn't look like a server address. It should start with https://".into(),
         )
     };
-    let (scheme, rest) = url.split_once("://").ok_or_else(bad)?;
-    let host_port = rest.split('/').next().unwrap_or("");
-    if host_port.is_empty() || rest.contains(['?', '#', ' ']) {
+    // A real URL parser (L1): `http://127.0.0.1:1@evil.example` is a
+    // user name and the host `evil.example`, and is refused.
+    let u = url::Url::parse(text).map_err(|_| bad())?;
+    if !u.username().is_empty() || u.password().is_some() {
+        return Err(SyncError::Invalid(
+            "A server address must not contain a user name or password.".into(),
+        ));
+    }
+    if u.query().is_some() || u.fragment().is_some() {
         return Err(bad());
     }
-    let host = if let Some(h) = host_port.strip_prefix('[') {
-        h.split(']').next().unwrap_or("")
-    } else {
-        host_port
-            .rsplit_once(':')
-            .map(|(h, _)| h)
-            .unwrap_or(host_port)
-    };
-    match scheme.to_ascii_lowercase().as_str() {
-        "https" => Ok(url.to_string()),
+    let host = u.host().ok_or_else(bad)?;
+    match u.scheme() {
+        "https" => Ok(text.to_string()),
         "http" => {
-            let local = matches!(host, "localhost" | "127.0.0.1" | "::1");
+            let ip: Option<std::net::IpAddr> = match &host {
+                url::Host::Ipv4(a) => Some((*a).into()),
+                url::Host::Ipv6(a) => Some((*a).into()),
+                url::Host::Domain(_) => None,
+            };
+            let local = matches!(&host, url::Host::Domain(d) if *d == "localhost")
+                || ip.is_some_and(|i| i.is_loopback());
+            // Debug builds only: the Android emulator's host and private
+            // networks, by address, never by a name that merely starts
+            // with "10." (D-96).
             let debug_ok = cfg!(debug_assertions)
-                && (host == "10.0.2.2"
-                    || host.starts_with("192.168.")
-                    || host.starts_with("10.")
-                    || host.ends_with(".local"));
+                && match ip {
+                    Some(std::net::IpAddr::V4(a)) => a.is_private(),
+                    Some(std::net::IpAddr::V6(a)) => (a.segments()[0] & 0xfe00) == 0xfc00,
+                    None => false,
+                };
             if local || debug_ok {
-                Ok(url.to_string())
+                Ok(text.to_string())
             } else {
                 Err(SyncError::Invalid(
                     "The server address must start with https:// so the connection is protected. (Plain http:// only works for a server on this same device.)".into(),

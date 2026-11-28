@@ -32,6 +32,34 @@ pub struct SyncConfig {
 pub(crate) struct Pending {
     pub batch: SealedBatch,
     pub upto: i64,
+    /// When this batch re-seals one made under an older epoch (L4): the
+    /// original, in case the server already has it.
+    #[serde(default)]
+    pub replaces: Option<SealedBatch>,
+}
+
+/// The newest batch accepted from a device: its number and hash (D-99).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) struct Head {
+    pub seq: u64,
+    pub hash: String,
+}
+
+impl Head {
+    pub fn start() -> Self {
+        Head {
+            seq: 0,
+            hash: housewright_crypto::batch::ZERO_HASH.to_string(),
+        }
+    }
+}
+
+/// Something about the household's devices changed (M3): shown on every
+/// device until dismissed.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Notice {
+    pub at_ms: u64,
+    pub text: String,
 }
 
 /// For the interface.
@@ -49,6 +77,21 @@ pub struct SyncStatus {
     /// Operations refused by the clock guard.
     pub refused_future_ops: u64,
     pub recovery_confirmed: bool,
+    /// Changes to the household's devices made from other devices.
+    #[serde(default)]
+    pub notices: Vec<Notice>,
+    /// The newest roster version another device's batch named (D-103).
+    #[serde(default)]
+    pub newest_roster_seen: u64,
+    /// Two devices were shown different histories by the server.
+    #[serde(default)]
+    pub fork: bool,
+    /// Batches too large to fetch, skipped (D-100).
+    #[serde(default)]
+    pub skipped_too_large: u64,
+    /// Local changes too large to send, kept on this device only.
+    #[serde(default)]
+    pub unsent_too_large: u64,
 }
 
 pub(crate) struct State {
@@ -61,7 +104,9 @@ pub(crate) struct State {
     pub push_cursor: i64,
     pub next_device_seq: u64,
     pub pending: Option<Pending>,
-    pub seen: BTreeMap<DeviceId, u64>,
+    pub heads: BTreeMap<DeviceId, Head>,
+    /// The hash of this device's own newest sealed batch.
+    pub own_head: String,
     pub status: SyncStatus,
 }
 
@@ -116,7 +161,9 @@ impl State {
             push_cursor: get(store, "push_cursor")?.unwrap_or(0),
             next_device_seq: get(store, "next_device_seq")?.unwrap_or(1),
             pending: get::<Option<Pending>>(store, "pending")?.flatten(),
-            seen: get(store, "seen")?.unwrap_or_default(),
+            heads: get(store, "heads")?.unwrap_or_default(),
+            own_head: get(store, "own_head")?
+                .unwrap_or_else(|| housewright_crypto::batch::ZERO_HASH.to_string()),
             status: load_status(store)?,
         })
     }
@@ -135,7 +182,8 @@ impl State {
         let push_cursor = put(&self.push_cursor);
         let next = put(&self.next_device_seq);
         let pending = put(&self.pending);
-        let seen = put(&self.seen);
+        let heads = put(&self.heads);
+        let own_head = put(&self.own_head);
         let status = put(&self.status);
         store.sync_set_many(&[
             ("config", &config),
@@ -146,7 +194,8 @@ impl State {
             ("push_cursor", &push_cursor),
             ("next_device_seq", &next),
             ("pending", &pending),
-            ("seen", &seen),
+            ("heads", &heads),
+            ("own_head", &own_head),
             ("status", &status),
         ])?;
         Ok(())

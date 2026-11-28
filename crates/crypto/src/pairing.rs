@@ -44,6 +44,8 @@ pub enum Part {
     Offer,
     Request,
     Reveal,
+    /// The new device's "the numbers match" (D-102).
+    Confirm,
 }
 
 impl Part {
@@ -52,6 +54,7 @@ impl Part {
             Part::Offer => "housewright/v1/pair-offer",
             Part::Request => "housewright/v1/pair-request",
             Part::Reveal => "housewright/v1/pair-reveal",
+            Part::Confirm => "housewright/v1/pair-confirm",
         }
     }
 }

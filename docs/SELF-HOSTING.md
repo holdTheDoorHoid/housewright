@@ -44,7 +44,9 @@ curl https://housewright.example.org/v1/health
 ```
 
 In the app: Settings, Sync and devices, "Your own server", type
-`https://housewright.example.org`.
+`https://housewright.example.org` and the registration token the server
+printed when it started (`journalctl -u housewright-server`, or the file
+`registration-token` in the data folder).
 
 With nginx instead, proxy to `127.0.0.1:8787`, pass
 `X-Forwarded-For`, and set `client_max_body_size 30m;` (files can be up to
@@ -79,8 +81,10 @@ Every flag also reads an environment variable.
 | `--tls-cert`, `--tls-key` | `HW_TLS_CERT`, `HW_TLS_KEY` | none | Serve HTTPS with these PEM files. |
 | `--behind-proxy` | `HW_BEHIND_PROXY` | off | Plain HTTP for a local proxy; trusts its `X-Forwarded-For` for rate limits. |
 | `--base-path` | `HW_BASE_PATH` | empty | Path prefix the proxy does not strip. |
-| `--registration-token` | `HW_REGISTRATION_TOKEN` | none | If set, adding a household needs this token (typed once in the app). |
-| `--max-households` | `HW_MAX_HOUSEHOLDS` | 20 | Stops strangers filling your disk. |
+| `--registration-token` | `HW_REGISTRATION_TOKEN` | made on first start | Adding a household needs this token (typed once in the app). Without the flag the server makes one, keeps it in `registration-token` in the data folder, and prints it at start (D-105). |
+| `--open-registration` | `HW_OPEN_REGISTRATION` | off | Anyone who can reach the server may add a household. Only on a private network. |
+| `--max-households` | `HW_MAX_HOUSEHOLDS` | 20 | A cap on households. It does not limit storage on its own. |
+| `--household-quota-mb` | `HW_HOUSEHOLD_QUOTA_MB` | 2048 | The most one household may store (changes and files). With the household cap, this bounds disk use. |
 
 ## Backups of the server
 

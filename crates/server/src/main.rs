@@ -29,9 +29,17 @@ struct Args {
     /// Path prefix when the proxy does not strip one, e.g. /housewright.
     #[arg(long, env = "HW_BASE_PATH", default_value = "")]
     base_path: String,
-    /// If set, a new household needs this token (typed once at setup).
+    /// The token a new household needs (typed once at setup). Without this
+    /// flag the server makes one on first start, keeps it in the data
+    /// folder (`registration-token`) and prints it (D-105).
     #[arg(long, env = "HW_REGISTRATION_TOKEN")]
     registration_token: Option<String>,
+    /// Let anyone who can reach the server add a household (no token).
+    #[arg(long, env = "HW_OPEN_REGISTRATION")]
+    open_registration: bool,
+    /// Most a household may store, in megabytes (changes and files).
+    #[arg(long, env = "HW_HOUSEHOLD_QUOTA_MB", default_value_t = 2048)]
+    household_quota_mb: u64,
     /// Most households this server will hold.
     #[arg(long, env = "HW_MAX_HOUSEHOLDS", default_value_t = 20)]
     max_households: u64,
@@ -42,8 +50,27 @@ async fn main() {
     let a = Args::parse();
     let mut cfg = Config::new(&a.data_dir);
     cfg.behind_proxy = a.behind_proxy;
-    cfg.registration_token = a.registration_token.filter(|t| !t.is_empty());
     cfg.max_households = a.max_households;
+    cfg.quota_bytes = a.household_quota_mb.saturating_mul(1024 * 1024);
+    cfg.registration_token = if a.open_registration {
+        None
+    } else if let Some(t) = a.registration_token.filter(|t| !t.is_empty()) {
+        Some(t)
+    } else {
+        match housewright_server::stored_token(&a.data_dir) {
+            Ok(t) => {
+                eprintln!(
+                    "housewright-server: registration token (type it once when turning on sync): {t}\n  (also in {}/registration-token; --open-registration turns this off)",
+                    a.data_dir.display()
+                );
+                Some(t)
+            }
+            Err(e) => {
+                eprintln!("housewright-server: {e}");
+                std::process::exit(1);
+            }
+        }
+    };
     let state = match AppState::open(cfg) {
         Ok(s) => s,
         Err(e) => {

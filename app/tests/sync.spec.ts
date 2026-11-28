@@ -13,11 +13,14 @@ const PHOTO = readFileSync(new URL('./fixtures/rating-plate-synthetic.jpg', impo
 const BIN = process.env.HW_SERVER_BIN ?? new URL('../../target/debug/housewright-server', import.meta.url).pathname;
 const PORT = 18000 + Math.floor(Math.random() * 1000);
 const URL_ = `http://127.0.0.1:${PORT}`;
+const TOKEN = 'E2E-TOKEN-1234';
 let dataDir = '';
 let server: ChildProcess | null = null;
 
 async function startServer() {
-  server = spawn(BIN, ['--listen', `127.0.0.1:${PORT}`, '--data-dir', dataDir], { stdio: ['ignore', 'ignore', 'pipe'] });
+  server = spawn(BIN, ['--listen', `127.0.0.1:${PORT}`, '--data-dir', dataDir, '--registration-token', TOKEN], {
+    stdio: ['ignore', 'ignore', 'pipe'],
+  });
   for (let i = 0; i < 100; i++) {
     try {
       const r = await fetch(`${URL_}/v1/health`);
@@ -91,6 +94,10 @@ test('set up sync, pair a second profile, edit on both, converge, photo, remove'
   await expect(a.getByRole('alert')).toContainText('https://');
   await a.getByLabel('Server address').fill(URL_);
   await a.getByLabel('Name for this device').fill("Ana's browser");
+  // Without the server's registration token, no household (D-105).
+  await a.getByRole('button', { name: 'Turn on sync' }).click();
+  await expect(a.getByRole('alert')).toContainText('registration token');
+  await a.getByLabel(/Registration token/).fill(TOKEN);
   await a.getByRole('button', { name: 'Turn on sync' }).click();
 
   // The recovery key, shown once, with the warning (D-15).
@@ -137,6 +144,8 @@ test('set up sync, pair a second profile, edit on both, converge, photo, remove'
   expect(onA).toBe(onB);
   await a.screenshot({ path: 'test-results/sync-pair-owner.png', fullPage: true });
   await b.screenshot({ path: 'test-results/sync-pair-new.png', fullPage: true });
+  // The owner cannot finish until the new device has said yes (D-102).
+  await expect(a.getByRole('button', { name: 'They match' })).toBeDisabled();
   await b.getByRole('button', { name: 'They match' }).click();
   await a.getByRole('button', { name: 'They match' }).click();
   await expect(a.getByText(/^Added\. It may take/)).toBeVisible();

@@ -544,9 +544,10 @@ export interface Commands {
   sync_join_poll: [None, PairState];
   sync_join_confirm: [{ matches: boolean }, PairState];
   sync_restore: [{ server: string; recovery_key: string; device_name: string }, Status];
-  sync_remove_device: [{ id: string }, SyncDevice[]];
-  sync_new_recovery_key: [None, RecoveryKeyOut];
+  sync_remove_device: [{ id: string; recovery_key?: string }, SyncDevice[]];
+  sync_new_recovery_key: [{ recovery_key: string }, RecoveryKeyOut];
   sync_stop: [None, SyncStatus];
+  sync_dismiss_notices: [None, SyncStatus];
 }
 
 // -- sync (Phase 6) ---------------------------------------------------------
@@ -566,6 +567,9 @@ export interface SyncStatus {
   pending_changes: number;
   recovery_confirmed: boolean;
   refused: number;
+  /** Changes to the household's devices made on other devices. */
+  notices: { at: string | null; text: string }[];
+  warnings: string[];
 }
 
 export interface SyncReport {
@@ -605,7 +609,7 @@ export interface Invitation {
 
 export type PairState =
   | { state: 'waiting' }
-  | { state: 'compare'; safety_number: string; other_name: string }
+  | { state: 'compare'; safety_number: string; other_name: string; other_confirmed: boolean }
   | { state: 'waiting_for_other' }
   | { state: 'done' }
   | { state: 'failed'; reason: string };
@@ -795,4 +799,5 @@ export const COMMANDS: Command[] = [
   'sync_remove_device',
   'sync_new_recovery_key',
   'sync_stop',
+  'sync_dismiss_notices',
 ];
