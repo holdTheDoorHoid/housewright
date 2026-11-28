@@ -217,6 +217,9 @@ test('set up sync, pair a second profile, edit on both, converge, photo, remove'
   await goHash(b, '#/sync');
   // B may already have found out by itself (it syncs in the background).
   const now = b.getByRole('button', { name: 'Sync now' });
+  const removedText = b.getByText(/removed from the household/).first();
+  // Wait for the screen to load (it shows one or the other).
+  await expect(now.or(removedText)).toBeVisible();
   if (await now.isVisible()) await now.click();
   await expect(b.getByText(/removed from the household/).first()).toBeVisible();
   await b.screenshot({ path: 'test-results/sync-b-removed.png', fullPage: true });

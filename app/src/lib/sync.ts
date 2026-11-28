@@ -15,7 +15,6 @@ const READS = new Set<string>([
 ]);
 
 let enabled = false;
-let running = false;
 let timer: ReturnType<typeof setTimeout> | null = null;
 let interval: ReturnType<typeof setInterval> | null = null;
 const listeners = new Set<(s: SyncStatus) => void>();
@@ -30,10 +29,21 @@ function tell(s: SyncStatus) {
   for (const f of listeners) f(s);
 }
 
-/** Sync now, quietly: errors are shown on the Sync screen, never as pop-ups. */
+/** Sync now, quietly: errors are shown on the Sync screen, never as pop-ups.
+ * If a sync is already running, this waits for it and then syncs again, so
+ * "Sync now" always reflects what is on the server at the moment of asking. */
+let current: Promise<SyncStatus | null> | null = null;
 export async function syncNow(): Promise<SyncStatus | null> {
-  if (running) return null;
-  running = true;
+  while (current) await current.catch(() => null);
+  current = runOnce();
+  try {
+    return await current;
+  } finally {
+    current = null;
+  }
+}
+
+async function runOnce(): Promise<SyncStatus | null> {
   try {
     const r = await call('sync_now');
     if (r.report.pulled_ops > 0 || r.report.files_down > 0) refresh();
@@ -47,8 +57,6 @@ export async function syncNow(): Promise<SyncStatus | null> {
     } catch {
       return null;
     }
-  } finally {
-    running = false;
   }
 }
 
