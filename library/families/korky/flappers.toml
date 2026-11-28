@@ -1,0 +1,58 @@
+format = 1
+id = "flappers"
+brand = "korky"
+name = "Korky replacement toilet flappers"
+category = "toilet"
+status = "current"
+description = "Replacement flappers in 2-inch and 3-inch sizes."
+
+[[manuals]]
+kind = "parts-page"
+title = "Flappers and seals"
+url = "https://www.korky.com/parts/flapper-seal-replacements"
+source = "https://www.korky.com/parts/flapper-seal-replacements"
+
+[[manuals]]
+kind = "support-page"
+title = "Support, instructions and FAQ"
+url = "https://www.korky.com/support"
+source = "https://www.korky.com/support"
+
+[[manuals]]
+kind = "manual-search"
+title = "Toilet Genius part finder"
+url = "https://www.korky.com/toilet-genius"
+source = "https://www.korky.com/"
+
+[[facts]]
+topic = "size"
+text = "Flappers come in 2-inch and 3-inch sizes. Look at the drain opening at the bottom of the tank: roughly orange-sized means 2-inch, roughly grapefruit-sized means 3-inch. Korky says most toilets built before 2000 take the 2-inch size."
+source = "https://www.korky.com/toilet-repair-help/what-size-flapper-do-i-need"
+
+[[consumables]]
+name = "2 inch Ultra High Performance toilet flapper, 3 pack"
+part = "100TP"
+size = "2 inch"
+for_task = "valves"
+source = "https://www.korky.com/parts/flapper-seal-replacements"
+
+[[sources]]
+url = "https://www.korky.com/parts/flapper-seal-replacements"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.korky.com/toilet-repair-help/what-size-flapper-do-i-need"
+title = "What size flapper do I need"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.korky.com/support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.korky.com/toilet-genius"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.korky.com/"
+checked = 2026-11-28

@@ -1,0 +1,12 @@
+format = 1
+id = "mysa"
+name = "Mysa"
+aliases = ["MYSA", "Mysa Smart Thermostats"]
+domains = ["getmysa.com"]
+website = "https://getmysa.com/"
+support_url = "https://help.getmysa.com/"
+manual_search_url = "https://guides.getmysa.com/"
+
+[[sources]]
+url = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+checked = 2026-11-28

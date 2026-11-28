@@ -1,0 +1,19 @@
+format = 1
+id = "franklin-electric"
+name = "Franklin Electric"
+aliases = ["FRANKLIN ELECTRIC", "Franklin Water", "Franklin Electric Co"]
+domains = ["franklinwater.com"]
+website = "https://www.franklinwater.com/"
+support_url = "https://www.franklinwater.com/support/technical-support/"
+manual_search_url = "https://www.franklinwater.com/resources/resource-library/"
+phone = "1-800-348-2420"
+note = "Phone is the technical support line; choose option 1 for Franklin Water."
+
+[[sources]]
+url = "https://www.franklinwater.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.franklinwater.com/support/technical-support/"
+title = "Franklin Water technical support"
+checked = 2026-11-28

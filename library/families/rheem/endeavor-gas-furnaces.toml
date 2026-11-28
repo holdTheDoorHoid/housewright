@@ -1,0 +1,44 @@
+format = 1
+id = "endeavor-gas-furnaces"
+brand = "rheem"
+name = "Rheem Endeavor Line gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["R98MV", "R97MV", "R962V", "R951V", "R921V", "R802V"]
+description = "Rheem Endeavor Line gas furnaces: Prestige, Classic Plus and Classic series from 80 to 98 percent AFUE."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem gas furnace range"
+url = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+
+[[manuals]]
+kind = "support-page"
+title = "Rheem residential heating and cooling product documentation"
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+source = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+
+[[facts]]
+topic = "model"
+text = "Examples from the current Endeavor range: R98MV is the 98 percent modulating Prestige, R921V a 92 percent single-stage Classic, and R802V an 80 percent two-stage Classic Plus."
+source = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+
+[[facts]]
+topic = "warranty"
+text = "No warranty years are printed on Rheem's warranty page. Register the furnace, then check its coverage with the serial number; have that serial handy when you contact a local Rheem Pro."
+source = "https://www.rheem.com/warranties/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/heating-and-cooling/furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/warranties/"
+checked = 2026-11-28

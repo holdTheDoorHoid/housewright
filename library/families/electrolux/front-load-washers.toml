@@ -1,0 +1,46 @@
+format = 1
+id = "front-load-washers"
+brand = "electrolux"
+name = "Electrolux front load washers"
+category = "washer"
+status = "current"
+description = "Electrolux front load washers; owner help sits on owner.electrolux.com."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean and care for your front load washer"
+url = "https://owner.electrolux.com/support-articles/article/1853590-how-to-clean-care-for-your-front-load-washer"
+source = "https://owner.electrolux.com/support-articles/laundry-/washers"
+
+[[manuals]]
+kind = "support-page"
+title = "Laundry washer support articles"
+url = "https://owner.electrolux.com/support-articles/laundry-/washers"
+source = "https://owner.electrolux.com/support-articles"
+
+[[manuals]]
+kind = "product-page"
+title = "ELFW7637AT-C1 front load washer product page"
+url = "https://www.electrolux.com/en/p/laundry-care/washers/front-load-washers/ELFW7637AT-C1"
+source = "https://www.electrolux.com/en/p/laundry-care/washers/front-load-washers/ELFW7637AT-C1"
+unverified = true
+note = "page timed out on WebFetch and curl at review; URL from search results"
+
+[[sources]]
+url = "https://owner.electrolux.com/support-articles/laundry-/washers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://owner.electrolux.com/support-articles"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.electrolux.com/en/p/laundry-care/washers/front-load-washers/ELFW7637AT-C1"
+checked = 2026-11-28
+unverified = true
+note = "fetch timed out at review; URL from search results"
+
+[[sources]]
+url = "https://owner.electrolux.com/support-articles/article/1853590-how-to-clean-care-for-your-front-load-washer"
+checked = 2026-11-28
+note = "opened at review; article body is empty (title and related links only)"

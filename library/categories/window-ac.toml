@@ -1,0 +1,7 @@
+format = 1
+id = "window-ac"
+name = "Window air conditioners"
+template = "window-ac"
+life_safety = false
+brands = ["frigidaire", "ge-appliances", "lg", "midea"]
+why_brands = "Common US retail brands for window units. Only four are covered so far because Haier, Whirlpool and Amana window units had no official US manual pages we could reach."

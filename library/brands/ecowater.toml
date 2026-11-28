@@ -1,0 +1,12 @@
+format = 1
+id = "ecowater"
+name = "EcoWater"
+aliases = ["ECOWATER", "EcoWater Systems", "Ecowater"]
+domains = ["ecowater.com"]
+website = "https://www.ecowater.com/"
+support_url = "https://www.ecowater.com/contact/"
+note = "Technical support articles are on a separate help-center host that is not in this brand's domains, so they are not cited."
+
+[[sources]]
+url = "https://www.ecowater.com/"
+checked = 2026-11-28

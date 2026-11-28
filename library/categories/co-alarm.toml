@@ -1,0 +1,7 @@
+format = 1
+id = "co-alarm"
+name = "Carbon monoxide alarms"
+template = "co-alarm"
+life_safety = true
+brands = ["first-alert", "kidde", "google-nest", "x-sense", "universal-security-instruments"]
+why_brands = "Common US retail and online brands for home CO alarms, mostly the same makers as smoke alarms; no public market-share table was found, so the order is our judgement."

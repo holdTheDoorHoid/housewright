@@ -1,0 +1,56 @@
+format = 1
+id = "smart-thermostats"
+brand = "carrier"
+name = "Carrier Infinity and smart thermostats"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+model_patterns = ["SYSTXCC*", "TSTATCC*", "EB-STATE#ICR*"]
+model_examples = ["SYSTXCCWIC01-C", "SYSTXCCITC01-C", "TSTATCCEWF-01", "EB-STATE6ICR-01"]
+description = "Infinity System Control for Carrier communicating systems, plus Carrier-branded Wi-Fi and ecobee-built thermostats."
+
+[[manuals]]
+kind = "product-page"
+title = "Infinity System Control, white"
+url = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+source = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Infinity control owner manual, English"
+url = "https://brandportal.carrier.com/asset/9616c246-9493-4ef7-91b9-0aa3ffda563f/OMSYSTXCCITC-VC-03.pdf"
+source = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Carrier residential product documents"
+url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+source = "https://www.carrier.com/residential/en/us/products/thermostats/"
+
+[[facts]]
+topic = "compatibility"
+text = "The Infinity System Control works only with Carrier Infinity systems and can run up to eight zones with the optional zoning panel."
+source = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+
+[[facts]]
+topic = "registration"
+text = "On eligible equipment, registering on time lets the owner pick a 10-year parts-only warranty or 5 years of parts plus 3 years of labor."
+source = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+
+[[sources]]
+url = "https://www.carrier.com/us/en/residential/smart-thermostats/systxccwic01-c/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://brandportal.carrier.com/asset/9616c246-9493-4ef7-91b9-0aa3ffda563f/OMSYSTXCCITC-VC-03.pdf"
+title = "Linked PDF, not fetched"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/thermostats/"
+title = "Thermostat list"
+checked = 2026-11-28

@@ -1,0 +1,18 @@
+format = 1
+id = "navien"
+name = "Navien"
+aliases = ["NAVIEN", "Navien Inc"]
+domains = ["navieninc.com"]
+website = "https://www.navieninc.com/"
+support_url = "https://www.navieninc.com/support"
+manual_search_url = "https://www.navieninc.com/downloads"
+phone = "800-519-8794"
+note = "Phone is the Navien technical support number given on its support, series and warranty pages."
+
+[[sources]]
+url = "https://www.navieninc.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/support"
+checked = 2026-11-28

@@ -18,7 +18,14 @@ use serde_json::Value;
 use crate::*;
 
 /// Commands that take a file's bytes as well as JSON arguments.
-pub const UPLOAD_COMMANDS: &[&str] = &["attach", "scan_label", "read_label", "restore_backup"];
+pub const UPLOAD_COMMANDS: &[&str] = &[
+    "attach",
+    "scan_label",
+    "read_label",
+    "restore_backup",
+    "library_import",
+    "attach_manual",
+];
 /// Commands that give back bytes rather than JSON.
 pub const DOWNLOAD_COMMANDS: &[&str] = &[
     "attachment_file",
@@ -43,6 +50,7 @@ pub(crate) fn attachment_out(a: &Attachment) -> AttachmentOut {
         height: a.height,
         at: a.at,
         sensitive: a.sensitivity == Sensitivity::Sensitive,
+        source: a.source.clone(),
     }
 }
 
@@ -198,6 +206,8 @@ impl Api {
             }
             "scan_label" => ok(self.scan(bytes)?),
             "read_label" => ok(self.read_label(bytes)?),
+            "library_import" => self.library_import(a, bytes),
+            "attach_manual" => self.attach_manual(a, bytes),
             _ => unreachable!("listed above"),
         }
     }
@@ -286,6 +296,7 @@ impl Api {
                     width: Some(p.width),
                     height: Some(p.height),
                     sensitivity,
+                    source: None,
                 },
             )?
         } else if photo::is_pdf(bytes) {
@@ -305,6 +316,7 @@ impl Api {
                     width: None,
                     height: None,
                     sensitivity,
+                    source: None,
                 },
             )?
         } else {
@@ -368,6 +380,7 @@ impl Api {
     fn update_item(&mut self, a: UpdateItemArgs) -> Result<UpdateItemOut, ApiError> {
         let id: ItemId = parse_id(&a.id, "item")?;
         let mut it: Item = self.store.fetch(&id.to_string())?;
+        let before = it.clone();
         if let Some(n) = a.name {
             if n.trim().is_empty() {
                 return Err(ApiError::invalid("give it a name".to_string()));
@@ -379,6 +392,13 @@ impl Api {
         }
         if let Some(v) = blank_to_none(a.model) {
             it.model = v;
+        }
+        // "None of these" was about the old make and model: offer
+        // suggestions again for the new ones (D-149).
+        if it.family.as_deref() == Some(NO_FAMILY)
+            && (it.make != before.make || it.model != before.model)
+        {
+            it.family = None;
         }
         if let Some(v) = blank_to_none(a.serial) {
             let sens = it
@@ -1003,7 +1023,15 @@ impl Api {
             }),
             None => None,
         };
+        // Suggest a model family from the brand and model read, narrowed
+        // to the kind of thing the label names (D-148).
+        let family = self.match_out(
+            r.brand.as_deref().unwrap_or(""),
+            r.model.as_deref().unwrap_or(""),
+            template.as_ref().map(|t| t.id.as_str()),
+        );
         Ok(LabelReadOut {
+            family,
             lines,
             brand: r.brand,
             model: r.model,

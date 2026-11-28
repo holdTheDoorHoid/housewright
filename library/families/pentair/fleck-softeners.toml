@@ -1,0 +1,31 @@
+format = 1
+id = "fleck-softeners"
+brand = "pentair"
+name = "Pentair / Fleck water softeners"
+category = "water-softener"
+status = "unknown"
+description = "Fleck-valve softeners sold by dealers; no model-level page was reachable, so only the maker's support hub is linked."
+
+[[manuals]]
+kind = "support-page"
+title = "Residential product support hub"
+url = "https://www.pentair.com/en-us/education-support/residential.html"
+source = "https://www.pentair.com/en-us/education-support/residential.html"
+
+[[manuals]]
+kind = "manual-search"
+title = "Download center"
+url = "https://www.pentair.com/en-us/download-center.html"
+source = "https://www.pentair.com/en-us/education-support/residential.html"
+unverified = true
+note = "link listed on the support hub but URL taken from the brand file"
+
+[[sources]]
+url = "https://www.pentair.com/en-us/education-support/residential.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/download-center.html"
+checked = 2026-11-28
+unverified = true
+note = "not opened"

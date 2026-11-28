@@ -1,0 +1,31 @@
+format = 1
+id = "cimarron"
+brand = "kohler"
+name = "Kohler Cimarron toilets"
+category = "toilet"
+status = "current"
+description = "Two-piece Kohler toilet line."
+unverified = true
+note = "source blocked automated fetch at review (kohler.com timed out to WebFetch and returned 403 to curl); details from search results"
+
+[[manuals]]
+kind = "parts-page"
+title = "Flapper for two-piece Class 5 toilets (GP1078441)"
+url = "https://www.kohler.com/en/support/find-a-service-part/shop-parts/toilet-flapper-for-two-piece-class-5-toilets-gp1078441"
+source = "https://www.kohler.com/en/support/find-a-service-part/shop-parts/toilet-flapper-for-two-piece-class-5-toilets-gp1078441"
+unverified = true
+note = "source blocked automated fetch at review; URL from search results"
+
+[[consumables]]
+name = "Flapper for two-piece Class 5 toilets"
+part = "GP1078441"
+for_task = "valves"
+source = "https://www.kohler.com/en/support/find-a-service-part/shop-parts/toilet-flapper-for-two-piece-class-5-toilets-gp1078441"
+unverified = true
+note = "source blocked automated fetch at review; search snippets say the page lists Cimarron as compatible. Some Cimarron tanks use a canister flush valve with no flapper, so check the part number inside the tank before buying."
+
+[[sources]]
+url = "https://www.kohler.com/en/support/find-a-service-part/shop-parts/toilet-flapper-for-two-piece-class-5-toilets-gp1078441"
+checked = 2026-11-28
+unverified = true
+note = "source blocked automated fetch at review; URL from search results"

@@ -1,0 +1,16 @@
+format = 1
+id = "miele"
+name = "Miele"
+aliases = ["MIELE", "Miele Inc."]
+parent = "Miele & Cie. KG"
+domains = ["mieleusa.com"]
+website = "https://www.mieleusa.com/"
+support_url = "https://www.mieleusa.com/support/customer-assistance/dishwashing-1316/all"
+note = "mieleusa.com returned 403 to automated fetching; URLs come from search results."
+
+[[sources]]
+url = "https://www.mieleusa.com/support/customer-assistance/dishwashing-1316/all"
+title = "Miele USA dishwasher customer assistance (from search results)"
+checked = 2026-11-28
+unverified = true
+note = "page blocked automated fetch; URL from search results"

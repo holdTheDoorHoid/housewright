@@ -1,0 +1,21 @@
+format = 1
+id = "generac"
+name = "Generac"
+aliases = ["GENERAC", "Generac Power Systems", "Generac Power Systems Inc"]
+parent = "Generac Holdings"
+domains = ["generac.com"]
+website = "https://www.generac.com/"
+support_url = "https://www.generac.com/support/"
+manual_search_url = "https://www.generac.com/support/product-info-user-manuals/"
+phone = "+1-888-436-3722"
+note = "Manual lookup takes a serial number, model number or ordering SKU, without dashes or special characters."
+
+[[sources]]
+url = "https://www.generac.com/support/"
+title = "Generac service and support hub"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.generac.com/support/product-info-user-manuals/"
+title = "Generac product information and user manuals"
+checked = 2026-11-28

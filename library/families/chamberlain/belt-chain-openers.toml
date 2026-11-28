@@ -1,0 +1,49 @@
+format = 1
+id = "belt-chain-openers"
+brand = "chamberlain"
+name = "Chamberlain residential belt and chain drive garage door openers"
+category = "garage-door-opener"
+status = "current"
+description = "Chamberlain home openers; the support articles cited apply across models."
+
+[[manuals]]
+kind = "support-page"
+title = "Recommended monthly and annual maintenance"
+url = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+source = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+
+[[manuals]]
+kind = "support-page"
+title = "How to test the safety reversal system"
+url = "https://support.chamberlaingroup.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+source = "https://support.chamberlaingroup.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+
+[[facts]]
+topic = "safety"
+text = "Each month, lay a board about 1.5 inches high (a 2x4 flat) on the floor in the door path and close the door with the opener; it must reverse on touching it. Also block the photo-eye beam while it closes and confirm it stops and reverses."
+source = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+
+[[facts]]
+topic = "care"
+text = "Once a year, lubricate rollers, bearings and hinges with garage door lubricant, but not the tracks. Every two to three years, if your opener needs it, put white lithium grease on the opener rail where the trolley slides, with power disconnected."
+source = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+
+[[facts]]
+topic = "battery"
+text = "If the opener has a battery backup, test it once a year as its owner manual describes."
+source = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+
+[[facts]]
+topic = "safety"
+text = "If the door sticks, binds, runs unevenly or fails either safety test, stop using it and call a garage door professional. Never loosen or adjust the springs, cables, pulleys or brackets yourself: they are under extreme tension."
+source = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+
+[[sources]]
+url = "https://support.chamberlaingroup.com/s/article/Does-my-garage-door-opener-require-any-monthly-or-annual-maintenance-1484145520006"
+title = "Chamberlain recommended maintenance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.chamberlaingroup.com/s/article/How-do-I-test-the-Safety-Reversal-System-1484145519301"
+title = "Chamberlain safety reversal test"
+checked = 2026-11-28

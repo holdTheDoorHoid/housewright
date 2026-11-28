@@ -1,0 +1,83 @@
+format = 1
+id = "10-year-battery-smoke-alarms"
+brand = "first-alert"
+name = "First Alert 10-year sealed battery smoke alarms (SM210, SM2-B10, P1210E)"
+category = "smoke-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["SM210", "SM210V", "SM210L", "SM2-B10", "P1210E"]
+model_examples = ["SM210", "SM210V", "SM210L", "SM2-B10", "P1210E"]
+description = "Battery-only smoke alarms whose lithium battery is sealed in for the alarm's ten-year life, so the whole unit is replaced rather than the battery."
+
+[[manuals]]
+kind = "product-page"
+title = "SM210 10-year battery smoke alarm, slim profile"
+url = "https://www.firstalert.com/products/10-year-battery-smoke-alarm-with-slim-profile-design"
+source = "https://www.firstalert.com/collections/smoke-alarms"
+
+[[manuals]]
+kind = "product-page"
+title = "SM2-B10 10-year battery smoke alarm"
+url = "https://www.firstalert.com/products/10-year-battery-smoke-alarm-1"
+source = "https://www.firstalert.com/collections/smoke-alarms"
+
+[[manuals]]
+kind = "product-page"
+title = "P1210E slim photoelectric alarm with path light"
+url = "https://www.firstalert.com/products/10-year-battery-photoelectric-smoke-alarm-with-slim-profile-and-safety-path-light"
+source = "https://www.firstalert.com/collections/smoke-alarms"
+
+[[manuals]]
+kind = "support-page"
+title = "Support center"
+url = "https://www.firstalert.com/pages/support"
+source = "https://www.firstalert.com/pages/support"
+
+[[facts]]
+topic = "replacement"
+text = "First Alert tells owners to replace a smoke alarm no later than 10 years after the manufacture date printed on its back."
+source = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+
+[[facts]]
+topic = "battery"
+text = "The sealed-battery models never need a battery swap, but they still need regular testing. Alarms on ordinary or backup batteries should get fresh ones at least every 6 months."
+source = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+
+[[facts]]
+topic = "end of life"
+text = "The SM210 gives an end-of-life warning when the alarm is due for replacement; since the battery is sealed, that warning means a new alarm, not a new battery."
+source = "https://www.firstalert.com/products/10-year-battery-smoke-alarm-with-slim-profile-design"
+
+[[facts]]
+topic = "alarm sound"
+text = "A pattern of three beeps and a pause means smoke: get everyone outside, then call 911. Chirps mean a battery or the alarm itself needs replacing; the exact chirp codes differ by model, so check its manual."
+source = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+
+[[sources]]
+url = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+title = "Why is my smoke detector beeping"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/pages/support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/collections/smoke-alarms"
+title = "Smoke alarms collection (model numbers listed per product)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/products/10-year-battery-smoke-alarm-with-slim-profile-design"
+title = "SM210 product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/products/10-year-battery-smoke-alarm-1"
+title = "SM2-B10 product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/products/10-year-battery-photoelectric-smoke-alarm-with-slim-profile-and-safety-path-light"
+title = "P1210E product page"
+checked = 2026-11-28

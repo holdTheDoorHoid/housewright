@@ -1,0 +1,7 @@
+format = 1
+id = "boiler"
+name = "Boilers"
+template = "boiler"
+life_safety = true
+brands = ["weil-mclain", "burnham", "navien", "lochinvar", "viessmann", "bosch-thermotechnology", "peerless", "utica", "rinnai", "slant-fin"]
+why_brands = "Common US residential boiler makers found on their own product pages; no public market-share list was available, so this is a judgement of common US brands. Slant/Fin is listed for its many installed units even though it no longer makes boilers."

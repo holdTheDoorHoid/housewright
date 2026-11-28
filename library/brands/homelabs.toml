@@ -1,0 +1,20 @@
+format = 1
+id = "homelabs"
+name = "hOmeLabs"
+aliases = ["HOMELABS", "HomeLabs", "Home Labs"]
+domains = ["homelabs.com"]
+website = "https://www.homelabs.com/"
+support_url = "https://www.homelabs.com/pages/support"
+manual_search_url = "https://www.homelabs.com/pages/manuals"
+phone = "1-800-898-3002"
+note = "Phone and support hours are on the support page."
+
+[[sources]]
+url = "https://www.homelabs.com/pages/support"
+title = "hOmeLabs support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.homelabs.com/pages/manuals"
+title = "hOmeLabs manuals"
+checked = 2026-11-28

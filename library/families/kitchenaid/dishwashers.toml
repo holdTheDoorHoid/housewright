@@ -1,0 +1,22 @@
+format = 1
+id = "dishwashers"
+brand = "kitchenaid"
+name = "KitchenAid dishwashers"
+category = "dishwasher"
+status = "current"
+description = "KitchenAid dishwashers; some models have a maintenance-free filter with nothing to clean."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean the dishwasher filters"
+url = "https://producthelp.kitchenaid.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+source = "https://producthelp.kitchenaid.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+
+[[facts]]
+topic = "filter"
+text = "Clean the filter about monthly, every 2 weeks with daily use, and whenever dishes come out gritty or the tub smells. Use a soft brush for hard-water scale, never wire brushes or scouring pads."
+source = "https://producthelp.kitchenaid.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+
+[[sources]]
+url = "https://producthelp.kitchenaid.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+checked = 2026-11-28

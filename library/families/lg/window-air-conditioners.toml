@@ -1,0 +1,40 @@
+format = 1
+id = "window-air-conditioners"
+brand = "lg"
+name = "LG window air conditioners"
+category = "window-ac"
+status = "current"
+description = "LG window-mounted air conditioners, many with a clean-filter indicator light."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean and replace the filter (window and portable units)"
+url = "https://www.lg.com/us/support/help-library/lg-ac-filter-windowpotable-how-do-i-clean-and-replace-the-filter--20155017810371"
+source = "https://www.lg.com/us/support/help-library/lg-ac-filter-windowpotable-how-do-i-clean-and-replace-the-filter--20155017810371"
+
+[[facts]]
+topic = "filter"
+text = "LG suggests cleaning the filter about every two weeks, more or less often depending on how hard the unit works. Wash it in lukewarm water below 104 F (40 C) and let it dry fully before refitting, since a damp filter can lead to smells or mould."
+source = "https://www.lg.com/us/support/help-library/lg-ac-filter-windowpotable-how-do-i-clean-and-replace-the-filter--20155017810371"
+
+[[facts]]
+topic = "filter"
+text = "On room units with a filter light, the light comes on after 250 hours of running. After cleaning, press Temp up and Temp down together on the unit's own control panel to clear it; the remote cannot reset it."
+source = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT32013622-20152779781882/"
+note = "From LG Canada's room air conditioner article; check the manual for your model."
+
+[[tasks]]
+key = "filter"
+schedule = { kind = "fixed", every = "2 weeks" }
+note = "LG recommends cleaning the filter about every two weeks while the unit is in use."
+source = "https://www.lg.com/us/support/help-library/lg-ac-filter-windowpotable-how-do-i-clean-and-replace-the-filter--20155017810371"
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-ac-filter-windowpotable-how-do-i-clean-and-replace-the-filter--20155017810371"
+title = "LG window/portable AC filter help article"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT32013622-20152779781882/"
+title = "LG Canada: cleaning the filter (room air conditioner)"
+checked = 2026-11-28

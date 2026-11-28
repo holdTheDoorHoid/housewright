@@ -1,0 +1,43 @@
+format = 1
+id = "x8s-smart-thermostat"
+brand = "honeywell-home"
+name = "X8S Smart Thermostat"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+description = "Honeywell Home Wi-Fi thermostat sold by Resideo."
+
+[[manuals]]
+kind = "product-page"
+title = "X8S product page"
+url = "https://www.honeywellhome.com/products/x8s-smart-thermostat"
+source = "https://www.honeywellhome.com/products/x8s-smart-thermostat"
+
+[[manuals]]
+kind = "support-page"
+title = "Resideo product support"
+url = "https://www.resideo.com/us/en/support/"
+source = "https://www.resideo.com/us/en/"
+
+[[manuals]]
+kind = "support-page"
+title = "Thermostat wiring compatibility"
+url = "https://www.resideo.com/us/en/thermostat-wiring-compatibility/"
+source = "https://www.resideo.com/us/en/"
+
+[[sources]]
+url = "https://www.resideo.com/us/en/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.honeywellhome.com/products/x8s-smart-thermostat"
+title = "X8S Smart Thermostat"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.resideo.com/us/en/support/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.resideo.com/us/en/thermostat-wiring-compatibility/"
+checked = 2026-11-28

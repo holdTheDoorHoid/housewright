@@ -1,0 +1,48 @@
+format = 1
+id = "washers"
+brand = "bosch"
+name = "Bosch front load washers"
+category = "washer"
+status = "current"
+description = "Bosch US washers (compact and full size)."
+
+[[manuals]]
+kind = "product-page"
+title = "Washing machines"
+url = "https://www.bosch-home.com/us/en/category/washers-and-dryers/washing-machines"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+
+[[manuals]]
+kind = "manual-search"
+title = "Owner manuals"
+url = "https://www.bosch-home.com/us/owner-support/get-support/owner-manuals"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+
+[[manuals]]
+kind = "support-page"
+title = "Washer cleaning self-help"
+url = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+
+[[facts]]
+topic = "care"
+text = "Bosch says to run its Washer Cleaner every few months to strip grease from the drum, and its Descaler every few months against limescale; no exact interval is given."
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+
+[[tasks]]
+key = "clean_drum"
+schedule = { kind = "fixed", every = "3 months" }
+note = "The maker says every few months for washer cleaner and descaler; three months is our reading."
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/get-support/support-selfhelp-washing-clean-washers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/en/category/washers-and-dryers/washing-machines"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/get-support/owner-manuals"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "samsung"
+name = "Samsung"
+aliases = ["SAMSUNG", "Samsung Electronics", "SAMSUNG ELECTRONICS CO LTD"]
+parent = "Samsung Electronics"
+domains = ["samsung.com"]
+website = "https://www.samsung.com/us/"
+support_url = "https://www.samsung.com/us/support/home-appliances/washers/"
+note = "Manuals are also hosted on downloadcenter.samsung.com, covered by the samsung.com domain."
+
+[[sources]]
+url = "https://www.samsung.com/us/support/home-appliances/washers/"
+title = "Samsung US washer support hub (URL from search results)"
+checked = 2026-11-28

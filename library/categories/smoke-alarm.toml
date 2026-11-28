@@ -1,0 +1,7 @@
+format = 1
+id = "smoke-alarm"
+name = "Smoke alarms"
+template = "smoke-alarm"
+life_safety = true
+brands = ["first-alert", "kidde", "google-nest", "x-sense", "universal-security-instruments"]
+why_brands = "Common US retail and online brands for home smoke alarms; no public market-share table was found, so the order is our judgement of how often each is seen on shelves and in homes."

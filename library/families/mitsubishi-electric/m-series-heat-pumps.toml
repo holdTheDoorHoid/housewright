@@ -1,0 +1,50 @@
+format = 1
+id = "m-series-heat-pumps"
+brand = "mitsubishi-electric"
+name = "Mitsubishi Electric M-Series ductless heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["MSZ*", "MFZ*"]
+model_examples = ["MSZ-FX", "MSZ-GX", "MSZ-EX", "MSZ-JX", "MSZ-WX", "MSZ-HX", "MFZ-KX"]
+description = "Mitsubishi Electric M-Series wall and floor mounted ductless indoor units, including Hyper-Heating Inverter systems."
+
+[[manuals]]
+kind = "product-page"
+title = "Mitsubishi wall-mounted systems"
+url = "https://www.mitsubishicomfort.com/products/wall-mounted"
+source = "https://www.mitsubishicomfort.com/products/wall-mounted"
+
+[[manuals]]
+kind = "manual-search"
+title = "Mitsubishi technical product data catalog"
+url = "https://www.mitsubishipro.com/catalog"
+source = "https://www.mitsubishicomfort.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Mitsubishi warranty statements"
+url = "https://www.mitsubishicomfort.com/warranty"
+source = "https://www.mitsubishicomfort.com/warranty"
+
+[[facts]]
+topic = "warranty"
+text = "The warranty page is headed with a 12 year parts and compressor claim, and product registration is needed for the top tier of cover. Actual terms sit in separate warranty statements chosen by model and install date."
+source = "https://www.mitsubishicomfort.com/warranty"
+
+[[sources]]
+url = "https://www.mitsubishicomfort.com/products/wall-mounted"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.mitsubishipro.com/catalog"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.mitsubishicomfort.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.mitsubishicomfort.com/warranty"
+checked = 2026-11-28

@@ -1,0 +1,23 @@
+format = 1
+id = "whole-house-filters"
+brand = "ge-appliances"
+name = "GE whole house water filtration systems (GXWH20S, GXWH40L)"
+category = "whole-house-filter"
+status = "current"
+model_examples = ["GXWH20S", "GXWH40L"]
+description = "GE single-cartridge whole house filters; the GXWH40L is the heavy-duty high-flow model with 1-inch ports."
+
+[[manuals]]
+kind = "product-page"
+title = "GXWH20S and GXWH40L comparison"
+url = "https://products.geappliances.com/appliance/gea-compare/&sku=GXWH20S&sku=GXWH40L"
+source = "https://products.geappliances.com/appliance/gea-compare/&sku=GXWH20S&sku=GXWH40L"
+
+[[facts]]
+topic = "filter"
+text = "For the GXWH20S, GE's comparison table gives a 3-month filter life and 16,000 gallons per polyspun depth cartridge; it lists no life or capacity for the GXWH40L. Both are rated at 4.0 gpm filtered flow."
+source = "https://products.geappliances.com/appliance/gea-compare/&sku=GXWH20S&sku=GXWH40L"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-compare/&sku=GXWH20S&sku=GXWH40L"
+checked = 2026-11-28

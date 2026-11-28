@@ -1,0 +1,46 @@
+format = 1
+id = "atoms-and-eq-openers"
+brand = "skylink"
+name = "Skylink ATOMS and EQ garage door openers"
+category = "garage-door-opener"
+status = "current"
+description = "Skylink residential openers including the ATOMS series and the EQ-1511."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "ATOMS series owner manual (2020)"
+url = "https://www.skylinkhome.com/wp-content/uploads/2016/03/ATR-Series-Manual-2020.pdf"
+source = "https://www.skylinkhome.com/wp-content/uploads/2016/03/ATR-Series-Manual-2020.pdf"
+unverified = true
+note = "page not fetched; URL and details taken from search results"
+
+[[manuals]]
+kind = "product-page"
+title = "Residential garage door opener EQ-1511 with manual download"
+url = "https://www.skylinkhome.com/residential-garage-door-opener-eq-1511"
+source = "https://www.skylinkhome.com/residential-garage-door-opener-eq-1511"
+unverified = true
+note = "page not fetched; URL and details taken from search results"
+
+[[manuals]]
+kind = "support-page"
+title = "How-to videos"
+url = "https://www.skylinkhome.com/videos"
+source = "https://www.skylinkhome.com/videos"
+unverified = true
+note = "page not fetched; URL and details taken from search results"
+
+[[sources]]
+url = "https://www.skylinkhome.com/wp-content/uploads/2016/03/ATR-Series-Manual-2020.pdf"
+title = "ATOMS owner manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.skylinkhome.com/residential-garage-door-opener-eq-1511"
+title = "EQ-1511 page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.skylinkhome.com/videos"
+title = "Skylink videos"
+checked = 2026-11-28

@@ -1,0 +1,50 @@
+format = 1
+id = "premier-xp-softeners"
+brand = "kinetico"
+name = "Premier XP water softeners"
+category = "water-softener"
+status = "current"
+description = "Kinetico's upgraded softener line, sized and sold through local authorised dealers."
+
+[[manuals]]
+kind = "product-page"
+title = "Premier XP softeners"
+url = "https://www.kinetico.com/water-softeners/kinetico-premier-xp-water-softeners/"
+source = "https://www.kinetico.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Owner resource center"
+url = "https://resourcecenter.kinetico.com/"
+source = "https://www.kinetico.com/"
+
+[[facts]]
+topic = "salt"
+text = "Most owners use tablet or block salt; curved salt is only for models that need that shape. Skip rock salt, whose dirt can clog the softener, and ask your Kinetico dealer what to adjust before moving to potassium chloride."
+source = "https://resourcecenter.kinetico.com/owners-support/refill-your-water-softener-salt/"
+
+[[facts]]
+topic = "salt"
+text = "Keep the brine tank 1/2 to 3/4 full on medium or high settings and about 1/2 full on low; filling it to the top can make the salt bridge into a hard crust."
+source = "https://resourcecenter.kinetico.com/owners-support/refill-your-water-softener-salt/"
+
+[[facts]]
+topic = "salt"
+text = "To check, open the brine tank lid: visible water above the salt means it is time to top up."
+source = "https://resourcecenter.kinetico.com/owners-support/refill-your-water-softener-salt/"
+
+[[sources]]
+url = "https://www.kinetico.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kinetico.com/water-softeners/kinetico-premier-xp-water-softeners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://resourcecenter.kinetico.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://resourcecenter.kinetico.com/owners-support/refill-your-water-softener-salt/"
+checked = 2026-11-28

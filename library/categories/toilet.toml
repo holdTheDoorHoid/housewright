@@ -1,0 +1,7 @@
+format = 1
+id = "toilet"
+name = "Toilets and fill valves"
+template = "toilets"
+life_safety = false
+brands = ["kohler", "american-standard", "toto", "fluidmaster", "korky"]
+why_brands = "Common US retail brands: three major toilet makers plus the two best-known makers of replacement fill valves and flappers. Not ranked from a public count."

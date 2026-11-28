@@ -1,0 +1,46 @@
+format = 1
+id = "proterra-heat-pump"
+brand = "rheem"
+name = "ProTerra hybrid electric heat pump water heaters"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["PROPH*"]
+model_examples = ["PROPH40 T2 RH400-30"]
+description = "Rheem heat pump storage heaters in 40 to 80 gallon sizes, including 120 volt plug-in versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pump water heaters listing"
+url = "https://www.rheem.com/products/residential/water-heating/heat-pump-water-heaters/"
+source = "https://www.rheem.com/products/residential/water-heating/heat-pump-water-heaters/"
+
+[[manuals]]
+kind = "product-page"
+title = "ProTerra top-connection model page"
+url = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+source = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+
+[[facts]]
+topic = "filter"
+text = "This model has a washable air filter mounted on top. The product page gives no cleaning interval, so check the Use and Care Manual."
+source = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+
+[[facts]]
+topic = "installation"
+text = "Offered in 40, 50, 65 and 80 gallon sizes with 15 amp or 30 amp circuit options in the model listed; a duct diverter accessory is documented."
+source = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+
+[warranty]
+summary = "Ten year limited tank and parts warranty on the top-connection model listed."
+length = "10 years"
+source = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/heat-pump-water-heaters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/product/rheem-professional-prestige-proterra-hybrid-electric-heat-pump-with-top-water-connections-proph40-t2-rh400-30/"
+checked = 2026-11-28

@@ -1,0 +1,46 @@
+format = 1
+id = "toilets"
+brand = "american-standard"
+name = "American Standard toilets"
+category = "toilet"
+status = "current"
+description = "The brand's toilet range; individual series names were not confirmed because the collection page rate-limited the fetch."
+
+[[manuals]]
+kind = "product-page"
+title = "Toilets collection"
+url = "https://www.americanstandard-us.com/collections/toilets"
+source = "https://www.americanstandard-us.com/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Toilet parts list by model"
+url = "https://www.americanstandard-us.com/collections/toilet-parts-list"
+source = "https://www.americanstandard-us.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Support"
+url = "https://www.americanstandard-us.com/pages/support"
+source = "https://www.americanstandard-us.com/pages/support"
+
+[[facts]]
+topic = "parts"
+text = "The support page offers a service guide for finding replacement toilet parts by toilet model."
+source = "https://www.americanstandard-us.com/pages/support"
+
+[[sources]]
+url = "https://www.americanstandard-us.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandard-us.com/collections/toilets"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandard-us.com/collections/toilet-parts-list"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandard-us.com/pages/support"
+checked = 2026-11-28

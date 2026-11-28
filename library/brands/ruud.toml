@@ -1,0 +1,13 @@
+format = 1
+id = "ruud"
+name = "Ruud"
+aliases = ["RUUD", "Ruud Manufacturing"]
+parent = "Rheem"
+domains = ["ruud.com"]
+website = "https://www.ruud.com/"
+support_url = "https://www.ruud.com/contact/"
+note = "No support phone number is listed on ruud.com contact or warranty pages. Ruud is a sister brand of Rheem; product pages and documents live on ruud.com."
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

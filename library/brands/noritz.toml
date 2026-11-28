@@ -1,0 +1,17 @@
+format = 1
+id = "noritz"
+name = "Noritz"
+aliases = ["NORITZ", "Noritz America"]
+domains = ["noritz.com"]
+website = "https://noritz.com/"
+support_url = "https://help.noritz.com"
+manual_search_url = "https://noritz.com/manuals"
+phone = "1-866-766-7489"
+
+[[sources]]
+url = "https://noritz.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://noritz.com/warranty"
+checked = 2026-11-28

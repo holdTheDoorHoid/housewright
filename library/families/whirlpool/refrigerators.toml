@@ -1,0 +1,73 @@
+format = 1
+id = "refrigerators"
+brand = "whirlpool"
+name = "Whirlpool refrigerators"
+category = "refrigerator"
+status = "current"
+description = "Whirlpool full-size refrigerators that use everydrop water filters; model patterns not confirmed."
+
+[[manuals]]
+kind = "manual-search"
+title = "Whirlpool manuals lookup"
+url = "https://www.whirlpool.com/services/manuals.html"
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+note = "Linked from a producthelp page; whirlpool.com itself returned 403 at review."
+
+[[manuals]]
+kind = "manual-search"
+title = "everydrop water filter finder (look up the filter for your model)"
+url = "https://www.everydropwater.com/water-filter-finder.html"
+source = "https://producthelp.whirlpool.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+unverified = true
+note = "Linked from Whirlpool's producthelp pages; everydropwater.com returned 403 or timed out at review."
+
+[[facts]]
+topic = "filter"
+text = "Whirlpool says to change the everydrop water filter about every 6 months. Fridges with a filter performance indicator alert you at 200 gallons; those without one alert at 100 gallons. Heavy use or poor water may need sooner changes."
+source = "https://producthelp.whirlpool.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+
+[[facts]]
+topic = "filter"
+text = "To find which filter your fridge takes, look in the Accessories part of the owner manual, read the number printed on the side of the old filter, or use the everydrop online filter finder."
+source = "https://producthelp.whirlpool.com/FAQ/Purchasing_Replacement_Refrigerator_Water_Filters"
+
+[[facts]]
+topic = "coils"
+text = "Most homes do not need routine condenser cleaning. With pets, heavy kitchen traffic or construction dust, check and clean the coils every 3 to 6 months. Some models never need it and some are technician-only, so check the owner manual first."
+source = "https://producthelp.whirlpool.com/Refrigeration/Full-Size_Refrigerators/Product_Info/Cleaning_and_Care/How_and_When_to_Safely_Clean_the_Condenser_Coils"
+
+[[facts]]
+topic = "coils"
+text = "The coils usually sit behind the base grille at the bottom. Cut the power first (plug or breaker), put on safety glasses, leave ice and water lines alone, take care not to bend the fins, and fix the grille back in place before switching on again."
+source = "https://producthelp.whirlpool.com/Refrigeration/Full-Size_Refrigerators/Product_Info/Cleaning_and_Care/How_and_When_to_Safely_Clean_the_Condenser_Coils"
+
+[[sources]]
+url = "https://www.whirlpool.com/services/manuals.html"
+checked = 2026-11-28
+unverified = true
+note = "whirlpool.com blocked automated fetch; URL linked from producthelp.whirlpool.com."
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.everydropwater.com/water-filter-finder.html"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch at review; URL linked from producthelp.whirlpool.com."
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Refrigeration/Water_Filter_Information/Product_Assistance/EveryDrop_Water_Filter_Questions"
+title = "everydrop water filter questions"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/FAQ/Purchasing_Replacement_Refrigerator_Water_Filters"
+title = "Purchasing replacement refrigerator water filters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Refrigeration/Full-Size_Refrigerators/Product_Info/Cleaning_and_Care/How_and_When_to_Safely_Clean_the_Condenser_Coils"
+title = "Cleaning the condenser coils"
+checked = 2026-11-28

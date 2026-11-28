@@ -1,0 +1,14 @@
+format = 1
+id = "goulds"
+name = "Goulds Water Technology"
+aliases = ["GOULDS", "Goulds Pumps", "Goulds Water Technology"]
+parent = "Xylem"
+domains = ["xylem.com"]
+website = "https://www.xylem.com/en-us/brand/goulds-water-technology/"
+support_url = "https://www.xylem.com/en-us/brand/goulds-water-technology/contact-us/homeowner-support/"
+manual_search_url = "https://www.xylem.com/en-us/brands/goulds-water-technology/resources-tools/literature-library/"
+note = "The old goulds.com address redirects to the Xylem site. The literature library page showed no results when checked by automated fetch."
+
+[[sources]]
+url = "https://www.xylem.com/en-us/brand/goulds-water-technology/"
+checked = 2026-11-28

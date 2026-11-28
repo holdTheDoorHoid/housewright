@@ -1,0 +1,14 @@
+format = 1
+id = "amana-hvac"
+name = "Amana"
+aliases = ["AMANA", "Amana Heating and Cooling", "Amana HVAC"]
+parent = "Daikin Comfort Technologies"
+domains = ["amana-hac.com"]
+website = "https://www.amana-hac.com/"
+support_url = "https://www.amana-hac.com/support"
+manual_search_url = "https://www.amana-hac.com/resources/literature-library"
+note = "Heating and cooling brand, separate from Amana appliances (Whirlpool)."
+
+[[sources]]
+url = "https://www.amana-hac.com/"
+checked = 2026-11-28

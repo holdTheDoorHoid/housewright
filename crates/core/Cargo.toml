@@ -17,6 +17,7 @@ jiff.workspace = true
 rusqlite.workspace = true
 toml.workspace = true
 sha2.workspace = true
+flate2.workspace = true
 zip.workspace = true
 
 [dev-dependencies]

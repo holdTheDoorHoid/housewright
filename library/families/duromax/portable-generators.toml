@@ -1,0 +1,60 @@
+format = 1
+id = "portable-generators"
+brand = "duromax"
+name = "DuroMax portable and dual fuel generators"
+category = "generator"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Open-frame and inverter portable generators including dual fuel models."
+
+[[manuals]]
+kind = "support-page"
+title = "FAQ with maintenance answers"
+url = "https://www.duromaxpower.com/pages/faq"
+source = "https://www.duromaxpower.com/pages/faq"
+
+[[manuals]]
+kind = "support-page"
+title = "Generator setup guide"
+url = "https://www.duromaxpower.com/pages/duromax-generator-setup"
+source = "https://www.duromaxpower.com/pages/duromax-generator-setup"
+
+[[facts]]
+topic = "service"
+text = "Check the oil before every use. The break-in oil change is due at 8 hours, then change it every 100 hours of running. During the first 6 to 8 hours use conventional oil and keep the load under half the rated output."
+source = "https://www.duromaxpower.com/pages/faq"
+
+[[facts]]
+topic = "service"
+text = "DuroMax generators take 30W, 10W-30 or 5W-30 oil, conventional or synthetic, chosen by climate; synthetic only after break-in. Your model manual has the details."
+source = "https://www.duromaxpower.com/pages/faq"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://www.duromaxpower.com/pages/faq"
+title = "DuroMax FAQ"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.duromaxpower.com/pages/duromax-generator-setup"
+title = "DuroMax generator setup"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

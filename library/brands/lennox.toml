@@ -1,0 +1,16 @@
+format = 1
+id = "lennox"
+name = "Lennox"
+aliases = ["LENNOX", "Lennox Industries", "Lennox International"]
+domains = ["lennox.com"]
+website = "https://www.lennox.com/"
+support_url = "https://www.lennox.com/residential/support/contact/"
+note = "Lennox support page offers a contact form and chat, and points owners to their dealer; no consumer phone number was shown."
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/contact/"
+checked = 2026-11-28

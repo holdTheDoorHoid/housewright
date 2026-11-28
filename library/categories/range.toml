@@ -1,0 +1,6 @@
+format = 1
+id = "range"
+name = "Ranges, cooktops and wall ovens"
+life_safety = true
+brands = ["ge-appliances", "whirlpool", "samsung", "lg", "frigidaire"]
+why_brands = "Common US retail brands of freestanding and slide-in ranges, chosen from the major appliance makers sold nationwide; no public count was used. Gas ranges are life-safety equipment, so anti-tip and gas-smell guidance is included."

@@ -1,0 +1,13 @@
+format = 1
+id = "zline"
+name = "ZLINE"
+aliases = ["ZLINE Kitchen and Bath", "ZLINE Kitchen", "Z-LINE"]
+domains = ["zlinekitchen.com"]
+website = "https://zlinekitchen.com/"
+support_url = "https://zlinekitchen.com/pages/faq"
+phone = "+1-614-777-5004"
+
+[[sources]]
+url = "https://zlinekitchen.com/pages/faq"
+title = "ZLINE FAQ (gives the Customer Experience phone number)"
+checked = 2026-11-28

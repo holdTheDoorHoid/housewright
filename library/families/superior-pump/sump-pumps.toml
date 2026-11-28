@@ -1,0 +1,33 @@
+format = 1
+id = "sump-pumps"
+brand = "superior-pump"
+name = "Superior Pump sump pumps"
+category = "sump-pump"
+status = "current"
+description = "Superior's sump pump range; individual model families were not listed on the pages fetched."
+
+[[manuals]]
+kind = "product-page"
+title = "Sump pump products"
+url = "https://www.superiorpump.com/en/products?type=sump&hsLang=en"
+source = "https://www.superiorpump.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Resources"
+url = "https://www.superiorpump.com/en/resources"
+source = "https://www.superiorpump.com/"
+unverified = true
+note = "Page linked from the home page; contents not checked for manuals."
+
+[[sources]]
+url = "https://www.superiorpump.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.superiorpump.com/en/products?type=sump&hsLang=en"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.superiorpump.com/en/resources"
+checked = 2026-11-28

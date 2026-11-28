@@ -1,0 +1,40 @@
+format = 1
+id = "premier-heat-pump"
+brand = "state"
+name = "Premier hybrid electric heat pump water heaters"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["HPAX*", "HPSX*", "HPVX*", "HPX*"]
+model_examples = ["HPAX-50-DHPT 210", "HPX-80-DHPTNE 130"]
+description = "State Premier heat pump storage heaters including MAX, AL Smart, 120V and CTA-2045 versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Hybrid electric heat pump listing"
+url = "https://www.statewaterheaters.com/residential/water-heaters/hybrid-electric-heat-pump/"
+source = "https://www.statewaterheaters.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals, documents and videos"
+url = "https://www.statewaterheaters.com/find-documents-and-videos"
+source = "https://www.statewaterheaters.com/"
+
+[warranty]
+summary = "All heat pump models on the listing page show a 10 year limited warranty."
+length = "10 years"
+source = "https://www.statewaterheaters.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[[sources]]
+url = "https://www.statewaterheaters.com/residential/water-heaters/hybrid-electric-heat-pump/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/find-documents-and-videos"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/"
+checked = 2026-11-28

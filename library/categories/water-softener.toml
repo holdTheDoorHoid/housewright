@@ -1,0 +1,7 @@
+format = 1
+id = "water-softener"
+name = "Water softeners"
+template = "water-softener"
+life_safety = false
+brands = ["culligan", "kinetico", "ecowater", "whirlpool", "morton", "rheem", "pentair"]
+why_brands = "Common US brands sold through dealers and home centers. Whirlpool, Morton and Rheem are added from their own pages; Pentair/Fleck has only a support hub link and GE softeners were not found on official pages."

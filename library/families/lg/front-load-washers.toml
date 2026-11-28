@@ -1,0 +1,42 @@
+format = 1
+id = "front-load-washers"
+brand = "lg"
+name = "LG front-load washers"
+category = "washer"
+status = "current"
+description = "LG front-load washing machines with a Tub Clean cycle and a drain pump filter behind a lower front panel."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+
+[[facts]]
+topic = "cleaning"
+text = "Tub Clean is a preset hot wash followed by a high spin to dry the drum, run with the drum empty; on models that lack it, LG says to use the Sanitary cycle."
+source = "https://www.lg.com/us/support/help-library/lg-washer-how-to-clean-the-tub-of-your-lg-washing-machine-CT10000010-1400786418920"
+
+[[facts]]
+topic = "filter"
+text = "LG recommends cleaning the drain pump filter monthly and checking it whenever draining is slow or an OE code shows. Open the access panel low on the front (left on most models), then unscrew the filter counterclockwise."
+source = "https://www.lg.com/us/support/help-library/lg-washer-how-to-clean-the-drain-pump-filter--20150206838321"
+
+[[facts]]
+topic = "care"
+text = "Dry the door and gasket after each wash day and clean both at least monthly with 3/4 cup bleach in a gallon of warm water, or vinegar instead. Never combine bleach and vinegar, and never use neat bleach on the gasket."
+source = "https://www.lg.com/us/support/help-library/lg-washer-how-to-clean-the-tub-of-your-lg-washing-machine-CT10000010-1400786418920"
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-washer-how-to-clean-the-tub-of-your-lg-washing-machine-CT10000010-1400786418920"
+title = "LG front load washer maintenance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-washer-how-to-clean-the-drain-pump-filter--20150206838321"
+title = "How to clean the drain pump filter"
+checked = 2026-11-28

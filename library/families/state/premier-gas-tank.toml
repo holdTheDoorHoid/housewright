@@ -1,0 +1,47 @@
+format = 1
+id = "premier-gas-tank"
+brand = "state"
+name = "Premier and Polaris gas tank water heaters"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "State gas storage heaters including Premier Force, Premier Low NOx and Polaris condensing models."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas tank water heaters listing"
+url = "https://www.statewaterheaters.com/residential/water-heaters/gas-tank/"
+source = "https://www.statewaterheaters.com/residential/water-heaters/gas-tank/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals, documents and videos"
+url = "https://www.statewaterheaters.com/find-documents-and-videos"
+source = "https://www.statewaterheaters.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty status check"
+url = "https://www.statewaterheaters.com/support/warranty-verification.html"
+source = "https://www.statewaterheaters.com/"
+
+[warranty]
+summary = "Listed Premier Force models show 8 years, Premier Low NOx 6 years and Polaris 10 years limited; check the model page."
+source = "https://www.statewaterheaters.com/residential/water-heaters/gas-tank/"
+
+[[sources]]
+url = "https://www.statewaterheaters.com/residential/water-heaters/gas-tank/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/find-documents-and-videos"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/support/warranty-verification.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.statewaterheaters.com/"
+checked = 2026-11-28

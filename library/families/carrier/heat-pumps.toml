@@ -1,0 +1,58 @@
+format = 1
+id = "heat-pumps"
+brand = "carrier"
+name = "Carrier Infinity, Performance and Comfort heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["27@@@#*"]
+model_examples = ["27VNA3", "27VNA1", "27VPA9", "27TPA8", "27SPA6", "27SCA5"]
+description = "Carrier split-system heat pumps; model numbers start 27, with a Coastal version ending in C."
+
+[[manuals]]
+kind = "product-page"
+title = "Carrier heat pump range"
+url = "https://www.carrier.com/residential/en/us/products/heat-pumps/"
+source = "https://www.carrier.com/residential/en/us/products/heat-pumps/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Carrier residential product documents"
+url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+source = "https://www.carrier.com/residential/en/us/products/furnaces/"
+
+[[facts]]
+topic = "filter"
+text = "Carrier says to look at the air filter every 2 to 3 months and swap it as needed; pets, smoke, cooking, allergies and how often the system runs all shorten the interval."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[[facts]]
+topic = "outdoor"
+text = "Keep 2 to 3 feet clear around the outdoor unit and cut shrubs back. Cut power first, rinse or vacuum the fins gently, and never use a pressure washer, which bends the fins."
+source = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+
+[warranty]
+summary = "Registered within 90 days: choose 10 years parts-only, or 5 years parts plus 3 years labor if the installer joins the labor program. Not registered in time: 5 years parts only."
+length = "10 years parts"
+source = "https://www.carrier.com/residential/en/us/homeowner-resources/warranty/"
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/heat-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/us/en/product-documents/?businessUnit=Residential"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/products/air-conditioners/ac-maintenance/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.carrier.com/residential/en/us/homeowner-resources/warranty/"
+checked = 2026-11-28

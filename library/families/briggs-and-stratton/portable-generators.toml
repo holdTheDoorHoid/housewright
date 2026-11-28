@@ -1,0 +1,60 @@
+format = 1
+id = "portable-generators"
+brand = "briggs-and-stratton"
+name = "Briggs & Stratton portable generators"
+category = "generator"
+fuel = ["gas"]
+status = "current"
+description = "Portable generators with Briggs & Stratton engines; intervals differ by engine series, so the model manual rules."
+
+[[manuals]]
+kind = "support-page"
+title = "Portable generator maintenance articles"
+url = "https://www.briggsandstratton.com/en-us/support/maintenance-how-to/tag/portable-generators"
+source = "https://www.briggsandstratton.com/en-us/support/maintenance-how-to/tag/portable-generators"
+
+[[manuals]]
+kind = "support-page"
+title = "Engine maintenance schedule FAQ"
+url = "https://www.briggsandstratton.com/na/en_us/support/faqs/browse/engine-maintenance-schedule.html"
+source = "https://www.briggsandstratton.com/na/en_us/support/faqs/browse/engine-maintenance-schedule.html"
+
+[[facts]]
+topic = "service"
+text = "On the general Briggs & Stratton small-engine schedule, the first oil change is due after 5 hours of running, then every 50 hours or once a year. Check the oil every 8 hours or each day of use. EXi series engines need no oil changes."
+source = "https://www.briggsandstratton.com/na/en_us/support/faqs/browse/engine-maintenance-schedule.html"
+
+[[facts]]
+topic = "service"
+text = "Clean the air filter and pre-cleaner every 25 hours or yearly, and replace them along with the spark plug and fuel filter once a year. Service more often under heavy use or in dust."
+source = "https://www.briggsandstratton.com/na/en_us/support/faqs/browse/engine-maintenance-schedule.html"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://www.briggsandstratton.com/en-us/support/maintenance-how-to/tag/portable-generators"
+title = "Portable generator maintenance articles"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.briggsandstratton.com/na/en_us/support/faqs/browse/engine-maintenance-schedule.html"
+title = "Engine maintenance schedule FAQ"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

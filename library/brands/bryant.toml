@@ -1,0 +1,19 @@
+format = 1
+id = "bryant"
+name = "Bryant"
+aliases = ["BRYANT", "Bryant Heating & Cooling Systems"]
+parent = "Carrier Global"
+domains = ["bryant.com"]
+website = "https://www.bryant.com/en/us/"
+support_url = "https://www.bryant.com/en/us/contact-us/"
+manual_search_url = "https://www.bryant.com/en/us/current-owners/document-search/"
+phone = "+1-800-428-4326"
+note = "Phone is the Customer Relations line on the Bryant contact page, weekdays 8am to 5pm Eastern."
+
+[[sources]]
+url = "https://www.bryant.com/en/us/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bryant.com/en/us/contact-us/"
+checked = 2026-11-28

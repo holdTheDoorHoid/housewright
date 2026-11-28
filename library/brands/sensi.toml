@@ -1,0 +1,20 @@
+format = 1
+id = "sensi"
+name = "Sensi"
+aliases = ["SENSI", "Sensi by Copeland", "Emerson Sensi", "Copeland"]
+parent = "Copeland"
+domains = ["copeland.com", "emerson.com"]
+website = "https://sensi.copeland.com/en-us"
+support_url = "https://sensi.copeland.com/en-us/support"
+manual_search_url = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+phone = "888-605-7131"
+note = "Sensi was Emerson Sensi before Copeland took over the brand. The Sensi home page failed an automated certificate check; the support pages opened fine."
+
+[[sources]]
+url = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://sensi.copeland.com/en-us/contact-us"
+title = "Contact page with support phone, opened at review"
+checked = 2026-11-28

@@ -1,0 +1,13 @@
+format = 1
+id = "universal-security-instruments"
+name = "Universal Security Instruments"
+aliases = ["USI", "UNIVERSAL SECURITY INSTRUMENTS", "Universal Security Instruments Inc", "USI Electric"]
+domains = ["universalsecurity.com"]
+website = "https://www.universalsecurity.com/"
+support_url = "https://www.universalsecurity.com/"
+note = "Model numbers start with USI/ and use slashes, for example USI/SM/10YR."
+
+[[sources]]
+url = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+title = "Why is my smoke detector beeping"
+checked = 2026-11-28

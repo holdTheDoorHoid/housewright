@@ -1,0 +1,24 @@
+format = 1
+id = "nest-thermostats"
+brand = "google-nest"
+name = "Nest Thermostat and Nest Learning Thermostat"
+category = "thermostat"
+fuel = ["hardwired", "battery"]
+status = "current"
+description = "Google Nest Wi-Fi thermostats."
+
+[[manuals]]
+kind = "support-page"
+title = "Batteries for Nest products"
+url = "https://support.google.com/googlehome/answer/9297548?hl=en"
+source = "https://support.google.com/googlehome/answer/9297548?hl=en"
+
+[[facts]]
+topic = "battery"
+text = "The plain Nest Thermostat runs on a pair of AAA alkaline cells, which you swap when they run low. The Nest Thermostat E and the Nest Learning Thermostat instead have a built-in rechargeable battery that is not meant to be changed by the owner."
+source = "https://support.google.com/googlehome/answer/9297548?hl=en"
+
+[[sources]]
+url = "https://support.google.com/googlehome/answer/9297548?hl=en"
+title = "Batteries for Nest products"
+checked = 2026-11-28

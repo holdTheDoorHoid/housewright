@@ -1,0 +1,24 @@
+format = 1
+id = "vent-hoods"
+brand = "ge-appliances"
+name = "GE vent hoods"
+category = "range-hood"
+extends = "range-hood"
+status = "current"
+description = "GE and GE Profile wall and under-cabinet vent hoods with metal grease filters."
+
+[[manuals]]
+kind = "support-page"
+title = "Vent hood: cleaning metal grease filters"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+
+[[facts]]
+topic = "grease filter"
+text = "Clean metal grease filters about every six months with normal cooking, sooner as needed. Soak in hot water with detergent, brush lightly, dry fully. Avoid ammonia products. Dishwasher is allowed but may discolor them."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+title = "Vent Hood - Cleaning Metal Grease Filters"
+checked = 2026-11-28

@@ -1,0 +1,40 @@
+format = 1
+id = "gas-furnaces"
+brand = "daikin"
+name = "Daikin gas furnaces (DR series)"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_patterns = ["DR##@@*"]
+model_examples = ["DR97MC", "DR96TC", "DR80TC"]
+description = "Daikin Comfort gas furnaces: DR97MC, DR96TC and DR80TC."
+
+[[manuals]]
+kind = "support-page"
+title = "Daikin Owner Support Center (brochures, spec sheets, owner manuals)"
+url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+source = "https://daikincomfort.com/products"
+
+[[manuals]]
+kind = "product-page"
+title = "Daikin gas furnaces"
+url = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/gas-furnaces"
+source = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/gas-furnaces"
+
+[[facts]]
+topic = "support"
+text = "Daikin lists a homeowner support line and a separate technician line, plus a warranty lookup and registration page, all reachable from the Owner Support Center."
+source = "https://daikincomfort.com/products"
+
+[[sources]]
+url = "https://daikincomfort.com/my-daikin-systems/owner-support-center"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://daikincomfort.com/products/heating-cooling/whole-home-systems/gas-furnaces"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://daikincomfort.com/products"
+checked = 2026-11-28

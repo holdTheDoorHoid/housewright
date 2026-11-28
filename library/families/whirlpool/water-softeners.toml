@@ -1,0 +1,64 @@
+format = 1
+id = "water-softeners"
+brand = "whirlpool"
+name = "Whirlpool demand-initiated water softeners (WHEC46 and WHES series)"
+category = "water-softener"
+status = "current"
+model_examples = ["WHEC46", "WHES18", "WHES30", "WHES33", "WHES40", "WHES44", "WHES48"]
+description = "Salt-based softeners made under Whirlpool license by Water Channel Partners; the WHEC46 is the Wi-Fi model."
+
+[[manuals]]
+kind = "product-page"
+title = "WHEC46 Wi-Fi softener"
+url = "https://whirlpoolwatersolutions.com/products/wifi-water-softener-for-on-demand-control/"
+source = "https://whirlpoolwatersolutions.com/products/wifi-water-softener-for-on-demand-control/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product manuals"
+url = "https://whirlpoolwatersolutions.com/owner-center/product-manuals/"
+source = "https://whirlpoolwatersolutions.com/owner-center/product-manuals/"
+
+[[manuals]]
+kind = "support-page"
+title = "Hard water and softening FAQ"
+url = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+source = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+
+[[facts]]
+topic = "salt"
+text = "Use high-purity evaporated salt pellets to cut down on tank sludge and salt bridges; potassium chloride works instead for anyone limiting sodium."
+source = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+
+[[facts]]
+topic = "regeneration"
+text = "A typical home regenerates every 3 to 7 days, only when the resin needs it. A cycle takes about 2 hours and is preset for 2 a.m."
+source = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+
+[[facts]]
+topic = "capacity"
+text = "WHEC46: 46,000 grain capacity, holds up to 200 lb of salt, rated for hardness up to 160 gpg and up to 12 ppm clear-water iron."
+source = "https://whirlpoolwatersolutions.com/products/wifi-water-softener-for-on-demand-control/"
+
+[[consumables]]
+name = "Whirlpool Water Softener Cleanser"
+part = "WHE-WSC"
+replace_every = "4 months"
+source = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+
+[warranty]
+summary = "Each year you buy three bottles of WHE-WSC cleanser (with the unit registered and receipts uploaded) adds a year of full parts-and-labor cover; the WHEC46 page advertises up to 5 years this way. The base term is not shown."
+length = "5 years with cleanser"
+source = "https://whirlpoolwatersolutions.com/products/wifi-water-softener-for-on-demand-control/"
+
+[[sources]]
+url = "https://whirlpoolwatersolutions.com/products/wifi-water-softener-for-on-demand-control/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whirlpoolwatersolutions.com/owner-center/hard-water-water-softening-systems-faq/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://whirlpoolwatersolutions.com/owner-center/product-manuals/"
+checked = 2026-11-28

@@ -1,0 +1,52 @@
+format = 1
+id = "vitodens-100-w"
+brand = "viessmann"
+name = "Vitodens 100-W wall-hung condensing boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["B1HE-##", "B1HE-###", "B1KE-###"]
+model_examples = ["B1HE-85", "B1HE-199", "B1KE-120"]
+description = "Wall-hung condensing gas boilers, 95 percent AFUE; B1KE models add on-demand hot water."
+
+[[manuals]]
+kind = "product-page"
+title = "Vitodens 100-W product page"
+url = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+source = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+
+[[manuals]]
+kind = "manual-search"
+title = "Viessmann manuals download page"
+url = "https://www.viessmann-us.com/en/services/downloads/manuals.html"
+source = "https://www.viessmann-us.com/"
+
+[[facts]]
+topic = "design"
+text = "Uses a stainless Inox-Radial heat exchanger and has WiFi for the ViCare app. A technician services it from the front, and all the piping joins underneath."
+source = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+
+[[facts]]
+topic = "sizes"
+text = "Heat-only B1HE comes in 85, 120, 150 and 199 MBH maximum input; the B1KE combi in 120 and 199 MBH. Natural gas and propane are both supported, and it is rated to 10,000 ft."
+source = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+
+[warranty]
+summary = "Residential installs carry a limited lifetime warranty; check the Viessmann warranty sheet for what it covers."
+length = "limited lifetime"
+source = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+
+[[sources]]
+url = "https://www.viessmann-us.com/en/products/vitodens/vitodens-100-b1he.html"
+title = "Vitodens 100-W"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.viessmann-us.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.viessmann-us.com/en/services/downloads/manuals.html"
+title = "Linked from product page"
+checked = 2026-11-28

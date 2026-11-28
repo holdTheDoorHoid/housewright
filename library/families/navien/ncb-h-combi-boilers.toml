@@ -1,0 +1,64 @@
+format = 1
+id = "ncb-h-combi-boilers"
+brand = "navien"
+name = "NCB-H condensing combi-boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+model_patterns = ["NCB-###/###H"]
+model_examples = ["NCB-190/060H", "NCB-240/130H", "NCB-250/150H"]
+description = "Wall-hung condensing combi-boilers giving space heat and on-demand hot water."
+
+[[manuals]]
+kind = "support-page"
+title = "NCB-H downloads page"
+url = "https://www.navieninc.com/series/ncb-h/downloads"
+source = "https://www.navieninc.com/series/ncb-h/downloads"
+
+[[manuals]]
+kind = "support-page"
+title = "NCB-H user's information manual"
+url = "https://www.navieninc.com/downloads/ncb-h-user-s-information-manual-en"
+source = "https://www.navieninc.com/series/ncb-h/downloads"
+
+[[manuals]]
+kind = "support-page"
+title = "NCB-H installation and operation manual"
+url = "https://www.navieninc.com/downloads/ncb-h-installation-and-operation-manual-en"
+source = "https://www.navieninc.com/series/ncb-h/downloads"
+
+[[facts]]
+topic = "design"
+text = "Space heating passes through a pair of stainless heat exchangers, while tap hot water has its own plate exchanger. The boiler board itself can drive as many as three heating zones, using pumps or zone valves."
+source = "https://www.navieninc.com/series/ncb-h"
+
+[[facts]]
+topic = "sizes"
+text = "Five models with maximum heating input from 60,000 to 150,000 BTU/h and maximum hot-water input from 160,000 to 210,000 BTU/h. Rated for use up to 10,100 feet on natural gas or propane."
+source = "https://www.navieninc.com/series/ncb-h"
+
+[[facts]]
+topic = "safety"
+text = "Navien publishes separate guides for converting between natural gas and propane and for high-altitude setup. These change gas settings: book a licensed installer rather than converting it yourself."
+source = "https://www.navieninc.com/series/ncb-h/downloads"
+
+[[sources]]
+url = "https://www.navieninc.com/series/ncb-h"
+title = "NCB-H product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/series/ncb-h/downloads"
+title = "NCB-H downloads"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/downloads/ncb-h-user-s-information-manual-en"
+title = "Linked from downloads page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/downloads/ncb-h-installation-and-operation-manual-en"
+title = "Linked from downloads page"
+checked = 2026-11-28

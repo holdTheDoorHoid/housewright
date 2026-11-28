@@ -1,0 +1,38 @@
+format = 1
+id = "over-the-range-microwaves"
+brand = "ge-appliances"
+name = "GE over-the-range microwaves"
+category = "microwave"
+status = "current"
+description = "GE and GE Profile over-the-range microwaves with a vent fan, grease filters and, when recirculating, a charcoal filter."
+
+[[manuals]]
+kind = "support-page"
+title = "Upfront filter with Reset Filter indicator light"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=23974"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=23974"
+
+[[facts]]
+topic = "charcoal filter"
+text = "On recirculating models, fit a new charcoal filter every 6 to 12 months, or earlier when it is visibly dirty or discolored or when the Reset Filter light comes on."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=23974"
+
+[[facts]]
+topic = "filter light"
+text = "The Reset Filter light is only a six-month timer and cannot sense a dirty filter. After fitting a new filter, hold the Reset Filter label on the control panel for 3 seconds to turn the light off."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=23974"
+
+[[facts]]
+topic = "grease filter"
+text = "Clean the metal grease filters roughly every six months or whenever they need it. Soak them in hot water with detergent and let them dry fully; a dishwasher is fine but can discolor them."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=23974"
+title = "Over-the-Range Microwave - Upfront Filter with Filter Reset Indicator Light"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16685"
+title = "Vent Hood - Cleaning Metal Grease Filters"
+checked = 2026-11-28

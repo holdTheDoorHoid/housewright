@@ -1,0 +1,64 @@
+format = 1
+id = "ez-series-tankless"
+brand = "noritz"
+name = "EZ Series gas tankless water heaters"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["EZ*"]
+model_examples = ["EZ98", "EZ111", "EZTR75"]
+description = "Noritz residential EZ tankless line (EZ98, EZ111) sold as direct tank replacements, plus EZTR bundles that ship with venting and valve kits."
+
+[[manuals]]
+kind = "product-page"
+title = "EZ Series"
+url = "https://noritz.com/ez-series"
+source = "https://noritz.com/product?heater_type=residential"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals"
+url = "https://noritz.com/manuals"
+source = "https://noritz.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty and product registration"
+url = "https://noritz.com/warranty"
+source = "https://noritz.com/warranty"
+
+[[facts]]
+topic = "water quality"
+text = "Noritz excludes damage from water harder than 12 grains per gallon (200 mg/L), high pH, or poorly treated well water; the owner guide has a water quality section."
+source = "https://noritz.com/warranty"
+
+[[facts]]
+topic = "maintenance"
+text = "Damage from improper or destructive maintenance is not covered. The warranty page gives no flush schedule, so use the owner guide."
+source = "https://noritz.com/warranty"
+
+[warranty]
+summary = "EZ models installed from 2019 in a single family home: heat exchanger 25 years or 15,000 burn hours, parts 5 years, labor 1 year. With pre-heated or recirculated water the heat exchanger term drops to 15 years (12,000 hours)."
+length = "25 years heat exchanger"
+source = "https://noritz.com/warranty"
+
+[[sources]]
+url = "https://noritz.com/ez-series"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://noritz.com/product?heater_type=residential"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://noritz.com/manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://noritz.com/warranty"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://noritz.com/"
+checked = 2026-11-28

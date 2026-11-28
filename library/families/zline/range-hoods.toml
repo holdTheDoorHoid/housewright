@@ -1,0 +1,51 @@
+format = 1
+id = "range-hoods"
+brand = "zline"
+name = "ZLINE range hoods"
+category = "range-hood"
+extends = "range-hood"
+status = "current"
+description = "ZLINE wall-mount, under-cabinet and insert hoods with stainless baffle filters."
+
+[[manuals]]
+kind = "product-page"
+title = "KB-36 wall mount range hood (user manual linked on the page)"
+url = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+source = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+
+[[facts]]
+topic = "grease filter"
+text = "The stainless baffle filters supplied with the KB-36 come out easily and can go in the dishwasher; ZLINE says its hoods ship with dishwasher-safe baffle or mesh filters depending on model."
+source = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+
+[[facts]]
+topic = "charcoal filter"
+text = "The KB-36 can run ductless, but only with charcoal filters (model CF1), which are not in the box and must be bought separately."
+source = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+
+[[facts]]
+topic = "parts"
+text = "ZLINE sells replacement filters and other parts through its separate parts website, zlineparts.com."
+source = "https://zlinekitchen.com/pages/faq"
+
+[[consumables]]
+name = "Charcoal filter (recirculating use)"
+part = "CF1"
+for_task = "charcoal"
+source = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+note = "Named for the KB-36; check the product page of other models for their kit."
+
+[warranty]
+summary = "Range hoods carry 3 years of parts-only cover plus a limited lifetime warranty on the motor, for qualifying home installations."
+length = "3 years"
+source = "https://zlinekitchen.com/pages/faq"
+
+[[sources]]
+url = "https://zlinekitchen.com/products/zline-36-wall-mount-range-hood-stainless-steel-kb-36"
+title = "ZLINE KB-36 product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://zlinekitchen.com/pages/faq"
+title = "ZLINE FAQ"
+checked = 2026-11-28

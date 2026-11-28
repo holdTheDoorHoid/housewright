@@ -80,6 +80,7 @@ fn item(h: &Home, name: &str, template: &str) -> Item {
         sensitivity: Sensitivity::Normal,
         price: Default::default(),
         value: Default::default(),
+        family: None,
     }
 }
 

@@ -1,0 +1,49 @@
+format = 1
+id = "ranges"
+brand = "lg"
+name = "LG ranges"
+category = "range"
+fuel = ["gas", "electric"]
+status = "current"
+description = "LG freestanding and slide-in gas, electric and dual fuel ranges."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+note = "At review this URL redirected to the LG US support page with the manual lookup pop-up."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Owner manual for a gas range (MFL68920504)"
+url = "https://www.lg.com/us/support/products/documents/MFL68920504_EN_ES_1_161005.pdf"
+source = "https://www.lg.com/us/support/products/documents/MFL68920504_EN_ES_1_161005.pdf"
+note = "Link checked with a HEAD request at review (200, PDF); contents not opened."
+
+[[facts]]
+topic = "anti-tip"
+text = "The bracket ships with a template. Its screws must reach framing or a wood sill plate, or the floor on metal-stud walls. Check by carefully tilting the range forward by hand, and re-check whenever it has been pulled out from the wall."
+source = "https://www.lg.com/us/support/products/documents/MFL68920504_EN_ES_1_161005.pdf"
+unverified = true
+note = "Only in the PDF manual, which reviewers may not open; wording came from search snippets of LG range manuals. No LG HTML page with this was found."
+
+[[facts]]
+topic = "gas smell"
+text = "If you smell gas or hear it leaking, CPSC says to get out of the home at once without touching lights, phones or any other electronics on the way, then call the gas utility or local gas authority from outside."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+note = "General CPSC advice from its 2026-03-16 release; LG's own wording is only in PDF manuals, which were not opened."
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/products/documents/MFL68920504_EN_ES_1_161005.pdf"
+checked = 2026-11-28
+note = "HEAD request only (200, application/pdf)."
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+title = "CPSC winter weather safety tips (gas leak advice)"
+checked = 2026-11-28

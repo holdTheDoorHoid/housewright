@@ -1,0 +1,57 @@
+format = 1
+id = "combo-smoke-co-alarms"
+brand = "universal-security-instruments"
+name = "USI smoke and CO combination alarms"
+category = "co-alarm"
+fuel = ["battery", "hardwired"]
+status = "current"
+model_patterns = ["USI/SMCO/10YR/V", "USI/SMCO/HW10YR/P"]
+model_examples = ["USI/SMCO/10YR/V", "USI/SMCO/HW10YR/P"]
+description = "Combination alarms with 10-year battery, sold as battery-only (USI/SMCO/10YR/V) or hardwired with backup (USI/SMCO/HW10YR/P)."
+
+[[manuals]]
+kind = "product-page"
+title = "10-Year Battery Smoke, Fire and CO Alarm"
+url = "https://www.universalsecurity.com/products/10-year-battery-smoke-fire-and-carbon-monoxide-alarm-usi-smco-10yr-v"
+source = "https://www.universalsecurity.com/products/10-year-battery-smoke-fire-and-carbon-monoxide-alarm-usi-smco-10yr-v"
+
+[[manuals]]
+kind = "product-page"
+title = "Hardwire smoke, fire and CO alarm with 10-year battery backup"
+url = "https://www.universalsecurity.com/products/hardwire-smoke-fire-and-carbon-monoxide-alarm-with-10-year-battery-backup-usi-smco-hw10yr-p"
+source = "https://www.universalsecurity.com/products/hardwire-smoke-fire-and-carbon-monoxide-alarm-with-10-year-battery-backup-usi-smco-hw10yr-p"
+
+[[facts]]
+topic = "end of life"
+text = "USI says two chirps every 60 seconds is its usual end-of-life pattern around 10 years, and a battery change will not stop it; the CO-specific lifespan is in the model manual."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+unverified = true
+note = "Blog is about smoke alarms; not confirmed for the combination models."
+
+[[facts]]
+topic = "alarm sound"
+text = "On USI combination alarms, four beeps then a pause signals carbon monoxide: get outside to fresh air at once and call 911."
+source = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+
+[[facts]]
+topic = "battery"
+text = "The USI/SMCO/10YR/V runs on a sealed 10-year battery, so there are no battery changes; instead it gives one end-of-life alert, with a voice reminder, when the alarm is due for replacement."
+source = "https://www.universalsecurity.com/products/10-year-battery-smoke-fire-and-carbon-monoxide-alarm-usi-smco-10yr-v"
+
+[[facts]]
+topic = "battery"
+text = "The hardwired USI/SMCO/HW10YR/P keeps a sealed 10-year backup battery for power cuts and links to compatible hardwired alarms in the home; it too ends with a single end-of-life alert rather than low-battery chirps."
+source = "https://www.universalsecurity.com/products/hardwire-smoke-fire-and-carbon-monoxide-alarm-with-10-year-battery-backup-usi-smco-hw10yr-p"
+
+[[sources]]
+url = "https://www.universalsecurity.com/blogs/safety-measures/why-is-my-smoke-detector-beeping"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.universalsecurity.com/products/10-year-battery-smoke-fire-and-carbon-monoxide-alarm-usi-smco-10yr-v"
+title = "USI/SMCO/10YR/V product page (read through the store's product data; the page rate-limits automated fetch)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.universalsecurity.com/products/hardwire-smoke-fire-and-carbon-monoxide-alarm-with-10-year-battery-backup-usi-smco-hw10yr-p"
+checked = 2026-11-28

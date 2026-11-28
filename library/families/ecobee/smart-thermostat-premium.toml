@@ -1,0 +1,43 @@
+format = 1
+id = "smart-thermostat-premium"
+brand = "ecobee"
+name = "Smart Thermostat Premium"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+description = "Wi-Fi thermostat with a 4-inch touchscreen and air quality monitoring."
+
+[[manuals]]
+kind = "product-page"
+title = "Product page"
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+source = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+
+[[manuals]]
+kind = "support-page"
+title = "ecobee help center"
+url = "https://support.ecobee.com/s/?language=en_US"
+source = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+
+[[facts]]
+topic = "power"
+text = "Takes no batteries. It runs on 24 volt AC through the C and Rc terminals; the included Power Extender Kit lets it work where there is no C wire."
+source = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+
+[[facts]]
+topic = "filter"
+text = "Sends air filter change reminders and poor air quality alerts. Filter delivery is an optional paid subscription."
+source = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+
+[warranty]
+summary = "Three year limited warranty."
+length = "3 years"
+source = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+
+[[sources]]
+url = "https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.ecobee.com/s/?language=en_US"
+checked = 2026-11-28

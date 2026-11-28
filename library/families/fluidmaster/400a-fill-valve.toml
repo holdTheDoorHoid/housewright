@@ -1,0 +1,37 @@
+format = 1
+id = "400a-fill-valve"
+brand = "fluidmaster"
+name = "Fluidmaster 400A universal fill valve"
+category = "toilet"
+status = "current"
+description = "Adjustable replacement fill valve for one-piece and two-piece toilets."
+
+[[manuals]]
+kind = "product-page"
+title = "400A product page"
+url = "https://fluidmaster.com/product/400a-universal-fill-valve/"
+source = "https://fluidmaster.com/product/400a-universal-fill-valve/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Toilet fill valves"
+url = "https://fluidmaster.com/toilet/part-type/toilet-fill-valves/"
+source = "https://fluidmaster.com/toilet/part-type/toilet-fill-valves/"
+
+[[facts]]
+topic = "size"
+text = "The 400A adjusts to fit tanks where the valve stands about 9 to 14 inches tall."
+source = "https://fluidmaster.com/product/400a-universal-fill-valve/"
+
+[[facts]]
+topic = "care"
+text = "Fluidmaster says in-tank drop-in cleaners containing bleach or chlorine can damage tank parts and void the warranty on this valve."
+source = "https://fluidmaster.com/product/400a-universal-fill-valve/"
+
+[[sources]]
+url = "https://fluidmaster.com/product/400a-universal-fill-valve/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://fluidmaster.com/toilet/part-type/toilet-fill-valves/"
+checked = 2026-11-28

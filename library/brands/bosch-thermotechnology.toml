@@ -1,0 +1,15 @@
+format = 1
+id = "bosch-thermotechnology"
+name = "Bosch Home Comfort"
+aliases = ["BOSCH", "Bosch Thermotechnology", "Bosch Home Comfort", "Buderus"]
+parent = "Bosch"
+domains = ["bosch-homecomfort.com"]
+website = "https://www.bosch-homecomfort.com/us/en/residential/"
+support_url = "https://www.bosch-homecomfort.com/us/en/residential/service/technical-support/"
+manual_search_url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/gas-oil-boilers-and-furnaces/"
+phone = "1-800-283-3787"
+note = "Separate from the Bosch appliance brand (bosch-home.com). Phone is the customer service line shown on the residential page."
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/"
+checked = 2026-11-28

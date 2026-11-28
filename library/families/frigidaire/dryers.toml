@@ -1,0 +1,32 @@
+format = 1
+id = "dryers"
+brand = "frigidaire"
+name = "Frigidaire stacked laundry centers (electric and gas dryer)"
+category = "dryer"
+fuel = ["electric", "gas"]
+status = "current"
+description = "Frigidaire stacked washer and dryer laundry centers; the dryer half is covered by these support pages."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support page, electric stacked laundry center"
+url = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCE7522AW"
+source = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCE7522AW"
+unverified = true
+note = "page blocked automated fetch; URL from search results."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support page, gas stacked laundry center"
+url = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCG7522AW"
+source = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCG7522AW"
+unverified = true
+note = "page blocked automated fetch; URL from search results."
+
+[[sources]]
+url = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCE7522AW"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.frigidaire.com/en/p/owner-center/product-support/FLCG7522AW"
+checked = 2026-11-28

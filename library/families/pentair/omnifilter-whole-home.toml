@@ -1,0 +1,41 @@
+format = 1
+id = "omnifilter-whole-home"
+brand = "pentair"
+name = "OMNIFilter whole-home filtration"
+category = "whole-house-filter"
+extends = "whole-house-water-filter"
+status = "current"
+
+[[manuals]]
+kind = "product-page"
+title = "Whole-home filtration systems"
+url = "https://www.pentair.com/en-us/home-water-treatment/whole-home-filtration-systems.html"
+source = "https://www.pentair.com/en-us/water-solutions.html"
+
+[[manuals]]
+kind = "manual-search"
+title = "Download center"
+url = "https://www.pentair.com/en-us/download-center.html"
+source = "https://www.pentair.com/en-us/water-solutions.html"
+
+[[manuals]]
+kind = "support-page"
+title = "Residential product support"
+url = "https://www.pentair.com/en-us/education-support/residential/product-support.html"
+source = "https://www.pentair.com/en-us/water-solutions.html"
+
+[[sources]]
+url = "https://www.pentair.com/en-us/water-solutions.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/home-water-treatment/whole-home-filtration-systems.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/download-center.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.pentair.com/en-us/education-support/residential/product-support.html"
+checked = 2026-11-28

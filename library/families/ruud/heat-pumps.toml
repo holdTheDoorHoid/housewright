@@ -1,0 +1,45 @@
+format = 1
+id = "heat-pumps"
+brand = "ruud"
+name = "Ruud split-system heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_examples = ["UP19AY", "UP18AZ", "RP15AZ", "RP14AY", "WP15AZ"]
+description = "Ruud Endeavor Line heat pumps from Choice and Achiever to Achiever Plus and Ultra."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pumps"
+url = "https://www.ruud.com/products/hvac/heat_pumps/"
+source = "https://www.ruud.com/products/hvac/heat_pumps/"
+
+[[manuals]]
+kind = "support-page"
+title = "Homeowner resources"
+url = "https://www.ruud.com/homeowners/"
+source = "https://www.ruud.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "Ratings run from 14.3 SEER2 for the RP14AZ to 20 SEER2 for the UP19AY and UP18AZ, with HSPF2 between 7.5 and 8.5 on most split units."
+source = "https://www.ruud.com/products/hvac/heat_pumps/"
+
+[[facts]]
+topic = "refrigerant"
+text = "Models that list a refrigerant use R-454B, except the RD17AZ, which lists R-410A."
+source = "https://www.ruud.com/products/hvac/heat_pumps/"
+
+[[sources]]
+url = "https://www.ruud.com/products/hvac/heat_pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/homeowners/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

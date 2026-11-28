@@ -1,0 +1,61 @@
+format = 1
+id = "portable-generators"
+brand = "westinghouse"
+name = "Westinghouse portable generators (WGen and WH series)"
+category = "generator"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Open-frame and inverter portable generators; each model has its own user manual PDF."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "User manual, WGen5300"
+url = "https://cdn.westinghouseoutdoorpower.com/owners_manuals/WGen5300_manual_web.pdf"
+source = "https://cdn.westinghouseoutdoorpower.com/owners_manuals/WGen5300_manual_web.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read."
+
+[[manuals]]
+kind = "manual-search"
+title = "Documents and manuals"
+url = "https://westinghouse.com/pages/manuals"
+source = "https://westinghouse.com/pages/manuals"
+
+[[facts]]
+topic = "service"
+text = "Westinghouse generators have four-stroke engines: never mix oil into the fuel. Use SAE 10W-30 in normal conditions; 5W-30 synthetic is fine across the rated 5 F to 104 F range. Maintenance intervals differ by model, so follow your user manual."
+source = "https://westinghouse.com/pages/faq"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://cdn.westinghouseoutdoorpower.com/owners_manuals/WGen5300_manual_web.pdf"
+title = "WGen5300 user manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://westinghouse.com/pages/faq"
+title = "Westinghouse FAQ (westinghouseoutdoorpower.com/pages/faq redirects here)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://westinghouse.com/pages/manuals"
+title = "Westinghouse documents and manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

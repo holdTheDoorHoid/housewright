@@ -1,0 +1,41 @@
+format = 1
+id = "air-conditioners"
+brand = "amana-hvac"
+name = "Amana split-system air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["ALX@#@*", "AXV#S*"]
+model_examples = ["ALXS4N", "ALXS4B", "ALXT7C", "ALXS5B", "AXV6S", "AXV9S"]
+description = "Amana R-32 central air conditioners from entry single-stage to variable-speed inverter models."
+
+[[manuals]]
+kind = "product-page"
+title = "Air conditioners"
+url = "https://www.amana-hac.com/products/air-conditioners"
+source = "https://www.amana-hac.com/products/air-conditioners"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature library"
+url = "https://www.amana-hac.com/resources/literature-library"
+source = "https://www.amana-hac.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "Ratings run from up to 14.5 SEER2 for the ALXS3 models to up to 19 SEER2 for the variable-speed AXV9S; the entry ALXS4 models reach up to 15.2."
+source = "https://www.amana-hac.com/products/air-conditioners"
+
+[[sources]]
+url = "https://www.amana-hac.com/products/air-conditioners"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/resources/literature-library"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "insinkerator"
+name = "InSinkErator"
+aliases = ["INSINKERATOR", "In-Sink-Erator", "Emerson InSinkErator"]
+parent = "Whirlpool Corporation"
+domains = ["insinkerator.com"]
+website = "https://www.insinkerator.com/en-us"
+support_url = "https://www.insinkerator.com/en-us/support"
+manual_search_url = "https://www.insinkerator.com/en-us/support/literature"
+phone = "+1-800-558-5700"
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support"
+checked = 2026-11-28

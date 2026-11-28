@@ -1,0 +1,100 @@
+format = 1
+id = "under-cabinet-hoods"
+brand = "broan-nutone"
+name = "Broan and NuTone under-cabinet range hoods"
+category = "range-hood"
+extends = "range-hood"
+status = "current"
+description = "Under-cabinet hoods such as the MTR1 series; ducted, or ductless with an optional charcoal filter."
+model_examples = ["MTR1303SS", "MTR1303BL", "MTR1303WW", "MTR1363SS"]
+
+[[manuals]]
+kind = "product-page"
+title = "MTR1303SS product page with installation guide and spec sheet"
+url = "https://broan-nutone.com/en-us/product/rangehoods/mtr1303ss"
+source = "https://broan-nutone.com/en-us/product/rangehoods/mtr1303ss"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product manual library"
+url = "https://broan-nutone.com/en-us/product-manuals"
+source = "https://broan-nutone.com/en-us/home/customer-service/frequently-asked-questions"
+
+[[facts]]
+topic = "grease filter"
+text = "Broan-NuTone puts most hood filters on a 1 to 3 month cleaning cycle, shorter if you cook daily, use lots of oil or cook at high heat. Wash with warm water, a mild degreaser and a soft brush or sponge, and let them dry fully before they go back."
+source = "https://broan-nutone.com/en-us/home/customer-service/range-hood-faqs"
+
+[[facts]]
+topic = "charcoal filter"
+text = "Charcoal filters in ductless hoods are generally not washable; they are replaced, on a schedule that depends on how much you cook."
+source = "https://broan-nutone.com/en-us/home/customer-service/range-hood-faqs"
+
+[[facts]]
+topic = "filter"
+text = "The MTR1303SS ships with two micromesh filters that can go in the dishwasher. Running it ductless needs a filter kit bought separately."
+source = "https://broan-nutone.com/en-us/product/rangehoods/mtr1303ss"
+
+[[consumables]]
+name = "Charcoal filter, 30 inch hoods, 2-pack with 4 clips, 12-7/8 x 14-5/8 in"
+part = "S97020466"
+size = "12-7/8 x 14-5/8 in"
+replace_every = "6 months"
+for_task = "charcoal"
+source = "https://broan-nutone.com/en-us/accessory/s97020466"
+
+[[consumables]]
+name = "Charcoal filter, 24 inch hoods, 2-pack"
+part = "S97020465"
+size = "14-5/8 x 9-7/8 in"
+replace_every = "6 months"
+for_task = "charcoal"
+source = "https://broan-nutone.com/en-us/accessory/s97020465"
+note = "Fits select 24 inch hood series; check the listing for your model."
+
+[[consumables]]
+name = "Charcoal filter, 42 inch hoods, 2-pack"
+part = "S97020468"
+size = "14-5/8 x 18-7/8 in"
+replace_every = "6 months"
+for_task = "charcoal"
+source = "https://shop.broan-nutone.com/parts/s97020468/"
+note = "Fits select 42 inch hood series; check the listing for your model."
+
+[warranty]
+summary = "The MTR1303SS spec table lists a 1 year warranty on the hood and 3 years on the LED module. Full terms are not on the product page."
+length = "1 year"
+source = "https://broan-nutone.com/en-us/product/rangehoods/mtr1303ss"
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/product/rangehoods/mtr1303ss"
+title = "MTR1303SS product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/home/customer-service/frequently-asked-questions"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/product-manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/home/customer-service/range-hood-faqs"
+title = "Range hood FAQs"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/accessory/s97020466"
+title = "Charcoal filter S97020466"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://broan-nutone.com/en-us/accessory/s97020465"
+title = "Charcoal filter S97020465"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://shop.broan-nutone.com/parts/s97020468/"
+title = "Charcoal filter S97020468 (official Broan-NuTone shop)"
+checked = 2026-11-28

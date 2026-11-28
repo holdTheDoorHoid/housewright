@@ -1,0 +1,55 @@
+format = 1
+id = "plug-in-co-alarms"
+brand = "kidde"
+name = "Kidde plug-in CO alarms with AA backup (COP series)"
+category = "co-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["COP*"]
+model_examples = ["COP", "COPD", "COPDW", "COPDLG", "COPDLQW"]
+description = "CO alarms that plug into an outlet and keep running on AA batteries during an outage; some add a display, smart features or gas detection."
+
+[[manuals]]
+kind = "product-page"
+title = "COP plug-in CO alarm product page"
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-plug-in-with-aa-backup-battery-cop"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-plug-in-with-aa-backup-battery-cop"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "English user guide for the plug-in CO alarm (linked from the COP page)"
+url = "https://brand.kidde.com/m/404472a7b56224b5/original/UG_CO-AC-Plug-In_En.pdf"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-plug-in-with-aa-backup-battery-cop"
+
+[[manuals]]
+kind = "product-page"
+title = "CO alarm range with model numbers"
+url = "https://www.kidde.com/products/carbon-monoxide-alarms"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms"
+
+[[facts]]
+topic = "replacement"
+text = "Kidde CO alarms have a 7 or 10 year service life depending on model; once one signals end of life, fitting new batteries will not stop the chirp and the alarm must be replaced."
+source = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+
+[[facts]]
+topic = "battery"
+text = "For the COP's backup, Kidde approves only alkaline AA cells (Energizer E91, Gold Peak 15A or Golden Power GLR6A) and says not to fit lithium batteries."
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-plug-in-with-aa-backup-battery-cop"
+
+[[sources]]
+url = "https://brand.kidde.com/m/404472a7b56224b5/original/UG_CO-AC-Plug-In_En.pdf"
+title = "User guide (PDF, HEAD-checked only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-plug-in-with-aa-backup-battery-cop"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/products/carbon-monoxide-alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+checked = 2026-11-28

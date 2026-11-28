@@ -1,0 +1,76 @@
+format = 1
+id = "smart-thermostats"
+brand = "sensi"
+name = "Sensi Lite, Smart, Touch and Touch 2 thermostats"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+model_patterns = ["1F96U-42WF*", "ST76*"]
+model_examples = ["1F96U-42WF"]
+description = "Wi-Fi thermostats from Sensi by Copeland, each with its own install guide."
+
+[[manuals]]
+kind = "manual-search"
+title = "Sensi manuals by model"
+url = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+source = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+
+[[manuals]]
+kind = "support-page"
+title = "Installing the Sensi Touch 2"
+url = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+source = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Sensi Touch 2 installation instructions"
+url = "https://media.copeland.com/9513ee0c-03a2-4bef-9b4c-b15000312ccd/sensi-touch-2-smart-thermostat-installation-instructions-en-8574398.pdf"
+source = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Sensi Lite install guide"
+url = "https://media.copeland.com/8778ef3f-a339-4e44-b954-b16b010c870b/R-5664%20-%20Sensi%20Lite%20-%20Install%20Guide.pdf"
+source = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+
+[[facts]]
+topic = "power"
+text = "The Touch 2 will not run without a common wire, so check for a spare wire behind the old thermostat before buying."
+source = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+
+[[facts]]
+topic = "wifi"
+text = "Sensi connects only to 2.4 GHz Wi-Fi, so a 5 GHz-only network will not work."
+source = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+
+[[facts]]
+topic = "safety"
+text = "Switch off the heating and cooling system first. Take a photo of the old wiring and tag the wires one at a time as you free them. Most buyers in a Sensi survey finished in 30 minutes or less; adding a common wire takes longer."
+source = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+
+[warranty]
+summary = "Three years on most models; five years on the professional series when a contractor both buys and installs it. The length depends on model type and who installed it."
+length = "3 years"
+source = "https://sensi.copeland.com/en-us/legal/sensi-warranty"
+
+[[sources]]
+url = "https://sensi.copeland.com/en-us/support/sensi-manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://sensi.copeland.com/en-us/support/installation/installing-sensi-touch2-smart-thermostat"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://sensi.copeland.com/en-us/legal/sensi-warranty"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://media.copeland.com/9513ee0c-03a2-4bef-9b4c-b15000312ccd/sensi-touch-2-smart-thermostat-installation-instructions-en-8574398.pdf"
+title = "PDF link, HEAD check only (200, application/pdf)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://media.copeland.com/8778ef3f-a339-4e44-b954-b16b010c870b/R-5664%20-%20Sensi%20Lite%20-%20Install%20Guide.pdf"
+title = "PDF link, HEAD check only (200, application/pdf)"
+checked = 2026-11-28

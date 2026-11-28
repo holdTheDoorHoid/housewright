@@ -1,0 +1,6 @@
+format = 1
+id = "microwave"
+name = "Microwaves"
+life_safety = false
+brands = ["ge-appliances", "whirlpool", "samsung", "lg", "panasonic", "frigidaire"]
+why_brands = "Common US retail brands of countertop and over-the-range microwaves; no public count was used."

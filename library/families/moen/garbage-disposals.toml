@@ -1,0 +1,41 @@
+format = 1
+id = "garbage-disposals"
+brand = "moen"
+name = "Moen garbage disposals"
+category = "garbage-disposal"
+status = "current"
+description = "Moen's disposal collection; series names were not confirmed on the page."
+
+[[manuals]]
+kind = "product-page"
+title = "Garbage disposal collection"
+url = "https://www.moen.com/collections/garbage-disposals"
+source = "https://www.moen.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature center"
+url = "https://www.moen.com/pages/literature-center"
+source = "https://www.moen.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Customer support"
+url = "https://www.moen.com/pages/support"
+source = "https://www.moen.com/"
+
+[[sources]]
+url = "https://www.moen.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.moen.com/collections/garbage-disposals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.moen.com/pages/literature-center"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.moen.com/pages/support"
+checked = 2026-11-28

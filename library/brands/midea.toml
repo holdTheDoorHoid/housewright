@@ -1,0 +1,19 @@
+format = 1
+id = "midea"
+name = "Midea"
+aliases = ["MIDEA", "Midea America", "GD Midea", "Midea Group"]
+parent = "Midea Group"
+domains = ["midea.com"]
+website = "https://www.midea.com/"
+support_url = "https://www.midea.com/us/Support"
+note = "US manuals sit under midea.com/content/dam/midea-aem/us/. support_url is the Customer Support link on the US home page; no phone was shown there."
+
+[[sources]]
+url = "https://www.midea.com/content/dam/midea-aem/us/air-conditioners/dehumidifiers/mad20s1qwt/MAD20S1QWT-2024-Cube-Manual.pdf"
+title = "Midea Cube dehumidifier manual (HEAD-checked)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.midea.com/us"
+title = "Midea US home page"
+checked = 2026-11-28

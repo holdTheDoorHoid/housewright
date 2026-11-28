@@ -1,0 +1,62 @@
+format = 1
+id = "refrigerators"
+brand = "ge-appliances"
+name = "GE and GE Profile refrigerators"
+category = "refrigerator"
+status = "current"
+description = "GE, GE Profile and Cafe refrigerators; the filter type depends on the model."
+
+[[manuals]]
+kind = "support-page"
+title = "Replacing the refrigerator water filter"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=21284"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=21284"
+
+[[manuals]]
+kind = "support-page"
+title = "SmartWater and related filters"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+
+[[facts]]
+topic = "filter"
+text = "GE says to swap the fridge water filter about every 6 months, or after roughly 170 to 200 gallons depending on model, and sooner if flow to the dispenser or ice maker slows. Follow the indicator light if your model has one."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=21284"
+
+[[facts]]
+topic = "filter"
+text = "Filter types are not interchangeable: MWF-style SmartWater, XWFE, RPWFE, cylindrical GSWF and MSWF all exist. Check the old cartridge label or the manual. Without a filter or the bypass plug the dispenser and ice maker will not run."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+
+[[consumables]]
+name = "XWFE water filter (replaced XWF in 2020)"
+part = "XWFE"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+note = "Rated for 170 gallons per the cited page."
+
+[[consumables]]
+name = "SmartWater filter"
+part = "MWF"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+note = "Page says up to 6 months or 300 gallons; the MWFP is the current replacement."
+
+[[consumables]]
+name = "In-fridge water filter"
+part = "RPWFE"
+replace_every = "6 months"
+for_task = "water_filter"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=21284"
+note = "Sits in the top left of the fresh food section or inside the left door depending on model."
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=21284"
+title = "Refrigerator - Replacing the Water Filter"
+checked = 2026-11-28
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16933"
+title = "SmartWater and related filters"
+checked = 2026-11-28

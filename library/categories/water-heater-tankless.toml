@@ -1,0 +1,7 @@
+format = 1
+id = "water-heater-tankless"
+name = "Tankless water heaters"
+template = "tankless-water-heater"
+life_safety = true
+brands = ["rinnai", "navien", "noritz", "rheem", "ao-smith", "takagi", "bosch", "ruud"]
+why_brands = "Common US retail and trade brands for gas tankless units; Rinnai, Navien and Noritz specialise in them while Rheem and A. O. Smith sell them beside tanks."

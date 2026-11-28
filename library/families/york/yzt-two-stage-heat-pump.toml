@@ -1,0 +1,45 @@
+format = 1
+id = "yzt-two-stage-heat-pump"
+brand = "york"
+name = "YORK YZT two-stage heat pump"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["YZT##*"]
+description = "Affinity Series two-stage split heat pump, 18+ SEER2 (19 SEER on the older scale), sizes YZT24 to YZT60."
+
+[[manuals]]
+kind = "product-page"
+title = "YZT product page with documents"
+url = "https://york.bosch-hcgroup.com/residential-equipment/heating-and-cooling/split-system-heat-pumps/yzt_ds/yzt-19-seer-two-stage-heat-pump"
+source = "https://york.bosch-hcgroup.com/residential-equipment/heating-and-cooling/split-system-heat-pumps/yzt_ds/yzt-19-seer-two-stage-heat-pump"
+
+[[manuals]]
+kind = "support-page"
+title = "Homeowner support"
+url = "https://york.bosch-hcgroup.com/residential-equipment/york-homeowner-support"
+source = "https://york.bosch-hcgroup.com/"
+
+[[facts]]
+topic = "specs"
+text = "Listed at 18+ SEER2 and 8.1 HSPF2 (up to 19 SEER and 10.0 HSPF under the old rating method), with a two-stage scroll compressor. It can be paired with a YORK gas furnace if you want dual-fuel heating."
+source = "https://york.bosch-hcgroup.com/residential-equipment/heating-and-cooling/split-system-heat-pumps/yzt_ds/yzt-19-seer-two-stage-heat-pump"
+
+[warranty]
+summary = "Lifetime coverage on the compressor and 10 years on parts, provided the unit is registered online within 90 days of installation."
+length = "10 years parts"
+source = "https://york.bosch-hcgroup.com/residential-equipment/heating-and-cooling/split-system-heat-pumps/yzt_ds/yzt-19-seer-two-stage-heat-pump"
+
+[[sources]]
+url = "https://york.bosch-hcgroup.com/residential-equipment/heating-and-cooling/split-system-heat-pumps/yzt_ds/yzt-19-seer-two-stage-heat-pump"
+title = "Opened at review; york.com now redirects to this host"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://york.bosch-hcgroup.com/residential-equipment/york-homeowner-support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://york.bosch-hcgroup.com/"
+checked = 2026-11-28

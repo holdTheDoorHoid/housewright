@@ -1,0 +1,54 @@
+format = 1
+id = "eu-inverter-generators"
+brand = "honda"
+name = "Honda EU series portable inverter generators"
+category = "generator"
+fuel = ["gas"]
+status = "current"
+description = "Honda quiet portable inverter generators; the EU2200i manual is cited here and other EU sizes have their own manuals."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Owner manual, EU2200i and EU2200i Companion"
+url = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+source = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read."
+
+[[facts]]
+topic = "service"
+text = "The unit ships with no oil in the engine, so fill it to the mark before the first start. The first oil change is due at 20 hours, and the regular service table works by months or hours, whichever comes first."
+source = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+unverified = true
+note = "source blocked automated fetch at review (powerequipment.honda.com returned 403); figure came from a search-result excerpt and the manual PDF was not opened"
+
+[[facts]]
+topic = "service"
+text = "Oil grade is SAE 10W-30 for general use and the crankcase holds only about 14 ounces, so a small amount of overfill or underfill matters. Service more often in dusty places."
+source = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+unverified = true
+note = "source blocked automated fetch at review (powerequipment.honda.com returned 403); figure came from a search-result excerpt and the manual PDF was not opened"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://cdn.powerequipment.honda.com/pe/pdf/manuals/00X31Z446010.pdf"
+title = "EU2200i owner manual"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

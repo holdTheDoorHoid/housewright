@@ -1,0 +1,13 @@
+format = 1
+id = "briggs-and-stratton"
+name = "Briggs & Stratton"
+aliases = ["BRIGGS & STRATTON", "Briggs and Stratton", "Briggs & Stratton Corporation"]
+domains = ["briggsandstratton.com"]
+website = "https://www.briggsandstratton.com/"
+support_url = "https://www.briggsandstratton.com/en-us/support/maintenance-how-to/tag/portable-generators"
+note = "Standby generators are covered on the energy.briggsandstratton.com subdomain. support_url is the portable generator how-to listing, opened at review."
+
+[[sources]]
+url = "https://www.briggsandstratton.com/en-us/support/maintenance-how-to/tag/portable-generators"
+title = "Portable generator maintenance articles"
+checked = 2026-11-28

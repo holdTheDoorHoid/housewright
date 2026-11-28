@@ -1,0 +1,57 @@
+format = 1
+id = "purefire-boilers"
+brand = "peerless"
+name = "Peerless PUREFIRE residential condensing boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "propane"]
+status = "current"
+model_examples = ["PF-80", "PF-140", "PF-210", "PF-300"]
+description = "Stainless steel sealed-combustion direct-vent gas boilers, 50 to 300 MBH input."
+
+[[manuals]]
+kind = "product-page"
+title = "PUREFIRE product page"
+url = "https://www.peerlessboilers.com/products/peerless-purefire/"
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "PUREFIRE user manual"
+url = "https://www.peerlessboilers.com/wp-content/uploads/2023/04/PF8147-R4_Users-Man_web0324.pdf"
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "PUREFIRE PF-50 to PF-399 installation, operation and maintenance manual"
+url = "https://www.peerlessboilers.com/wp-content/uploads/2017/10/PF8248-R9_PF50-399_IOM_web0426.pdf"
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[[facts]]
+topic = "efficiency"
+text = "PF-50 through PF-200 are rated 95 percent AFUE and the PF-210 is 95.1 percent. Larger models are rated by thermal efficiency, 96.5 percent for the PF-300."
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[[facts]]
+topic = "service"
+text = "Peerless writes its install and technical literature for professional installers only. Have a pro handle installation, maintenance and service, including any switch between natural gas and LP."
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[warranty]
+summary = "Heat exchanger covered for 12 years; parts and labor covered for the first year, but only if the boiler is registered."
+length = "12 years heat exchanger"
+source = "https://www.peerlessboilers.com/products/peerless-purefire/"
+
+[[sources]]
+url = "https://www.peerlessboilers.com/products/peerless-purefire/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.peerlessboilers.com/wp-content/uploads/2023/04/PF8147-R4_Users-Man_web0324.pdf"
+title = "PDF link, HEAD check only (200, application/pdf)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.peerlessboilers.com/wp-content/uploads/2017/10/PF8248-R9_PF50-399_IOM_web0426.pdf"
+title = "PDF link, HEAD check only (200, application/pdf)"
+checked = 2026-11-28

@@ -1,0 +1,82 @@
+format = 1
+id = "rx-condensing-tankless"
+brand = "rinnai"
+name = "Rinnai condensing gas tankless water heaters (RX, RXP, RUS, RUCS)"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Rinnai condensing tankless line including the Sensei RX and RXP series."
+
+[[manuals]]
+kind = "product-page"
+title = "Residential tankless listing"
+url = "https://www.rinnai.us/residential/tankless-water-heaters"
+source = "https://www.rinnai.us/residential/tankless-water-heaters"
+
+[[manuals]]
+kind = "product-page"
+title = "Sensei RX product page"
+url = "https://www.rinnai.us/residential/sensei-rx"
+source = "https://www.rinnai.us/residential/tankless-water-heaters"
+
+[[manuals]]
+kind = "manual-search"
+title = "Document library"
+url = "https://www.rinnai.us/professional/document-library"
+source = "https://www.rinnai.us/"
+
+[[facts]]
+topic = "flush"
+text = "Rinnai wants scale flushed out at least yearly and says the job is for a professional installer; it also posts a 13 step flushing guide."
+source = "https://www.rinnai.us/residential/faq"
+
+[[facts]]
+topic = "filter"
+text = "Look at the in-line inlet screen now and then and rinse off any debris; Rinnai sets no fixed interval and says maintenance timing depends on your water quality."
+source = "https://www.rinnai.us/residential/faq"
+
+[[facts]]
+topic = "warranty"
+text = "Registering within 90 days of purchase stretches labor cover from 1 to 5 years (registration is not a condition in California, Quebec and similar places). Units bought from unauthorised online sellers get no Rinnai warranty."
+source = "https://www.rinnai.us/support/warranty"
+
+[warranty]
+summary = "Labor 1 year, or 5 years when registered within 90 days; heat exchanger and parts terms are in the owner guide, not on the warranty page."
+source = "https://www.rinnai.us/support/warranty"
+
+[[tasks]]
+key = "descale"
+title = "Book a yearly tankless flush by a professional installer"
+steps = [
+  "Book a professional installer to flush mineral scale out of the heater at least once a year.",
+  "Ask them to check and clean the inlet water filter screen on the same visit.",
+  "Ask whether your water quality calls for flushing more often than yearly.",
+  "Keep the service record with the heater's paperwork.",
+]
+note = "Rinnai asks for a flush at least yearly and says a professional installer should do it."
+source = "https://www.rinnai.us/residential/faq"
+
+[[sources]]
+url = "https://www.rinnai.us/residential/tankless-water-heaters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/sensei-rx"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/professional/document-library"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/faq"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/support/warranty"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/"
+checked = 2026-11-28

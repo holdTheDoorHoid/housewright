@@ -1,0 +1,13 @@
+format = 1
+id = "korky"
+name = "Korky"
+aliases = ["KORKY"]
+parent = "Lavelle Industries"
+domains = ["korky.com"]
+website = "https://www.korky.com/"
+support_url = "https://www.korky.com/support"
+phone = "262-763-2434"
+
+[[sources]]
+url = "https://www.korky.com/support"
+checked = 2026-11-28

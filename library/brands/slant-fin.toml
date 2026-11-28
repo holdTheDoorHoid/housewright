@@ -1,0 +1,13 @@
+format = 1
+id = "slant-fin"
+name = "Slant/Fin"
+aliases = ["SLANT/FIN", "SLANT FIN", "Slant Fin Corporation"]
+domains = ["slantfin.com"]
+website = "https://slantfin.com/"
+support_url = "https://slantfin.com/contact/"
+manual_search_url = "https://slantfin.com/library/"
+note = "Slant/Fin has stopped making boilers; the site keeps parts lists and warranty pages for older units."
+
+[[sources]]
+url = "https://slantfin.com/"
+checked = 2026-11-28

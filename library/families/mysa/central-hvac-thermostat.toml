@@ -1,0 +1,64 @@
+format = 1
+id = "central-hvac-thermostat"
+brand = "mysa"
+name = "Mysa Smart Thermostat for central heating and cooling"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+description = "Mysa 24 volt Wi-Fi thermostat for furnaces, heat pumps and central AC."
+
+[[manuals]]
+kind = "product-page"
+title = "Product page"
+url = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+source = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+
+[[manuals]]
+kind = "support-page"
+title = "Help desk"
+url = "https://help.getmysa.com/"
+source = "https://getmysa.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "DIY installation guides"
+url = "https://guides.getmysa.com/"
+source = "https://getmysa.com/"
+
+[[facts]]
+topic = "power"
+text = "Runs on 24 volts AC and needs a common wire. For two-wire heat-only or cool-only systems Mysa sells a separate C-wire power adapter."
+source = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+
+[[facts]]
+topic = "wiring"
+text = "If the system has separate RH and RC wires, flip the switch on the back of the display to the non-default side; leave it alone for a single transformer."
+source = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+
+[[facts]]
+topic = "limits"
+text = "No accessory terminal, so it cannot run a humidifier. Wi-Fi must be 2.4 GHz. It handles up to 3 heat stages and 2 cool stages."
+source = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+
+[warranty]
+summary = "Five-year limited warranty."
+length = "5 years"
+source = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+
+[[sources]]
+url = "https://getmysa.com/pages/thermostats/mysa-thermostat"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://help.getmysa.com/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://guides.getmysa.com/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://getmysa.com/"
+checked = 2026-11-28

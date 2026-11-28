@@ -1,0 +1,55 @@
+format = 1
+id = "thermostats"
+brand = "trane"
+name = "Trane smart and traditional thermostats"
+category = "thermostat"
+fuel = ["hardwired"]
+status = "current"
+model_examples = ["XR724", "XL824", "XL850", "XL1050", "UX360", "XR202", "XR303"]
+description = "Trane XL and XR series thermostats and the Link UX360 smart control."
+
+[[manuals]]
+kind = "product-page"
+title = "Smart thermostats"
+url = "https://www.trane.com/residential/en/products/thermostats-and-controls/smart-thermostats/"
+source = "https://www.trane.com/residential/en/products/thermostats-and-controls/smart-thermostats/"
+
+[[manuals]]
+kind = "support-page"
+title = "Thermostat troubleshooting"
+url = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+source = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+
+[[manuals]]
+kind = "support-page"
+title = "Trane Home support"
+url = "https://support.tranehome.com"
+source = "https://www.trane.com/residential/en/products/thermostats-and-controls/smart-thermostats/"
+
+[[facts]]
+topic = "care"
+text = "A blank traditional thermostat is most often dead batteries. If new batteries do not help, switch its breaker off for 20 to 30 seconds with the HVAC idle, then back on."
+source = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+
+[[facts]]
+topic = "wifi"
+text = "A smart thermostat that drops Wi-Fi normally reconnects alone. If not, switch Wireless off and on under Menu, Settings, Network."
+source = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+
+[[facts]]
+topic = "care"
+text = "On XL824, XL850 and XL1050 models the shown temperature can be corrected under Indoor Calibrations; compare it with a trusted thermometer first."
+source = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+
+[[sources]]
+url = "https://www.trane.com/residential/en/products/thermostats-and-controls/smart-thermostats/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/troubleshooting/thermostat-controls/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.tranehome.com"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28

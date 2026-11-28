@@ -1,0 +1,76 @@
+format = 1
+id = "home-standby-generators"
+brand = "generac"
+name = "Generac home standby generators (air-cooled, 10 to 26 kW class)"
+category = "generator"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Permanently installed automatic standby generators; other Generac standby sizes and the 48-80 kW liquid-cooled units have their own manuals."
+
+[[manuals]]
+kind = "manual-search"
+title = "Product information and user manuals lookup by serial or model"
+url = "https://www.generac.com/support/product-info-user-manuals/"
+source = "https://www.generac.com/support/product-info-user-manuals/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Owner manual, 60 Hz air-cooled generators 10 to 24 kW"
+url = "https://www.generac.com/globalassets/products/residential/standby-generators/owners-manual/10kw-24kw_60-hz-aircooled-generators_owners-manual.pdf"
+source = "https://www.generac.com/globalassets/products/residential/standby-generators/owners-manual/10kw-24kw_60-hz-aircooled-generators_owners-manual.pdf"
+note = "Link checked with a HEAD request at review (PDF served); contents not read."
+
+[[facts]]
+topic = "exercise"
+text = "Guardian-series air-cooled units do a fixed 5-minute self-test, which can be scheduled weekly, every two weeks or monthly. Next Generation units with the Power Zone 200 controller default to 5 minutes and can be set up to 20; some older models ran 12 minutes."
+source = "https://support.generac.com/s/article/How-Long-Is-My-Generator-s-Weekyl-Run-Time"
+
+[[facts]]
+topic = "service"
+text = "On Guardian 10 to 26 kW and Next Generation 10 to 28 kW air-cooled units (2017 on), the first oil and filter change is due at 25 run hours (20 on the 7.5 kW PowerPact), then every 200 run hours and never more than 2 years apart."
+source = "https://support.generac.com/s/article/How-do-I-perform-the-yearly-maintenance-for-my-home-standby-generator"
+
+[[facts]]
+topic = "service"
+text = "If the generator runs in weather colder than 40 F or hotter than 85 F, Generac halves the oil interval to every 100 run hours. Whoever services it, keep a record of the maintenance; the Mobile Link app can track it."
+source = "https://support.generac.com/s/article/How-do-I-perform-the-yearly-maintenance-for-my-home-standby-generator"
+
+[[facts]]
+topic = "safety"
+text = "Generator exhaust carbon monoxide can kill within minutes. Use a portable generator only outside, far from the house and clear of windows, doors and vents, never in the home, a garage, basement or shed, and keep a working CO alarm indoors."
+source = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+
+[[facts]]
+topic = "safety"
+text = "CPSC's May 2026 hurricane-season release: set a portable generator at least 20 feet from homes and buildings with the exhaust aimed away from openings, never in an enclosed space even if doors or windows are open, and look for a model with a CO shut-off feature."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+
+[[sources]]
+url = "https://www.generac.com/support/product-info-user-manuals/"
+title = "Generac product information and user manuals"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.generac.com/globalassets/products/residential/standby-generators/owners-manual/10kw-24kw_60-hz-aircooled-generators_owners-manual.pdf"
+title = "Owner manual, 10 to 24 kW air-cooled"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.generac.com/s/article/How-Long-Is-My-Generator-s-Weekyl-Run-Time"
+title = "Generac support: exercise run time"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.generac.com/s/article/How-do-I-perform-the-yearly-maintenance-for-my-home-standby-generator"
+title = "Generac support: yearly maintenance for home standby"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Safety-Education/Safety-Guides/Carbon-Monoxide-Home/Generators-and-Engine-Driven-Tools"
+title = "CPSC generators and engine-driven tools CO guidance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season"
+title = "CPSC generator hazards news release"
+checked = 2026-11-28

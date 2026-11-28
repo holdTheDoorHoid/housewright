@@ -1,0 +1,14 @@
+format = 1
+id = "ge-appliances"
+name = "GE Appliances"
+aliases = ["GE", "GE APPLIANCES", "GE Profile", "General Electric"]
+parent = "Haier"
+domains = ["geappliances.com"]
+website = "https://www.geappliances.com/"
+support_url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+note = "GE Profile is a sub-brand; its manuals sit on the same site. support_url is a dryer support article; the generic GE support landing page was not fetched."
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=17442"
+title = "Dryer excessive lint support article"
+checked = 2026-11-28

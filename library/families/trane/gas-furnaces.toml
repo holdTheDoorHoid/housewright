@@ -1,0 +1,66 @@
+format = 1
+id = "gas-furnaces"
+brand = "trane"
+name = "Trane gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+description = "Trane residential gas furnaces, topped by the 96 Modulating Variable Speed model rated up to 97.3 percent AFUE."
+
+[[manuals]]
+kind = "support-page"
+title = "Trane owner's manuals (listed by product type, no model search)"
+url = "https://www.trane.com/residential/en/resources/owners-guides/"
+source = "https://www.trane.com/residential/en/resources/owners-guides/"
+
+[[manuals]]
+kind = "support-page"
+title = "Trane gas furnace troubleshooting"
+url = "https://www.trane.com/residential/en/resources/troubleshooting/gas-furnaces/"
+source = "https://www.trane.com/residential/en/products/furnaces/"
+
+[[facts]]
+topic = "filter"
+text = "Filter timing from Trane, in days: 30 to 90 for a pet-free home, 30 to 60 with one pet, 20 to 45 with two or more pets or someone with allergies or asthma. Thick filters outlast 1 inch ones. If the furnace fan also serves the AC, keep changing it through summer."
+source = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+
+[[facts]]
+topic = "service"
+text = "Trane wants a dealer to service the furnace each autumn ahead of the heating months; the visit checks the flue and venting, drains, heat exchanger, gas valve and pressure, burners, flame sensor, thermostat and blower. Book a technician."
+source = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+
+[[facts]]
+topic = "safety"
+text = "Burner flames should look blue and steady; flickering yellow or orange is a job for a technician. On a gas or rotten-egg smell, light nothing, leave switches and indoor phones alone, and ring the gas supplier from outdoors. A furnace that was flooded must not be used."
+source = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+
+[[facts]]
+topic = "safety"
+text = "If the furnace suffers a fuel, electrical or mechanical failure, Trane's order is: gas off at the manual valve on the supply pipe, then electricity off, then call a qualified service company. Do not attempt repairs yourself."
+source = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+
+[warranty]
+summary = "Registered within 60 days of installation: usually 10 years on parts. Not registered, or registered late: usually 5 years. Terms vary by product. Labor is not included; a dealer-sold extended plan may add it. No maintenance condition is stated."
+length = "10 years parts"
+source = "https://www.trane.com/residential/en/resources/warranty-and-registration/"
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/owners-guides/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/troubleshooting/gas-furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/products/furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/maintenance-tips/gas-furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.trane.com/residential/en/resources/warranty-and-registration/"
+checked = 2026-11-28

@@ -1,0 +1,19 @@
+format = 1
+id = "lg"
+name = "LG"
+aliases = ["LG Electronics", "LG ELECTRONICS INC", "LG Electronics USA"]
+parent = "LG Electronics"
+domains = ["lg.com"]
+website = "https://www.lg.com/us/"
+support_url = "https://www.lg.com/us/support/contact"
+manual_search_url = "https://www.lg.com/us/support/manuals-documents"
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+title = "LG US manuals and documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/contact"
+title = "LG US contact page, seen linked from the manuals page"
+checked = 2026-11-28

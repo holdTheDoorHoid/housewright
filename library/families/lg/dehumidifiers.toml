@@ -1,0 +1,39 @@
+format = 1
+id = "dehumidifiers"
+brand = "lg"
+name = "LG PuriCare dehumidifiers"
+category = "dehumidifier"
+status = "current"
+description = "LG PuriCare portable dehumidifiers with washable filters, for example the 50 pint UD501KOG5 (now listed as discontinued)."
+
+[[manuals]]
+kind = "product-page"
+title = "50 pint PuriCare dehumidifier UD501KOG5"
+url = "https://www.lg.com/us/dehumidifiers/lg-ud501kog5-50-pint-dehumidifier"
+source = "https://www.lg.com/us/dehumidifiers/lg-ud501kog5-50-pint-dehumidifier"
+
+[[manuals]]
+kind = "support-page"
+title = "Dehumidifier general usage help article"
+url = "https://www.lg.com/us/support/help-library/lg-dehumidifier-general-usage--20150768174494"
+source = "https://www.lg.com/us/support/help-library/lg-dehumidifier-general-usage--20150768174494"
+
+[[facts]]
+topic = "filter"
+text = "A Check Filter light comes on after 350 hours of running (about 15 days nonstop). Inspect and wash the filter as needed, then hold Filter Reset for 3 seconds to set the hour count back to zero."
+source = "https://www.lg.com/us/support/help-library/lg-dehumidifier-general-usage--20150768174494"
+
+[[facts]]
+topic = "operation"
+text = "Run it only in rooms between 41 F and 90 F; colder and water can freeze inside, hotter and it can overheat. After 23 hours of nonstop running it rests for an hour on its own, which is normal."
+source = "https://www.lg.com/us/support/help-library/lg-dehumidifier-general-usage--20150768174494"
+
+[[sources]]
+url = "https://www.lg.com/us/dehumidifiers/lg-ud501kog5-50-pint-dehumidifier"
+title = "UD501KOG5 product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/support/help-library/lg-dehumidifier-general-usage--20150768174494"
+title = "LG dehumidifier general usage"
+checked = 2026-11-28

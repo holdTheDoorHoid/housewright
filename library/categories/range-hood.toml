@@ -1,0 +1,7 @@
+format = 1
+id = "range-hood"
+name = "Range hoods"
+template = "range-hood"
+life_safety = false
+brands = ["broan-nutone", "ge-appliances", "zephyr", "zline", "cosmo"]
+why_brands = "Common US retail brands of under-cabinet and wall-mount hoods: the largest ventilation maker, a major appliance brand, and three popular premium and online-sold hood brands; no public count was used."

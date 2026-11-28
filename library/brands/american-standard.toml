@@ -1,0 +1,14 @@
+format = 1
+id = "american-standard"
+name = "American Standard"
+aliases = ["AMERICAN STANDARD", "American Standard Brands"]
+parent = "LIXIL"
+domains = ["americanstandard-us.com"]
+website = "https://www.americanstandard-us.com/"
+support_url = "https://www.americanstandard-us.com/pages/support"
+phone = "800-215-5130"
+note = "Plumbing brand. The heating and cooling company of the same name is a different business."
+
+[[sources]]
+url = "https://www.americanstandard-us.com/pages/support"
+checked = 2026-11-28

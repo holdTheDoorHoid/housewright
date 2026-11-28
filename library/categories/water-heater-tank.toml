@@ -1,0 +1,7 @@
+format = 1
+id = "water-heater-tank"
+name = "Tank water heaters"
+template = "water-heater"
+life_safety = true
+brands = ["rheem", "ao-smith", "bradford-white", "state", "ruud"]
+why_brands = "Common US retail and trade brands for storage water heaters; State and Ruud are sister brands of A. O. Smith and Rheem sold under their own names."

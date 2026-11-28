@@ -1,0 +1,36 @@
+format = 1
+id = "sc07-w-combo-co"
+brand = "x-sense"
+name = "X-Sense SC07-W wireless smoke and CO alarm"
+category = "co-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["SC07-W"]
+model_examples = ["SC07-W"]
+description = "Wireless-interconnecting combination smoke and CO alarm with a sealed 10-year battery; ETL certified to the UL 217 smoke standard."
+
+[[manuals]]
+kind = "product-page"
+title = "SC07-W product page"
+url = "https://www.x-sense.com/products/sc07-w-wireless-interconnected-combination-smoke-and-carbon-monoxide-detector"
+source = "https://www.x-sense.com/products/sc07-w-wireless-interconnected-combination-smoke-and-carbon-monoxide-detector"
+
+[[facts]]
+topic = "battery"
+text = "The SC07-W has a sealed 10-year battery that is not user-replaceable, so the whole alarm is replaced when it runs out or signals end of life."
+source = "https://www.x-sense.com/products/sc07-w-wireless-interconnected-combination-smoke-and-carbon-monoxide-detector"
+
+[[facts]]
+topic = "replacement"
+text = "An X-Sense article puts typical CO detector life at 5 to 7 years against about 10 for smoke alarms; check the SC07-W manual for this combination unit's own end-of-life point."
+source = "https://www.x-sense.com/blogs/tips/how-long-do-smoke-detectors-last"
+unverified = true
+note = "General maker blog, not a model specification; the SC07-W manual was not read."
+
+[[sources]]
+url = "https://www.x-sense.com/products/sc07-w-wireless-interconnected-combination-smoke-and-carbon-monoxide-detector"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.x-sense.com/blogs/tips/how-long-do-smoke-detectors-last"
+checked = 2026-11-28

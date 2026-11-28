@@ -1,0 +1,18 @@
+format = 1
+id = "ao-smith"
+name = "A. O. Smith"
+aliases = ["A. O. SMITH", "A.O. SMITH", "AO SMITH", "A O Smith"]
+domains = ["hotwater.com", "aosmith.com"]
+website = "https://www.hotwater.com/"
+support_url = "https://www.hotwater.com/support.html"
+manual_search_url = "https://www.hotwater.com/find-documents-and-videos"
+phone = "877-552-0010"
+note = "Phone is listed on the support page as the North American water heating headquarters line."
+
+[[sources]]
+url = "https://www.hotwater.com/support.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/"
+checked = 2026-11-28

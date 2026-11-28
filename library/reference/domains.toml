@@ -1,0 +1,4 @@
+# Domains any library file may cite, in addition to the brand's own domains.
+# Government and standards bodies only - never retailers, forums or review sites.
+format = 1
+shared = ["energystar.gov", "cpsc.gov", "saferproducts.gov", "recalls.gov", "energy.gov", "epa.gov", "nfpa.org", "ul.com", "ulse.org"]

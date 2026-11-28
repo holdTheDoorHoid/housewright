@@ -1,0 +1,19 @@
+format = 1
+id = "google-nest"
+name = "Google Nest"
+aliases = ["NEST", "Nest Labs", "Nest Protect"]
+parent = "Google"
+domains = ["support.google.com", "store.google.com", "nest.com"]
+website = "https://store.google.com/us/product/nest_protect_2nd_gen"
+support_url = "https://support.google.com/googlehome/answer/9243107"
+note = "Nest Protect is a combined smoke and CO alarm. The old nest.com address redirects to the Google Store."
+
+[[sources]]
+url = "https://support.google.com/googlehome/answer/9243107"
+title = "Nest Protect lights and sounds"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://nest.com/smoke-co-alarm/overview/"
+title = "Redirects to the Google Store product page"
+checked = 2026-11-28

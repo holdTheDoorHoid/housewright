@@ -1,0 +1,35 @@
+format = 1
+id = "central-ac"
+brand = "goodman"
+name = "Goodman split air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_examples = ["GLXS4B", "GLXS4M", "GLXS5B", "GXV6S", "GXV9S", "GLXT7C"]
+description = "Goodman split-system air conditioners, including R-32 models."
+
+[[manuals]]
+kind = "product-page"
+title = "Goodman air conditioners"
+url = "https://www.goodmanmfg.com/products/air-conditioners"
+source = "https://www.goodmanmfg.com/products/air-conditioners"
+
+[[manuals]]
+kind = "manual-search"
+title = "Goodman literature library"
+url = "https://www.goodmanmfg.com/support/literature-library"
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[facts]]
+topic = "manuals"
+text = "In the literature library, find your model name under Air Conditioners; each has a ProductSpecs sheet and a warranty certificate."
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[sources]]
+url = "https://www.goodmanmfg.com/products/air-conditioners"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/support/literature-library"
+checked = 2026-11-28

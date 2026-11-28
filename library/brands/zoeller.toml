@@ -1,0 +1,13 @@
+format = 1
+id = "zoeller"
+name = "Zoeller"
+aliases = ["ZOELLER", "Zoeller Pump Company", "Zoeller Co."]
+domains = ["zoellerpumps.com"]
+website = "https://zoellerpumps.com/"
+support_url = "https://zoellerpumps.com/product-support/"
+manual_search_url = "https://zoellerpumps.com/service-literature/"
+phone = "+1-800-928-7867"
+
+[[sources]]
+url = "https://zoellerpumps.com/"
+checked = 2026-11-28

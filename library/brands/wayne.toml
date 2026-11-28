@@ -1,0 +1,12 @@
+format = 1
+id = "wayne"
+name = "Wayne"
+aliases = ["WAYNE", "Wayne Water Systems", "WAYNE Pumps"]
+domains = ["waynepumps.com"]
+website = "https://www.waynepumps.com/"
+support_url = "https://www.waynepumps.com/contact-us/"
+manual_search_url = "https://www.waynepumps.com/wayne-operating-manuals/"
+
+[[sources]]
+url = "https://www.waynepumps.com/"
+checked = 2026-11-28

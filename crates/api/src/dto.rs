@@ -146,6 +146,9 @@ pub struct AddFromTemplateArgs {
     /// Field values as typed, by field key.
     #[serde(default)]
     pub values: BTreeMap<String, String>,
+    /// The appliance library family the person accepted (D-149).
+    #[serde(default)]
+    pub family: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -290,6 +293,8 @@ pub struct TaskDetail {
     pub steps: Vec<String>,
     pub why: Option<String>,
     pub source: Option<String>,
+    /// The page the advice comes from (manufacturer guidance, D-150).
+    pub source_link: Option<String>,
     /// "3 months" for fixed and floating schedules.
     pub interval: Option<String>,
     pub paused: bool,
@@ -360,6 +365,10 @@ pub struct ItemDetail {
     pub price: Option<housewright_core::model::Money>,
     pub value: Option<housewright_core::model::Money>,
     pub warranty: Option<crate::alerts::WarrantyOut>,
+    /// The confirmed model family's links, facts and parts (D-149).
+    pub maker: Option<crate::library::MakerOut>,
+    /// Families that fit the make and model, when none is confirmed yet.
+    pub family_suggestion: Option<crate::library::MatchOut>,
 }
 
 /// A thing's place on a floor plan, for the thumbnail on its page.
@@ -396,6 +405,8 @@ pub struct AttachmentOut {
     pub height: Option<u32>,
     pub at: Option<Timestamp>,
     pub sensitive: bool,
+    /// Where a saved manual was downloaded from (D-151).
+    pub source: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -796,4 +807,7 @@ pub struct LabelReadOut {
     pub model_alternatives: Vec<String>,
     pub serial_alternatives: Vec<String>,
     pub template: Option<TemplateRef>,
+    /// Appliance library families that fit the brand and model read
+    /// (D-148); only a suggestion, the person confirms.
+    pub family: crate::library::MatchOut,
 }

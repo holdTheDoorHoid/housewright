@@ -1,0 +1,40 @@
+format = 1
+id = "voltex-heat-pump"
+brand = "ao-smith"
+name = "Voltex hybrid electric heat pump water heaters"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["HPT*", "FPTU*"]
+model_examples = ["HPTU-50N 130", "HPTS-66 210", "FPTU-80 130"]
+description = "Voltex heat pump storage heaters in 50, 66 and 80 gallon sizes, plus split system and Voltex MAX variants."
+
+[[manuals]]
+kind = "product-page"
+title = "Hybrid electric heat pump listing"
+url = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+source = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals, documents and videos"
+url = "https://www.hotwater.com/find-documents-and-videos"
+source = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[[facts]]
+topic = "warranty"
+text = "Most Voltex models listed (HPTU, HPTA, HPTS) show 10 year warranties; the older FPTU models show 6 years."
+source = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[warranty]
+summary = "Ten years on HPTU, HPTA and HPTS models and six years on FPTU models, as shown on the listing page."
+source = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+
+[[sources]]
+url = "https://www.hotwater.com/residential/water-heaters/hybrid-electric-heat-pump/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/find-documents-and-videos"
+checked = 2026-11-28

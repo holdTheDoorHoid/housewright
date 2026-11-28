@@ -1,0 +1,51 @@
+format = 1
+id = "ranges"
+brand = "samsung"
+name = "Samsung ranges"
+category = "range"
+fuel = ["gas", "electric"]
+status = "current"
+description = "Samsung freestanding and slide-in gas and electric ranges, some with Flex Duo ovens."
+
+[[manuals]]
+kind = "manual-pdf"
+title = "User manual for NE63A675 series electric ranges"
+url = "https://downloadcenter.samsung.com/content/UM/202502/20250214164150842/O_IB_FULL_NE5000A_NE63A6751-04_AA_EN.pdf"
+source = "https://downloadcenter.samsung.com/content/UM/202502/20250214164150842/O_IB_FULL_NE5000A_NE63A6751-04_AA_EN.pdf"
+note = "Link checked with a HEAD request at review (200, PDF); contents not opened."
+
+[[manuals]]
+kind = "support-page"
+title = "Samsung US home appliance terms and safety information (range anti-tip and gas safety sections)"
+url = "https://www.samsung.com/us/support/legal/LGL10000309/"
+source = "https://www.samsung.com/us/support/legal/LGL10000309/"
+
+[[facts]]
+topic = "anti-tip"
+text = "Samsung ranges must be held by an anti-tip device hooked at a back corner of the base. To test, hold the top back edge and try tipping the range toward you; it should stop after a few inches. Check again after any move, and never take the leveling legs off fully."
+source = "https://www.samsung.com/us/support/legal/LGL10000309/"
+
+[[facts]]
+topic = "self-clean"
+text = "Self Clean cannot be started while the warming drawer is on (on models that have one) or while any cooktop burner or element is in use."
+source = "https://www.samsung.com/us/support/troubleshoot/TSG10002418/"
+
+[[facts]]
+topic = "gas smell"
+text = "Samsung's gas advice: do not light any appliance, flip any electrical switch, touch the range or its cord, or start the vent fan. Open windows, then phone the gas supplier from a safe distance away from the building, or the fire department if the supplier cannot be reached."
+source = "https://www.samsung.com/us/support/legal/LGL10000309/"
+
+[[sources]]
+url = "https://downloadcenter.samsung.com/content/UM/202502/20250214164150842/O_IB_FULL_NE5000A_NE63A6751-04_AA_EN.pdf"
+checked = 2026-11-28
+note = "HEAD request only (200, application/pdf)."
+
+[[sources]]
+url = "https://www.samsung.com/us/support/legal/LGL10000309/"
+title = "Samsung US Home Appliance Terms and Conditions (safety sections)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.samsung.com/us/support/troubleshoot/TSG10002418/"
+title = "Self Clean or other buttons do not respond on Samsung oven"
+checked = 2026-11-28

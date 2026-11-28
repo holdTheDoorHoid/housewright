@@ -1,0 +1,6 @@
+format = 1
+id = "thermostat"
+name = "Thermostats"
+life_safety = false
+brands = ["honeywell-home", "ecobee", "google-nest", "amazon", "sensi", "mysa", "carrier", "trane", "lennox"]
+why_brands = "Common US retail smart-thermostat brands plus the thermostat lines from the big HVAC makers (Carrier, Trane, Lennox); Sensi now sits under Copeland, whose support pages opened even though the Sensi home page failed a certificate check."

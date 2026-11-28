@@ -1,0 +1,50 @@
+format = 1
+id = "gas-furnaces"
+brand = "amana-hvac"
+name = "Amana 80 and 90+ percent AFUE gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+description = "Amana gas furnaces in an 80 percent and a 90 plus percent AFUE line."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas furnaces"
+url = "https://www.amana-hac.com/products/gas-furnaces"
+source = "https://www.amana-hac.com/products/gas-furnaces"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature library"
+url = "https://www.amana-hac.com/resources/literature-library"
+source = "https://www.amana-hac.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty information"
+url = "https://www.amana-hac.com/warranty-information"
+source = "https://www.amana-hac.com/"
+
+[[facts]]
+topic = "specs"
+text = "The 90+ percent line uses a stainless steel heat exchanger and the 80 percent line a stainless steel tubular primary heat exchanger; both come with multi-speed or variable-speed blower motors."
+source = "https://www.amana-hac.com/products/gas-furnaces"
+
+[[sources]]
+url = "https://www.amana-hac.com/products/gas-furnaces"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/resources/literature-library"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/warranty-information"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.amana-hac.com/"
+checked = 2026-11-28

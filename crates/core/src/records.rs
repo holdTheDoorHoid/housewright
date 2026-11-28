@@ -29,6 +29,8 @@ pub struct NewFile<'a> {
     pub width: Option<u32>,
     pub height: Option<u32>,
     pub sensitivity: Sensitivity,
+    /// Where it was downloaded from (a manufacturer's manual, D-151).
+    pub source: Option<String>,
 }
 
 impl Store {
@@ -87,6 +89,7 @@ impl Store {
             height: f.height,
             by: Some(self.author()?),
             at: Some(self.now()),
+            source: f.source,
         };
         a.validate().map_err(Error::Invalid)?;
         self.append(&a)?;

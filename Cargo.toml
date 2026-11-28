@@ -14,6 +14,7 @@ members = [
     "web",
     "web-binder",
     "tools/climate-build",
+    "tools/library-sync",
 ]
 exclude = ["app/src-tauri"]
 
@@ -44,6 +45,7 @@ clap = { version = "4", features = ["derive", "env"] }
 proptest = "1"
 # Phase 4 records (licences in docs/THIRD-PARTY.md).
 sha2 = "0.11"
+flate2 = { version = "1", default-features = false, features = ["zlib-rs"] }
 zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
 qrcode = { version = "0.15", default-features = false, features = ["svg"] }

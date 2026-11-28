@@ -1,0 +1,27 @@
+format = 1
+id = "basement-protection-systems"
+brand = "wayne"
+name = "Wayne basement protection and battery backup systems"
+category = "sump-pump"
+status = "current"
+model_examples = ["ESP25n", "WBPS50", "WSS30Vn"]
+
+[[manuals]]
+kind = "product-page"
+title = "Basement protection systems"
+url = "https://www.waynepumps.com/product-category/sump-pumps/back-up/"
+source = "https://www.waynepumps.com/product-category/sump-pumps/back-up/"
+
+[[manuals]]
+kind = "product-page"
+title = "WBPS50 system"
+url = "https://www.waynepumps.com/product/wbps50-wayne-basement-protection-system/"
+source = "https://www.waynepumps.com/product-category/sump-pumps/back-up/"
+
+[[sources]]
+url = "https://www.waynepumps.com/product-category/sump-pumps/back-up/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.waynepumps.com/product/wbps50-wayne-basement-protection-system/"
+checked = 2026-11-28

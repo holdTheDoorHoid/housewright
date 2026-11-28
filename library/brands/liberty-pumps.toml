@@ -1,0 +1,12 @@
+format = 1
+id = "liberty-pumps"
+name = "Liberty Pumps"
+aliases = ["LIBERTY PUMPS", "Liberty Pump", "LIBERTY"]
+domains = ["libertypumps.com"]
+website = "https://www.libertypumps.com/"
+support_url = "https://www.libertypumps.com/wholesale/contact-us/"
+phone = "+1-800-543-2550"
+
+[[sources]]
+url = "https://www.libertypumps.com/"
+checked = 2026-11-28

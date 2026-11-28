@@ -1,0 +1,41 @@
+format = 1
+id = "big-dog-connect"
+brand = "basement-watchdog"
+name = "Big Dog CONNECT battery backup sump pump system"
+category = "sump-pump"
+status = "current"
+model_examples = ["BWD12-120C"]
+
+[[manuals]]
+kind = "product-page"
+title = "Big Dog CONNECT"
+url = "https://basementwatchdog.com/product/big-dog-connect-backup-sump-pump/"
+source = "https://www.basementwatchdog.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and videos"
+url = "https://basementwatchdog.com/basement-watchdog-manuals-videos/"
+source = "https://www.basementwatchdog.com/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Pump batteries"
+url = "https://basementwatchdog.com/product-category/basement-watchdog-pump-batteries/"
+source = "https://www.basementwatchdog.com/"
+
+[[sources]]
+url = "https://www.basementwatchdog.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://basementwatchdog.com/product/big-dog-connect-backup-sump-pump/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://basementwatchdog.com/basement-watchdog-manuals-videos/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://basementwatchdog.com/product-category/basement-watchdog-pump-batteries/"
+checked = 2026-11-28

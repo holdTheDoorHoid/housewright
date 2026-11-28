@@ -1,0 +1,54 @@
+format = 1
+id = "adapt-gas-tankless"
+brand = "ao-smith"
+name = "Adapt gas tankless water heaters"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["ATHR*", "ATM*"]
+model_examples = ["ATHR-199X3 100", "ATM-180M-N 100"]
+description = "Condensing gas tankless line in premium (Adapt+) and standard (Adapt SC) versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas tankless listing"
+url = "https://www.hotwater.com/residential/water-heaters/gas-tankless/"
+source = "https://www.hotwater.com/residential/water-heaters/gas-tankless/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals, documents and videos"
+url = "https://www.hotwater.com/find-documents-and-videos"
+source = "https://www.hotwater.com/support.html"
+
+[[facts]]
+topic = "efficiency"
+text = "Adapt+ and Adapt SC condensing models are listed at 0.95 UEF and ENERGY STAR certified on the listing page."
+source = "https://www.hotwater.com/residential/water-heaters/gas-tankless/"
+
+[[facts]]
+topic = "descaling"
+text = "With no tank there is nothing to flush, but A. O. Smith notes tankless units often need descaling and inspection; check the model's manual for how often."
+source = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+
+[warranty]
+summary = "Listed Adapt+ and Adapt SC models show a 15 year limited warranty on the listing page."
+length = "15 years"
+source = "https://www.hotwater.com/residential/water-heaters/gas-tankless/"
+
+[[sources]]
+url = "https://www.hotwater.com/residential/water-heaters/gas-tankless/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/find-documents-and-videos"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/support.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.hotwater.com/info-center/water-heater-maintenance.html"
+checked = 2026-11-28

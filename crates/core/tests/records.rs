@@ -58,6 +58,7 @@ fn home() -> Home {
             sensitivity: Sensitivity::Normal,
             price: Default::default(),
             value: Default::default(),
+            family: None,
         })
         .unwrap();
     let task = TaskId::new();
@@ -83,6 +84,7 @@ fn home() -> Home {
             active: true,
             paused: false,
             not_applicable: false,
+            guidance: None,
         })
         .unwrap();
     Home {
@@ -104,6 +106,7 @@ fn file<'a>(about: EntityRef, bytes: &'a [u8], thumb: Option<&'a [u8]>) -> NewFi
         width: None,
         height: None,
         sensitivity: Sensitivity::Normal,
+        source: None,
     }
 }
 

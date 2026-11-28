@@ -1,0 +1,7 @@
+format = 1
+id = "central-ac"
+name = "Central air conditioners"
+template = "central-ac"
+life_safety = false
+brands = ["carrier", "trane", "lennox", "goodman", "rheem", "bryant", "american-standard-hvac", "ruud", "amana-hvac"]
+why_brands = "Common US dealer-installed split-system air conditioner brands; no public per-brand sales count was found, so the list is our own judgment."

@@ -1,0 +1,37 @@
+format = 1
+id = "refrigerators"
+brand = "frigidaire"
+name = "Frigidaire refrigerators"
+category = "refrigerator"
+status = "current"
+description = "Frigidaire refrigerators using PureSource filters."
+
+[[manuals]]
+kind = "support-page"
+title = "PureSource Ultra II water filter page"
+url = "https://www.frigidaire.com/en/p/accessories/refrigerator-accessories/refrigerator-accessories-and-consumables/water-filters/EPTWFU01"
+source = "https://www.frigidaire.com/en/p/accessories/refrigerator-accessories/refrigerator-accessories-and-consumables/water-filters/EPTWFU01"
+unverified = true
+note = "frigidaire.com timed out for both WebFetch and curl at review; URL from search results, not opened."
+
+[[manuals]]
+kind = "support-page"
+title = "How often should I change my water filter?"
+url = "https://owner.frigidaire.com/support-articles/article/1847717-refrigerators-how-often-should-i-change-my-water-filter-"
+source = "https://owner.frigidaire.com/support-articles/article/1847717-refrigerators-how-often-should-i-change-my-water-filter-"
+
+[[facts]]
+topic = "filter"
+text = "Frigidaire's general rule is a new water filter about every six months; most models light a filter status indicator on the display when the change is due. Buy the same filter type that is already fitted."
+source = "https://owner.frigidaire.com/support-articles/article/1847717-refrigerators-how-often-should-i-change-my-water-filter-"
+
+[[sources]]
+url = "https://www.frigidaire.com/en/p/accessories/refrigerator-accessories/refrigerator-accessories-and-consumables/water-filters/EPTWFU01"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch at review."
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1847717-refrigerators-how-often-should-i-change-my-water-filter-"
+title = "Frigidaire owner article on water filter changes"
+checked = 2026-11-28

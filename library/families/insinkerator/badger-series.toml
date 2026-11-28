@@ -1,0 +1,45 @@
+format = 1
+id = "badger-series"
+brand = "insinkerator"
+name = "Badger series garbage disposals"
+category = "garbage-disposal"
+status = "current"
+description = "Continuous-feed disposals (Badger 1, 5 and 5XP) at the lower end of the brand's price range."
+
+[[manuals]]
+kind = "product-page"
+title = "Badger series product page"
+url = "https://www.insinkerator.com/en-us/insinkerator-products/garbage-disposals/badger-series"
+source = "https://www.insinkerator.com/en-us/support"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product literature: installation and care manuals"
+url = "https://www.insinkerator.com/en-us/support/literature"
+source = "https://www.insinkerator.com/en-us/support"
+
+[[facts]]
+topic = "jam"
+text = "For a jam, turn off the disposer and water, fit the supplied wrench (or a 1/4 inch Allen key) in the hole under the unit and work it back and forth until it spins freely. Lift debris out with tongs, never your hand."
+source = "https://www.insinkerator.com/en-us/support/fixing-a-jammed-garbage-disposal"
+
+[[facts]]
+topic = "reset"
+text = "When the motor overheats, the small red overload button on the bottom drops about 1/4 inch. Press it back gently; if it will not stay in, wait ten minutes and retry, and if the motor still will not run, check the breaker or fuse."
+source = "https://www.insinkerator.com/en-us/support/fixing-a-jammed-garbage-disposal"
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/insinkerator-products/garbage-disposals/badger-series"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support/literature"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.insinkerator.com/en-us/support/fixing-a-jammed-garbage-disposal"
+checked = 2026-11-28

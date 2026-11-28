@@ -1,0 +1,65 @@
+format = 1
+id = "npe-a2-condensing-tankless"
+brand = "navien"
+name = "NPE-A2 condensing gas tankless water heaters"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["NPE###A2"]
+model_examples = ["NPE-180A2", "NPE-210A2", "NPE-240A2"]
+description = "Navien condensing tankless line with built-in recirculation, indoor or outdoor wall mount."
+
+[[manuals]]
+kind = "product-page"
+title = "NPE-A2 series page"
+url = "https://www.navieninc.com/series/npe-a2"
+source = "https://www.navieninc.com/series/npe-a2"
+
+[[manuals]]
+kind = "manual-search"
+title = "NPE-A2 downloads"
+url = "https://www.navieninc.com/series/npe-a2/downloads"
+source = "https://www.navieninc.com/series/npe-a2"
+
+[[manuals]]
+kind = "support-page"
+title = "NPE-A2 FAQs"
+url = "https://www.navieninc.com/series/npe-a2/npe-a2-series-faqs"
+source = "https://www.navieninc.com/series/npe-a2"
+
+[[facts]]
+topic = "venting"
+text = "With 2 inch vent the longest run is 75 feet and 6 elbows, each 90 degree elbow counting as 8 feet. With 3 inch vent it is 150 feet and 8 elbows, each counting 5 feet."
+source = "https://www.navieninc.com/series/npe-a2/npe-a2-series-faqs"
+
+[[facts]]
+topic = "clearance"
+text = "Schedule 40 PVC vent pipe may sit with zero clearance to combustible material, according to the FAQ."
+source = "https://www.navieninc.com/series/npe-a2/npe-a2-series-faqs"
+
+[[facts]]
+topic = "installation"
+text = "Gas line of 1/2 inch is allowed up to 24 feet and the series can be cascaded up to 32 units."
+source = "https://www.navieninc.com/series/npe-a2"
+
+[warranty]
+summary = "Residential NPE-A2 Advanced: labor 1 year, parts 5 years, heat exchanger 15 years (standard or controlled recirculation); with uncontrolled recirculation parts 3 and heat exchanger 5 years. Void for online or unauthorised purchase; hard water damage excluded."
+length = "15 years heat exchanger"
+source = "https://www.navieninc.com/series/npe-a2/warranty"
+
+[[sources]]
+url = "https://www.navieninc.com/series/npe-a2"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/series/npe-a2/downloads"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/series/npe-a2/npe-a2-series-faqs"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.navieninc.com/series/npe-a2/warranty"
+checked = 2026-11-28

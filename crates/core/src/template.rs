@@ -249,7 +249,7 @@ impl Template {
 }
 
 impl TemplateTask {
-    fn validate(&self) -> Result<(), String> {
+    pub fn validate(&self) -> Result<(), String> {
         if !is_key(&self.key) {
             return Err("key must be lowercase letters, digits and underscores".into());
         }
@@ -320,6 +320,7 @@ impl TemplateTask {
             why: Some(Why {
                 text: self.why.clone(),
                 source: self.source.clone(),
+                link: None,
             }),
             minutes: self.minutes,
             completion_fields: self.completion_fields.clone(),
@@ -330,6 +331,7 @@ impl TemplateTask {
             active: false,
             paused: false,
             not_applicable: false,
+            guidance: None,
         }
     }
 }
@@ -590,6 +592,7 @@ source = "template author"
             sensitivity: Sensitivity::Normal,
             price: Default::default(),
             value: Default::default(),
+            family: None,
         };
         let owner = MemberId::new();
         let (_, tasks) = r.plan_for_item(&item, owner, date(2026, 1, 1));

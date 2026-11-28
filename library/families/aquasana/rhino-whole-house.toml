@@ -1,0 +1,54 @@
+format = 1
+id = "rhino-whole-house"
+brand = "aquasana"
+name = "Rhino whole-house water filters"
+category = "whole-house-filter"
+extends = "whole-house-water-filter"
+status = "current"
+description = "Aquasana's main whole-house tank systems, including Max Flow and chloramine versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Rhino whole-house filter"
+url = "https://www.aquasana.com/whole-house-water-filters/rhino-100365488.html"
+source = "https://www.aquasana.com/whole-house-water-filters"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product owner manuals"
+url = "https://www.aquasana.com/product-owners-manuals.html"
+source = "https://www.aquasana.com/whole-house-water-filters"
+
+[[manuals]]
+kind = "parts-page"
+title = "Replacement filters"
+url = "https://www.aquasana.com/water-filter-replacements/"
+source = "https://www.aquasana.com/whole-house-water-filters"
+
+[[consumables]]
+name = "Rhino filter media"
+replace_every = "10 years"
+for_task = "cartridge"
+source = "https://www.aquasana.com/whole-house-water-filters"
+note = "Rated 1,000,000 gallons or 10 years, whichever comes first. No part number on the page."
+
+[[facts]]
+topic = "filter"
+text = "The Rhino and Rhino Max Flow are rated for 1,000,000 gallons or 10 years. The well-water model with UV is rated for 500,000 gallons or 5 years."
+source = "https://www.aquasana.com/whole-house-water-filters"
+
+[[sources]]
+url = "https://www.aquasana.com/whole-house-water-filters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.aquasana.com/whole-house-water-filters/rhino-100365488.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.aquasana.com/product-owners-manuals.html"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.aquasana.com/water-filter-replacements/"
+checked = 2026-11-28

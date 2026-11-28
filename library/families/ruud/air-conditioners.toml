@@ -1,0 +1,40 @@
+format = 1
+id = "air-conditioners"
+brand = "ruud"
+name = "Ruud split-system air conditioners"
+category = "central-ac"
+extends = "central-ac"
+fuel = ["electric"]
+status = "current"
+model_examples = ["UA19AY", "UA16AZ", "RA15AY", "RA14AZ", "WA14AZ"]
+description = "Ruud Endeavor Line air conditioners from Choice to Ultra, 13.4 to 20 SEER2."
+
+[[manuals]]
+kind = "product-page"
+title = "Air conditioners"
+url = "https://www.ruud.com/products/hvac/air_conditioners/"
+source = "https://www.ruud.com/products/hvac/air_conditioners/"
+
+[[manuals]]
+kind = "support-page"
+title = "Homeowner resources"
+url = "https://www.ruud.com/homeowners/"
+source = "https://www.ruud.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "SEER2 runs from 13.4 for the northern-region RA13NY and WA13 models to up to 20 for the Ultra UA19AY."
+source = "https://www.ruud.com/products/hvac/air_conditioners/"
+
+[[sources]]
+url = "https://www.ruud.com/products/hvac/air_conditioners/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/homeowners/"
+title = "Linked official page; loads, checked at review (link only)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

@@ -1,0 +1,13 @@
+format = 1
+id = "cosmo"
+name = "Cosmo"
+aliases = ["COSMO", "Cosmo Appliances", "Cosmo Kitchen"]
+domains = ["cosmoappliances.com"]
+website = "https://cosmoappliances.com/"
+support_url = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+manual_search_url = "https://cosmoappliances.com/manuals/"
+
+[[sources]]
+url = "https://cosmoappliances.com/support-hub/general-range-hood-faq/"
+title = "General range hood FAQ (links to the manuals and documents page)"
+checked = 2026-11-28

@@ -1,0 +1,39 @@
+format = 1
+id = "discontinued-boilers"
+brand = "slant-fin"
+name = "Slant/Fin boilers (discontinued)"
+category = "boiler"
+extends = "boiler"
+status = "discontinued"
+description = "Older Slant/Fin boilers; the company no longer makes them but keeps a library of parts lists."
+
+[[manuals]]
+kind = "manual-search"
+title = "Slant/Fin library"
+url = "https://slantfin.com/library/"
+source = "https://slantfin.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Contact"
+url = "https://slantfin.com/contact/"
+source = "https://slantfin.com/"
+
+[[facts]]
+topic = "status"
+text = "Slant/Fin no longer builds boilers or sells parts for them. Its final boilers went to wholesalers in June 2022, after which it dropped replacement-part warranties; anyone who bought a boiler after September 2023 should ask the wholesaler about part warranties."
+source = "https://slantfin.com/"
+
+[[sources]]
+url = "https://slantfin.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://slantfin.com/library/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://slantfin.com/contact/"
+title = "Opened at review"
+checked = 2026-11-28

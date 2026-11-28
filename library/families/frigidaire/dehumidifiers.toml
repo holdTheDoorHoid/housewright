@@ -1,0 +1,59 @@
+format = 1
+id = "dehumidifiers"
+brand = "frigidaire"
+name = "Frigidaire dehumidifiers (25 to 70 pint)"
+category = "dehumidifier"
+status = "current"
+description = "Frigidaire portable dehumidifiers, some with built-in pump."
+
+[[manuals]]
+kind = "support-page"
+title = "Product support page, 50 pint dehumidifier FFAD5033W1"
+url = "https://www.frigidaire.com/Owner-Center/Product-Support/FFAD5033W1"
+source = "https://www.frigidaire.com/Owner-Center/Product-Support/FFAD5033W1"
+unverified = true
+note = "frigidaire.com timed out for both WebFetch and curl at review; URL from search results, not opened."
+
+[[manuals]]
+kind = "support-page"
+title = "Dehumidifier clean and care"
+url = "https://owner.frigidaire.com/support-articles/article/1927766-dehumidifier-clean-and-care"
+source = "https://owner.frigidaire.com/support-articles/article/1927766-dehumidifier-clean-and-care"
+
+[[manuals]]
+kind = "support-page"
+title = "Dehumidifier error code guide"
+url = "https://owner.frigidaire.com/support-articles/article/1838728-dehumidifiers-error-code-guide"
+source = "https://owner.frigidaire.com/support-articles/article/1838728-dehumidifiers-error-code-guide"
+
+[[facts]]
+topic = "storage"
+text = "To put the unit away, unplug it, take off any drain hoses, empty and wash the bucket, let everything dry for a day or two, then cover it or box it. When you bring it back out, wash the filter and flush the drain hoses first."
+source = "https://owner.frigidaire.com/support-articles/article/1927766-dehumidifier-clean-and-care"
+
+[[facts]]
+topic = "bucket"
+text = "Wash the bucket with mild soap and water, taking off the handle and splash guard as the owner manual shows; pan treatment tablets help keep odor and algae down."
+source = "https://owner.frigidaire.com/support-articles/article/1927766-dehumidifier-clean-and-care"
+
+[[facts]]
+topic = "troubleshooting"
+text = "H3 or E5 means the compressor overload protection tripped: give the unit proper clearance, clean the filter if dirty, run it only between 41 F and 89 F, and unplug it to cool. PU means the pump could not empty the bucket in time; check the drain hose for kinks, clogs or ice."
+source = "https://owner.frigidaire.com/support-articles/article/1838728-dehumidifiers-error-code-guide"
+
+[[sources]]
+url = "https://www.frigidaire.com/Owner-Center/Product-Support/FFAD5033W1"
+title = "FFAD5033W1 product support"
+checked = 2026-11-28
+unverified = true
+note = "Blocked automated fetch at review."
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1927766-dehumidifier-clean-and-care"
+title = "Dehumidifier clean and care article"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1838728-dehumidifiers-error-code-guide"
+title = "Dehumidifier error code guide"
+checked = 2026-11-28

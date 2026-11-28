@@ -1,0 +1,41 @@
+format = 1
+id = "aerotherm-heat-pump"
+brand = "bradford-white"
+name = "AeroTherm hybrid electric heat pump water heaters"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["RE2H*"]
+model_examples = ["RE2HP5010", "RE2HP8010", "RE2H50S10-1NCTT-CON"]
+description = "Bradford White heat pump storage heaters in 50, 65 and 80 gallon sizes, with an optional Connect app version."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pump water heaters listing"
+url = "https://www.bradfordwhite.com/heat-pump-water-heaters/"
+source = "https://www.bradfordwhite.com/heat-pump-water-heaters/"
+
+[[manuals]]
+kind = "product-page"
+title = "AeroTherm Series G2 product page"
+url = "https://forthepro.bradfordwhite.com/our-products/usa-residential-heat-pump/aerotherm-series-g2/"
+source = "https://www.bradfordwhite.com/heat-pump-water-heaters/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty Center"
+url = "https://warrantycenter.bradfordwhite.com/"
+source = "https://www.bradfordwhite.com/heat-pump-water-heaters/"
+
+[[sources]]
+url = "https://www.bradfordwhite.com/heat-pump-water-heaters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://forthepro.bradfordwhite.com/our-products/usa-residential-heat-pump/aerotherm-series-g2/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://warrantycenter.bradfordwhite.com/"
+checked = 2026-11-28

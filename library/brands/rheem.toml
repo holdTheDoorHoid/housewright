@@ -1,0 +1,28 @@
+format = 1
+id = "rheem"
+name = "Rheem"
+aliases = ["RHEEM", "Rheem Manufacturing Company"]
+parent = "Paloma Rheem Holdings"
+domains = ["rheem.com", "rheemwatertreatment.com"]
+website = "https://www.rheem.com/"
+support_url = "https://www.rheem.com/help-and-support/"
+manual_search_url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+phone = "800-432-8373"
+note = "Phone is the assistance line on the help and support page. Water heater documents are at the residential water heating product documentation page instead of the manual_search_url, which covers heating and cooling. rheemwatertreatment.com (copyright Rheem) hosts the softener line and is linked from rheem.com's Preferred Series water softener page; no licensing statement appears on it."
+
+[[sources]]
+url = "https://www.rheem.com/help-and-support/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-heating-and-cooling/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-water-heating/product-documentation/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/rheem-preferred-series-water-softeners/"
+title = "Rheem Preferred Series softeners (links to rheemwatertreatment.com)"
+checked = 2026-11-28

@@ -1,0 +1,53 @@
+format = 1
+id = "ranges"
+brand = "whirlpool"
+name = "Whirlpool ranges"
+category = "range"
+fuel = ["gas", "electric"]
+status = "current"
+description = "Whirlpool freestanding and front-control gas and electric ranges."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals lookup"
+url = "https://www.whirlpool.com/services/manuals.html"
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+note = "Linked from the producthelp page; whirlpool.com itself returned 403 at review."
+
+[[manuals]]
+kind = "support-page"
+title = "Checking the anti-tip bracket installation"
+url = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+
+[[facts]]
+topic = "anti-tip"
+text = "Ranges with a lift-out storage drawer: remove the drawer and look under a back corner with a torch; the back leveling leg should be seated in the bracket. Other ranges: set your foot against the base at the front, hold the top and ease it toward you."
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+
+[[facts]]
+topic = "anti-tip"
+text = "A solid, immediate stop on the tilt test means the leg is engaged. If the back comes up more than half an inch with nothing holding it, set it down and do not use the oven until the bracket is anchored. Whirlpool says a missing bracket should be supplied free."
+source = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+
+[[facts]]
+topic = "gas smell"
+text = "If you smell gas or hear it leaking, CPSC says to get out of the home at once without touching lights, phones or any other electronics on the way, then call the gas utility or local gas authority from outside."
+source = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+note = "General CPSC advice from its 2026-03-16 release; no Whirlpool HTML page with gas-smell guidance could be opened."
+
+[[sources]]
+url = "https://www.whirlpool.com/services/manuals.html"
+checked = 2026-11-28
+unverified = true
+note = "whirlpool.com blocked automated fetch; URL linked from producthelp.whirlpool.com."
+
+[[sources]]
+url = "https://producthelp.whirlpool.com/Cooking/Wall_Ovens_and_Ranges/Product_Info/Oven_Installation_Support/Checking_the_Anti-Tip_Bracket_Installation"
+title = "Checking the Anti-Tip Bracket Installation"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Issues-Winter-Weather-Safety-Tips-to-Prevent-Fires-and-Carbon-Monoxide-Poisoning"
+title = "CPSC winter weather safety tips (gas leak advice)"
+checked = 2026-11-28

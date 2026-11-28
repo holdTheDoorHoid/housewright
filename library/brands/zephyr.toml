@@ -1,0 +1,15 @@
+format = 1
+id = "zephyr"
+name = "Zephyr"
+aliases = ["ZEPHYR", "Zephyr Ventilation"]
+domains = ["zephyronline.com"]
+website = "https://www.zephyronline.com/"
+support_url = "https://docs.zephyronline.com/"
+note = "Manuals are on docs.zephyronline.com and filters on store.zephyronline.com. The store blocked automated fetching; website and docs root URLs are the domains printed in the manuals, not separately fetched."
+
+[[sources]]
+url = "https://docs.zephyronline.com/docs/manuals/sienab_manual.pdf"
+title = "Sienna use, care and installation guide (URL from search results)"
+checked = 2026-11-28
+unverified = true
+note = "PDF not fetched; URL from search results."

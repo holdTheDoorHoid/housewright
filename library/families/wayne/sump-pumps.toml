@@ -1,0 +1,31 @@
+format = 1
+id = "sump-pumps"
+brand = "wayne"
+name = "Wayne sump pumps"
+category = "sump-pump"
+status = "current"
+description = "Wayne's thermoplastic, cast iron and combination sump pumps; model families were not individually confirmed."
+
+[[manuals]]
+kind = "product-page"
+title = "Sump pump category"
+url = "https://www.waynepumps.com/product-category/sump-pumps/"
+source = "https://www.waynepumps.com/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Operating manuals"
+url = "https://www.waynepumps.com/wayne-operating-manuals/"
+source = "https://www.waynepumps.com/"
+
+[[sources]]
+url = "https://www.waynepumps.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.waynepumps.com/product-category/sump-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.waynepumps.com/wayne-operating-manuals/"
+checked = 2026-11-28

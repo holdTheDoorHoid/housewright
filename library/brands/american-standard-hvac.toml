@@ -1,0 +1,15 @@
+format = 1
+id = "american-standard-hvac"
+name = "American Standard Heating and Air Conditioning"
+aliases = ["AMERICAN STANDARD", "American Standard Heating & Air Conditioning", "American Standard HVAC"]
+parent = "Trane Technologies"
+domains = ["americanstandardair.com"]
+website = "https://www.americanstandardair.com/"
+support_url = "https://www.americanstandardair.com/customer-care/"
+manual_search_url = "https://www.americanstandardair.com/resources/owners-support/"
+phone = "1-844-955-4401"
+note = "Not the plumbing brand (brand file american-standard). Phone is the Customer Care line on the home page, weekdays 7am-5pm Central."
+
+[[sources]]
+url = "https://www.americanstandardair.com/"
+checked = 2026-11-28

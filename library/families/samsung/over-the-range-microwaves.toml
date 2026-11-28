@@ -1,0 +1,33 @@
+format = 1
+id = "over-the-range-microwaves"
+brand = "samsung"
+name = "Samsung over-the-range microwaves"
+category = "microwave"
+status = "current"
+description = "Samsung over-the-range microwaves with grease filters and, for recirculating installs, a charcoal filter."
+
+[[manuals]]
+kind = "support-page"
+title = "Replace and clean Samsung microwave filters"
+url = "https://www.samsung.com/us/support/answer/ANS10002320/"
+source = "https://www.samsung.com/us/support/answer/ANS10002320/"
+
+[[facts]]
+topic = "charcoal filter"
+text = "Only recirculating installs have a charcoal filter. Replace it every 6 to 12 months; it cannot be washed. Unplug first, remove the 2 or 3 vent screws, slide the vent out, and fit the new filter at the same angle."
+source = "https://www.samsung.com/us/support/answer/ANS10002320/"
+
+[[facts]]
+topic = "grease filter"
+text = "Clean a single grease filter at least monthly, or every 4 months on two-filter models. Soak in hot water with mild detergent, rinse, shake dry and lightly brush off debris."
+source = "https://www.samsung.com/us/support/answer/ANS10002320/"
+
+[[facts]]
+topic = "filter light"
+text = "If the filter reminder light is on after servicing a filter, hold the 0 button to reset it."
+source = "https://www.samsung.com/us/support/answer/ANS10002320/"
+
+[[sources]]
+url = "https://www.samsung.com/us/support/answer/ANS10002320/"
+title = "Replace and clean Samsung microwave filters"
+checked = 2026-11-28

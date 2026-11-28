@@ -1352,6 +1352,7 @@ dependencies = [
 name = "housewright-api"
 version = "0.1.0"
 dependencies = [
+ "flate2",
  "housewright-binder",
  "housewright-core",
  "housewright-crypto",
@@ -1441,6 +1442,7 @@ dependencies = [
 name = "housewright-core"
 version = "0.1.0"
 dependencies = [
+ "flate2",
  "housewright-plan",
  "jiff",
  "proptest",
@@ -1471,6 +1473,16 @@ dependencies = [
  "subtle",
  "thiserror",
  "zeroize",
+]
+
+[[package]]
+name = "housewright-library-sync"
+version = "0.1.0"
+dependencies = [
+ "flate2",
+ "housewright-core",
+ "serde_json",
+ "ureq",
 ]
 
 [[package]]

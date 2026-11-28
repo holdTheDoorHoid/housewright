@@ -4,6 +4,7 @@
 //! Licensed AGPL-3.0-only.
 
 pub mod alerts;
+pub mod appliances;
 pub mod audit;
 pub mod backup;
 pub mod blobs;

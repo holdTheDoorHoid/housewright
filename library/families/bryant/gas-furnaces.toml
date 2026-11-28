@@ -1,0 +1,62 @@
+format = 1
+id = "gas-furnaces"
+brand = "bryant"
+name = "Bryant Evolution, Preferred and Legacy gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["987M", "926T", "820S", "916S"]
+description = "Bryant gas furnaces in three tiers: Evolution, Preferred and Legacy, each model named by three digits and one or two letters."
+
+[[manuals]]
+kind = "manual-search"
+title = "Bryant product document search"
+url = "https://www.bryant.com/en/us/current-owners/document-search/"
+source = "https://www.bryant.com/en/us/"
+
+[[manuals]]
+kind = "product-page"
+title = "Bryant gas furnace range"
+url = "https://www.bryant.com/en/us/products/gas-furnaces/"
+source = "https://www.bryant.com/en/us/products/gas-furnaces/"
+
+[[facts]]
+topic = "filter"
+text = "Rough replacement guide from Bryant: thin 1 inch fiberglass, monthly; 1 inch pleated, every 60 to 90 days; thick 4 or 5 inch media (such as EZ Flex), about two times a year. Look at it once a month either way."
+source = "https://www.bryant.com/en/us/current-owners/air-filters/"
+
+[[facts]]
+topic = "filter"
+text = "To find the size to buy, read the dimensions off the edge of the filter currently installed; most makers print them there."
+source = "https://www.bryant.com/en/us/current-owners/air-filters/"
+
+[[facts]]
+topic = "warranty"
+text = "Bryant's page does not state a yearly-maintenance condition for warranty, but tells owners to read the conditions and limitations sections of the warranty certificate that came with the equipment."
+source = "https://www.bryant.com/en/us/current-owners/warranty-information/"
+
+[warranty]
+summary = "Registered within 90 days by the original homeowner: 10-year parts warranty; otherwise 5 years. California, Quebec and other places that forbid registration conditions get the 10 years without registering. Component terms vary by model."
+length = "10 years parts"
+source = "https://www.bryant.com/en/us/current-owners/warranty-information/"
+
+[[sources]]
+url = "https://www.bryant.com/en/us/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bryant.com/en/us/current-owners/document-search/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bryant.com/en/us/products/gas-furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bryant.com/en/us/current-owners/air-filters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bryant.com/en/us/current-owners/warranty-information/"
+checked = 2026-11-28

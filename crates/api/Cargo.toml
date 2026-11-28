@@ -18,6 +18,12 @@ serde.workspace = true
 serde_json.workspace = true
 jiff.workspace = true
 
+[build-dependencies]
+# Packs the vendored appliance library (library/) into one compressed
+# bundle compiled into the app (D-147).
+flate2.workspace = true
+serde_json.workspace = true
+
 [features]
 default = ["typeset"]
 # Typeset the binder in this process (Android, desktop, tests). The web

@@ -1,0 +1,51 @@
+format = 1
+id = "heat-pumps"
+brand = "lennox"
+name = "Lennox Signature, Elite and Merit heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_examples = ["SL22KLV", "EL21KLV", "EL19KPV", "EL18KSLV", "EL16KP1", "ML16KP2", "ML14KP1"]
+description = "Lennox split heat pumps in the Dave Lennox Signature, Elite and Merit series, including cold-climate models."
+
+[[manuals]]
+kind = "product-page"
+title = "Lennox heat pumps"
+url = "https://www.lennox.com/products/heating-cooling/heat-pumps"
+source = "https://www.lennox.com/products/heating-cooling/heat-pumps"
+
+[[manuals]]
+kind = "support-page"
+title = "Lennox product help index"
+url = "https://www.lennox.com/residential/support/product-help"
+source = "https://www.lennox.com/residential/support/"
+
+[[facts]]
+topic = "filter"
+text = "Lennox says to change standard 1 inch disposable filters about every 3 months, or monthly with allergies, pets or dust. The size is on the filter frame."
+source = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+
+[warranty]
+summary = "Parts-only factory warranty; registering lets the original owner pick up to 3 years of labor cover. Claims go through a Lennox dealer."
+source = "https://www.lennox.com/residential/owners/assistance/warranty/"
+
+[[sources]]
+url = "https://www.lennox.com/products/heating-cooling/heat-pumps"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/support/product-help"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/parts-and-filters/filters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lennox.com/residential/owners/assistance/warranty/"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "peerless"
+name = "Peerless"
+aliases = ["PEERLESS", "Peerless Boilers", "PB Heat", "PB Heat LLC"]
+parent = "PB Heat"
+domains = ["peerlessboilers.com"]
+website = "https://www.peerlessboilers.com/"
+support_url = "https://www.peerlessboilers.com/contact-us/"
+manual_search_url = "https://www.peerlessboilers.com/document_category/literature/"
+note = "pbheating.com is a parked sale page, not the maker."
+
+[[sources]]
+url = "https://www.peerlessboilers.com/product_category/residential/"
+checked = 2026-11-28

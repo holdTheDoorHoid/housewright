@@ -1,0 +1,7 @@
+format = 1
+id = "furnace-gas"
+name = "Gas furnaces"
+template = "furnace"
+life_safety = true
+brands = ["carrier", "trane", "lennox", "goodman", "rheem", "bryant", "daikin", "american-standard-hvac", "ruud", "amana-hvac"]
+why_brands = "Common US retail and dealer-installed gas furnace brands; no public per-brand sales count was found, so the list is our own judgment. Carrier and Bryant, and Goodman and Daikin, are sister brands with different model names."

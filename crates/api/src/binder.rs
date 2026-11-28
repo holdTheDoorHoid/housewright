@@ -349,6 +349,7 @@ impl Api {
             why: Some(Why {
                 text: "The binder helps most when it is right. Only the sections that changed need printing.".into(),
                 source: "Housewright".into(),
+                link: None,
             }),
             minutes: Some(15),
             completion_fields: vec![],
@@ -359,6 +360,7 @@ impl Api {
             active: false,
             paused: false,
             not_applicable: false,
+            guidance: None,
         };
         self.store.put(&t)?;
         Ok(t)

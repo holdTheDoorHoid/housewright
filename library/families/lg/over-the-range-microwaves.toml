@@ -1,0 +1,61 @@
+format = 1
+id = "over-the-range-microwaves"
+brand = "lg"
+name = "LG over-the-range microwaves"
+category = "microwave"
+status = "current"
+description = "LG over-the-range microwaves with removable grease filters and an optional charcoal filter."
+
+[[manuals]]
+kind = "manual-search"
+title = "Manuals and documents lookup"
+url = "https://www.lg.com/us/support/manuals-documents"
+source = "https://www.lg.com/us/support/manuals-documents"
+
+[[manuals]]
+kind = "support-page"
+title = "Help article: cleaning the grease filters (LG Canada)"
+url = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT52001644-1424373987212/"
+source = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT52001644-1424373987212/"
+
+[[facts]]
+topic = "grease filter"
+text = "Take the grease filters out and wash them at least once a month. They do not go in the dishwasher: unplug the oven, soak them in hot water with a mild detergent, and skip ammonia or lye-based oven cleaners."
+source = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT52001644-1424373987212/"
+
+[[facts]]
+topic = "charcoal filter"
+text = "The charcoal filter sits behind the vent grille on many models. It cannot be washed; LG says to swap it for a new one every 6 to 12 months, sooner with heavy cooking."
+source = "https://www.lg.com/ca_en/care-accessories/microwave-ovens/others/5230w1a003a/"
+
+[[consumables]]
+name = "Microwave grease filter"
+part = "5230W1A012E"
+source = "https://www.lg.com/us/appliances-accessories/lg-5230w1a012e-microwave-grease-filter"
+note = "The accessory page does not list which models it fits; use its compatibility search."
+
+[[consumables]]
+name = "Microwave oven charcoal filter"
+part = "5230W1A003A"
+replace_every = "12 months"
+source = "https://www.lg.com/ca_en/care-accessories/microwave-ovens/others/5230w1a003a/"
+note = "LG gives 6 to 12 months; 12 is the outer limit. The page lists no compatible models, so check fit for yours."
+
+[[sources]]
+url = "https://www.lg.com/us/support/manuals-documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/ca_en/support/product-support/troubleshoot/help-library/cs-CT52001644-1424373987212/"
+title = "LG Canada help article on cleaning grease filters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/us/appliances-accessories/lg-5230w1a012e-microwave-grease-filter"
+title = "LG grease filter 5230W1A012E"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lg.com/ca_en/care-accessories/microwave-ovens/others/5230w1a003a/"
+title = "LG Canada charcoal filter 5230W1A003A"
+checked = 2026-11-28

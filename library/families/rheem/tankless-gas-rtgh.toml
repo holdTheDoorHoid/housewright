@@ -1,0 +1,38 @@
+format = 1
+id = "tankless-gas-rtgh"
+brand = "rheem"
+name = "Rheem condensing and non-condensing gas tankless water heaters"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Rheem IKONIC, RTGH and RTG-R series gas tankless units, indoor and outdoor."
+
+[[manuals]]
+kind = "product-page"
+title = "Rheem tankless water heaters listing"
+url = "https://www.rheem.com/products/residential/water-heating/tankless/"
+source = "https://www.rheem.com/products/residential/water-heating/tankless/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Product documentation"
+url = "https://www.rheem.com/professionals/residential-water-heating/product-documentation/"
+source = "https://www.rheem.com/products/residential/water-heating/"
+
+[[facts]]
+topic = "lineup"
+text = "The listing shows seven gas tankless products across the IKONIC, RTGH, RTG-R and ThermaForce lines, plus one 24 kW RTEX electric unit; each product page has its own documents."
+source = "https://www.rheem.com/products/residential/water-heating/tankless/"
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/tankless/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/products/residential/water-heating/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rheem.com/professionals/residential-water-heating/product-documentation/"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "frigidaire"
+name = "Frigidaire"
+aliases = ["FRIGIDAIRE", "Electrolux Home Products"]
+parent = "Electrolux"
+domains = ["frigidaire.com"]
+website = "https://www.frigidaire.com/"
+support_url = "https://www.frigidaire.com/"
+note = "frigidaire.com blocked automated fetching; support is per-model on product-support pages, so support_url is the home page."
+
+[[sources]]
+url = "https://www.frigidaire.com/Owner-Center/Product-Support--Manuals/?productCode=FFFW5000QW"
+title = "Product support page for a model (URL from search results)"
+checked = 2026-11-28

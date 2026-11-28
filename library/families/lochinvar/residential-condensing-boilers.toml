@@ -1,0 +1,40 @@
+format = 1
+id = "residential-condensing-boilers"
+brand = "lochinvar"
+name = "Residential condensing boilers (Knight, Noble)"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+description = "Lochinvar residential wall and floor mount condensing boilers including combi versions."
+
+[[manuals]]
+kind = "product-page"
+title = "Residential boilers list"
+url = "https://www.lochinvar.com/en_US/residential/boilers/"
+source = "https://www.lochinvar.com/en_US/residential/boilers/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Find documents and videos"
+url = "https://www.lochinvar.com/en_US/find-documents-and-videos"
+source = "https://www.lochinvar.com/"
+
+[[facts]]
+topic = "lineup"
+text = "The US residential range covers Knight condensing boilers (including a wall-mount version), Noble wall-hung boilers and Noble combis in wall or floor versions, plus the non-condensing Solution boiler."
+source = "https://www.lochinvar.com/en_US/residential/boilers/"
+
+[[sources]]
+url = "https://www.lochinvar.com/en_US/residential/boilers/"
+title = "Residential boilers"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lochinvar.com/en_US/find-documents-and-videos"
+title = "Documents"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.lochinvar.com/"
+checked = 2026-11-28

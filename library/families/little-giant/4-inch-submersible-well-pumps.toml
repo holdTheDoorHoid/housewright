@@ -1,0 +1,31 @@
+format = 1
+id = "4-inch-submersible-well-pumps"
+brand = "little-giant"
+name = "Little Giant 4-inch submersible well pumps"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+model_patterns = ["W5G*", "W8G*", "W12G*", "W16G*", "W22G*"]
+model_examples = ["W5G05S8-21P", "W12G10S10-22S", "W22G15S8-32P"]
+description = "Residential-duty 4 inch deep well pumps, 1/2 to 1.5 hp, thermoplastic (P) or stainless steel (S) pump ends."
+
+[[manuals]]
+kind = "product-page"
+title = "4-inch submersible well pump with model table"
+url = "https://www.littlegiant.com/products/submersible-well-pumps/residential-duty-submersible-well-pumps/little-giant-4-inch-submersible-well-pumps/4-inch-submersible-well-pump/"
+source = "https://www.littlegiant.com/products/submersible-well-pumps/residential-duty-submersible-well-pumps/little-giant-4-inch-submersible-well-pumps/4-inch-submersible-well-pump/"
+
+[[facts]]
+topic = "specs"
+text = "Sizes run 1/2 to 1.5 hp at 115 or 230 volts, flows of 5, 8, 12, 16 or 22 gpm, and a 1-1/4 inch female NPT discharge. Water must stay at or below 120 F."
+source = "https://www.littlegiant.com/products/submersible-well-pumps/residential-duty-submersible-well-pumps/little-giant-4-inch-submersible-well-pumps/4-inch-submersible-well-pump/"
+
+[[facts]]
+topic = "model"
+text = "In the model tables, numbers ending in P are listed as thermoplastic and those ending in S as stainless steel, and the number right after the W matches the gpm of each table (5, 8, 12, 16 or 22)."
+source = "https://www.littlegiant.com/products/submersible-well-pumps/residential-duty-submersible-well-pumps/little-giant-4-inch-submersible-well-pumps/4-inch-submersible-well-pump/"
+
+[[sources]]
+url = "https://www.littlegiant.com/products/submersible-well-pumps/residential-duty-submersible-well-pumps/little-giant-4-inch-submersible-well-pumps/4-inch-submersible-well-pump/"
+checked = 2026-11-28

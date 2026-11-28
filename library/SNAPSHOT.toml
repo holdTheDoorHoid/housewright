@@ -1,0 +1,9 @@
+# Written by tools/library-sync; do not edit by hand.
+# The appliance library data in this folder is CC BY 4.0 (LICENSE).
+format = 1
+version = "2026.11.28"
+commit = "d623c10820f220f6c3de8d415394bb271a18b416"
+source = "https://github.com/holdTheDoorHoid/housewright-library"
+published = 2026-11-28
+licence = "CC BY 4.0"
+credit = "Housewright appliance library contributors"

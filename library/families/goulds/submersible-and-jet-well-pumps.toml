@@ -1,0 +1,43 @@
+format = 1
+id = "submersible-and-jet-well-pumps"
+brand = "goulds"
+name = "Goulds well pumps (submersible and jet)"
+category = "well-pump"
+extends = "well-pump"
+fuel = ["electric"]
+status = "current"
+description = "Goulds Water Technology 4 and 6 inch submersible well pumps and jet pumps."
+
+[[manuals]]
+kind = "product-page"
+title = "Submersible well pumps"
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/submersible-well-pumps/"
+source = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/submersible-well-pumps/"
+
+[[manuals]]
+kind = "product-page"
+title = "Jet pumps"
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/jet-pumps/"
+source = "https://www.xylem.com/en-us/brand/goulds-water-technology/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Literature library"
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/resources-tools/literature-library/"
+source = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/submersible-well-pumps/"
+
+[[sources]]
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/submersible-well-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.xylem.com/en-us/brand/goulds-water-technology/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/products/jet-pumps/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.xylem.com/en-us/brands/goulds-water-technology/resources-tools/literature-library/"
+checked = 2026-11-28

@@ -1,0 +1,28 @@
+format = 1
+id = "window-air-conditioners"
+brand = "ge-appliances"
+name = "GE window and room air conditioners"
+category = "window-ac"
+status = "current"
+description = "GE window-mounted room air conditioners."
+
+[[manuals]]
+kind = "support-page"
+title = "Get your room air conditioner ready for summer"
+url = "https://www.geappliances.com/ge/lifestyles/preparing-air-conditioner-for-summer"
+source = "https://www.geappliances.com/ge/lifestyles/preparing-air-conditioner-for-summer"
+
+[[facts]]
+topic = "filter"
+text = "GE asks for a filter check at the start of the season and then every 30 days or sooner while the AC is running. Hand-wash it in warm soapy water (not the dishwasher), rinse, and refit only once it is fully dry."
+source = "https://www.geappliances.com/ge/lifestyles/preparing-air-conditioner-for-summer"
+
+[[facts]]
+topic = "coils"
+text = "If the outdoor-facing coils on a unit left in the window all year are caked with dirt, GE suggests having them cleaned by a professional."
+source = "https://www.geappliances.com/ge/lifestyles/preparing-air-conditioner-for-summer"
+
+[[sources]]
+url = "https://www.geappliances.com/ge/lifestyles/preparing-air-conditioner-for-summer"
+title = "GE room air conditioner seasonal prep"
+checked = 2026-11-28

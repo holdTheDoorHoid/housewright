@@ -1,0 +1,43 @@
+format = 1
+id = "professional-achiever-gas-tank"
+brand = "ruud"
+name = "Professional Achiever and Ultra gas tank water heaters"
+category = "water-heater-tank"
+extends = "water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Ruud gas storage heaters from atmospheric vent Achiever models to Super High Efficiency Achiever Plus and Ultra models."
+
+[[manuals]]
+kind = "product-page"
+title = "Gas tank water heaters listing"
+url = "https://www.ruud.com/products/water-heaters/tank/gas/"
+source = "https://www.ruud.com/products/water-heaters/tank/gas/"
+
+[[manuals]]
+kind = "support-page"
+title = "Ruud warranty and registration"
+url = "https://www.ruud.com/warranty/"
+source = "https://www.ruud.com/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Ruud parts"
+url = "https://parts.ruud.com"
+source = "https://www.ruud.com/"
+
+[[sources]]
+url = "https://www.ruud.com/products/water-heaters/tank/gas/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/warranty/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://parts.ruud.com"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

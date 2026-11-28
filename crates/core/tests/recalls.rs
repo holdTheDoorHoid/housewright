@@ -29,6 +29,7 @@ fn item(name: &str, make: Option<&str>, model: Option<&str>) -> Item {
         sensitivity: Default::default(),
         price: None,
         value: None,
+        family: None,
     }
 }
 

@@ -1,0 +1,43 @@
+format = 1
+id = "cgi-series-5"
+name = "CGi Series 5 cast iron gas boilers"
+brand = "weil-mclain"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas", "propane"]
+status = "current"
+model_patterns = ["CGi*"]
+model_examples = ["CGi-25", "CGi-4", "CGi-8"]
+description = "Cast iron gas-fired water boilers for homes, rated 84 percent AFUE, sizes CGi-25 to CGi-8."
+
+[[manuals]]
+kind = "product-page"
+title = "CGi Series 5 product page with manuals"
+url = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+source = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Users manual covering CGi Series 5 (shared with other gas boilers)"
+url = "https://www.weil-mclain.com/wp-content/uploads/Users-Manual-CGaS4-CGiS5-EGS7-PEGS7-LGBS2-3-0425.pdf"
+source = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+
+[[facts]]
+topic = "design"
+text = "Has a built-in low water cutoff, intermittent electronic ignition and no vent damper. It can be vented by natural draft or direct exhaust."
+source = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+
+[[facts]]
+topic = "downloads"
+text = "The sales flyer offered on the product page has a Series 4 file name, and the user manual is shared with other Weil-McLain gas boilers, so check that a document names your CGi Series 5 before relying on it."
+source = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+
+[[sources]]
+url = "https://www.weil-mclain.com/products/cgi-gas-boiler-series-5/"
+title = "CGi Series 5"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.weil-mclain.com/wp-content/uploads/Users-Manual-CGaS4-CGiS5-EGS7-PEGS7-LGBS2-3-0425.pdf"
+title = "Linked from product page (HEAD checked)"
+checked = 2026-11-28

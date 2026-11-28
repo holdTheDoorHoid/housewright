@@ -1,0 +1,13 @@
+format = 1
+id = "basement-watchdog"
+name = "Basement Watchdog"
+aliases = ["BASEMENT WATCHDOG", "Glentronics", "Glentronics Inc."]
+parent = "Glentronics"
+domains = ["basementwatchdog.com"]
+website = "https://basementwatchdog.com/"
+support_url = "https://basementwatchdog.com/basement-watchdog-customer-service/"
+manual_search_url = "https://basementwatchdog.com/basement-watchdog-manuals-videos/"
+
+[[sources]]
+url = "https://www.basementwatchdog.com/"
+checked = 2026-11-28

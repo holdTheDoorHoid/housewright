@@ -1,0 +1,23 @@
+format = 1
+id = "window-air-conditioners"
+brand = "frigidaire"
+name = "Frigidaire window and room air conditioners"
+category = "window-ac"
+status = "current"
+description = "Frigidaire window-mounted room air conditioners."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean the room air conditioner filter"
+url = "https://owner.frigidaire.com/support-articles/article/1847753-room-air-conditioners-how-do-i-clean-my-air-conditioner-s-air-filter-"
+source = "https://owner.frigidaire.com/support-articles/article/1847753-room-air-conditioners-how-do-i-clean-my-air-conditioner-s-air-filter-"
+
+[[facts]]
+topic = "filter"
+text = "Clean the filter either with a brush-tipped vacuum or by washing it in warm soapy water; a washed filter must be fully dry before it goes back in. Model-specific steps are in the Use and Care manual."
+source = "https://owner.frigidaire.com/support-articles/article/1847753-room-air-conditioners-how-do-i-clean-my-air-conditioner-s-air-filter-"
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1847753-room-air-conditioners-how-do-i-clean-my-air-conditioner-s-air-filter-"
+title = "Room air conditioner filter article"
+checked = 2026-11-28

@@ -1,0 +1,81 @@
+format = 1
+id = "battery-co-alarms"
+brand = "kidde"
+name = "Kidde battery-powered CO alarms (COB series)"
+category = "co-alarm"
+fuel = ["battery"]
+status = "current"
+model_patterns = ["COB*"]
+model_examples = ["COB", "COBD", "COBDL", "COB10", "COBD10", "COBDL10"]
+description = "Plug-free carbon monoxide alarms on AA batteries, plus 10-year sealed-battery versions; D means digital display and L means low-level alert."
+
+[[manuals]]
+kind = "product-page"
+title = "COB (AA battery) product page"
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-aa-battery-powered-cob"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-aa-battery-powered-cob"
+
+[[manuals]]
+kind = "product-page"
+title = "COB10 (10-year battery) product page"
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "English user guide for the COB and COB10 (linked from the product pages)"
+url = "https://brand.kidde.com/m/10712bc721ccef25/original/UG_CO-DC_En.pdf"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+
+[[manuals]]
+kind = "support-page"
+title = "CO alarm replacement and end-of-life FAQ"
+url = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+source = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+
+[[facts]]
+topic = "replacement"
+text = "Kidde gives a 7 or 10 year service life for its CO alarms depending on the model; the user guide for your model says which applies."
+source = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+
+[[facts]]
+topic = "end of life"
+text = "A non-digital Kidde CO alarm that has reached end of life gives a short beep twice a minute while its red light flashes. New batteries will not silence it; replace the alarm."
+source = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+
+[[facts]]
+topic = "battery"
+text = "The COB runs on AA batteries that Kidde says normally need replacing once a year."
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-aa-battery-powered-cob"
+
+[[facts]]
+topic = "battery"
+text = "The COB10 has a 10-year battery that is never replaced, so there are no battery changes or low-battery chirps; heat, cold or high humidity can shorten that battery life."
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+
+[[facts]]
+topic = "hush"
+text = "The COB10 has a single button for testing and for silencing false alarms."
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+
+[warranty]
+summary = "Ten-year limited warranty on the COB10, battery included."
+length = "10 years"
+source = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+
+[[sources]]
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-aa-battery-powered-cob"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/products/carbon-monoxide-alarms/carbon-monoxide-alarm-10-year-battery-powered-cob10"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.kidde.com/support/carbon-monoxide-alarms/replacement-faqs"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://brand.kidde.com/m/10712bc721ccef25/original/UG_CO-DC_En.pdf"
+title = "User guide (PDF, not fetched)"
+checked = 2026-11-28

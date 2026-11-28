@@ -1,0 +1,44 @@
+format = 1
+id = "dehumidifiers"
+brand = "ge-appliances"
+name = "GE dehumidifiers (including ENERGY STAR models with pump)"
+category = "dehumidifier"
+status = "current"
+description = "GE portable dehumidifiers such as the APER50LZ, an ENERGY STAR model with a built-in pump."
+
+[[manuals]]
+kind = "support-page"
+title = "Owner Center for the APER50LZ (manual and support)"
+url = "https://products.geappliances.com/appliance/gea-specs/APER50LZ/support"
+source = "https://products.geappliances.com/appliance/gea-specs/APER50LZ/support"
+
+[[manuals]]
+kind = "support-page"
+title = "Dehumidifier cleaning and maintenance"
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34658"
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34658"
+
+[[facts]]
+topic = "filter"
+text = "On newer GE models a Clean the Filter light comes on after 250 hours of running. Clean the filter, then clear the reminder by holding the Filter button for 3 seconds. The filter must not go in a dishwasher."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16794"
+
+[[facts]]
+topic = "filter"
+text = "To clean it, vacuum the filter; if it is very dirty, wash it with warm (not hot) water and a little dish soap. It must be completely dry before it goes back in. On older models GE suggests looking at it every 2 to 3 weeks."
+source = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34658"
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-specs/APER50LZ/support"
+title = "APER50LZ Owner Center"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=34658"
+title = "Dehumidifier cleaning and maintenance"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://products.geappliances.com/appliance/gea-support-search-content?contentId=16794"
+title = "Dehumidifier air filter"
+checked = 2026-11-28

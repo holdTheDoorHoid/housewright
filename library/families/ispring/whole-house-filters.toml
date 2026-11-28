@@ -1,0 +1,54 @@
+format = 1
+id = "whole-house-filters"
+brand = "ispring"
+name = "iSpring whole house filters (WGB32B and WGB32BM Big Blue, WGB21B, WF150K, WDS150K)"
+category = "whole-house-filter"
+status = "current"
+model_examples = ["WGB32BM", "WGB21B", "WF150K", "WDS150K", "WHO32B"]
+description = "Housing-and-cartridge and tank-style whole house systems."
+
+[[manuals]]
+kind = "product-page"
+title = "WGB21B 2-stage whole house filter"
+url = "https://www.ispringfilter.com/products/ispring-wgb21b-2-stage-heavy-duty-whole-house-water-filtration-system-10x45-in-sediment-filter-and-cto-filter1in-inletoutlet"
+source = "https://www.ispringfilter.com/products/ispring-wgb21b-2-stage-heavy-duty-whole-house-water-filtration-system-10x45-in-sediment-filter-and-cto-filter1in-inletoutlet"
+
+[[manuals]]
+kind = "product-page"
+title = "WGB32BM sediment, carbon and iron system"
+url = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+source = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+
+[[manuals]]
+kind = "support-page"
+title = "FAQ"
+url = "https://www.ispringfilter.com/pages/faq"
+source = "https://www.ispringfilter.com/pages/faq"
+
+[[facts]]
+topic = "filter"
+text = "WGB32BM: 20 by 4.5 inch cartridges; iSpring rates the sediment and carbon stages at 100,000 gallons each, about a year for a family of four, and gives no figure for the iron stage."
+source = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+
+[[consumables]]
+name = "3-stage replacement filter pack for WGB32BM"
+part = "F3WGB32BM"
+for_task = "cartridge"
+source = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+
+[warranty]
+summary = "One year from iSpring once the system is registered online."
+length = "1 year"
+source = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+
+[[sources]]
+url = "https://www.ispringfilter.com/products/ispring-wgb21b-2-stage-heavy-duty-whole-house-water-filtration-system-10x45-in-sediment-filter-and-cto-filter1in-inletoutlet"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ispringfilter.com/products/ispring-whole-house-water-filtration-system-sediment-carbon-iron-manganese-big-blue"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ispringfilter.com/pages/faq"
+checked = 2026-11-28

@@ -1,0 +1,72 @@
+format = 1
+id = "furnaces"
+brand = "american-standard-hvac"
+name = "American Standard gas furnaces"
+category = "furnace-gas"
+extends = "furnace"
+fuel = ["gas"]
+status = "current"
+model_examples = ["ADHMB060CCV3VA", "AUHMB080CCV3VA", "ADHMC100CCV4VA", "AUHMD120CCV5VA"]
+description = "American Standard single-stage, two-stage and modulating gas furnaces, topped by the Platinum 95."
+
+[[manuals]]
+kind = "product-page"
+title = "Furnaces"
+url = "https://www.americanstandardair.com/products/furnaces/"
+source = "https://www.americanstandardair.com/products/furnaces/"
+
+[[manuals]]
+kind = "product-page"
+title = "Platinum 95 furnace"
+url = "https://www.americanstandardair.com/products/furnaces/platinum-95-furnace/"
+source = "https://www.americanstandardair.com/products/furnaces/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Owner's manuals and support"
+url = "https://www.americanstandardair.com/resources/owners-support/"
+source = "https://www.americanstandardair.com/"
+
+[[manuals]]
+kind = "support-page"
+title = "Warranty and registration"
+url = "https://www.americanstandardair.com/resources/warranty-and-registration/"
+source = "https://www.americanstandardair.com/"
+
+[[facts]]
+topic = "efficiency"
+text = "The Platinum 95 is a condensing furnace with two heat exchangers, a modulating gas valve and a variable-speed blower, rated up to 97.3 percent AFUE."
+source = "https://www.americanstandardair.com/products/furnaces/"
+
+[[facts]]
+topic = "fuel"
+text = "Select furnaces can burn propane after a dealer fits a conversion kit; do not convert one yourself."
+source = "https://www.americanstandardair.com/products/furnaces/"
+
+[[facts]]
+topic = "warranty"
+text = "Register the furnace within 60 days of installation to get the 10-year Registered Limited Warranty; otherwise the base limited warranty, typically 5 years, applies."
+source = "https://www.americanstandardair.com/resources/warranty-and-registration/"
+
+[[sources]]
+url = "https://www.americanstandardair.com/products/furnaces/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/resources/owners-support/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/resources/warranty-and-registration/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/products/furnaces/platinum-95-furnace/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.americanstandardair.com/"
+checked = 2026-11-28

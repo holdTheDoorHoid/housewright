@@ -1,0 +1,21 @@
+format = 1
+id = "big-combo-connect"
+brand = "basement-watchdog"
+name = "Big Combo CONNECT primary and backup sump pump system"
+category = "sump-pump"
+status = "current"
+model_examples = ["CITS-50"]
+
+[[manuals]]
+kind = "product-page"
+title = "Big Combo CONNECT"
+url = "https://basementwatchdog.com/product/big-combo-ac-backup-pumps/"
+source = "https://www.basementwatchdog.com/"
+
+[[sources]]
+url = "https://www.basementwatchdog.com/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://basementwatchdog.com/product/big-combo-ac-backup-pumps/"
+checked = 2026-11-28

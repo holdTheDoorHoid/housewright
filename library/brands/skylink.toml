@@ -1,0 +1,18 @@
+format = 1
+id = "skylink"
+name = "Skylink"
+aliases = ["SKYLINK", "Skylink Home", "Skylink Technologies"]
+domains = ["skylinkhome.com"]
+website = "https://www.skylinkhome.com/"
+support_url = "https://www.skylinkhome.com/support"
+note = "How-to videos are at skylinkhome.com/videos. No phone was shown on the pages checked."
+
+[[sources]]
+url = "https://www.skylinkhome.com/videos"
+title = "Skylink how-to videos"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.skylinkhome.com/support"
+title = "Skylink support"
+checked = 2026-11-28

@@ -1,0 +1,35 @@
+format = 1
+id = "heat-pumps"
+brand = "goodman"
+name = "Goodman split heat pumps"
+category = "heat-pump"
+extends = "heat-pump"
+fuel = ["electric"]
+status = "current"
+model_examples = ["GLZS4B", "GLZS5B", "GLZT7C", "GZV6S", "GZV7S", "GZV9S"]
+description = "Goodman split-system heat pumps, including variable-speed inverter models."
+
+[[manuals]]
+kind = "product-page"
+title = "Goodman heat pumps"
+url = "https://www.goodmanmfg.com/products/heat-pumps"
+source = "https://www.goodmanmfg.com/products/heat-pumps"
+
+[[manuals]]
+kind = "manual-search"
+title = "Goodman literature library"
+url = "https://www.goodmanmfg.com/support/literature-library"
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[facts]]
+topic = "manuals"
+text = "In the literature library, find your model name under Heat Pumps; each has a ProductSpecs sheet and a warranty certificate."
+source = "https://www.goodmanmfg.com/support/literature-library"
+
+[[sources]]
+url = "https://www.goodmanmfg.com/products/heat-pumps"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.goodmanmfg.com/support/literature-library"
+checked = 2026-11-28

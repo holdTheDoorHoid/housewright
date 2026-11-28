@@ -1,0 +1,14 @@
+format = 1
+id = "kitchenaid"
+name = "KitchenAid"
+aliases = ["KITCHENAID", "KitchenAid Major Appliances"]
+parent = "Whirlpool Corporation"
+domains = ["kitchenaid.com"]
+website = "https://www.kitchenaid.com/"
+support_url = "https://www.kitchenaid.com/service-and-support.html"
+note = "Product help pages live on producthelp.kitchenaid.com. support_url is the Service and Support page linked from a producthelp article; kitchenaid.com itself returned 403 at review. No phone number was found on a page that could be opened."
+
+[[sources]]
+url = "https://producthelp.kitchenaid.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+title = "How to clean the dishwasher filters (links to kitchenaid.com service and support)"
+checked = 2026-11-28

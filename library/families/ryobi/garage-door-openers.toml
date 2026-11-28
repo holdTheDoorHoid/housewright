@@ -1,0 +1,33 @@
+format = 1
+id = "garage-door-openers"
+brand = "ryobi"
+name = "Ryobi garage door openers (GD125 and GD200 lines)"
+category = "garage-door-opener"
+status = "current"
+description = "Ryobi compact and ultra-quiet openers; manual files are listed on each product support page."
+
+[[manuals]]
+kind = "support-page"
+title = "Support page, Quiet Compact Garage Door Opener"
+url = "https://www.ryobitools.com/support/details/33287177110"
+source = "https://www.ryobitools.com/support/details/33287177110"
+unverified = true
+note = "page not fetched; URL and details taken from search results"
+
+[[manuals]]
+kind = "support-page"
+title = "Support landing page"
+url = "https://www.ryobitools.com/support"
+source = "https://www.ryobitools.com/support"
+unverified = true
+note = "page not fetched; URL and details taken from search results"
+
+[[sources]]
+url = "https://www.ryobitools.com/support/details/33287177110"
+title = "Quiet Compact opener support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ryobitools.com/support"
+title = "Ryobi support"
+checked = 2026-11-28

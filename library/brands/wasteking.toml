@@ -1,0 +1,20 @@
+format = 1
+id = "wasteking"
+name = "Waste King"
+aliases = ["WASTE KING", "WasteKing", "Anaheim Manufacturing"]
+domains = ["wasteking.com"]
+website = "https://www.wasteking.com/"
+support_url = "https://www.wasteking.com/support/contact-us"
+manual_search_url = "https://www.wasteking.com/support/downloads"
+phone = "+1-800-854-3229"
+note = "The site carries Moen branding and its contact page gives Anaheim Manufacturing Company mailing addresses, but no page states a parent company, so none is recorded. Phone is from the contact page."
+
+[[sources]]
+url = "https://www.wasteking.com/"
+title = "Waste King home page (nav: support, downloads, contact, phone)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.wasteking.com/support/contact-us"
+title = "Waste King contact page (phone, Anaheim Manufacturing Company addresses)"
+checked = 2026-11-28

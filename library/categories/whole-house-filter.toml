@@ -1,0 +1,7 @@
+format = 1
+id = "whole-house-filter"
+name = "Whole-house water filters"
+template = "whole-house-water-filter"
+life_safety = false
+brands = ["aquasana", "culligan", "pentair", "ispring", "ge-appliances", "whirlpool"]
+why_brands = "Common US retail brands for whole-home filtration. iSpring, GE and Whirlpool are added; 3M Aqua-Pure blocked automated fetching and Rheem had no whole-house page found."

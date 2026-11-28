@@ -1,0 +1,12 @@
+format = 1
+id = "lochinvar"
+name = "Lochinvar"
+aliases = ["LOCHINVAR", "Lochinvar LLC"]
+domains = ["lochinvar.com"]
+website = "https://www.lochinvar.com/"
+support_url = "https://www.lochinvar.com/en_US/contact.html"
+manual_search_url = "https://www.lochinvar.com/en_US/find-documents-and-videos"
+
+[[sources]]
+url = "https://www.lochinvar.com/"
+checked = 2026-11-28

@@ -1,0 +1,14 @@
+format = 1
+id = "weil-mclain"
+name = "Weil-McLain"
+aliases = ["WEIL-MCLAIN", "Weil McLain", "WEIL MCLAIN"]
+domains = ["weil-mclain.com"]
+website = "https://www.weil-mclain.com/"
+support_url = "https://www.weil-mclain.com/contact-us/"
+manual_search_url = "https://www.weil-mclain.com/resource-library"
+phone = "630-560-3700"
+note = "Phone is the company line shown on the website home page. Warranty claims go through a heating contractor."
+
+[[sources]]
+url = "https://www.weil-mclain.com/"
+checked = 2026-11-28

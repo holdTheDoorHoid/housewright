@@ -1,0 +1,14 @@
+format = 1
+id = "first-alert"
+name = "First Alert"
+aliases = ["FIRST ALERT", "BRK Brands", "BRK Brands Inc"]
+domains = ["firstalert.com"]
+website = "https://www.firstalert.com/"
+support_url = "https://support.firstalert.com/s/"
+manual_search_url = "https://www.firstalert.com/pages/support"
+note = "Support site support.firstalert.com is covered by the firstalert.com domain. Its TLS certificate failed automated verification during research, so pages there were not opened."
+
+[[sources]]
+url = "https://www.firstalert.com/"
+title = "First Alert home page"
+checked = 2026-11-28

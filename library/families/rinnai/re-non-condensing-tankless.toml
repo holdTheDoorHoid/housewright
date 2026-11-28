@@ -1,0 +1,58 @@
+format = 1
+id = "re-non-condensing-tankless"
+brand = "rinnai"
+name = "Rinnai non-condensing gas tankless water heaters (RE, REP, V)"
+category = "water-heater-tankless"
+extends = "tankless-water-heater"
+fuel = ["gas", "propane"]
+status = "current"
+description = "Rinnai non-condensing tankless series."
+
+[[manuals]]
+kind = "product-page"
+title = "RE model series"
+url = "https://www.rinnai.us/residential/re-model-series"
+source = "https://www.rinnai.us/residential/tankless-water-heaters"
+
+[[manuals]]
+kind = "manual-search"
+title = "Document library"
+url = "https://www.rinnai.us/professional/document-library"
+source = "https://www.rinnai.us/"
+
+[[facts]]
+topic = "flush"
+text = "Rinnai wants scale flushed out at least yearly and says the job is for a professional installer."
+source = "https://www.rinnai.us/residential/faq"
+
+[[tasks]]
+key = "descale"
+title = "Book a yearly tankless flush by a professional installer"
+steps = [
+  "Book a professional installer to flush mineral scale out of the heater at least once a year.",
+  "Ask them to check and clean the inlet water filter screen on the same visit.",
+  "Ask whether your water quality calls for flushing more often than yearly.",
+  "Keep the service record with the heater's paperwork.",
+]
+note = "Rinnai asks for a flush at least yearly and says a professional installer should do it."
+source = "https://www.rinnai.us/residential/faq"
+
+[[sources]]
+url = "https://www.rinnai.us/residential/re-model-series"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/tankless-water-heaters"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/professional/document-library"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/residential/faq"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.rinnai.us/"
+checked = 2026-11-28

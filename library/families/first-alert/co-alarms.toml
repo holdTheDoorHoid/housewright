@@ -1,0 +1,59 @@
+format = 1
+id = "co-alarms"
+brand = "first-alert"
+name = "First Alert carbon monoxide and combination alarms"
+category = "co-alarm"
+status = "current"
+model_examples = ["CO400", "CO605", "CO615", "CO710", "CO3-B01-T", "CO3-P01-T", "SC2-B10-T", "PRC710", "SC9120B"]
+description = "Stand-alone CO alarms (battery, plug-in and tabletop) and smoke plus CO combination alarms; examples are model numbers listed on the maker's collection pages."
+
+[[manuals]]
+kind = "product-page"
+title = "Carbon monoxide alarms collection"
+url = "https://www.firstalert.com/collections/carbon-monoxide-alarms"
+source = "https://www.firstalert.com/collections/carbon-monoxide-alarms"
+
+[[manuals]]
+kind = "product-page"
+title = "Combination smoke and CO alarms collection"
+url = "https://www.firstalert.com/collections/combo-smoke-carbon-monoxide-alarms"
+source = "https://www.firstalert.com/collections/combo-smoke-carbon-monoxide-alarms"
+
+[[manuals]]
+kind = "support-page"
+title = "Support center"
+url = "https://www.firstalert.com/pages/support"
+source = "https://www.firstalert.com/pages/support"
+
+[[facts]]
+topic = "replacement"
+text = "The maker's beeps article says alarms should be replaced within 10 years of the date printed on the back; it is written about smoke alarms, so check the CO lifespan in your model's manual."
+source = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+unverified = true
+note = "Blog is about smoke alarms; CO lifespan per model not confirmed. Manuals on support.firstalert.com were not opened."
+
+[[facts]]
+topic = "battery"
+text = "The CO710 tabletop alarm runs on a built-in lithium battery sealed for the life of the alarm, so it needs no battery changes and gives no low-battery chirps."
+source = "https://www.firstalert.com/products/carbon-monoxide-alarm-with-10-year-battery-and-digital-temperature-display"
+
+[[sources]]
+url = "https://www.firstalert.com/products/carbon-monoxide-alarm-with-10-year-battery-and-digital-temperature-display"
+title = "CO710 product page"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/collections/carbon-monoxide-alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/collections/combo-smoke-carbon-monoxide-alarms"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/pages/support"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.firstalert.com/blogs/safety-corner/what-does-the-smoke-alarm-beeps-mean"
+checked = 2026-11-28

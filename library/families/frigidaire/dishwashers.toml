@@ -1,0 +1,33 @@
+format = 1
+id = "dishwashers"
+brand = "frigidaire"
+name = "Frigidaire dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Frigidaire dishwashers with a coarse filter and cylinder fine filter."
+
+[[manuals]]
+kind = "support-page"
+title = "Dishwasher glass trap and filter guide"
+url = "https://owner.frigidaire.com/support-articles/article/1829617-dishwasher-glass-trap-and-filter-guide"
+source = "https://owner.frigidaire.com/support-articles/article/1829617-dishwasher-glass-trap-and-filter-guide"
+
+[[facts]]
+topic = "filter"
+text = "Twist the cylinder fine filter counterclockwise to lift it out and empty it; the coarse filter then comes up from the tub floor. Hold each under the tap (a sponge or bottle brush shifts stuck food) and put them back."
+source = "https://owner.frigidaire.com/support-articles/article/1829617-dishwasher-glass-trap-and-filter-guide"
+
+[[facts]]
+topic = "filter"
+text = "To keep smells away Frigidaire suggests clearing the filter and glass trap every 2 to 3 months; for an existing odor, run the dishwasher empty with a cup of white vinegar and no detergent."
+source = "https://owner.frigidaire.com/support-articles/article/1928381-dishwasher-odors"
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1829617-dishwasher-glass-trap-and-filter-guide"
+title = "Frigidaire dishwasher glass trap and filter guide"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://owner.frigidaire.com/support-articles/article/1928381-dishwasher-odors"
+title = "Frigidaire dishwasher odors"
+checked = 2026-11-28

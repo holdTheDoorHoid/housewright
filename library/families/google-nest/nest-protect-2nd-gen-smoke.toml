@@ -1,0 +1,70 @@
+format = 1
+id = "nest-protect-2nd-gen-smoke"
+brand = "google-nest"
+name = "Nest Protect (2nd gen) smoke and CO alarm"
+category = "smoke-alarm"
+fuel = ["battery", "hardwired"]
+status = "current"
+description = "One combined smoke and CO alarm, listed under both categories; comes in a battery-powered version and a wired version with battery backup."
+
+[[manuals]]
+kind = "support-page"
+title = "Nest Protect lights and sounds"
+url = "https://support.google.com/googlehome/answer/9243107"
+source = "https://support.google.com/googlehome/answer/9243107"
+
+[[manuals]]
+kind = "support-page"
+title = "When to replace your Nest Protect"
+url = "https://support.google.com/googlehome/answer/9249296"
+source = "https://support.google.com/googlehome/answer/9249296"
+
+[[manuals]]
+kind = "support-page"
+title = "Replace Nest Protect batteries"
+url = "https://support.google.com/googlehome/answer/9218291"
+source = "https://support.google.com/googlehome/answer/9218291"
+
+[[facts]]
+topic = "replacement"
+text = "Google says the 2nd gen Protect is due for replacement 10 years from its manufacture date. The app shows a Replace by date in the device settings; the date is also on the back, reached by turning the unit counterclockwise off its plate (switch off the breaker first on a wired unit)."
+source = "https://support.google.com/googlehome/answer/9249296"
+
+[[facts]]
+topic = "end of life"
+text = "When it expires the light ring pulses yellow, a voice announces the expiry, and it sounds two chirps each minute that only stop once the unit is replaced. It warns a few months ahead."
+source = "https://support.google.com/googlehome/answer/9243107"
+
+[[facts]]
+topic = "battery"
+text = "The battery model takes 6 AA cells and the wired model 3 AA as backup, in both cases Energizer Ultimate Lithium AA (L91) only; alkaline and rechargeable cells drain too fast. Low batteries show as a yellow ring, then one chirp a minute."
+source = "https://support.google.com/googlehome/answer/9218291"
+
+[[facts]]
+topic = "testing"
+text = "A press of the center button starts a self-test of the sensors, batteries, Wi-Fi and links to other Protects while the ring glows blue. The 2nd gen Sound Check then sounds the horn once for smoke and twice for CO."
+source = "https://support.google.com/googlehome/answer/9243107"
+
+[[facts]]
+topic = "hush"
+text = "Silencing a Heads-Up or Emergency with the button or app is temporary: the alarm returns if the danger remains, and it cannot be silenced at very high smoke levels. Low-battery and expiry chirps cannot be hushed, only fixed."
+source = "https://support.google.com/googlehome/answer/9243107"
+
+[[consumables]]
+name = "Energizer Ultimate Lithium AA (L91) batteries"
+size = "AA, 6 for battery model, 3 for wired model"
+for_task = "battery"
+source = "https://support.google.com/googlehome/answer/9218291"
+
+[[sources]]
+url = "https://support.google.com/googlehome/answer/9243107"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.google.com/googlehome/answer/9249296"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://support.google.com/googlehome/answer/9218291"
+checked = 2026-11-28
+

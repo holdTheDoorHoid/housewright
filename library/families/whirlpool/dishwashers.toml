@@ -1,0 +1,34 @@
+format = 1
+id = "dishwashers"
+brand = "whirlpool"
+name = "Whirlpool dishwashers"
+category = "dishwasher"
+status = "current"
+description = "Whirlpool dishwashers with a removable two-part filter; model patterns not confirmed."
+
+[[manuals]]
+kind = "manual-search"
+title = "Whirlpool manuals lookup"
+url = "https://www.whirlpool.com/services/manuals.html"
+source = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+
+[[facts]]
+topic = "filter"
+text = "Clean the filters about once a month, or every 2 weeks in a big household or with daily runs. Rinse both parts under running water, use only a soft brush, and never run the machine without them."
+source = "https://producthelp.whirlpool.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+
+[[facts]]
+topic = "filter"
+text = "After refitting, the upper filter assembly should lock with a quarter turn. If it spins freely it is not locked in."
+source = "https://producthelp.whirlpool.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+
+[[sources]]
+url = "https://www.whirlpool.com/services/manuals.html"
+checked = 2026-11-28
+[[sources]]
+url = "https://producthelp.whirlpool.com/Laundry/Washers/Product_Info/Washer_Cleaning_and_Care/Removing_Odors_from_the_Interior_of_a_Washer"
+checked = 2026-11-28
+[[sources]]
+url = "https://producthelp.whirlpool.com/Dishwashers/Product_Info/Dishwasher_Cleaning_and_Care/How_to_Clean_the_Dishwasher_Filters"
+title = "How to clean the dishwasher filters"
+checked = 2026-11-28

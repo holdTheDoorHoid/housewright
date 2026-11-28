@@ -1,0 +1,33 @@
+format = 1
+id = "ultra-heat-pump"
+brand = "ruud"
+name = "Ultra hybrid electric heat pump water heaters"
+category = "water-heater-heat-pump"
+extends = "heat-pump-water-heater"
+fuel = ["electric"]
+status = "current"
+description = "Ruud heat pump storage heaters, including 120 volt plug-in models and versions with leak protection."
+
+[[manuals]]
+kind = "product-page"
+title = "Heat pump water heaters listing"
+url = "https://www.ruud.com/products/water-heaters/tank/heat-pump-water-heaters/"
+source = "https://www.ruud.com/products/water-heaters/tank/heat-pump-water-heaters/"
+
+[[manuals]]
+kind = "support-page"
+title = "Ruud warranty and registration"
+url = "https://www.ruud.com/warranty/"
+source = "https://www.ruud.com/"
+
+[[sources]]
+url = "https://www.ruud.com/products/water-heaters/tank/heat-pump-water-heaters/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/warranty/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.ruud.com/"
+checked = 2026-11-28

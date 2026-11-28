@@ -1,0 +1,46 @@
+format = 1
+id = "refrigerators"
+brand = "bosch"
+name = "Bosch refrigerators (100, 500, 800 and Benchmark series)"
+category = "refrigerator"
+status = "current"
+description = "French door, bottom freezer and single door models."
+
+[[manuals]]
+kind = "product-page"
+title = "Refrigerators"
+url = "https://www.bosch-home.com/us/en/category/refrigerators"
+source = "https://www.bosch-home.com/us/products/refrigerators"
+
+[[manuals]]
+kind = "support-page"
+title = "Refrigerator care and support"
+url = "https://www.bosch-home.com/us/owner-support/get-support/support-refrigeration"
+source = "https://www.bosch-home.com/us/owner-support/get-support/support-refrigeration"
+
+[[manuals]]
+kind = "parts-page"
+title = "Water filters and accessories"
+url = "https://www.bosch-home.com/us/en/category-page/refrigerators/accessories-and-water-filters"
+source = "https://www.bosch-home.com/us/products/refrigerators"
+
+[[facts]]
+topic = "filter"
+text = "Bosch sells the UltraClarityPro water filter; the pages we read gave no part number or change interval, so use the filter finder or the model manual."
+source = "https://www.bosch-home.com/us/products/refrigerators"
+
+[[sources]]
+url = "https://www.bosch-home.com/us/products/refrigerators"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/owner-support/get-support/support-refrigeration"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/en/category/refrigerators"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-home.com/us/en/category-page/refrigerators/accessories-and-water-filters"
+checked = 2026-11-28

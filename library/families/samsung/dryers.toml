@@ -1,0 +1,34 @@
+format = 1
+id = "dryers"
+brand = "samsung"
+name = "Samsung clothes dryers"
+category = "dryer"
+status = "current"
+fuel = ["electric", "gas"]
+description = "Samsung electric and gas front-load dryers."
+
+[[manuals]]
+kind = "support-page"
+title = "How to clean your Samsung dryer"
+url = "https://www.samsung.com/us/support/answer/ANS10001019/"
+source = "https://www.samsung.com/us/support/answer/ANS10001019/"
+
+[[facts]]
+topic = "lint"
+text = "Clear the lint filter with every load; Samsung prefers doing it before a cycle, and doing it both before and after is better still."
+source = "https://www.samsung.com/us/support/answer/ANS10001019/"
+
+[[facts]]
+topic = "vent"
+text = "Samsung suggests cleaning the exhaust vent once or twice a year and recommends a professional vent cleaning service for it, though owners may do it themselves."
+source = "https://www.samsung.com/us/support/answer/ANS10001019/"
+
+[[facts]]
+topic = "gas safety"
+text = "Before cleaning the vent of a gas model, Samsung says to shut off its gas supply and unplug it, then turn the gas back on once the job is finished."
+source = "https://www.samsung.com/us/support/answer/ANS10001019/"
+
+[[sources]]
+url = "https://www.samsung.com/us/support/answer/ANS10001019/"
+title = "How to clean your Samsung dryer"
+checked = 2026-11-28

@@ -1,0 +1,63 @@
+format = 1
+id = "greenstar-boilers"
+brand = "bosch-thermotechnology"
+name = "Bosch Greenstar condensing gas boilers"
+category = "boiler"
+extends = "boiler"
+fuel = ["gas"]
+status = "current"
+model_examples = ["Greenstar 79", "Greenstar 100", "Greenstar 151", "Greenstar 131 Combi"]
+description = "95 percent AFUE condensing gas boilers, heating-only or combi, wall-hung or floor-standing."
+
+[[manuals]]
+kind = "product-page"
+title = "Greenstar boilers"
+url = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[manuals]]
+kind = "manual-search"
+title = "Gas and oil boiler manuals"
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/gas-oil-boilers-and-furnaces/"
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[manuals]]
+kind = "manual-pdf"
+title = "Greenstar boiler warranty"
+url = "https://www.bosch-homecomfort.com/us/media/country_pool/documents/product-warranty-library/residential-boiler/6720815241_greenstar_warranty_en-fr__07.2024.pdf"
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[manuals]]
+kind = "parts-page"
+title = "Spare parts diagrams"
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/spare-parts-diagrams/"
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[facts]]
+topic = "parts"
+text = "Parts changed after a product update: the pressure relief valve pipe grew from 18 mm to 22 mm, and the new parts do not fit older units. Floor units built after January 2020 (date code 037) and wall units after February 2022 (date code 238) have the new pipe."
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[facts]]
+topic = "efficiency"
+text = "Rated 95 percent AFUE, in heating-only and combi versions, wall-hung or floor-standing."
+source = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/ocs/residential/greenstar-boilers-1098954-p/"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/manuals/gas-oil-boilers-and-furnaces/"
+title = "Opened at review"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/media/country_pool/documents/product-warranty-library/residential-boiler/6720815241_greenstar_warranty_en-fr__07.2024.pdf"
+title = "PDF link, HEAD check only (200, application/pdf)"
+checked = 2026-11-28
+
+[[sources]]
+url = "https://www.bosch-homecomfort.com/us/en/residential/technical-documentation/spare-parts-diagrams/"
+title = "Opened at review"
+checked = 2026-11-28
