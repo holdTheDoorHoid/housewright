@@ -34,11 +34,12 @@ lets the server stay unable to read anything (D-14).
 | `models/ocr` | The bundled OCR models (CC BY-SA 4.0, D-74). |
 | `crates/crypto` | Household keys, key wrapping, operation and file encryption (D-15). |
 | `crates/sync` | Operation exchange with a server; hybrid logical clocks; merge (D-13). |
-| `crates/binder` | House binder and reports through Typst (D-43). |
+| `crates/binder` | The house binder (D-40 to D-43, D-80 to D-88): gathers one property's data, redacts it for the main volume, builds the editions as a document model, typesets them with an embedded Typst (fonts compiled in, no file system or network), fingerprints sections for reprints. |
 | `crates/server` | Sync relay, share links, paid extras. |
 | `crates/cli` | A command-line front end over the core, for testing and for power users. |
 | `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
 | `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
+| `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, fetched only on the first print; it turns a bundle made by `web/` into a PDF (D-80). |
 | `integrations/home-assistant` | Custom integration and add-on (D-26). |
 | `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
 | `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
@@ -66,6 +67,8 @@ lets the server stay unable to read anything (D-14).
   Home Assistant, used by usage-based schedules.
 - **Contractor**: contact, trades, licence and insurance expiry, private rating;
   linked to completions for job history and cost (D-28).
+- **Binder print**: append-only record of a binder PDF made: edition,
+  volume, printed-on date and a fingerprint per section (D-82).
 - **Attachment**: a file (manual, receipt, warranty, photo) referenced by
   content hash; the bytes live in a blob store beside the database (D-71),
   encrypted from Phase 6.
@@ -153,6 +156,33 @@ sticker: housewright://item/<id> + HW-XXXXX code ◄─ core::labels
 - On Android, files the WebView cannot handle (PDFs, backups) are written to
   the app cache and opened or shared through the plugin (D-79).
 
+## The house binder (Phase 5)
+
+```
+Store ─► binder::gather ─► HouseData (every sensitivity flag kept; private
+                              │        rating and member contacts dropped)
+                              ├─► redact::Public::of ─► build::main_volume ─► Document (main)
+                              └──────────────────────► build::sealed_volume ─► Document (sealed)
+Document ─► check_main (no sensitive value in the text) ─► typeset::source
+         ─► render (Typst, closed world: main.typ + img/<sha>.jpg + Lato) ─► PDF
+Document.sections ─► fingerprint ─► track::status vs binder_print records
+                                    ("3 sections changed since Nov 2")
+```
+
+- A *document* is a list of loose-leaf *sections* of *blocks* (headings,
+  label/value pairs, tables, steps, photos, the emergency layout). It knows
+  nothing about Typst, so tests read its strings directly.
+- `typeset` writes a fixed prelude (page setup, footer "Printed <date> ·
+  Water 3", one function per block) and then one call per block, with every
+  piece of household text as an escaped Typst string literal.
+- The API's `binder_pdf` download builds, checks, shrinks photos for print
+  (`media::photo`), typesets, and records the print. On the web the same
+  steps are split: `binder_bundle` (in `web/`) makes a ZIP of the Typst
+  source, photos and a receipt; `web-binder/` typesets it; the worker then
+  calls `record_binder_print` with the receipt. On Android the PDF goes
+  to the phone's viewer through the existing plugin (D-79); on the web it
+  opens in a new tab (or downloads).
+
 ## Sync and encryption (summary)
 
 Every change becomes an operation `{id, hlc, author, entity, field, value}`.
@@ -177,5 +207,5 @@ Reschedule (P1, P6, P7).
   Android before building on them.
 - **SQLite in the browser** needs OPFS and a single-tab lock; the web build must
   handle a second tab gracefully.
-- **Typst in WebAssembly** is possible but large; the web build may render the
-  binder lazily.
+- **Typst in WebAssembly** is large (see D-80 for the measured cost); it is
+  part of the web build's one WebAssembly file.

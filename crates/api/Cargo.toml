@@ -10,9 +10,16 @@ rust-version.workspace = true
 [dependencies]
 housewright-core.workspace = true
 housewright-media.workspace = true
+housewright-binder.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 jiff.workspace = true
+
+[features]
+default = ["typeset"]
+# Typeset the binder in this process (Android, desktop, tests). The web
+# build leaves it out and typesets in `web-binder/` (D-80).
+typeset = ["housewright-binder/typeset"]
 
 [dev-dependencies]
 image.workspace = true

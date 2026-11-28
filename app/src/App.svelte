@@ -19,6 +19,7 @@
   import Costs from './screens/Costs.svelte';
   import Labels from './screens/Labels.svelte';
   import Scan from './screens/Scan.svelte';
+  import Binder from './screens/Binder.svelte';
 
   let fatal = $state<{ text: string; locked: boolean } | null>(null);
 
@@ -70,7 +71,7 @@
       ? 'today'
       : app.route.name === 'thing' || app.route.name === 'add' || app.route.name === 'scan'
         ? 'things'
-        : app.route.name === 'costs' || app.route.name === 'labels'
+        : app.route.name === 'costs' || app.route.name === 'labels' || app.route.name === 'binder'
           ? 'home'
           : app.route.name,
   );
@@ -108,6 +109,7 @@
     {:else if app.route.name === 'costs'}<Costs />
     {:else if app.route.name === 'labels'}<Labels />
     {:else if app.route.name === 'scan'}<Scan />
+    {:else if app.route.name === 'binder'}<Binder />
     {/if}
   </main>
   {#if app.route.name !== 'questions'}

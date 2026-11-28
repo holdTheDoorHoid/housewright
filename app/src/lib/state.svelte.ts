@@ -14,7 +14,8 @@ export type Route =
   | { name: 'home' }
   | { name: 'costs' }
   | { name: 'labels' }
-  | { name: 'scan' };
+  | { name: 'scan' }
+  | { name: 'binder' };
 
 export function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -51,6 +52,8 @@ export function parse(hash: string): Route {
       return { name: 'labels' };
     case 'scan':
       return { name: 'scan' };
+    case 'binder':
+      return { name: 'binder' };
     default:
       return { name: 'today' };
   }

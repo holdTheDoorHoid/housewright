@@ -20,7 +20,13 @@ use crate::*;
 /// Commands that take a file's bytes as well as JSON arguments.
 pub const UPLOAD_COMMANDS: &[&str] = &["attach", "scan_label", "read_label", "restore_backup"];
 /// Commands that give back bytes rather than JSON.
-pub const DOWNLOAD_COMMANDS: &[&str] = &["attachment_file", "full_backup", "label_sheet_pdf"];
+pub const DOWNLOAD_COMMANDS: &[&str] = &[
+    "attachment_file",
+    "full_backup",
+    "label_sheet_pdf",
+    "binder_pdf",
+    "binder_bundle",
+];
 
 pub(crate) fn attachment_out(a: &Attachment) -> AttachmentOut {
     AttachmentOut {
@@ -198,6 +204,9 @@ impl Api {
                 code: "not_initialized".into(),
                 message: "set up a household first".into(),
             });
+        }
+        if let Some(r) = self.binder_download(cmd, a.clone()) {
+            return r;
         }
         match cmd {
             "attachment_file" => {

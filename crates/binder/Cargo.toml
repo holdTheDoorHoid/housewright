@@ -1,0 +1,27 @@
+[package]
+name = "housewright-binder"
+description = "The house binder for Housewright: a printable house manual in two volumes, typeset with Typst"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+housewright-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+jiff.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+zip.workspace = true
+# Typesetting (D-80). Optional so the web app's main module can build
+# binders without carrying Typst; the web typesets in a separate module
+# (`web-binder/`) loaded only when someone prints.
+typst = { version = "0.15.1", optional = true }
+typst-pdf = { version = "0.15.1", optional = true }
+typst-layout = { version = "0.15.1", optional = true }
+
+[features]
+default = ["typeset"]
+typeset = ["dep:typst", "dep:typst-pdf", "dep:typst-layout"]

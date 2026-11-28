@@ -4,7 +4,7 @@ description = "Housewright on Android and desktop: Tauri 2 shell over the core"
 version = "0.1.0"
 license = "AGPL-3.0-only"
 edition = "2024"
-rust-version = "1.90"
+rust-version = "1.92"
 publish = false
 
 # Built only by `cargo tauri android ...` (and desktop where WebKitGTK is
@@ -64,3 +64,16 @@ rten-vecmath = { opt-level = 3 }
 rten-imageproc = { opt-level = 3 }
 rten-sequence = { opt-level = 3 }
 rten-onnx = { opt-level = 3 }
+# The binder's typesetter (D-80): unoptimised, a 30-page binder takes tens
+# of seconds, which matters most in the debug APK on the emulator.
+typst-library = { opt-level = 2 }
+typst-layout = { opt-level = 2 }
+typst-realize = { opt-level = 2 }
+typst-eval = { opt-level = 2 }
+typst-pdf = { opt-level = 2 }
+typst-syntax = { opt-level = 2 }
+typst-utils = { opt-level = 2 }
+krilla = { opt-level = 2 }
+rustybuzz = { opt-level = 2 }
+ttf-parser = { opt-level = 2 }
+comemo = { opt-level = 2 }

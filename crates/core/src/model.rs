@@ -86,10 +86,14 @@ pub enum EntityKind {
     /// The household's own fields added to a template (D-22), kept apart
     /// from the bundled template copy so a library update cannot drop them.
     TemplateFields,
+    /// Append-only record of a house binder print: which sections, and a
+    /// fingerprint of each one's content, so the app can say what changed
+    /// since (D-42, D-82).
+    BinderPrint,
 }
 
 impl EntityKind {
-    pub const ALL: [EntityKind; 20] = [
+    pub const ALL: [EntityKind; 21] = [
         EntityKind::Household,
         EntityKind::Member,
         EntityKind::Property,
@@ -110,6 +114,7 @@ impl EntityKind {
         EntityKind::SuggestionAnswer,
         EntityKind::CompletionDetail,
         EntityKind::TemplateFields,
+        EntityKind::BinderPrint,
     ];
 
     /// The kinds that existed at schema version 1. Migration 1 creates
@@ -156,6 +161,7 @@ impl EntityKind {
             EntityKind::SuggestionAnswer => "suggestion_answer",
             EntityKind::CompletionDetail => "completion_detail",
             EntityKind::TemplateFields => "template_fields",
+            EntityKind::BinderPrint => "binder_print",
         }
     }
 
@@ -174,6 +180,7 @@ impl EntityKind {
                 | EntityKind::Note
                 | EntityKind::SuggestionAnswer
                 | EntityKind::CompletionDetail
+                | EntityKind::BinderPrint
         )
     }
 
@@ -186,6 +193,7 @@ impl EntityKind {
                 | EntityKind::Snooze
                 | EntityKind::SuggestionAnswer
                 | EntityKind::CompletionDetail
+                | EntityKind::BinderPrint
         )
     }
 }
@@ -513,6 +521,9 @@ pub struct Contractor {
     pub private_rating: Option<u8>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub notes: Option<Flagged<String>>,
+    /// Listed under "Who to call" on the binder's emergency page (D-81).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub emergency: bool,
 }
 entity!(Contractor, Contractor);
 
@@ -649,3 +660,24 @@ impl Entity for TemplateFields {
         self.id.clone()
     }
 }
+
+/// A house binder print (D-82): append-only. For each section printed, a
+/// fingerprint of what it said, so later the app can say which sections
+/// changed since. The latest print that includes a section is the one that
+/// counts for it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct BinderPrint {
+    pub id: BinderPrintId,
+    pub property: PropertyId,
+    /// `emergency`, `full`, `handover` or `succession`.
+    pub edition: String,
+    /// `main` or `sealed`.
+    pub volume: String,
+    pub by: MemberId,
+    pub at: Timestamp,
+    /// The printed-on date shown in every page footer.
+    pub printed_on: Date,
+    /// Section key to fingerprint, for the sections in this print.
+    pub sections: BTreeMap<String, String>,
+}
+entity!(BinderPrint, BinderPrint);

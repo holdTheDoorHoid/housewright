@@ -81,6 +81,8 @@ define_id!(
     SuggestionAnswerId,
     /// Details (costs, values) added to a completion afterwards.
     CompletionDetailId,
+    /// A record that the house binder was printed.
+    BinderPrintId,
     /// An operation in the operation log.
     OpId,
 );

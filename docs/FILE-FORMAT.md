@@ -1,4 +1,4 @@
-# Housewright export format (version 3)
+# Housewright export format (version 4)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -12,7 +12,7 @@ database. The code is `crates/core/src/export.rs`.
 ```json
 {
   "format": "housewright-export",
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-11-27T17:00:00Z",
   "household_id": "01a21f65-3c12-72cb-92ba-a9ba73a49591",
   "entities": { "household": [ ... ], "member": [ ... ], "task": [ ... ] },
@@ -23,7 +23,7 @@ database. The code is `crates/core/src/export.rs`.
 | Key | Meaning |
 |---|---|
 | `format` | Always `"housewright-export"`. |
-| `version` | `3` (since Phase 4; `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
+| `version` | `4` (since Phase 5; `3` in Phase 4, `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
 | `exported_at` | When the file was written (RFC 3339, UTC). |
 | `household_id` | The household this file holds. |
 | `entities` | The current state, grouped by kind. |
@@ -77,13 +77,14 @@ Required fields are in **bold**.
 | `snooze` | **id**, **task**, **by**, **at**, **until** (date), reason |
 | `meter` | **id**, **key**, **name**, **unit**, item |
 | `meter_reading` | **id**, **meter**, **at**, **value**, **by** |
-| `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5, never shared), notes (wrapped) |
+| `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5, never shared or printed), notes (wrapped), emergency (version 4: `true` puts them on the binder's emergency page) |
 | `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant) |
-| `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped) |
-| `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`), room |
+| `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped). A note about a `property`, `room` or `item` is a "quirk only you know", printed in the house binder (main volume, or the sealed volume when sensitive). |
+| `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`; `sealed_volume_location` is where the binder's sealed volume is kept, always normal so the main binder can print it), room |
 | `profile` | (version 2) the answers to the home questions, one per property: **id** (the property's id), home_type, built, zip (wrapped), heating `[...]`, cooling `[...]`, water_heater, water_supply, sewer, features `{basement: true, ...}`, smoke_alarms, smoke_power, co_alarms, **people** `{adults, children, older_adults, pets}`. A missing answer means "not sure". Values are the snake_case names in `crates/core/src/profile.rs`. |
 | `suggestion_answer` | (version 2) **id**, **property**, **key** (`ask:<template id>` or `task:<task id>`), **answer** (`added`, `not_for_us`, `later`), **by**, **at** |
 | `completion_detail` | (version 3) **id**, **completion**, **by**, **at**, costs `[{kind: parts/labour/contractor/other, amount: Money}]`, values (as completion `values`). Added after Done. For one completion, the latest detail that has `costs` gives its costs (an empty list clears them); values are overlaid in order. |
+| `binder_print` | (version 4) **id**, **property**, **edition** (`emergency`, `full`, `handover`, `succession`), **volume** (`main`, `sealed`), **by**, **at**, **printed_on** (date), **sections** `{section key: fingerprint}`. A record that a binder PDF was made, holding a hash of what each section printed, so the app can say which sections changed since. The latest record that includes a section counts for it. |
 | `template_fields` | (version 3) **id** (a template id), **fields** (field definitions the household added to every thing made from that template) |
 
 `schedule` uses the same shapes as templates, plus two that only a real house
@@ -100,7 +101,7 @@ where `type` is `text`, `number`, `date`, `yes_no`, `choice` or `photo` (an
 attachment id).
 
 Completions, snoozes, meter readings, attachments, notes, suggestion
-answers and completion details are records: they are never edited. A completion logged by mistake is cancelled by a later
+answers, completion details and binder prints are records: they are never edited. A completion logged by mistake is cancelled by a later
 completion whose `voids` is the mistaken one's id.
 
 Attachments hold only a content hash (and, for photos, the hash of a small
@@ -138,12 +139,12 @@ To rebuild state from operations (the merge rules, D-13):
 2. Order operations by `hlc`, then `author`, then `id` (all as strings).
 3. For an ordinary field, the latest operation in that order wins.
 4. For `$record` (completion, snooze, meter_reading, attachment, note,
-   suggestion_answer, completion_detail), the
+   suggestion_answer, completion_detail, binder_print), the
    record is the whole `value`; if two records claim one id, the earliest in
    that order wins.
 5. `$deleted` marks the entity deleted forever; later edits do not bring it
-   back. Completions, snoozes, suggestion answers and completion details
-   cannot be deleted; such operations are ignored. Attachments can be.
+   back. Completions, snoozes, suggestion answers, completion details and
+   binder prints cannot be deleted; such operations are ignored. Attachments can be.
 6. Field operations on record kinds, and `$record` on other kinds, are ignored.
 
 The result does not depend on the order in which the operations are applied.
@@ -195,3 +196,7 @@ removes one, or adds a new kind bumps `version`.
   Version 1 and 2 files import unchanged (tested with
   `crates/core/tests/fixtures/export-v2-phase3.json`, written by the Phase 3
   code).
+- **Version 4** (Phase 5) added the `binder_print` kind and the optional
+  `emergency` field on `contractor`. Version 1, 2 and 3 files import
+  unchanged (the Phase 3 fixture is also printed as a binder in
+  `crates/api/tests/binder.rs`).

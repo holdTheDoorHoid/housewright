@@ -9,6 +9,7 @@
 //!
 //! Licensed AGPL-3.0-only.
 
+mod binder;
 mod dto;
 mod records;
 mod templates;
@@ -92,6 +93,17 @@ pub const COMMANDS: &[&str] = &[
     "set_currency",
     "label_sheet",
     "find_label",
+    "binder",
+    "set_sealed_location",
+    "set_binder_reminder",
+    "set_paper",
+    "record_binder_print",
+    "notes",
+    "add_note",
+    "delete_note",
+    "contractors",
+    "save_contractor",
+    "delete_contractor",
 ];
 
 /// The bundled template library, parsed once.
@@ -165,6 +177,17 @@ impl Api {
 
     pub fn store(&self) -> &Store {
         &self.store
+    }
+
+    /// Direct access to the store, for tests and tools that need to set
+    /// something no command offers (a contractor's private rating).
+    pub fn store_mut(&mut self) -> &mut Store {
+        &mut self.store
+    }
+
+    /// The attachment bytes, for tests and tools.
+    pub fn blobs(&self) -> &dyn BlobStore {
+        self.blobs.as_ref()
     }
 
     /// Run one command. `args` is a JSON object (or null for none).
@@ -288,7 +311,10 @@ impl Api {
                 let a: AnswerArgs = args(a)?;
                 ok(self.answer_suggestion(a)?)
             }
-            other => self.records_call(other, a),
+            other => match self.binder_call(other, a.clone()) {
+                Some(r) => r,
+                None => self.records_call(other, a),
+            },
         }
     }
 

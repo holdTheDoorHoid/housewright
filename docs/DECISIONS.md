@@ -184,7 +184,7 @@ and the app files it into the right volume.
 - *stays current*: pages carry a printed-on date; the app tracks what changed
   since the last print and asks you to reprint just the changed pages.
 
-**D-43 Binder rendering (Proposed).** Generate the binder with Typst, a Rust
+**D-43 Binder rendering (Proposed; detailed by D-80).** Generate the binder with Typst, a Rust
 typesetting engine (Apache-2.0) embedded in the core, so it renders identically
 and offline on every platform. Loose-leaf layout: each section starts on its own
 page, and pages are numbered by section (e.g. "Water 3") so single sections can be
@@ -576,6 +576,140 @@ Android's WebView cannot hand a raw request body to the app; this costs a
 third more bytes in memory for the moment of the transfer. On the web the
 worker passes bytes directly, and files open in a new tab or download.
 
+## Phase 5 house binder (proposed by the Phase 5 build, 2026-11-28)
+
+**D-80 Binder rendering: Typst, embedded, a closed world (Proposed).**
+Confirms and details D-43 after measuring the alternative. The binder is
+typeset by Typst 0.15 (`typst`, `typst-layout`, `typst-pdf`, Apache-2.0)
+inside the new `housewright-binder` crate, on Android, the web
+(WebAssembly) and the desktop alike. Extending the sticker sheet's
+`pdf-writer` code was the other option; it would have meant writing our own
+line breaking, tables that split across pages, image placement and per-page
+footers, which Typst already does well. Typst sees a closed "world": one
+source file, the photos we hand it by name, and two fonts compiled in
+(Lato Regular and Bold, SIL Open Font License 1.1, in
+`crates/binder/fonts/`). It has no file system, no network and no packages,
+so `#import`, `#read` and `#include` fail. The Typst source is generated
+from a document model; **user text is only ever written as a Typst string
+literal** (only `\` and `"` are special inside one, and both are escaped)
+and shown by fixed functions, so `#set`, `$`, `*`, `_`, `` ` `` and `\`
+print as themselves (tested with hostile strings through the whole
+renderer). **On the web, Typst is a separate WebAssembly module, loaded
+only when someone prints.** Measured 2026-11-28: with Typst inside the main
+module the web app's WebAssembly grew from 8.56 MB (3.23 MB gzipped) to
+38.3 MB (14.2 MB gzipped), more than four times its size, for a feature
+used once or twice a year. So the main module builds the binder and makes
+a *bundle* (the Typst source, the photos, and a receipt of section
+fingerprints, as one ZIP); `web-binder/` (Typst only) is fetched from the
+app's own origin the first time someone prints, turns the bundle into a
+PDF, and the receipt is then recorded as the print. Rendering is identical
+on every platform, and the web still works offline once that module has
+been fetched once (like label reading's models, D-74). Android and the
+desktop typeset in-process. With the split, the main module is 9.41 MB
+(3.46 MB gzipped, +0.24 MB gzipped for the binder's own code) and the
+binder module, fetched on first print only, is 30.9 MB (11.6 MB gzipped).
+Android's native library carries Typst directly (see the Phase 5 notes for
+its size). Typst's crates are
+compiled optimised in debug builds too (`[profile.dev.package]`), because
+unoptimised a 30-page binder takes tens of seconds.
+
+**D-81 The emergency page (Proposed).** Implements D-42's first edition.
+One page, large type, page 1 of every main volume and printable alone:
+shutoffs (the water main, gas and electrical panel facts first, then any
+other fact in "Shutoffs and safety" and anything about breakers, with up to
+three of their photos), who to call (911 "or your local emergency number",
+contractors marked *for emergencies*, and non-sensitive facts in
+"Utilities and accounts" such as the gas company's emergency line), and
+four short action boxes: gas smell, carbon monoxide alarm, water leak, no
+power. The wording is our own, generic and widely published (leave first,
+call from outside, do not operate switches; turn off the water main;
+never run a generator indoors), with the household's own locations filled
+in; no statistics. If a household has recorded a lot, very long entries are
+cut with an ellipsis and the type shrinks in steps until it fits: it is
+always one page (tested on Letter and A4 with a crowded household).
+Contractors gain an `emergency` flag for this, and the binder screen gains
+a small "Who to call" editor (name, what they do, phone, email, notes,
+private notes, emergency). The private rating is not edited there and is
+never printed (D-28): it is dropped when the binder's data is gathered.
+
+**D-82 Change tracking: binder prints (Proposed).** Implements D-42's
+"stays current". Each section has a fingerprint: a hash of exactly what it
+prints (never of the printed-on date). Generating a binder PDF records a
+`binder_print` record (append-only, synced like any other): edition,
+volume, who, when, the printed-on date, and the fingerprint of each section
+in it. A section has changed when its fingerprint differs from the one in
+the latest print that included it, or it was never printed. Editions are
+tracked separately. The screen says "3 sections have changed since you
+printed on Nov 2" and offers "Print the 3 changed sections", which makes a
+PDF of only those (main and sealed separately). Making the PDF counts as
+printing it: the app cannot know whether the paper came out, and asking
+every time would be a chore. Storage schema 4 adds the table; export
+version 4 adds the kind.
+
+**D-83 How the main volume is kept free of sensitive values (Proposed).**
+Implements D-41. The main volume's builders take a `Public` value, and the
+only way to make one is `Public::of`, which removes every sensitive value
+first: sensitive facts; whole things marked sensitive (a safe), with their
+tasks, history and notes; sensitive serials, locations, warranty references
+and custom values (sensitive by value or by field); sensitive notes,
+attachments and contractor notes or licence numbers; a sensitive address.
+The main volume says only how many were left out and which sealed section
+holds them. As a last check, before a main volume is typeset, every
+sensitive value of six characters or more with a digit, or twelve
+characters or more, is looked for in its text; if one is found nothing is
+printed. Tests build every edition from a household full of sensitive
+values and check the document model, the laid-out pages and the PDF text
+(`pdftotext`) of every main volume. The sealed volume holds: a cover
+("SEALED — keep in a safe place"), the recovery key page (a placeholder,
+"Recovery key: set up when you turn on sync", until Phase 6), codes and
+access, accounts and utilities, and valuables and private details.
+
+**D-84 What the editions hold (Proposed).** Implements D-42.
+*Household binder*: emergency page, about this binder (with where the
+sealed volume is kept, from a fact the owner fills in, or a line to write
+on), the house (profile answers, rooms, quirks), home facts, one section
+per kind of thing (safety, water, heating, electrical, appliances,
+structure, outside, yard, other: make, model, serial, ages, warranty, last
+serviced, next due, sticker code, fields, a photo, quirks, documents, and
+each switched-on task with how often, last done, next due, who looks after
+it, why with its source, and the steps), the next 12 months (monthly jobs
+listed once, then month by month), maintenance history (60 most recent),
+manuals and documents, who to call. *Handover*: the same without the
+sealed volume, the sealed-volume page or who looks after each task;
+household members become "Previous owner" (a contractor who did the work
+is still named), contractor notes are left out, warranties say whether
+they transfer, costs are off unless asked for, notes about things are on
+but can be switched off. *Succession*: the household binder plus
+"Accounts and utilities to transfer", a tick list of non-sensitive
+utilities that says how many more are in the sealed volume's "Accounts to
+transfer" section, itself a tick list. Only the owner may print a sealed
+volume (D-23); members may print main volumes; limited members neither.
+
+**D-85 Photos in print (Proposed).** Photos are shrunk again for print, to
+900 pixels on the long edge at JPEG quality 78 (about 3 inches at
+300 dpi, as large as the layout prints one): one photo per thing, up to
+six per facts group, three on the emergency page.
+
+**D-86 Quirks only you know (Proposed).** Free-text notes about the house,
+a room or a thing are the existing append-only `note` record, about a
+`property`, `room` or `item`. Removing one is a tombstone; changing one is
+remove and add. A note's sensitivity comes from its words like a fact's
+label (a spare key's hiding place is sensitive) unless the person ticks
+"Private". Quirks are added on a thing's page and, for the whole house, on
+the binder screen; rooms have no screen of their own yet (the API and the
+binder support them).
+
+**D-87 The yearly reprint reminder (Proposed).** After the first print a
+task "Reprint the house binder" (every year, low priority, 15 minutes) is
+created *switched off*. The binder screen offers it once, calmly
+("Want a reminder once a year?"), and as a switched-off task it can also
+come up as the weekly suggestion. It is never switched on by itself (P3,
+P5, P10).
+
+**D-88 Paper size (Proposed).** US Letter by default (D-06), A4 on request;
+the choice is a setting on the device, not synced. The emergency page
+fits on either.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -591,3 +725,6 @@ worker passes bytes directly, and files open in a new tab or download.
   12 MB to the repository and the Android app. Proposed: keep them in the
   repository as is. Alternatives: Git LFS, or a pinned download at build
   time.
+- **Q-07** The binder's emergency-page wording (D-81) is our own, generic
+  guidance. Proposed: have it read once by someone with fire-service or
+  gas-utility experience before a public release.

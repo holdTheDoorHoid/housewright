@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "wasm": "wasm-pack build ../web --target web --out-dir pkg --release",
+    "wasm": "wasm-pack build ../web --target web --out-dir pkg --release && wasm-pack build ../web-binder --target web --out-dir pkg --release",
     "dev": "vite",
     "dev:web": "npm run wasm && vite --mode web",
     "build": "vite build",
