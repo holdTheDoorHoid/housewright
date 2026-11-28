@@ -39,6 +39,7 @@ lets the server stay unable to read anything (D-14).
 | `crates/cli` | A command-line front end over the core, for testing and for power users. |
 | `app/` | Svelte interface and Tauri 2 shell (Android, iOS, desktop); `app/src-tauri/plugins/reminders` holds Android reminders (D-62). |
 | `web/` | The API compiled to WebAssembly (SQLite on OPFS in a worker, D-61); the interface's web mode loads it. |
+| `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, fetched only on the first print; it turns a bundle made by `web/` into a PDF (D-80). |
 | `integrations/home-assistant` | Custom integration and add-on (D-26). |
 | `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
 | `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
@@ -175,7 +176,10 @@ Document.sections ─► fingerprint ─► track::status vs binder_print record
   Water 3", one function per block) and then one call per block, with every
   piece of household text as an escaped Typst string literal.
 - The API's `binder_pdf` download builds, checks, shrinks photos for print
-  (`media::photo`), typesets, and records the print. On Android the PDF goes
+  (`media::photo`), typesets, and records the print. On the web the same
+  steps are split: `binder_bundle` (in `web/`) makes a ZIP of the Typst
+  source, photos and a receipt; `web-binder/` typesets it; the worker then
+  calls `record_binder_print` with the receipt. On Android the PDF goes
   to the phone's viewer through the existing plugin (D-79); on the web it
   opens in a new tab (or downloads).
 
