@@ -6,16 +6,17 @@ import type { FromWorker } from './protocol';
 export class WasmBackend implements Backend {
   readonly kind = 'wasm' as const;
   private next = 1;
-  private pending = new Map<number, (text: string) => void>();
+  private pending = new Map<number, (r: { text?: string; bytes?: Uint8Array }) => void>();
   private constructor(
     private worker: Worker,
     private where: 'opfs' | 'memory',
   ) {
     worker.addEventListener('message', (e: MessageEvent<FromWorker>) => {
-      if (e.data.type === 'result') {
-        const r = this.pending.get(e.data.id);
-        this.pending.delete(e.data.id);
-        r?.(e.data.text);
+      const m = e.data;
+      if (m.type === 'result' || m.type === 'bytes') {
+        const r = this.pending.get(m.id);
+        this.pending.delete(m.id);
+        r?.(m.type === 'result' ? { text: m.text } : { bytes: m.bytes });
       }
     });
   }
@@ -58,14 +59,49 @@ export class WasmBackend implements Backend {
   call(cmd: string, args: unknown): Promise<unknown> {
     const id = this.next++;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, (text) => {
+      this.pending.set(id, ({ text }) => {
         try {
-          resolve(unwrap(text));
+          resolve(unwrap(text ?? ''));
         } catch (e) {
           reject(e);
         }
       });
       this.worker.postMessage({ id, cmd, args: JSON.stringify(args ?? {}) });
+    });
+  }
+
+  upload(cmd: string, args: unknown, bytes: Uint8Array): Promise<unknown> {
+    const id = this.next++;
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, ({ text }) => {
+        try {
+          resolve(unwrap(text ?? ''));
+        } catch (e) {
+          reject(e);
+        }
+      });
+      this.worker.postMessage(
+        { id, kind: 'upload', cmd, args: JSON.stringify(args ?? {}), bytes },
+        [bytes.buffer as ArrayBuffer],
+      );
+    });
+  }
+
+  download(cmd: string, args: unknown): Promise<Uint8Array> {
+    const id = this.next++;
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, ({ text, bytes }) => {
+        if (bytes) resolve(bytes);
+        else {
+          try {
+            unwrap(text ?? '');
+            reject(new ApiFailure({ code: 'internal', message: 'no file came back' }));
+          } catch (e) {
+            reject(e);
+          }
+        }
+      });
+      this.worker.postMessage({ id, kind: 'download', cmd, args: JSON.stringify(args ?? {}) });
     });
   }
 }

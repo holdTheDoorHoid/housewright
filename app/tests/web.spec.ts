@@ -99,7 +99,7 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   await page.getByRole('link', { name: 'Things', exact: true }).click();
   await page.getByRole('link', { name: /^Smoke alarms/ }).click();
   await expect(page.getByRole('heading', { name: 'Smoke alarms', level: 1 })).toBeVisible();
-  await page.getByRole('link', { name: /^Test the smoke alarm/ }).click();
+  await page.getByRole('link', { name: /^Test the smoke alarm/ }).first().click();
   await expect(page.getByRole('heading', { name: 'Why it matters' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Steps' })).toBeVisible();
 

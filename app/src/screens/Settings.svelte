@@ -3,6 +3,8 @@
   import { app, toast } from '../lib/state.svelte';
   import { errorText } from '../lib/actions';
   import { reminders, resync, type Permission } from '../lib/reminders';
+  import { saveFile } from '../lib/files';
+  import { CURRENCIES } from '../lib/money';
 
   const DAYS: [Weekday, string][] = [
     ['monday', 'Mon'],
@@ -74,6 +76,25 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  let currency = $state(app.status?.currency ?? 'USD');
+  async function saveCurrency() {
+    try {
+      app.status = await call('set_currency', { currency });
+      toast({ text: `Costs are now in ${currency}.` }, 3000);
+    } catch (err) {
+      toast({ text: errorText(err) });
+    }
+  }
+
+  async function fullBackup() {
+    try {
+      const day = new Date().toISOString().slice(0, 10);
+      await saveFile('full_backup', undefined, `housewright-backup-${day}.zip`, 'application/zip');
+    } catch (err) {
+      toast({ text: errorText(err) });
+    }
+  }
+
   function toggleDay(d: Weekday) {
     winDays = winDays.includes(d) ? winDays.filter((x) => x !== d) : [...winDays, d];
   }
@@ -136,11 +157,32 @@
     An export is one JSON file with everything, including the full history. It can be restored on a new
     device or read by other programs (see FILE-FORMAT.md).
   </p>
-  <button onclick={doExport}>Export everything</button>
-  <p class="muted small">To restore an export, start on a fresh install and choose “I have an export file”.</p>
+  <p class="muted small">
+    A full backup is one .zip file with the export and every photo and document. Keep it somewhere
+    safe, like a cloud drive or a USB stick.
+  </p>
+  <p class="row">
+    <button class="primary" onclick={fullBackup}>Make a full backup</button>
+    <button onclick={doExport}>Export (JSON, no photos)</button>
+  </p>
+  <p class="muted small">
+    To restore, start on a fresh install and choose “I have a backup or export to restore”.
+  </p>
+
+  <h2>Costs</h2>
+  <div class="row">
+    <label for="currency" class="inline">Currency</label>
+    <select id="currency" bind:value={currency} onchange={saveCurrency}>
+      {#each CURRENCIES as c (c)}<option value={c}>{c}</option>{/each}
+    </select>
+  </div>
 
   <h2>About</h2>
   <p class="muted small">Housewright is free software under the AGPL-3.0.</p>
+  <p class="muted small">
+    Label reading uses the ocrs models (github.com/robertknight/ocrs-models), trained on the HierText
+    dataset by Google Research, licensed under CC BY-SA 4.0.
+  </p>
 </section>
 
 <style>

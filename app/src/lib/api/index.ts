@@ -1,6 +1,6 @@
 import type { Backend, Args, Result } from './backend';
 import { ApiFailure } from './backend';
-import type { Command } from './types';
+import type { Command, DownloadCommands, UploadCommands } from './types';
 
 export * from './types';
 export { ApiFailure } from './backend';
@@ -47,5 +47,40 @@ export async function call<C extends Command>(cmd: C, args?: Args<C>): Promise<R
       throw new ApiFailure(e as { code: string; message: string });
     }
     throw new ApiFailure({ code: 'internal', message: String(e) });
+  }
+}
+
+function wrap(e: unknown): ApiFailure {
+  if (e instanceof ApiFailure) return e;
+  if (e && typeof e === 'object' && 'code' in e && 'message' in e) {
+    return new ApiFailure(e as { code: string; message: string });
+  }
+  return new ApiFailure({ code: 'internal', message: String(e) });
+}
+
+/** Run a command that takes a file. */
+export async function upload<C extends keyof UploadCommands>(
+  cmd: C,
+  args: UploadCommands[C][0],
+  bytes: Uint8Array,
+): Promise<UploadCommands[C][1]> {
+  const b = backend ?? (await connect());
+  try {
+    return (await b.upload(cmd, args ?? {}, bytes)) as UploadCommands[C][1];
+  } catch (e) {
+    throw wrap(e);
+  }
+}
+
+/** Run a command that returns bytes. */
+export async function download<C extends keyof DownloadCommands>(
+  cmd: C,
+  args: DownloadCommands[C],
+): Promise<Uint8Array> {
+  const b = backend ?? (await connect());
+  try {
+    return await b.download(cmd, args ?? {});
+  } catch (e) {
+    throw wrap(e);
   }
 }

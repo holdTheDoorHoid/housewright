@@ -1,15 +1,22 @@
 <script lang="ts">
   import { categoryLabel } from '../lib/labels';
-  import { call, type ItemDetail } from '../lib/api';
+  import { call, type ItemDetail, type Card } from '../lib/api';
   import { app, refresh, toast } from '../lib/state.svelte';
-  import { errorText } from '../lib/actions';
+  import { errorText, markDone } from '../lib/actions';
   import { resync } from '../lib/reminders';
-  import { when } from '../lib/format';
+  import { dueText, when } from '../lib/format';
+  import { money } from '../lib/money';
   import TaskRow from './TaskRow.svelte';
+  import Attachments from './Attachments.svelte';
+  import ThingEdit from './ThingEdit.svelte';
 
   let { id }: { id: string } = $props();
   let d = $state<ItemDetail | null>(null);
   let error = $state<string | null>(null);
+  let editing = $state(false);
+  let offered = $state<Card[]>([]);
+  let stale = $state<Card[]>([]);
+  let revealed = $state<Record<string, string>>({});
 
   $effect(() => {
     void app.tick;
@@ -29,8 +36,25 @@
     }
   }
 
+  async function setActive(card: Card, active: boolean) {
+    await call('set_active', { id: card.id, active });
+    offered = offered.filter((c) => c.id !== card.id);
+    stale = stale.filter((c) => c.id !== card.id);
+    refresh();
+    resync();
+  }
+
+  async function reveal(key: string) {
+    try {
+      revealed[key] = (await call('reveal_field', { item_id: id, key })).value;
+    } catch (e) {
+      toast({ text: errorText(e) });
+    }
+  }
+
   const off = $derived(d?.tasks.filter((t) => !t.active) ?? []);
   const on = $derived(d?.tasks.filter((t) => t.active) ?? []);
+  const currency = $derived(app.status?.currency ?? 'USD');
 </script>
 
 {#if error}
@@ -39,17 +63,90 @@
   <article>
     <p><a href="#/things">← Things</a></p>
     <h1>{d.row.name}</h1>
-    <dl class="facts">
-      {#if d.row.room_name}<dt>Room</dt><dd>{d.row.room_name}</dd>{/if}
-      {#if d.row.category}<dt>Kind</dt><dd>{categoryLabel(d.row.category)}</dd>{/if}
-      {#if d.make}<dt>Make</dt><dd>{d.make}</dd>{/if}
-      {#if d.model}<dt>Model</dt><dd>{d.model}</dd>{/if}
-      {#if d.installed}<dt>Installed</dt><dd>{d.installed}</dd>{/if}
-      {#each d.fields as f (f.key)}
-        <dt>{f.label}</dt>
-        <dd>{f.sensitive ? 'Hidden (sensitive)' : f.value}</dd>
-      {/each}
-    </dl>
+    <p class="muted small">Sticker code <strong data-testid="sticker-code">{d.code}</strong></p>
+
+    {#if d.next}
+      <!-- Scanning a sticker lands here: the next job and one tap (P1, P4). -->
+      <div class="card next" data-testid="next-task">
+        <div class="grow">
+          <a href={`#/task/${d.next.id}`}><strong>{d.next.title}</strong></a>
+          <div class="small muted">{dueText(d.next)}</div>
+        </div>
+        <button class="primary done" onclick={() => d?.next && markDone(d.next).catch((e) => toast({ text: errorText(e) }))}
+          >Done</button
+        >
+      </div>
+    {/if}
+
+    {#if offered.length || stale.length}
+      <div class="card offer" data-testid="offered">
+        {#if offered.length}
+          <p>Now that we know more, {offered.length === 1 ? 'this task applies' : 'these tasks apply'}. Switch on what you want; nothing changes by itself.</p>
+          <ul class="stack list">
+            {#each offered as c (c.id)}
+              <li class="row">
+                <a class="grow" href={`#/task/${c.id}`}>{c.title}</a>
+                <button onclick={() => setActive(c, true)}>Switch on</button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        {#if stale.length}
+          <p>{stale.length === 1 ? 'This task may' : 'These tasks may'} no longer apply:</p>
+          <ul class="stack list">
+            {#each stale as c (c.id)}
+              <li class="row">
+                <a class="grow" href={`#/task/${c.id}`}>{c.title}</a>
+                <button onclick={() => setActive(c, false)}>Switch off</button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        <button class="quiet" onclick={() => ((offered = []), (stale = []))}>Not now</button>
+      </div>
+    {/if}
+
+    {#if editing}
+      <ThingEdit
+        {d}
+        ondone={(r) => {
+          editing = false;
+          if (r) {
+            d = r.detail;
+            offered = r.offered;
+            stale = r.no_longer_apply;
+            revealed = {};
+            refresh();
+            toast({ text: 'Saved.' }, 2500);
+          }
+        }}
+      />
+    {:else}
+      <dl class="facts">
+        {#if d.row.room_name}<dt>Room</dt><dd>{d.row.room_name}</dd>{/if}
+        {#if d.row.category}<dt>Kind</dt><dd>{categoryLabel(d.row.category)}</dd>{/if}
+        {#if d.make}<dt>Make</dt><dd>{d.make}</dd>{/if}
+        {#if d.model}<dt>Model</dt><dd>{d.model}</dd>{/if}
+        {#if d.serial}<dt>Serial</dt><dd>{d.serial}</dd>{:else if d.serial_sensitive}
+          <dt>Serial</dt><dd>{#if revealed.serial}{revealed.serial}{:else}<button class="quiet reveal" onclick={() => reveal('serial')}>Hidden · Reveal</button>{/if}</dd>
+        {/if}
+        {#if d.installed}<dt>Installed</dt><dd>{d.installed}</dd>{/if}
+        {#if d.purchased}<dt>Bought</dt><dd>{d.purchased}</dd>{/if}
+        {#each d.fields as f (f.key)}
+          <dt>{f.label}</dt>
+          <dd>
+            {#if !f.sensitive}{f.value === 'photo' ? 'Photo (below)' : f.value.replaceAll('_', ' ')}
+            {:else if revealed[f.key]}{revealed[f.key]}
+            {:else}<button class="quiet reveal" onclick={() => reveal(f.key)}>Hidden · Reveal</button>{/if}
+          </dd>
+        {/each}
+      </dl>
+      <p><button onclick={() => (editing = true)}>Edit details</button></p>
+    {/if}
+
+    <h2>Photos and documents</h2>
+    <p class="muted small">The label, the manual, the receipt, the warranty. Photos are made smaller on this device before they are kept.</p>
+    <Attachments aboutKind="item" aboutId={d.row.id} items={d.attachments} addLabel="Add a photo or PDF" onchange={refresh} />
 
     <h2>Tasks</h2>
     {#if on.length}
@@ -81,7 +178,9 @@
         {#each d.history as h (h.id)}
           <li class="card" class:voided={h.voided}>
             <div><strong>{h.task_title}</strong></div>
-            <div class="muted small">{when(h.at)} · {h.by_name}{h.voided ? ' · undone' : ''}</div>
+            <div class="muted small">
+              {when(h.at)} · {h.by_name}{h.voided ? ' · undone' : ''}{h.cost_total ? ` · ${money(h.cost_total, currency)}` : ''}{h.attachments.length ? ` · ${h.attachments.length} photo${h.attachments.length === 1 ? '' : 's'}` : ''}
+            </div>
             {#each h.notes as n, i (i)}<div>{n}</div>{/each}
           </li>
         {/each}
@@ -97,12 +196,17 @@
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.3rem 1rem;
+    align-items: center;
   }
   .facts dt {
     color: var(--muted);
   }
   .facts dd {
     margin: 0;
+  }
+  .reveal {
+    min-height: 0;
+    padding: 0;
   }
   .list {
     padding: 0;
@@ -120,5 +224,22 @@
   }
   .voided {
     opacity: 0.6;
+  }
+  .next {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0 1rem;
+  }
+  .next a {
+    color: inherit;
+  }
+  .done {
+    min-width: 5.5rem;
+    min-height: 56px;
+  }
+  .offer {
+    margin: 0.5rem 0 1rem;
+    background: var(--accent-soft);
   }
 </style>

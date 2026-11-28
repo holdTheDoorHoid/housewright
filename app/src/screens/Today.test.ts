@@ -30,7 +30,7 @@ describe('Today', () => {
     expect(fake.calls.find((c) => c.cmd === 'complete')!.args).toEqual({ id: 't1' });
     // Afterwards: a note is offered, never required, and Undo is there.
     await waitFor(() => expect(app.toast?.text).toBe('Done: Test the smoke alarm.'));
-    expect(app.toast?.actions?.map((a) => a.label)).toEqual(['Add a note', 'Undo']);
+    expect(app.toast?.actions?.map((a) => a.label)).toEqual(['Add details', 'Undo']);
     await screen.findByText('Nothing needs doing right now.');
   });
 

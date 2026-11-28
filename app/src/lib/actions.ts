@@ -2,7 +2,8 @@ import { call, type Card } from './api';
 import { refresh, toast, go } from './state.svelte';
 import { resync } from './reminders';
 
-/** One-tap Done (P1). Nothing is asked first; a note can be added after. */
+/** One-tap Done (P1). Nothing is asked first; a note, photo or cost can be
+ * added after ("Add details"), never required. */
 export async function markDone(card: Pick<Card, 'id' | 'title'>): Promise<void> {
   const r = await call('complete', { id: card.id });
   refresh();
@@ -10,7 +11,7 @@ export async function markDone(card: Pick<Card, 'id' | 'title'>): Promise<void> 
   toast({
     text: `Done: ${card.title}.`,
     actions: [
-      { label: 'Add a note', run: () => go(`#/task/${card.id}`) },
+      { label: 'Add details', run: () => go(`#/task/${card.id}/details`) },
       {
         label: 'Undo',
         run: async () => {

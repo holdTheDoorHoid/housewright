@@ -14,6 +14,7 @@ crate-type = ["cdylib", "rlib"]
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 housewright-api.workspace = true
 housewright-core.workspace = true
+housewright-media.workspace = true
 rusqlite.workspace = true
 serde_json.workspace = true
 wasm-bindgen = "0.2"

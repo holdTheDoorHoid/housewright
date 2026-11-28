@@ -7,6 +7,10 @@ export interface Backend {
   /** Where the data lives, for the Settings screen. */
   storage(): string;
   call(cmd: string, args: unknown): Promise<unknown>;
+  /** A command that takes a file's bytes as well as arguments. */
+  upload(cmd: string, args: unknown, bytes: Uint8Array): Promise<unknown>;
+  /** A command that returns bytes. */
+  download(cmd: string, args: unknown): Promise<Uint8Array>;
 }
 
 export class ApiFailure extends Error {
