@@ -42,7 +42,7 @@ lets the server stay unable to read anything (D-14).
 | `web-binder/` | The binder's typesetter (Typst) as a second WebAssembly module, fetched only on the first print; it turns a bundle made by `web/` into a PDF (D-80). |
 | `crates/bridge` | `housewright-bridge`: the Home Assistant bridge, a headless member device with a token-protected local JSON API (D-117, D-122, D-124). |
 | `integrations/home-assistant` | The Home Assistant custom integration (Python glue only, D-117), its tests, blueprints and the add-on (D-26). |
-| `templates/` | Community template library (D-21; may split into its own repo, Q-05). |
+| `templates/` | Bundled template library (D-21); moving later to the separate public appliance library `holdTheDoorHoid/housewright-library` (CC BY 4.0, D-127 to D-129). |
 | `tools/climate-build` | Builds the bundled ZIP climate table from NOAA and Census data (D-64). |
 
 ## Data model (core entities)

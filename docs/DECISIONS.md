@@ -1062,17 +1062,45 @@ of every response object to
 when they change; a Python test checks the running bridge against the
 same file.
 
+## Appliance library (Owner, 2026-11-28)
+
+**D-127 Manuals: links and our own words, never the manual (Owner,
+2026-11-28).** Refines D-21. The app and the library store *links* to the
+manufacturer's official manual and support pages, plus maintenance facts
+written in our own words: intervals, sizes, part numbers and paraphrased
+procedures, each with a citation of where it came from. No manual text and
+no manual PDFs are kept in any repository. When someone adds an appliance,
+the app may fetch the official PDF onto that person's own device for their
+records; it is stored there like any attachment they add themselves and is
+never redistributed.
+
+**D-128 The appliance library is its own public repository, CC BY 4.0
+(Owner, 2026-11-28).** The library lives in a separate public repository,
+`holdTheDoorHoid/housewright-library`, licensed CC BY 4.0 (it is data, not
+code). The app's bundled templates (`templates/`) will move there later;
+until then they stay where they are. Settles Q-02 (licence: CC BY 4.0) and
+Q-05 (a separate repository).
+
+**D-129 First pass of the library (Owner, 2026-11-28).** The first pass
+covers the top US brands across about 25 categories. Research is done by
+Sonnet sub-agents, and an Opus pass checks every entry for accuracy and for
+copyright (our own words, a citation for each fact, nothing copied). The
+library is not wired into the app yet (not in Phase 8).
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
   listing.
 - **Q-02** Template library license. Proposed: CC BY 4.0 for template text (lets
   others reuse it, with credit), separate from the AGPL code.
+  *Closed 2026-11-28: CC BY 4.0 (D-128, Owner).*
 - **Q-03** Paid tier price and storage limits.
 - **Q-04** Who is the publisher on the app stores (personal name or an entity)?
 - **Q-05** Should the template library live in its own repository from the start,
   or in this one until it has contributors? Proposed: in this repo under
   `templates/` until v0.1, then split.
+  *Closed 2026-11-28: a separate repository, `holdTheDoorHoid/housewright-library`
+  (D-128, Owner); the bundled templates move there later.*
 - **Q-06** Label reading's models (D-74) are CC BY-SA 4.0 and add about
   12 MB to the repository and the Android app. Proposed: keep them in the
   repository as is. Alternatives: Git LFS, or a pinned download at build
