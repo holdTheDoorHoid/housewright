@@ -330,6 +330,37 @@ impl Store {
             at: self.now(),
             costs,
             values,
+            contractor: None,
+            contractor_cleared: false,
+        };
+        self.append(&d)?;
+        Ok(d)
+    }
+
+    /// Say who did a completed job after Done (P1, D-28): a contractor, or
+    /// `None` for "not a contractor after all". Append-only, like every
+    /// detail; the latest one wins.
+    pub fn link_contractor(
+        &mut self,
+        completion: CompletionId,
+        contractor: Option<crate::ids::ContractorId>,
+    ) -> Result<CompletionDetail> {
+        let c: Completion = self.fetch(&completion.to_string())?;
+        if c.voids.is_some() {
+            return Err(Error::Invalid("that record cancels another".into()));
+        }
+        if let Some(k) = contractor {
+            let _: crate::model::Contractor = self.fetch(&k.to_string())?;
+        }
+        let d = CompletionDetail {
+            id: CompletionDetailId::new(),
+            completion,
+            by: self.author()?,
+            at: self.now(),
+            costs: None,
+            values: Default::default(),
+            contractor,
+            contractor_cleared: contractor.is_none(),
         };
         self.append(&d)?;
         Ok(d)

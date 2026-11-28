@@ -82,7 +82,7 @@ pub fn effective_costs(c: &Completion, details: &[CompletionDetail]) -> Vec<Cost
 }
 
 /// Completions that still count (not voided, not voiding records).
-fn effective(all: Vec<Completion>) -> Vec<Completion> {
+pub(crate) fn effective(all: Vec<Completion>) -> Vec<Completion> {
     let voided: Vec<CompletionId> = all.iter().filter_map(|c| c.voids).collect();
     all.into_iter()
         .filter(|c| c.voids.is_none() && !voided.contains(&c.id))

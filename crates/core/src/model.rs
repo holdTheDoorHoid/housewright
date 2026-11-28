@@ -100,10 +100,14 @@ pub enum EntityKind {
     PlanPin,
     /// A free text label on a floor plan.
     PlanLabel,
+    /// "Not mine": a product recall the household has looked at and says
+    /// does not apply to one of its things (Phase 9). Append-only; removing
+    /// it (a tombstone) brings the match back.
+    RecallDismissal,
 }
 
 impl EntityKind {
-    pub const ALL: [EntityKind; 25] = [
+    pub const ALL: [EntityKind; 26] = [
         EntityKind::Household,
         EntityKind::Member,
         EntityKind::Property,
@@ -129,6 +133,7 @@ impl EntityKind {
         EntityKind::Opening,
         EntityKind::PlanPin,
         EntityKind::PlanLabel,
+        EntityKind::RecallDismissal,
     ];
 
     /// The floor plan kinds (Phase 8, schema 6).
@@ -188,6 +193,7 @@ impl EntityKind {
             EntityKind::Opening => "opening",
             EntityKind::PlanPin => "plan_pin",
             EntityKind::PlanLabel => "plan_label",
+            EntityKind::RecallDismissal => "recall_dismissal",
         }
     }
 
@@ -207,6 +213,7 @@ impl EntityKind {
                 | EntityKind::SuggestionAnswer
                 | EntityKind::CompletionDetail
                 | EntityKind::BinderPrint
+                | EntityKind::RecallDismissal
         )
     }
 
@@ -501,9 +508,20 @@ pub struct PlanLabel {
 }
 entity!(PlanLabel, PlanLabel);
 
+/// A warranty. `expires` is always stored, so older readers keep working;
+/// when it was worked out from a length (`months`) from the install or
+/// purchase date, `months` says so and the date is worked out again when
+/// those dates change (see [`crate::warranty`]).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Warranty {
     pub expires: Date,
+    /// The warranty's length, when it was given as one ("5 years").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub months: Option<u32>,
+    /// The manufacturer's product registration page, if known (P9: an
+    /// action to go with the reminder). An https link only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub register_url: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub provider: Option<String>,
     #[serde(default)]
@@ -553,6 +571,12 @@ pub struct Item {
     /// Whole-item sensitivity (e.g. a safe, jewellery).
     #[serde(default)]
     pub sensitivity: Sensitivity,
+    /// What it cost when bought (Phase 9, for the insurance inventory).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub price: Option<Money>,
+    /// What the household thinks it is worth now (their own estimate).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<Money>,
 }
 entity!(Item, Item);
 
@@ -692,16 +716,32 @@ pub struct Credential {
     pub expires: Option<Date>,
 }
 
+/// Someone who works on the house (D-28).
+///
+/// **Private fields** (`private_rating`, `would_hire_again`,
+/// `private_notes`): the household's own opinion. They are never printed
+/// (the binder drops them when it gathers its data), never sent to Home
+/// Assistant (the bridge never reads contractors), never shared with any
+/// server extra (D-16), and travel only inside end-to-end encrypted sync
+/// operations (D-14) like every other field.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Contractor {
     pub id: ContractorId,
     pub name: String,
+    /// The business, when the person works for one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
     #[serde(default)]
     pub trades: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
+    /// Where they work ("Philadelphia and the Main Line").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service_area: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub licence: Option<Credential>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -714,8 +754,26 @@ pub struct Contractor {
     /// Listed under "Who to call" on the binder's emergency page (D-81).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub emergency: bool,
+    /// Private: would the household hire them again? Licence and insurance
+    /// reminders go only for contractors marked yes (P5).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub would_hire_again: Option<bool>,
+    /// Private notes: never printed, never shared.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub private_notes: Option<String>,
 }
 entity!(Contractor, Contractor);
+
+impl Contractor {
+    /// Drop the private fields (for anything that leaves the household's
+    /// own screens: the binder, exports for others).
+    pub fn without_private(mut self) -> Self {
+        self.private_rating = None;
+        self.would_hire_again = None;
+        self.private_notes = None;
+        self
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -837,6 +895,13 @@ pub struct CompletionDetail {
     pub costs: Option<Vec<CostLine>>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub values: CustomValues,
+    /// Who did the work: a contractor (D-28), said after Done (P1). A later
+    /// detail that names one (or clears it) replaces an earlier one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contractor: Option<ContractorId>,
+    /// Set when this detail says "not a contractor after all".
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub contractor_cleared: bool,
 }
 entity!(CompletionDetail, CompletionDetail);
 
@@ -875,3 +940,16 @@ pub struct BinderPrint {
     pub sections: BTreeMap<String, String>,
 }
 entity!(BinderPrint, BinderPrint);
+
+/// "Not mine" for one recall and one thing (Phase 9). Append-only; a
+/// tombstone undoes it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct RecallDismissal {
+    pub id: RecallDismissalId,
+    pub item: ItemId,
+    /// The CPSC recall number ("26158").
+    pub recall: String,
+    pub by: MemberId,
+    pub at: Timestamp,
+}
+entity!(RecallDismissal, RecallDismissal);
