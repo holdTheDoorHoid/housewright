@@ -95,6 +95,51 @@ pub struct Action {
     pub steps: Vec<String>,
 }
 
+/// A floor plan drawn on the page (D-25). Every coordinate is plan
+/// millimetres, shifted so the drawing starts at (0, 0); the typesetter
+/// scales it to fit. Only numbers and the room names, areas and label texts
+/// (all printed as plain strings) come from the household.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Drawing {
+    pub width: i64,
+    pub height: i64,
+    pub rooms: Vec<DrawnRoom>,
+    /// Walls: (x1, y1, x2, y2, thickness).
+    pub walls: Vec<[i64; 5]>,
+    /// Gaps cut in walls for doors, windows and openings: (x1, y1, x2, y2, width).
+    pub gaps: Vec<[i64; 5]>,
+    /// The glass line of each window: (x1, y1, x2, y2).
+    pub windows: Vec<[i64; 4]>,
+    /// Door leaves and their swing, as open polylines.
+    pub swings: Vec<Vec<[i64; 2]>>,
+    pub pins: Vec<DrawnPin>,
+    pub labels: Vec<DrawnLabel>,
+    /// A scale bar: its length in plan millimetres and what it says.
+    pub bar: (i64, String),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DrawnRoom {
+    pub points: Vec<[i64; 2]>,
+    pub name: String,
+    pub area: String,
+    pub at: [i64; 2],
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DrawnPin {
+    pub at: [i64; 2],
+    pub number: u32,
+    /// Shown dark: a shutoff on the emergency page.
+    pub strong: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DrawnLabel {
+    pub at: [i64; 2],
+    pub text: String,
+}
+
 /// The building blocks of a section.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -160,6 +205,10 @@ pub enum Block {
         #[serde(skip)]
         key: Option<String>,
     },
+    /// A floor plan drawing.
+    Plan {
+        drawing: Drawing,
+    },
     /// A big title for a volume's cover.
     Cover {
         title: String,
@@ -214,6 +263,14 @@ impl Block {
                     out.push(a.title.clone());
                     out.extend(a.steps.iter().cloned());
                 }
+            }
+            Block::Plan { drawing } => {
+                for r in &drawing.rooms {
+                    out.push(r.name.clone());
+                    out.push(r.area.clone());
+                }
+                out.extend(drawing.labels.iter().map(|l| l.text.clone()));
+                out.push(drawing.bar.1.clone());
             }
             Block::RecoveryKey { key } => {
                 out.push(key.clone().unwrap_or_else(|| RECOVERY_NOT_HERE.to_string()))

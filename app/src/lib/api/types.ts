@@ -69,6 +69,8 @@ export interface Status {
   property: PropertyInfo | null;
   /** ISO 4217, e.g. "USD". */
   currency: string | null;
+  /** Floor plan units (D-06). */
+  units: Units | null;
 }
 
 export interface Card {
@@ -190,6 +192,8 @@ export interface ItemDetail {
   attachments: AttachmentInfo[];
   edit: FieldEdit[];
   serial_sensitive: boolean;
+  /** Where it is on a floor plan (D-25). */
+  pin: { pin_id: string; floor_id: string; floor_name: string; at: Point } | null;
 }
 
 export interface FieldEdit {
@@ -349,6 +353,8 @@ export interface FactInfo {
   room_id: string | null;
   room_name: string | null;
   attachments: AttachmentInfo[];
+  /** The floor plan pin it is linked to. */
+  pin_id: string | null;
 }
 
 export interface FactPrompt {
@@ -508,6 +514,8 @@ export interface Commands {
       sensitive?: boolean;
       key?: string;
       room_id?: string;
+      /** Absent keeps the link; "" removes it. */
+      pin_id?: string;
     },
     FactInfo,
   ];
@@ -529,6 +537,33 @@ export interface Commands {
   contractors: [None, ContractorInfo[]];
   save_contractor: [ContractorInfo, ContractorInfo[]];
   delete_contractor: [{ id: string }, null];
+  // -- floor plans (Phase 8) --
+  floors: [None, FloorInfo[]];
+  save_floor: [{ id?: string; name: string; level?: number }, FloorInfo[]];
+  delete_floor: [{ id: string }, FloorInfo[]];
+  floor_plan: [{ floor_id: string }, PlanInfo];
+  save_room_shape: [{ floor_id: string; room_id?: string; name?: string; outline?: Point[] }, PlanSaved];
+  remove_room_shape: [{ id: string }, PlanInfo];
+  save_walls: [{ floor_id: string; walls: { id?: string; a: Point; b: Point; thickness?: number | null }[] }, PlanSaved];
+  delete_wall: [{ id: string }, PlanInfo];
+  save_opening: [
+    { id?: string; wall_id: string; kind: OpeningKind; offset: number; width: number; swing?: Swing | null },
+    PlanSaved,
+  ];
+  delete_opening: [{ id: string }, PlanInfo];
+  save_pin: [
+    { id?: string; floor_id: string; at: Point; item_id?: string; label?: string; wall_id?: string; sensitive?: boolean },
+    PlanSaved,
+  ];
+  delete_pin: [{ id: string }, PlanInfo];
+  save_label: [{ id?: string; floor_id: string; at: Point; text: string; sensitive?: boolean }, PlanSaved];
+  delete_label: [{ id: string }, PlanInfo];
+  set_background: [
+    { floor_id: string; attachment_id?: string | null; at?: Point; width?: number; opacity?: number },
+    PlanInfo,
+  ];
+  set_units: [{ units: Units }, Status];
+  plan_restore: [{ floor_id: string; to: PlanState; from: PlanState }, { plan: PlanInfo; renamed: Record<string, string> }];
   // -- sync (Phase 6) --
   sync_status: [None, SyncStatus];
   sync_check_server: [{ server: string }, { ok: boolean; version: string; time_ms: number; registration_open: boolean }];
@@ -548,6 +583,119 @@ export interface Commands {
   sync_new_recovery_key: [{ recovery_key: string }, RecoveryKeyOut];
   sync_stop: [None, SyncStatus];
   sync_dismiss_notices: [None, SyncStatus];
+}
+
+// -- floor plans (Phase 8, D-25) ---------------------------------------------
+
+/** Plan millimetres; y points down. */
+export interface Point {
+  x: number;
+  y: number;
+}
+export type Units = 'imperial' | 'metric';
+export type OpeningKind = 'door' | 'window' | 'gap';
+export interface Swing {
+  hinge: 'a' | 'b';
+  side: 'left' | 'right';
+}
+
+export interface FloorInfo {
+  id: string;
+  name: string;
+  level: number;
+  drawn: boolean;
+  rooms: number;
+  area_text: string | null;
+}
+
+export interface PlanRoom {
+  id: string;
+  name: string;
+  outline: Point[] | null;
+  area_mm2: number | null;
+  area_text: string | null;
+  perimeter_text: string | null;
+  label_at: Point | null;
+  things: number;
+}
+
+export interface PlanWall {
+  id: string;
+  a: Point;
+  b: Point;
+  thickness: number;
+  length_mm: number;
+  length_text: string;
+}
+
+export interface PlanOpening {
+  id: string;
+  wall_id: string;
+  kind: OpeningKind;
+  offset: number;
+  width: number;
+  width_text: string;
+  swing: Swing | null;
+}
+
+export interface PlanPin {
+  id: string;
+  number: number;
+  at: Point;
+  item_id: string | null;
+  item_name: string | null;
+  label: string | null;
+  wall_id: string | null;
+  sensitive: boolean;
+  room_name: string | null;
+  fact_id: string | null;
+  fact_label: string | null;
+}
+
+export interface PlanLabel {
+  id: string;
+  at: Point;
+  text: string | null;
+  sensitive: boolean;
+}
+
+/** The stored entities of one floor, kept by the editor for undo. */
+export interface PlanState {
+  walls: unknown[];
+  openings: unknown[];
+  pins: unknown[];
+  labels: unknown[];
+  rooms: unknown[];
+}
+
+export interface PlanInfo {
+  floor: FloorInfo;
+  floors: FloorInfo[];
+  units: Units;
+  rooms: PlanRoom[];
+  walls: PlanWall[];
+  openings: PlanOpening[];
+  pins: PlanPin[];
+  labels: PlanLabel[];
+  spaces: { outline: Point[]; area_text: string; label_at: Point }[];
+  total_area_text: string | null;
+  background: {
+    attachment_id: string;
+    at: Point;
+    width: number;
+    opacity: number;
+    pixel_width: number | null;
+    pixel_height: number | null;
+  } | null;
+  corners: Point[];
+  can_edit: boolean;
+  state: PlanState;
+}
+
+export interface PlanSaved {
+  plan: PlanInfo;
+  ids: string[];
+  moved_to: string | null;
 }
 
 // -- sync (Phase 6) ---------------------------------------------------------
@@ -691,7 +839,7 @@ export interface BinderPdfArgs {
   recovery_key?: string;
 }
 
-export type AboutKind = 'item' | 'completion' | 'fact' | 'contractor';
+export type AboutKind = 'item' | 'completion' | 'fact' | 'contractor' | 'floor';
 
 /** Commands that send a file's bytes too: [arguments, result]. */
 export interface UploadCommands {
@@ -784,6 +932,23 @@ export const COMMANDS: Command[] = [
   'contractors',
   'save_contractor',
   'delete_contractor',
+  'floors',
+  'save_floor',
+  'delete_floor',
+  'floor_plan',
+  'save_room_shape',
+  'remove_room_shape',
+  'save_walls',
+  'delete_wall',
+  'save_opening',
+  'delete_opening',
+  'save_pin',
+  'delete_pin',
+  'save_label',
+  'delete_label',
+  'set_background',
+  'set_units',
+  'plan_restore',
   'sync_status',
   'sync_check_server',
   'sync_setup',

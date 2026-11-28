@@ -15,6 +15,7 @@ fn store(author: u128, clock: &ManualClock) -> Store {
 
 fn room(id: u128, name: &str) -> Room {
     Room {
+        outline: None,
         id: RoomId(Uuid::from_u128(id)),
         property: PropertyId(Uuid::from_u128(2)),
         floor: None,

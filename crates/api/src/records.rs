@@ -49,8 +49,10 @@ fn about_kind(s: &str) -> Result<EntityKind, ApiError> {
         "completion" => Ok(EntityKind::Completion),
         "fact" => Ok(EntityKind::Fact),
         "contractor" => Ok(EntityKind::Contractor),
+        // A floor's traced-over background (D-25).
+        "floor" => Ok(EntityKind::Floor),
         other => Err(ApiError::invalid(format!(
-            "files can be added to a thing, a completion, a fact or a contractor, not '{other}'"
+            "files can be added to a thing, a completion, a fact, a contractor or a floor, not '{other}'"
         ))),
     }
 }
@@ -653,6 +655,7 @@ impl Api {
             sensitive,
             key: f.key.clone(),
             room_id: f.room.map(|r| r.to_string()),
+            pin_id: f.pin.map(|p| p.to_string()),
             room_name: match f.room {
                 Some(r) => self.store.get::<Room>(&r.to_string())?.map(|r| r.name),
                 None => None,
@@ -747,7 +750,17 @@ impl Api {
             }
             None => None,
         };
+        let pin = match a.pin_id.as_deref() {
+            None => existing.as_ref().and_then(|f| f.pin),
+            Some("") => None,
+            Some(id) => {
+                let id: PlanPinId = parse_id(id, "pin")?;
+                let _: PlanPin = self.store.fetch(&id.to_string())?;
+                Some(id)
+            }
+        };
         let f = Fact {
+            pin,
             id: existing.as_ref().map(|f| f.id).unwrap_or_else(FactId::new),
             property: existing.as_ref().map(|f| f.property).unwrap_or(p.id),
             category: group,

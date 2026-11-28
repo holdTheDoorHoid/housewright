@@ -72,6 +72,7 @@ const MIGRATIONS: &[(i64, Migration)] = &[
     (3, migration_3),
     (4, migration_4),
     (5, migration_5),
+    (6, migration_6),
 ];
 
 fn migration_1(conn: &Connection) -> rusqlite::Result<()> {
@@ -147,6 +148,15 @@ fn migration_5(conn: &Connection) -> rusqlite::Result<()> {
         "CREATE TABLE sync_state (key TEXT PRIMARY KEY, value TEXT NOT NULL);
          CREATE TABLE sync_remote (op_id TEXT PRIMARY KEY);",
     )
+}
+
+/// Phase 8: floor plans (D-25): walls, openings, pins and labels.
+fn migration_6(conn: &Connection) -> rusqlite::Result<()> {
+    let mut sql = String::new();
+    for kind in EntityKind::PLAN {
+        sql.push_str(&entity_table(kind));
+    }
+    conn.execute_batch(&sql)
 }
 
 /// How far an operation's clock may be ahead of the reference time (the

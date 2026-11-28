@@ -18,6 +18,7 @@ pub mod labels;
 pub mod model;
 pub mod onboard;
 pub mod oplog;
+pub mod plan;
 pub mod priority;
 pub mod profile;
 pub mod records;

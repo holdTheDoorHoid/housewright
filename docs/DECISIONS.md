@@ -1062,17 +1062,145 @@ of every response object to
 when they change; a Python test checks the running bridge against the
 same file.
 
+## Appliance library (Owner, 2026-11-28)
+
+**D-127 Manuals: links and our own words, never the manual (Owner,
+2026-11-28).** Refines D-21. The app and the library store *links* to the
+manufacturer's official manual and support pages, plus maintenance facts
+written in our own words: intervals, sizes, part numbers and paraphrased
+procedures, each with a citation of where it came from. No manual text and
+no manual PDFs are kept in any repository. When someone adds an appliance,
+the app may fetch the official PDF onto that person's own device for their
+records; it is stored there like any attachment they add themselves and is
+never redistributed.
+
+**D-128 The appliance library is its own public repository, CC BY 4.0
+(Owner, 2026-11-28).** The library lives in a separate public repository,
+`holdTheDoorHoid/housewright-library`, licensed CC BY 4.0 (it is data, not
+code). The app's bundled templates (`templates/`) will move there later;
+until then they stay where they are. Settles Q-02 (licence: CC BY 4.0) and
+Q-05 (a separate repository).
+
+**D-129 First pass of the library (Owner, 2026-11-28).** The first pass
+covers the top US brands across about 25 categories. Research is done by
+Sonnet sub-agents, and an Opus pass checks every entry for accuracy and for
+copyright (our own words, a citation for each fact, nothing copied). The
+library is not wired into the app yet (not in Phase 8).
+
+## Phase 8 floor plans (proposed by the Phase 8 build, 2026-11-28)
+
+**D-130 Plan geometry in whole millimetres, merged per wall (Proposed).**
+Implements D-25. A new pure crate, `housewright-plan` (no I/O, no clock),
+holds the geometry: points and lengths are whole millimetres (`i64`), so
+two devices merging the same edits hold byte-identical plans and no
+float drift accumulates; x points right and y points down, as on screen.
+It computes areas (shoelace, exact), perimeters, wall lengths, angles
+between walls, polygon validity (at least three corners, no repeated
+corner, some area, no edge touching another except at its own corners),
+point-in-room, a label point, snapping (an existing corner first, then a
+90° or 45° direction from the last point with the length on the grid,
+then the grid; the grid may be fractional, 6 inches = 152.4 mm, without
+drifting), rooms found from walls (the closed spaces, with walls meeting
+at their ends or in a T; walls crossing in an X are not split), and
+lengths read and written as people do (`12' 6"`, `12 6`, `6 1/2"`,
+`3.81 m`, `3 m 81`; a bare number is feet or metres by the household's
+setting; feet and metres cannot be mixed). The editor mirrors the same
+functions in TypeScript for live readouts; both are tested against one
+file of shared vectors (`crates/plan/tests/vectors.json`).
+*Storage and merging:* each wall, opening (door, window or gap), pin and
+label is its own record (new kinds `wall`, `opening`, `plan_pin`,
+`plan_label`), so two people editing different walls at once both keep
+their edits. Within one record, fields merge last-writer-wins as usual: a
+wall's two ends are separate fields, so one person moving its start and
+another its end both survive. A room's outline is **one** field on the
+existing `room` record: mixing corners from two reshapes could make an
+outline that crosses itself, so the later reshape wins whole. Rooms
+without an outline work exactly as before (P3). Moving a corner shared by
+several walls writes each wall's end; if two people move the same corner
+at the same moment to different places, the walls can end up apart; the
+plan shows the gap and snapping closes it with one drag. What a merge can
+leave behind is shown forgivingly: a door on a wall deleted elsewhere is
+not shown; a door that no longer fits a wall shortened elsewhere is
+clamped onto it; a pin whose wall went stays where it is. Deleting a wall
+deletes its doors and windows; deleting a floor deletes its drawing but
+keeps its rooms, things and tasks. Storage schema 6, export version 6.
+
+**D-131 Undo and redo restore one step (Proposed).** The editor keeps up
+to 50 steps per visit, each as the floor's stored plan before and after.
+Undo sends both to the core (`plan_restore`), which puts back only what
+that step changed, so a change someone made meanwhile on another device
+(or elsewhere on the floor) is kept. Because deletes are final (D-52),
+undoing a delete makes the thing again under a new id, and the editor
+renames it in its remembered steps. Undo history is not saved: it ends
+when you leave the page.
+
+**D-132 Pins put things in rooms; one pin per thing (Proposed).** A pin
+holds a thing, or a name with no thing ("Water main"). Dropping a thing's
+pin inside a room's outline puts the thing in that room (the smallest
+room, where outlines nest), and says so; outside every room nothing
+changes. A thing has one pin: placing it again moves it. A pin dropped
+near a wall sits on the wall. A home fact can be linked to a pin
+(`fact.pin`); the emergency page then says where it is ("Basement plan,
+pin 2") and the plan prints that pin dark. The thing's page shows a small
+plan with its pin; a thing with no pin offers "Show where it is on the
+floor plan" only once some floor is drawn.
+
+**D-133 Floor plans in the binder; private pins stay out (Proposed).**
+Refines D-42 and D-83. The main volume gets one section per drawn floor,
+after the home facts, keyed `plan:<floor id>` so it is tracked and
+reprinted like any section: the plan drawn by Typst from numbers only
+(rooms with name and area, walls at their thickness, doors with their
+swing, windows, numbered pins, labels, a scale bar), the rooms' areas and
+the total, and a legend of pins (number, what, room). Pins are numbered
+top to bottom, then left to right. Left out of the main volume: pins and
+labels marked private, pins of things marked sensitive, and pins of
+things whose location note is sensitive (the pin would give the place
+away); the plan says how many were left out, and the last-chance check
+(D-83) also looks for private pin and label text. Printing one floor
+(`binder_pdf` with that one section, not recorded as a binder print) is
+the plan's own "Print this floor (PDF)". Labels whose words look private
+(a code, a safe, a password) default to private, like facts (D-78).
+
+**D-134 Tracing over a picture (Proposed).** A floor can have one
+background picture: a photo or screenshot of an existing plan, attached
+to the floor like any photo (shrunk on the device, synced encrypted),
+shown dimmed behind the plan. Its place, real-life width and strength are
+one field on the floor, so a move and a resize made at once on two
+devices never mix. A PDF cannot be shown behind the plan yet (the web
+view cannot draw a PDF page into the drawing); the app says to use a
+photo or screenshot of the page instead.
+
+**D-135 The editor (Proposed).** One screen per floor with a floor
+switcher. Tools: Move (tap to see or change, drag to pan, pinch or scroll
+to zoom, drag corners, room corners and pins), Room (drag a rectangle or
+an L, then name it, choosing an existing room or a new one), Walls (tap
+corner by corner with a live length, direction and corner angle; type a
+length to place the next corner along the pointer's direction; tap the
+last corner again to stop; snapping to corners, square and 45° and the
+grid), Door and Window (tap a wall; then type width and position, flip the
+swing), Pin, Label. Spaces closed by walls show as "Tap to name". Undo and
+Redo; keyboard shortcuts on desktop (V R W D N P L, Ctrl+Z, Ctrl+Shift+Z,
++, -, 0). Everything drawn is also listed under the plan (rooms with
+areas, pins, walls, doors and windows, labels), each opening the same
+panel, so nothing needs the drawing to be reached. Limited members see
+the plan and cannot change it. Lengths and areas follow a household
+setting: feet and inches (default, D-06) or metres. Phone scanning
+(LiDAR) is not built (D-25: a later stretch goal).
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
   listing.
 - **Q-02** Template library license. Proposed: CC BY 4.0 for template text (lets
   others reuse it, with credit), separate from the AGPL code.
+  *Closed 2026-11-28: CC BY 4.0 (D-128, Owner).*
 - **Q-03** Paid tier price and storage limits.
 - **Q-04** Who is the publisher on the app stores (personal name or an entity)?
 - **Q-05** Should the template library live in its own repository from the start,
   or in this one until it has contributors? Proposed: in this repo under
   `templates/` until v0.1, then split.
+  *Closed 2026-11-28: a separate repository, `holdTheDoorHoid/housewright-library`
+  (D-128, Owner); the bundled templates move there later.*
 - **Q-06** Label reading's models (D-74) are CC BY-SA 4.0 and add about
   12 MB to the repository and the Android app. Proposed: keep them in the
   repository as is. Alternatives: Git LFS, or a pinned download at build
@@ -1106,3 +1234,14 @@ same file.
   Assistant)? Proposed: not now; it would protect against a stolen disk
   but not against someone who controls Home Assistant, which is the
   realistic threat (see SECURITY.md).
+- **Q-15** Floor plans: should a thing's pin always move it into the room
+  it is dropped in (D-132, as built), or ask first? Proposed: move it and
+  say so, since asking is a step and the room can be changed back.
+- **Q-16** Should the emergency page show a small piece of the plan
+  around each shutoff (D-42 says "plan snippets")? Built: the page names
+  the floor and pin number and the plan page prints shutoff pins dark;
+  a drawn snippet risks pushing the page past one page (D-81).
+- **Q-17** Tracing over a PDF plan (D-134): rasterising a PDF page needs a
+  PDF renderer (pdf.js on the web is a large third-party script; a Rust
+  one would be a new dependency). Proposed: photos and screenshots only
+  until someone asks.

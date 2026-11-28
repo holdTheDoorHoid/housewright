@@ -141,6 +141,7 @@ impl Store {
             id: RoomId::new(),
             property,
             floor: None,
+            outline: None,
             name: name.to_string(),
         };
         self.put(&r)?;

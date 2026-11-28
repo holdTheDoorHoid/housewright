@@ -10,6 +10,7 @@
   import Attachments from './Attachments.svelte';
   import Quirks from './Quirks.svelte';
   import ThingEdit from './ThingEdit.svelte';
+  import PlanThumb from './PlanThumb.svelte';
 
   let { id }: { id: string } = $props();
   let d = $state<ItemDetail | null>(null);
@@ -52,6 +53,14 @@
       toast({ text: errorText(e) });
     }
   }
+
+  // Offer "show where it is" only once there is a plan (P3: never pushed).
+  let hasPlan = $state(false);
+  $effect(() => {
+    call('floors')
+      .then((f) => (hasPlan = f.some((x) => x.drawn)))
+      .catch(() => (hasPlan = false));
+  });
 
   const off = $derived(d?.tasks.filter((t) => !t.active) ?? []);
   const on = $derived(d?.tasks.filter((t) => t.active) ?? []);
@@ -148,6 +157,13 @@
         {/each}
       </dl>
       <p><button onclick={() => (editing = true)}>Edit details</button></p>
+    {/if}
+
+    {#if d.pin}
+      <h2>Where it is</h2>
+      <PlanThumb floorId={d.pin.floor_id} pinId={d.pin.pin_id} name={d.row.name} />
+    {:else if hasPlan}
+      <p><a class="quiet small" href={`#/plans/place/${d.row.id}`}>Show where it is on the floor plan</a></p>
     {/if}
 
     <h2>Photos and documents</h2>

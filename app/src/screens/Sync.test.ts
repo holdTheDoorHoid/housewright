@@ -31,6 +31,7 @@ describe('Sync screen', () => {
   app.status = {
     initialized: true,
     household_name: 'Home',
+    units: 'imperial',
     me: { id: 'm1', name: 'Ana', role: 'owner', reminders: {} },
     property: null,
     currency: 'USD',

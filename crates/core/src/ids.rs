@@ -83,6 +83,14 @@ define_id!(
     CompletionDetailId,
     /// A record that the house binder was printed.
     BinderPrintId,
+    /// A wall on a floor plan.
+    WallId,
+    /// A door, window or open gap in a wall.
+    OpeningId,
+    /// A pin on a floor plan (a thing, or a labelled spot such as a shutoff).
+    PlanPinId,
+    /// A free text label on a floor plan.
+    PlanLabelId,
     /// An operation in the operation log.
     OpId,
 );

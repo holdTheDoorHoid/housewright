@@ -14,6 +14,7 @@ pub mod build;
 pub mod bundle;
 pub mod data;
 pub mod doc;
+pub mod plans;
 pub mod redact;
 #[cfg(feature = "typeset")]
 pub mod render;
@@ -122,6 +123,20 @@ pub fn sensitive_strings(full: &HouseData) -> Vec<String> {
         && s(a.sensitivity)
     {
         v.push(a.value.clone());
+    }
+    for f in &full.floors {
+        for p in &f.pins {
+            if s(p.pin.sensitivity)
+                && let Some(l) = &p.pin.label
+            {
+                v.push(l.clone());
+            }
+        }
+        for l in &f.labels {
+            if s(l.sensitivity) {
+                v.push(l.text.clone());
+            }
+        }
     }
     v.retain(|x| {
         let t = x.trim();

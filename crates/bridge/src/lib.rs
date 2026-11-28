@@ -860,6 +860,7 @@ impl Bridge {
             not_applicable: false,
         })?;
         store.put(&Fact {
+            pin: None,
             id: FactId::new(),
             property: property.id,
             category: "codes".into(),

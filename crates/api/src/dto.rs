@@ -202,6 +202,8 @@ pub struct StatusOut {
     pub property: Option<PropertyDto>,
     /// ISO 4217 code for costs (D-76).
     pub currency: Option<String>,
+    /// How floor plan lengths and areas are shown (D-06).
+    pub units: Option<housewright_core::model::Units>,
 }
 
 /// A task as a list row.
@@ -344,6 +346,17 @@ pub struct ItemDetail {
     /// Every field it can have, with the current value for editing.
     pub edit: Vec<FieldEdit>,
     pub serial_sensitive: bool,
+    /// Where it is on a floor plan, if it has a pin.
+    pub pin: Option<ItemPinOut>,
+}
+
+/// A thing's place on a floor plan, for the thumbnail on its page.
+#[derive(Clone, Debug, Serialize)]
+pub struct ItemPinOut {
+    pub pin_id: String,
+    pub floor_id: String,
+    pub floor_name: String,
+    pub at: housewright_core::model::Point,
 }
 
 /// A field on the edit form. Sensitive values are not sent; the form shows
@@ -614,6 +627,8 @@ pub struct FactOut {
     pub room_id: Option<String>,
     pub room_name: Option<String>,
     pub attachments: Vec<AttachmentOut>,
+    /// The floor plan pin it is linked to.
+    pub pin_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -646,6 +661,9 @@ pub struct SaveFactArgs {
     pub key: Option<String>,
     #[serde(default)]
     pub room_id: Option<String>,
+    /// Where it is on a floor plan: absent keeps the link, "" removes it.
+    #[serde(default)]
+    pub pin_id: Option<String>,
 }
 
 #[derive(Deserialize)]

@@ -256,6 +256,7 @@ mod tests {
         assert!(keys.contains(&"hvac_filter_size"));
 
         let answered = Fact {
+            pin: None,
             id: crate::ids::FactId::new(),
             property: pid,
             category: "shutoffs".into(),

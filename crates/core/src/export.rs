@@ -18,8 +18,10 @@ pub const EXPORT_FORMAT: &str = "housewright-export";
 /// `suggestion_answer` kinds; version 3 (Phase 4) adds `completion_detail`
 /// and `template_fields`; version 4 (Phase 5) adds `binder_print`; version 5
 /// (Phase 7) adds the `triggered` schedule, `member.kind` and
-/// `completion.done_by`. Older files import unchanged.
-pub const EXPORT_VERSION: u32 = 5;
+/// `completion.done_by`; version 6 (Phase 8) adds the floor plan kinds
+/// (`wall`, `opening`, `plan_pin`, `plan_label`) and plan fields on floors,
+/// rooms, facts and the household. Older files import unchanged.
+pub const EXPORT_VERSION: u32 = 6;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Export {

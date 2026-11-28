@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
 members = [
+    "crates/plan",
     "crates/core",
     "crates/cli",
     "crates/api",
@@ -24,6 +25,7 @@ repository = "https://github.com/holdTheDoorHoid/housewright"
 rust-version = "1.92"
 
 [workspace.dependencies]
+housewright-plan = { path = "crates/plan" }
 housewright-core = { path = "crates/core" }
 housewright-api = { path = "crates/api", default-features = false }
 housewright-media = { path = "crates/media" }

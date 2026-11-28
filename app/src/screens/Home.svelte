@@ -107,6 +107,7 @@
 <section aria-labelledby="home-h">
   <h1 id="home-h">Home facts</h1>
   <p class="row links">
+    <a class="button" href="#/plans">Floor plans</a>
     <a class="button" href="#/binder">House binder</a>
     <a class="button" href="#/costs">Costs</a>
     <a class="button" href="#/labels">Print stickers</a>

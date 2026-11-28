@@ -261,6 +261,6 @@ fn a_phase_2_export_still_imports_with_records() {
     let e = export::from_json(text).unwrap();
     let mut s = Store::open_in_memory(Box::new(ManualClock::new(NOW_MS))).unwrap();
     export::import(&mut s, &e, None).unwrap();
-    assert_eq!(s.schema_version().unwrap(), 5);
+    assert_eq!(s.schema_version().unwrap(), 6);
     assert!(costs::summarise(&s).unwrap().by_year.is_empty());
 }

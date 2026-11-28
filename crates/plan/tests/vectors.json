@@ -1,0 +1,44 @@
+{
+  "_comment": "Shared test vectors: checked by crates/plan/tests/props.rs and by app/src/lib/plan/geometry.test.ts, so the interface's live readouts agree with the Rust core.",
+  "parse": [
+    ["12' 6\"", "imperial", 3810],
+    ["12'6", "imperial", 3810],
+    ["12 ft 6 in", "imperial", 3810],
+    ["12 6", "imperial", 3810],
+    ["12", "imperial", 3658],
+    ["12.5 ft", "imperial", 3810],
+    ["150\"", "imperial", 3810],
+    ["6 1/2\"", "imperial", 165],
+    ["2' 6 1/2\"", "imperial", 775],
+    ["3.81 m", "imperial", 3810],
+    ["3.81", "metric", 3810],
+    ["381 cm", "metric", 3810],
+    ["3810 mm", "metric", 3810],
+    ["3 m 81 cm", "metric", 3810],
+    ["3 m 81", "metric", 3810]
+  ],
+  "parse_errors": [
+    ["", "imperial"],
+    ["abc", "imperial"],
+    ["6\" 12'", "imperial"],
+    ["3 m 2 ft", "metric"],
+    ["12 6 7", "imperial"],
+    ["2000 m", "metric"]
+  ],
+  "format": [
+    [3810, "imperial", "12' 6\""],
+    [3048, "imperial", "10' 0\""],
+    [152, "imperial", "6\""],
+    [3652, "imperial", "12' 0\""],
+    [3810, "metric", "3.81 m"]
+  ],
+  "area": [
+    [[[0, 0], [4000, 0], [4000, 3000], [0, 3000]], 12000000, "129 sq ft", "12.0 m²"],
+    [[[0, 0], [6000, 0], [6000, 2000], [4000, 2000], [4000, 4000], [0, 4000]], 20000000, "215 sq ft", "20.0 m²"]
+  ],
+  "angle": [
+    [[1000, 0], [0, 0], [0, 1000], 90],
+    [[1000, 0], [0, 0], [1000, 1000], 45],
+    [[1000, 0], [0, 0], [-1000, 0], 180]
+  ]
+}

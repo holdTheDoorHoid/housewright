@@ -322,6 +322,7 @@ impl Api {
                 // Normal on purpose: the main binder must be able to say
                 // where the sealed volume is (D-41).
                 let f = Fact {
+                    pin: None,
                     id: existing.as_ref().map(|f| f.id).unwrap_or_default(),
                     property: p.id,
                     category: "other".into(),

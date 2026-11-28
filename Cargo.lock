@@ -1356,6 +1356,7 @@ dependencies = [
  "housewright-core",
  "housewright-crypto",
  "housewright-media",
+ "housewright-plan",
  "housewright-server",
  "housewright-sync",
  "image",
@@ -1371,6 +1372,7 @@ name = "housewright-binder"
 version = "0.1.0"
 dependencies = [
  "housewright-core",
+ "housewright-plan",
  "jiff",
  "serde",
  "serde_json",
@@ -1439,6 +1441,7 @@ dependencies = [
 name = "housewright-core"
 version = "0.1.0"
 dependencies = [
+ "housewright-plan",
  "jiff",
  "proptest",
  "rusqlite",
@@ -1485,6 +1488,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "housewright-plan"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "housewright-server"
 version = "0.1.0"
 dependencies = [
@@ -1510,6 +1522,7 @@ dependencies = [
  "axum",
  "housewright-core",
  "housewright-crypto",
+ "housewright-plan",
  "housewright-server",
  "http-body-util",
  "jiff",

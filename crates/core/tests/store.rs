@@ -17,6 +17,7 @@ fn store(author: u128, clock: &ManualClock) -> Store {
 
 fn room(name: &str) -> Room {
     Room {
+        outline: None,
         id: RoomId(Uuid::from_u128(1)),
         property: PropertyId(Uuid::from_u128(2)),
         floor: None,
@@ -187,13 +188,13 @@ fn file_store_persists_hlc_author_and_schema() {
         s.set_author(MemberId(Uuid::from_u128(4))).unwrap();
         s.put(&room("Hall")).unwrap();
         hlc = s.hlc();
-        assert_eq!(s.schema_version().unwrap(), 5);
+        assert_eq!(s.schema_version().unwrap(), 6);
     }
     let s = Store::open(&path).unwrap();
     assert_eq!(s.hlc(), hlc);
     assert_eq!(s.author().unwrap(), MemberId(Uuid::from_u128(4)));
     assert_eq!(s.list::<Room>().unwrap().len(), 1);
-    assert_eq!(s.schema_version().unwrap(), 5);
+    assert_eq!(s.schema_version().unwrap(), 6);
     drop(s);
     std::fs::remove_dir_all(dir).ok();
 }
@@ -237,7 +238,7 @@ fn a_schema_1_database_is_migrated_to_the_latest() {
     conn.execute_batch(&sql).unwrap();
     let clock = ManualClock::new(1_000);
     let mut s = Store::with_connection(conn, Box::new(clock)).unwrap();
-    assert_eq!(s.schema_version().unwrap(), 5);
+    assert_eq!(s.schema_version().unwrap(), 6);
     s.set_author(MemberId(Uuid::from_u128(4))).unwrap();
     let p = Profile::empty(PropertyId(Uuid::from_u128(9)));
     s.put(&p).unwrap();
