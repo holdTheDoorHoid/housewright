@@ -1146,5 +1146,5 @@ fn the_insurance_bundle_renders_like_the_native_pdf() {
     let zip = d.api.call_download("insurance_bundle", json!({})).unwrap();
     let r = binder::render::render_bundle(&zip).unwrap();
     assert!(r.pages >= 3);
-    assert!(r.page_text.join(" ").contains("Totals by room"));
+    assert!(r.page_text.join(" ").contains("Totals and receipts"));
 }

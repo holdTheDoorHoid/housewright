@@ -181,6 +181,19 @@ pub fn inventory(d: &HouseData, opts: InsuranceOptions) -> Inventory {
     }
 }
 
+/// Whether anything worth an insurer's time is recorded about a thing.
+fn has_details(l: &Line) -> bool {
+    !(l.make.is_empty()
+        && l.model.is_empty()
+        && l.serial.is_empty()
+        && l.purchased.is_empty()
+        && l.price.is_none()
+        && l.value.is_none()
+        && l.warranty.is_empty()
+        && l.receipts.is_empty()
+        && l.photo.is_none())
+}
+
 fn money(m: &Option<Money>) -> String {
     m.as_ref()
         .map(|m| text::money(m.minor, &m.currency))
@@ -191,7 +204,7 @@ fn money(m: &Option<Money>) -> String {
 /// a list of receipts, and the totals.
 pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Document {
     let mut sections = Vec::new();
-    let mut cover = Section::new("cover", "Cover", "Home inventory");
+    let mut cover = Section::new("cover", "Cover", "For your insurer");
     let mut lines = vec![format!("Prepared {}", text::date(d.today))];
     if let Some(a) = &d.property.address
         && (!sens(a.sensitivity) || opts.include_sensitive)
@@ -260,9 +273,14 @@ pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Docum
             .push(l);
     }
     let mut summary = Vec::new();
+    // Rooms follow one another (an inventory is printed whole, not
+    // reprinted by section); things with nothing recorded about them yet
+    // (a roof, the gutters) are named in one line instead of a box each.
+    let mut s = Section::new("things", "Inventory", "Room by room");
     for ((_, room), ls) in &by_room {
-        let mut s = Section::new(format!("room:{room}"), room.clone(), room.clone());
-        let entries = ls
+        s.push(Block::Heading { text: room.clone() });
+        let (detailed, bare): (Vec<&&Line>, Vec<&&Line>) = ls.iter().partition(|l| has_details(l));
+        let entries: Vec<InventoryEntry> = detailed
             .iter()
             .map(|l| {
                 let mut rows = Vec::new();
@@ -298,9 +316,6 @@ pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Docum
                 if !l.receipts.is_empty() {
                     rows.push(("Receipts".into(), l.receipts.join(", ")));
                 }
-                if rows.is_empty() {
-                    rows.push(("Details".into(), "None recorded yet".into()));
-                }
                 InventoryEntry {
                     name: l.name.clone(),
                     photo: l.photo.clone(),
@@ -308,7 +323,20 @@ pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Docum
                 }
             })
             .collect();
-        s.push(Block::Inventory { entries });
+        if !entries.is_empty() {
+            s.push(Block::Inventory { entries });
+        }
+        if !bare.is_empty() {
+            s.push(Block::Note {
+                text: format!(
+                    "Also here, with no details recorded yet: {}.",
+                    bare.iter()
+                        .map(|l| l.name.as_str())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ),
+            });
+        }
         let sum = |f: fn(&Line) -> &Option<Money>| -> i64 {
             ls.iter()
                 .filter_map(|l| f(l).as_ref())
@@ -322,35 +350,10 @@ pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Docum
             text::money(sum(|l| &l.price), &inv.currency),
             text::money(sum(|l| &l.value), &inv.currency),
         ]);
-        sections.push(s);
     }
+    sections.push(s);
 
-    let mut receipts = Section::new("receipts", "Receipts", "Receipts");
-    let rows: Vec<Vec<String>> = inv
-        .lines
-        .iter()
-        .flat_map(|l| {
-            l.receipts
-                .iter()
-                .map(|r| vec![l.name.clone(), l.room.clone(), r.clone()])
-        })
-        .collect();
-    if rows.is_empty() {
-        receipts.push(Block::Note {
-            text: "No receipts kept in the app yet. Add a photo or PDF of a receipt on a thing's page, with the kind \"Receipt\".".into(),
-        });
-    } else {
-        receipts.push(Block::Note {
-            text: "The receipt files themselves are kept in the app and in its full backup.".into(),
-        });
-        receipts.push(Block::Table {
-            columns: vec!["Thing".into(), "Room".into(), "Receipt".into()],
-            rows,
-        });
-    }
-    sections.push(receipts);
-
-    let mut totals = Section::new("totals", "Totals", "Totals by room");
+    let mut totals = Section::new("totals", "Totals", "Totals and receipts");
     summary.push(vec![
         "All rooms".into(),
         inv.lines.len().to_string(),
@@ -366,6 +369,32 @@ pub fn document(d: &HouseData, inv: &Inventory, opts: InsuranceOptions) -> Docum
         ],
         rows: summary,
     });
+    totals.push(Block::Heading {
+        text: "Receipts".into(),
+    });
+    let rows: Vec<Vec<String>> = inv
+        .lines
+        .iter()
+        .flat_map(|l| {
+            l.receipts
+                .iter()
+                .map(|r| vec![l.name.clone(), l.room.clone(), r.clone()])
+        })
+        .collect();
+    if rows.is_empty() {
+        totals.push(Block::Note {
+            text: "No receipts kept in the app yet. Add a photo or PDF of a receipt on a thing's page, with the kind \"Receipt\".".into(),
+        });
+    } else {
+        totals.push(Block::Note {
+            text: "The receipt files themselves are kept in the app and in its full backup.".into(),
+        });
+        totals.push(Block::Table {
+            columns: vec!["Thing".into(), "Room".into(), "Receipt".into()],
+            rows,
+        });
+    }
+
     sections.push(totals);
 
     Document {
