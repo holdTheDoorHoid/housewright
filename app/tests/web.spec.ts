@@ -87,7 +87,7 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   await page.getByRole('link', { name: 'Things', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Things', level: 1 })).toBeVisible();
   await page.getByRole('link', { name: 'Add a thing' }).first().click();
-  await page.getByLabel('What is it?').fill('fridge');
+  await page.getByLabel('What is it?').fill('refrig');
   await page.getByRole('button', { name: /Refrigerator/i }).click();
   await page.getByLabel('Room').selectOption({ label: 'Basement' });
   await page.getByRole('button', { name: 'Add', exact: true }).click();
@@ -114,7 +114,8 @@ test('first run, home questions, starting plan, Today, suggestion, Done, history
   for (let i = 1; i <= 6; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(page.getByText('Question 7 of 10')).toBeVisible();
   await page.getByRole('button', { name: 'Pool', exact: true }).click();
-  for (let i = 7; i <= 9; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
+  for (let i = 7; i <= 8; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await page.getByRole('button', { name: 'Not sure', exact: true }).click(); // built: still not sure
   await page.getByRole('button', { name: 'Show my plan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Your answers are saved' })).toBeVisible();
   await expect(page.getByText('1 new thing was added')).toBeVisible();
