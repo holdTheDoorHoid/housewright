@@ -6,6 +6,8 @@
 |---|---|
 | `crates/core` | The core: model, schedule engine, reminders plan, storage, op log. |
 | `crates/api` | One JSON command surface over the core, used by every front end (D-63). |
+| `crates/media` | Photos, QR codes, the sticker PDF and on-device OCR (Phase 4). |
+| `models/ocr` | The OCR models (12.2 MB, CC BY-SA 4.0); see its README. |
 | `crates/cli` | The `hw` command-line tool. |
 | `web/` | The API compiled to WebAssembly, with SQLite on OPFS (D-61). |
 | `app/` | The Svelte 5 interface (`src/`), vitest tests, Playwright tests (`tests/`). |
@@ -25,6 +27,12 @@ cargo test --workspace
 Do not turn on incremental compilation or set a shared `CARGO_TARGET_DIR`;
 `sccache` is the shared cache.
 
+The OCR, image and QR crates are compiled optimised even in debug and test
+builds (`[profile.dev.package]` in the workspace `Cargo.toml` and in
+`app/src-tauri/Cargo.toml`); unoptimised, reading one label takes minutes.
+`cargo test -p housewright-media --test ocr` reads a synthetic rating plate
+with the bundled models.
+
 ## Web
 
 Needs Rust with the `wasm32-unknown-unknown` target, `wasm-pack`, and Node 22+.
@@ -33,9 +41,15 @@ Needs Rust with the `wasm32-unknown-unknown` target, `wasm-pack`, and Node 22+.
 cd app
 npm ci
 npm run dev:web        # builds web/pkg, then serves on http://localhost:5173
-npm run build:web      # production bundle in app/dist-web
+npm run build:web      # production bundle in app/dist-web (includes ocr/*.onnx)
 npm run preview:web    # serves app/dist-web on http://localhost:4173
 ```
+
+The web build serves the OCR models as `ocr/*.onnx` beside the app (a Vite
+plugin in `vite.config.ts` reads them from `models/ocr/`); the worker fetches
+them only when a label is first read. The Tauri build does not include them
+in its web assets; Android compiles them into the native library instead
+(Cargo feature `ocr`; build with `--no-default-features` to leave them out).
 
 Use `localhost`: OPFS needs a secure context. Only one tab can own the
 database at a time. A second tab shows "Already open elsewhere".

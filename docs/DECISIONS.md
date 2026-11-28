@@ -435,6 +435,143 @@ operations), answering a suggestion and adding a thing use it. Without it,
 the first onboarding took about 20 seconds in the browser on a loaded
 machine, because OPFS makes each separate transaction slow.
 
+## Phase 4 records (proposed by the Phase 4 build, 2026-11-27)
+
+**D-71 Attachment storage (Proposed).** Refines D-17. A photo or document is
+stored once, as a *blob* named by the SHA-256 of its bytes, beside the
+database: one file per blob in a `blobs/` folder next to the database on
+Android and desktop; on the web, a second SQLite file
+(`housewright.db-blobs`) in the same browser storage (OPFS) as the database,
+because the web's storage layer already gives synchronous SQLite files and
+nothing else. An `Attachment` record in the operation log names the hash,
+the kind (manual, receipt, warranty, photo, other), what it is about (a
+thing, a completion, a fact, later a contractor), who added it and when.
+The same file added twice is stored once. Deleting an attachment is a
+tombstone in the log; then every blob no live attachment uses is removed
+(garbage collection), so a blob shared by two attachments survives until
+both are gone. All storage goes through one `BlobStore` trait, so Phase 6
+can wrap it in encryption (D-15) without changing callers. Blobs are not
+operations; syncing them is Phase 6's job.
+
+**D-72 Photos are made smaller on the device; documents are not (Proposed).**
+A photo (JPEG, PNG or WebP) is turned upright (EXIF orientation), shrunk so
+its long edge is at most 1600 pixels, and saved as JPEG at quality 80, with
+a 320-pixel thumbnail at quality 70. A 12-megapixel phone photo becomes
+about 300 KB. Re-encoding drops the camera's metadata, including any GPS
+location, which is a privacy gain. This runs in Rust (`housewright-media`,
+the `image` crate) so Android and the web do exactly the same. Photos over
+50 megapixels are refused rather than risk running out of memory. A PDF is
+kept byte for byte, up to 25 MB (a scanned manual is usually 5 to 15 MB).
+Other file types are refused with a plain message.
+
+**D-73 The full backup (Proposed).** Refines D-57. Besides the plain JSON
+export (unchanged, still importable, and now carrying attachment metadata),
+Settings makes a *full backup*: one ZIP file holding
+`housewright-export.json`, `README.txt`, and `blobs/<sha256>` for every file
+a live attachment uses. Restoring needs an empty database, like an import;
+every blob is checked against its name before anything is written, so a
+damaged backup is refused whole. The same "restore" accepts either a ZIP or
+a JSON export. Database schema 3 adds the `completion_detail` and
+`template_fields` tables; export format version 3 adds those kinds, and
+version 1 and 2 files import unchanged (tested with fixtures written by
+the Phase 2 and Phase 3 code).
+
+**D-74 Label reading on the device: ocrs (Proposed).** Implements D-29's
+free tier. Text is read with `ocrs` (MIT/Apache-2.0) on the `rten` runtime
+(MIT/Apache-2.0), both pure Rust, with the ocrs project's two pre-trained
+models (12.2 MB, CC BY-SA 4.0 inherited from Google's HierText dataset;
+attribution in `models/ocr/README.md` and Settings, About). The models are
+committed to the repository (the ocrs project says its download URLs may
+not last and apps should bundle their own copy) and are never fetched from
+anywhere at run time:
+- Android compiles them into the app (`include_bytes!`, Cargo feature `ocr`,
+  on by default).
+- The web build serves them beside the app, from the app's own origin, and
+  the worker loads them the first time a label is read, so people who never
+  read a label never download 12 MB. This is the same server the app itself
+  came from, not a third party, and nothing about the photo leaves the
+  browser. Offline use of label reading on the web needs the page to have
+  read one label while online (or a future offline cache).
+A plain, tested heuristic picks candidates from the lines read: values after
+MODEL, MODEL NO, M/N, MOD, SERIAL, SER NO, S/N, SN (same line, or the next
+line), at least one digit, 3 to 30 characters; a brand from a list of about
+50 appliance makers (whole words only, so "GE" is not found in "GENERATOR");
+and a matching bundled template from words such as WATER HEATER or FURNACE.
+The person always sees every line read and the candidates, corrects them
+(OCR confuses 0 and O), and nothing is saved until they choose "Use these".
+On a synthetic plate it takes about 3 seconds natively; see the Phase 4
+notes for the web and Android timings and the size cost.
+
+**D-75 QR stickers (Proposed).** Implements D-30. Each thing has a short
+code, `HW-` and five Crockford base-32 characters (no I, L, O or U; typing
+O for 0 is forgiven), derived from a hash of its id, so every device
+computes the same code with nothing stored or synced. Two things in one
+home sharing a code is very unlikely (25 bits); if it happens, typing the
+code offers both. A sticker's QR code holds `housewright://item/<id>`. On
+Android the app registers that scheme, so the phone's own camera app opens
+the thing, which shows its most pressing task with a one-tap Done (P1, P4).
+On any platform "Scan a sticker" reads the QR code from a photo with
+`rqrr` (pure Rust), and the code can be typed. The sticker sheet is a PDF
+(written with `pdf-writer`), because the Android WebView cannot print a page
+and a PDF prints the same everywhere. The grid is fully configurable; three
+presets are offered (US Letter 3 x 10 at 2⅝ x 1 in, US Letter 4 x 6 squares
+of 1½ in centred, A4 3 x 8 at 70 x 37 mm) and described by their sizes, not
+by any label maker's product name, with advice to test on plain paper
+first. We have not checked them against a manufacturer's template.
+
+**D-76 Costs (Proposed).** Implements D-27's spending. After Done (never
+before, P1), a completion can get *details*: costs split into parts, labour,
+contractor and other, and the task's completion fields. Details are a new
+append-only record (`completion_detail`) because completions are never
+edited (D-12, D-52); a later detail's costs replace an earlier one's, so a
+typo is corrected by saving again. A voided completion's costs no longer
+count. Costs are kept in minor units in the household's currency (default
+USD, D-06; Settings offers USD, CAD, EUR, GBP, AUD and NZD, all two-decimal
+currencies). The Costs view is a plain table: by calendar year (in the
+home's time zone), by thing, and by home when there are several. Amounts in
+another currency are left out of the totals and counted, not converted.
+
+**D-77 Custom fields and conditional tasks (Proposed).** Implements D-22's
+editing. A thing's fields are its template's, then the household's own
+additions to that template, then fields added to that one thing. The
+household's additions are a separate `template_fields` entity, because the
+stored template copy is replaced whenever a thing is added from the bundled
+library. Keys come from labels ("Gate code" becomes `gate_code`). A new
+field's sensitivity comes from its name unless chosen (codes, passwords,
+PINs, combinations, accounts, policies, safes, Wi-Fi: sensitive). After a
+thing's fields change, its template's conditional tasks are compared again:
+a task that now applies (the boiler's fuel is now known to be gas) is added
+switched off and *offered* on the screen; a switched-on task whose
+condition no longer holds is listed with a "Switch off" button. Nothing is
+switched on or off by itself. Completion fields (pressure, pass/fail) are
+offered after Done with the note, photo and cost.
+
+**D-78 The home facts sheet (Proposed).** Implements D-27's facts sheet.
+One sheet per home, in fixed groups: Shutoffs and safety; Sizes and
+supplies; Finishes; Access; Utilities and accounts; Other. Access and
+Utilities facts are sensitive by default, and so is any fact whose name
+says code, password, PIN, combination, account, policy, safe or Wi-Fi.
+A sensitive value is not sent to the screen at all until someone taps
+"reveal", and only the household's owner may reveal it (D-23,
+`Role::can_see_sensitive`). The same applies to sensitive fields on a
+thing. Values never appear in History (D-58) or in a reminder. The sheet
+asks one question at a time from a short list chosen from the home
+profile (water main, electrical panel, gas shutoff if something burns gas,
+well switch, septic lid, filter size if there is ducted heating or
+cooling, smoke alarm battery, Wi-Fi, electricity account); an answered
+question is not asked again. A fact can carry photos (the panel, the
+shutoff). The binder (Phase 5) prints normal facts in the main volume and
+sensitive ones in the sealed volume.
+
+**D-79 Opening and sharing files on Android (Proposed).** The Android
+WebView cannot show a PDF or download a file. The core writes the file to
+the app's cache folder and the reminders plugin hands it to the phone's own
+viewer (`ACTION_VIEW`) or share sheet (`ACTION_SEND`) through the existing
+FileProvider. The same plugin notices `housewright://item/...` links. The
+plugin's name now undersells it; renaming it is left for a quiet moment.
+Photos are taken or picked through the WebView's ordinary file input. On
+the web, files open in a new tab or download.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -446,3 +583,7 @@ machine, because OPFS makes each separate transaction slow.
 - **Q-05** Should the template library live in its own repository from the start,
   or in this one until it has contributors? Proposed: in this repo under
   `templates/` until v0.1, then split.
+- **Q-06** Label reading's models (D-74) are CC BY-SA 4.0 and add about
+  12 MB to the repository and the Android app. Proposed: keep them in the
+  repository as is. Alternatives: Git LFS, or a pinned download at build
+  time.

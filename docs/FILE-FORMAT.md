@@ -1,4 +1,4 @@
-# Housewright export format (version 2)
+# Housewright export format (version 3)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -12,7 +12,7 @@ database. The code is `crates/core/src/export.rs`.
 ```json
 {
   "format": "housewright-export",
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-11-27T17:00:00Z",
   "household_id": "01a21f65-3c12-72cb-92ba-a9ba73a49591",
   "entities": { "household": [ ... ], "member": [ ... ], "task": [ ... ] },
@@ -23,7 +23,7 @@ database. The code is `crates/core/src/export.rs`.
 | Key | Meaning |
 |---|---|
 | `format` | Always `"housewright-export"`. |
-| `version` | `2` (since Phase 3; `1` before). A reader must refuse versions newer than it knows. |
+| `version` | `3` (since Phase 4; `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
 | `exported_at` | When the file was written (RFC 3339, UTC). |
 | `household_id` | The household this file holds. |
 | `entities` | The current state, grouped by kind. |
@@ -65,7 +65,7 @@ Required fields are in **bold**.
 
 | Kind | Fields |
 |---|---|
-| `household` | **id**, **name**, **time_zone** (IANA) |
+| `household` | **id**, **name**, **time_zone** (IANA), currency (ISO 4217; absent means USD) |
 | `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), contact (wrapped), reminders `{quiet_hours: {start, end}, maintenance_window: {days, start, end}}` (times as `"HH:MM:SS"`, days as weekday names; D-59) |
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy, hard_freeze}`, address (wrapped) |
 | `floor` | **id**, **property**, **name**, level |
@@ -78,11 +78,13 @@ Required fields are in **bold**.
 | `meter` | **id**, **key**, **name**, **unit**, item |
 | `meter_reading` | **id**, **meter**, **at**, **value**, **by** |
 | `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5, never shared), notes (wrapped) |
-| `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity |
+| `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant) |
 | `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped) |
-| `fact` | **id**, **property**, **category**, **label**, **value**, **sensitivity** |
+| `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`), room |
 | `profile` | (version 2) the answers to the home questions, one per property: **id** (the property's id), home_type, built, zip (wrapped), heating `[...]`, cooling `[...]`, water_heater, water_supply, sewer, features `{basement: true, ...}`, smoke_alarms, smoke_power, co_alarms, **people** `{adults, children, older_adults, pets}`. A missing answer means "not sure". Values are the snake_case names in `crates/core/src/profile.rs`. |
 | `suggestion_answer` | (version 2) **id**, **property**, **key** (`ask:<template id>` or `task:<task id>`), **answer** (`added`, `not_for_us`, `later`), **by**, **at** |
+| `completion_detail` | (version 3) **id**, **completion**, **by**, **at**, costs `[{kind: parts/labour/contractor/other, amount: Money}]`, values (as completion `values`). Added after Done. For one completion, the latest detail that has `costs` gives its costs (an empty list clears them); values are overlaid in order. |
+| `template_fields` | (version 3) **id** (a template id), **fields** (field definitions the household added to every thing made from that template) |
 
 `schedule` uses the same shapes as templates, plus two that only a real house
 can have: `{"kind": "one_off", "due": "2027-03-01"}` and an `anchor` date on
@@ -97,12 +99,13 @@ field shape. Custom values (`custom`, `values`) map a field key to:
 where `type` is `text`, `number`, `date`, `yes_no`, `choice` or `photo` (an
 attachment id).
 
-Completions, snoozes, meter readings, attachments, notes and suggestion
-answers are records: they are never edited. A completion logged by mistake is cancelled by a later
+Completions, snoozes, meter readings, attachments, notes, suggestion
+answers and completion details are records: they are never edited. A completion logged by mistake is cancelled by a later
 completion whose `voids` is the mistaken one's id.
 
-Attachments hold only a content hash. Phase 1 does not store or export file
-contents.
+Attachments hold only a content hash (and, for photos, the hash of a small
+thumbnail). The JSON export does not contain file contents; the full backup
+does (below).
 
 ## Operations
 
@@ -135,12 +138,12 @@ To rebuild state from operations (the merge rules, D-13):
 2. Order operations by `hlc`, then `author`, then `id` (all as strings).
 3. For an ordinary field, the latest operation in that order wins.
 4. For `$record` (completion, snooze, meter_reading, attachment, note,
-   suggestion_answer), the
+   suggestion_answer, completion_detail), the
    record is the whole `value`; if two records claim one id, the earliest in
    that order wins.
 5. `$deleted` marks the entity deleted forever; later edits do not bring it
-   back. Completions, snoozes and suggestion answers cannot be deleted; such
-   operations are ignored.
+   back. Completions, snoozes, suggestion answers and completion details
+   cannot be deleted; such operations are ignored. Attachments can be.
 6. Field operations on record kinds, and `$record` on other kinds, are ignored.
 
 The result does not depend on the order in which the operations are applied.
@@ -158,6 +161,24 @@ The result does not depend on the order in which the operations are applied.
 
 The importing device acts as the first `owner` member in the file.
 
+## The full backup (ZIP)
+
+A full backup (Settings, "Make a full backup") is one ZIP file:
+
+```text
+housewright-export.json   the JSON export described above, unchanged
+blobs/<sha256>            the bytes of each stored file, named by their hash
+README.txt                a short note for whoever opens the zip
+```
+
+Only blobs some live (not deleted) attachment uses are included, thumbnails
+too. Photos are JPEG as stored (at most 1600 px on the long edge); PDFs are
+byte for byte as added. To check a blob, compute the SHA-256 of its bytes:
+it must equal its name. Restoring needs an empty database, checks every
+blob first, then imports the JSON exactly as an import does. "Restore" also
+accepts a plain JSON export, which brings back everything except file
+contents. The code is `crates/core/src/backup.rs`.
+
 ## Compatibility
 
 New optional fields may appear in any version; readers should ignore fields
@@ -169,3 +190,8 @@ removes one, or adds a new kind bumps `version`.
   unchanged (tested with `crates/core/tests/fixtures/export-v1-phase2.json`,
   written by the Phase 2 code). A version 1 reader refuses version 2 files
   with a clear message rather than misreading them.
+- **Version 3** (Phase 4) added the `completion_detail` and `template_fields`
+  kinds and optional fields on `household`, `attachment` and `fact`.
+  Version 1 and 2 files import unchanged (tested with
+  `crates/core/tests/fixtures/export-v2-phase3.json`, written by the Phase 3
+  code).
