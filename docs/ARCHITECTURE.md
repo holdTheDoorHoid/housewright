@@ -28,6 +28,7 @@ lets the server stay unable to read anything (D-14).
 
 | Path | What it is |
 |---|---|
+| `crates/plan` | Floor plan geometry (D-130): whole-millimetre points, areas, angles, snapping, polygon checks, rooms from walls, lengths typed and shown. Pure; no I/O. |
 | `crates/core` | Domain model, schedule engine, prioritisation, storage, operation log. No platform code. |
 | `crates/api` | One JSON command surface over the core, shared by the Tauri app, the WebAssembly build and Android's notification receivers (D-63). File bytes travel beside the JSON (`call_upload`, `call_download`). |
 | `crates/media` | Pixel work shared by Android and the web: photo downscaling, QR codes, the sticker sheet PDF, on-device OCR (D-72, D-74, D-75). |
@@ -49,7 +50,10 @@ lets the server stay unable to read anything (D-14).
 
 - **Household**: the sharing and encryption boundary. Has members and roles (D-23).
 - **Property**: a house. A household can hold several (landlords).
-- **Floor → Room**: places within a property. Floors carry the floor plan geometry.
+- **Floor → Room**: places within a property. A floor may carry a plan
+  (Phase 8): walls, openings (doors, windows, gaps), pins and labels are
+  their own records on the floor; a room may have an outline; a floor may
+  have a background picture to trace over. All optional.
 - **Item**: something in the house (water heater, smoke alarm, roof). Optional
   make, model, serial, purchase and install dates, warranty, location (room +
   plan position), parent item (a filter inside a furnace), custom field values,
@@ -241,6 +245,29 @@ housewright-server ◄──► the household's other devices
   against the real bridge (D-126).
 - The add-on runs the server and the bridge in one container
   (`integrations/home-assistant/addon/`).
+
+## Floor plans (Phase 8)
+
+```
+housewright-plan (pure geometry, mm integers) ◄── core::plan (FloorPlan projection,
+   area, snap, faces, units        │               delete_wall/floor/pin, place_pin)
+                                   ▼                       │ op log: wall, opening,
+app/src/lib/plan/geometry.ts ── same functions,            │ plan_pin, plan_label,
+   (live readouts while drawing)   shared test vectors     │ room.outline, floor.background
+                                                           ▼
+api::plan (floors, floor_plan, save_*, plan_restore) ── Plans.svelte (SVG editor)
+binder::plans ── one section per drawn floor (Typst draws from numbers only)
+```
+
+- The interface snaps and measures in TypeScript for speed, then sends
+  whole-millimetre points; the core validates (outline simple, wall ends
+  apart, door fits its wall and does not overlap another) and stores.
+- Undo and redo (D-131) are the core's `plan_restore`: it re-applies only
+  what one step changed, so other people's edits are kept.
+- A thing's pin puts it in the room it is dropped in (D-132). The thing's
+  page draws a small copy of its floor with the pin.
+- Merge granularity and what a merge can leave behind: D-130 and
+  [FILE-FORMAT.md](FILE-FORMAT.md#floor-plans-version-6).
 
 ## Reminders
 

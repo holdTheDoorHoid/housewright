@@ -1522,6 +1522,7 @@ dependencies = [
  "axum",
  "housewright-core",
  "housewright-crypto",
+ "housewright-plan",
  "housewright-server",
  "http-body-util",
  "jiff",

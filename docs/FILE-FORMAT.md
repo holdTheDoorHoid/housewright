@@ -1,4 +1,4 @@
-# Housewright export format (version 5)
+# Housewright export format (version 6)
 
 Housewright can write everything about a household to one JSON file and read it
 back without losing anything. The format is documented here so that your data is
@@ -12,7 +12,7 @@ database. The code is `crates/core/src/export.rs`.
 ```json
 {
   "format": "housewright-export",
-  "version": 4,
+  "version": 6,
   "exported_at": "2026-11-27T17:00:00Z",
   "household_id": "01a21f65-3c12-72cb-92ba-a9ba73a49591",
   "entities": { "household": [ ... ], "member": [ ... ], "task": [ ... ] },
@@ -23,7 +23,7 @@ database. The code is `crates/core/src/export.rs`.
 | Key | Meaning |
 |---|---|
 | `format` | Always `"housewright-export"`. |
-| `version` | `4` (since Phase 5; `3` in Phase 4, `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
+| `version` | `6` (since Phase 8; `5` in Phase 7, `4` in Phase 5, `3` in Phase 4, `2` in Phase 3, `1` before). A reader must refuse versions newer than it knows. |
 | `exported_at` | When the file was written (RFC 3339, UTC). |
 | `household_id` | The household this file holds. |
 | `entities` | The current state, grouped by kind. |
@@ -65,11 +65,11 @@ Required fields are in **bold**.
 
 | Kind | Fields |
 |---|---|
-| `household` | **id**, **name**, **time_zone** (IANA), currency (ISO 4217; absent means USD) |
+| `household` | **id**, **name**, **time_zone** (IANA), currency (ISO 4217; absent means USD), units (version 6: `imperial` or `metric`, how floor plans show lengths; absent means imperial) |
 | `member` | **id**, **name**, **role** (`owner`, `member`, `limited`), kind (version 5: `home_assistant` for the Home Assistant bridge, D-122; absent for people), contact (wrapped), reminders `{quiet_hours: {start, end}, maintenance_window: {days, start, end}}` (times as `"HH:MM:SS"`, days as weekday names; D-59) |
 | `property` | **id**, **name**, **time_zone**, **climate** `{hemisphere: north/south, first_frost_doy, last_frost_doy, hard_freeze}`, address (wrapped) |
-| `floor` | **id**, **property**, **name**, level |
-| `room` | **id**, **property**, **name**, floor |
+| `floor` | **id**, **property**, **name**, level, background (version 6: `{attachment, at: {x, y}, width, opacity}`, a picture of an existing plan to trace over; `at` is its top-left corner and `width` its real-life width, in plan millimetres; `opacity` 0 to 100) |
+| `room` | **id**, **property**, **name**, floor, outline (version 6: the room's shape on its floor's plan, a list of `{x, y}` corners in plan millimetres; a simple polygon) |
 | `item` | **id**, **property**, **name**, room, parent (item id), category, make, model, serial (wrapped), purchased, installed, warranty `{expires, provider, transferable, reference (wrapped)}`, location_note (wrapped), template, extra_fields, custom, sensitivity |
 | `template` | the template, exactly as in `templates/README.md` |
 | `task` | **id**, **property**, **title**, **owner** (member id), **priority**, **schedule**, **start** (date), item, room, window, steps, why `{text, source}`, minutes, completion_fields, template `{template, task}`, active, paused, not_applicable |
@@ -80,11 +80,15 @@ Required fields are in **bold**.
 | `contractor` | **id**, **name**, trades, phone, email, licence and insurance `{number (wrapped), expires}`, private_rating (1-5, never shared or printed), notes (wrapped), emergency (version 4: `true` puts them on the binder's emergency page) |
 | `attachment` | **id**, **sha256** (hex), **name**, **media_type**, **size**, **kind** (`manual`, `receipt`, `warranty`, `photo`, `other`), **about** `{kind, id}`, sensitivity, thumb_sha256 (hex, photos), width, height (pixels), by (member id), at (instant) |
 | `note` | **id**, **about** `{kind, id}`, **by**, **at**, **text** (wrapped). A note about a `property`, `room` or `item` is a "quirk only you know", printed in the house binder (main volume, or the sealed volume when sensitive). |
-| `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`; `sealed_volume_location` is where the binder's sealed volume is kept, always normal so the main binder can print it), room |
+| `fact` | **id**, **property**, **category** (`shutoffs`, `sizes`, `finishes`, `access`, `utilities`, `other`), **label**, **value**, **sensitivity**, key (the suggested question it answers, e.g. `water_main`; `sealed_volume_location` is where the binder's sealed volume is kept, always normal so the main binder can print it), room, pin (version 6: the `plan_pin` showing where it is) |
 | `profile` | (version 2) the answers to the home questions, one per property: **id** (the property's id), home_type, built, zip (wrapped), heating `[...]`, cooling `[...]`, water_heater, water_supply, sewer, features `{basement: true, ...}`, smoke_alarms, smoke_power, co_alarms, **people** `{adults, children, older_adults, pets}`. A missing answer means "not sure". Values are the snake_case names in `crates/core/src/profile.rs`. |
 | `suggestion_answer` | (version 2) **id**, **property**, **key** (`ask:<template id>` or `task:<task id>`), **answer** (`added`, `not_for_us`, `later`), **by**, **at** |
 | `completion_detail` | (version 3) **id**, **completion**, **by**, **at**, costs `[{kind: parts/labour/contractor/other, amount: Money}]`, values (as completion `values`). Added after Done. For one completion, the latest detail that has `costs` gives its costs (an empty list clears them); values are overlaid in order. |
 | `binder_print` | (version 4) **id**, **property**, **edition** (`emergency`, `full`, `handover`, `succession`), **volume** (`main`, `sealed`), **by**, **at**, **printed_on** (date), **sections** `{section key: fingerprint}`. A record that a binder PDF was made, holding a hash of what each section printed, so the app can say which sections changed since. The latest record that includes a section counts for it. |
+| `wall` | (version 6) **id**, **floor**, **a**, **b** (its two ends, `{x, y}` in plan millimetres), thickness (millimetres; absent means 115) |
+| `opening` | (version 6) **id**, **floor**, **wall**, **kind** (`door`, `window`, `gap`), **offset** (millimetres from the wall's `a` end to its near edge), **width**, swing (doors: `{hinge: a/b, side: left/right}`, the side seen looking from `a` to `b`) |
+| `plan_pin` | (version 6) **id**, **floor**, **at** (`{x, y}`), item (a thing), label, wall (when it sits on one), sensitivity. A pin holds a thing, a label, or both. |
+| `plan_label` | (version 6) **id**, **floor**, **at**, **text**, sensitivity |
 | `template_fields` | (version 3) **id** (a template id), **fields** (field definitions the household added to every thing made from that template) |
 
 `schedule` uses the same shapes as templates, plus two that only a real house
@@ -109,6 +113,18 @@ completion whose `voids` is the mistaken one's id.
 Attachments hold only a content hash (and, for photos, the hash of a small
 thumbnail). The JSON export does not contain file contents; the full backup
 does (below).
+
+### Floor plans (version 6)
+
+Plan coordinates are whole millimetres: x points right and y points
+**down** (as on a screen). Each wall, opening, pin and label is its own
+entity, so concurrent edits to different ones merge cleanly; within one,
+fields merge last-writer-wins like any other entity (a wall's `a` and `b`
+are separate fields). A room's `outline` is one field: concurrent
+reshapes of the same room resolve to the later outline, whole (D-130).
+A reader drawing a plan should skip an opening whose wall is missing or
+deleted, and clamp an opening onto a wall that has become too short for
+it (offset and width within the wall's length).
 
 ## Operations
 
@@ -233,3 +249,10 @@ removes one, or adds a new kind bumps `version`.
   Version 1 to 4 files import unchanged. A version 4 program refuses a
   version 5 file; it would also fail to read a triggered task arriving by
   sync, so every device in a household should run the Phase 7 version.
+- **Version 6** (Phase 8) added the floor plan kinds `wall`, `opening`,
+  `plan_pin` and `plan_label`, and optional fields `household.units`,
+  `floor.background`, `room.outline` and `fact.pin` (D-130). Version 1 to
+  5 files import unchanged (the Phase 2 and Phase 3 fixtures still import
+  in the core's tests). A version 5 program refuses a version 6 file, and
+  it cannot apply plan operations arriving by sync, so every device in a
+  household should run the Phase 8 version before anyone draws a plan.

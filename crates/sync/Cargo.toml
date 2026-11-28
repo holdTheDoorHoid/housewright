@@ -24,6 +24,7 @@ default = []
 native-http = ["dep:ureq"]
 
 [dev-dependencies]
+housewright-plan.workspace = true
 housewright-server = { path = "../server" }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 tower = { version = "0.5", features = ["util"] }

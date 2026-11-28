@@ -502,7 +502,7 @@ fn binder_house() -> House {
 
 #[test]
 fn the_binder_prints_one_page_per_floor_without_private_pins() {
-    let mut h = binder_house();
+    let h = binder_house();
     let data = binder::gather(h.api.store(), None, h.api.store().now()).unwrap();
     let b = binder::build(&data, Edition::Full, Options::default());
     let keys: Vec<&str> = b.main.sections.iter().map(|s| s.key.as_str()).collect();

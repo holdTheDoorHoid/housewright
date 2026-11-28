@@ -5,7 +5,7 @@
   // by point with live length and angle, typed lengths, doors and windows,
   // areas, undo and redo. Everything on the plan is also in the lists
   // below it, for keyboards and screen readers.
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import {
     call,
     upload,
@@ -92,7 +92,15 @@
   // Drawing state.
   let draftRoom = $state<{ a: Pt; b: Pt } | null>(null);
   let chain = $state<Pt[]>([]); // wall corners placed so far
-  let cursor = $state<Pt | null>(null); // snapped pointer, plan mm
+  let pointer = $state<Pt | null>(null); // the pointer, plan mm
+  // Snapped against the latest corner, so it is right as soon as a corner
+  // is placed, before the pointer moves again.
+  const cursor = $derived.by<Pt | null>(() => {
+    if (!pointer) return null;
+    if (mode === 'wall') return snapped(pointer, chain[chain.length - 1] ?? null);
+    if (mode === 'room' || mode === 'pin' || mode === 'label') return snapped(pointer);
+    return null;
+  });
   let typed = $state(''); // typed wall length
   let drag = $state<
     | { kind: 'pan'; sx: number; sy: number; v: View }
@@ -176,6 +184,16 @@
     view = fit(allPoints(plan), size.w, size.h);
   }
 
+  // Until someone pans or zooms, keep the whole floor in view as the
+  // drawing area gets its real size (and when a phone turns).
+  let userMoved = false;
+  $effect(() => {
+    void size.w;
+    void size.h;
+    // Only the size is tracked: saving a change must not move the view.
+    if (!userMoved) untrack(fitView);
+  });
+
   onMount(() => {
     loadFloors();
     call('items').then((r) => (items = r));
@@ -184,6 +202,14 @@
     const onKey = (e: KeyboardEvent) => keys(e);
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  });
+
+  // Scroll-wheel zoom needs a listener that may cancel the page scroll.
+  $effect(() => {
+    const el = svg;
+    if (!el) return;
+    el.addEventListener('wheel', wheel, { passive: false });
+    return () => el.removeEventListener('wheel', wheel);
   });
 
   $effect(() => {
@@ -197,8 +223,17 @@
   // -- changes, with undo ----------------------------------------------------
 
   /** Run a change that returns the new plan; remember it for undo. */
-  async function change(what: string, run: () => Promise<PlanInfo>): Promise<PlanInfo | null> {
-    if (!plan || busy) return null;
+  // Changes run one after another: a quick second tap waits for the
+  // first to be saved instead of being dropped.
+  let queue: Promise<unknown> = Promise.resolve();
+  function change(what: string, run: () => Promise<PlanInfo>): Promise<PlanInfo | null> {
+    const job = queue.then(() => applyChange(what, run));
+    queue = job.catch(() => null);
+    return job;
+  }
+
+  async function applyChange(what: string, run: () => Promise<PlanInfo>): Promise<PlanInfo | null> {
+    if (!plan) return null;
     const before = plan.state;
     const floor = plan.floor.id;
     busy = true;
@@ -301,6 +336,9 @@
   const pointers = new Map<number, { x: number; y: number }>();
   let pinch: { d: number; mx: number; my: number; v: View } | null = null;
   let downAt: { x: number; y: number; t: number } | null = null;
+  // What was under the pointer when it went down (after capture, the
+  // pointer-up event's target is the drawing itself).
+  let downHit: ReturnType<typeof hit> = null;
   let moved = false;
 
   function local(e: PointerEvent | WheelEvent): { x: number; y: number } {
@@ -347,6 +385,7 @@
     moved = false;
     const p = planAt(e);
     const h = hit(e);
+    downHit = h;
     if (!plan.can_edit && mode !== 'move') mode = 'move';
     if (mode === 'move') {
       if (h?.kind === 'corner' && plan.can_edit) {
@@ -382,19 +421,20 @@
       let v = zoomAt(pinch.v, d / Math.max(1, pinch.d), pinch.mx, pinch.my);
       v = { ...v, x: v.x - (mx - pinch.mx) / v.k, y: v.y - (my - pinch.my) / v.k };
       view = v;
+      userMoved = true;
       return;
     }
     const s = local(e);
     if (downAt && Math.hypot(s.x - downAt.x, s.y - downAt.y) > 6) moved = true;
     const p = planAt(e);
-    if (mode === 'wall') cursor = snapped(p, chain[chain.length - 1] ?? null);
-    else if (mode === 'room' || mode === 'pin' || mode === 'label') cursor = snapped(p);
+    pointer = p;
     if (draftRoom) {
       draftRoom = { a: draftRoom.a, b: snapped(p) };
       return;
     }
     if (!drag) return;
     if (drag.kind === 'pan' && moved) {
+      userMoved = true;
       view = { ...drag.v, x: drag.v.x - (s.x - drag.sx) / drag.v.k, y: drag.v.y - (s.y - drag.sy) / drag.v.k };
     } else if (drag.kind === 'corner') {
       const from = drag.from;
@@ -426,7 +466,8 @@
     if (!plan) return;
     const tap = !moved;
     const p = planAt(e);
-    const h = hit(e);
+    const h = downHit;
+    downHit = null;
     const d = drag;
     drag = null;
     downAt = null;
@@ -500,11 +541,13 @@
 
   function wheel(e: WheelEvent) {
     e.preventDefault();
+    userMoved = true;
     const s = local(e);
     view = zoomAt(view, Math.exp(-e.deltaY * 0.0015), s.x, s.y);
   }
 
   function zoomBy(f: number) {
+    userMoved = true;
     view = zoomAt(view, f, size.w / 2, size.h / 2);
   }
 
@@ -603,11 +646,17 @@
       finishChain();
       return;
     }
-    const pl = await change('draw a wall', async () => (await call('save_walls', { floor_id: plan!.floor.id, walls: [{ a: last, b: p }] })).plan);
-    if (!pl) return;
+    // The corner shows at once; the wall is saved in order behind it.
     const closed = chain.length > 1 && p.x === chain[0].x && p.y === chain[0].y;
+    const before = chain;
     chain = closed ? [] : [...chain, p];
     typed = '';
+    const floor = plan.floor.id;
+    const pl = await change('draw a wall', async () => (await call('save_walls', { floor_id: floor, walls: [{ a: last, b: p }] })).plan);
+    if (!pl) {
+      if (!closed && chain[chain.length - 1] === p) chain = before;
+      return;
+    }
     if (closed) toast({ text: 'Walls closed. Tap the new space to name the room.' }, 5000);
   }
 
@@ -913,7 +962,7 @@
     mode = m;
     chain = [];
     draftRoom = null;
-    cursor = null;
+    pointer = null;
     if (m !== 'move') sel = null;
   }
 
@@ -1060,13 +1109,6 @@
     </div>
 
     {#if plan}
-      {#if plan.can_edit}
-        <div class="tools" role="toolbar" aria-label="Drawing tools">
-          {#each [['move', 'Move', 'V'], ['room', 'Room', 'R'], ['wall', 'Walls', 'W'], ['door', 'Door', 'D'], ['window', 'Window', 'N'], ['pin', 'Pin', 'P'], ['label', 'Label', 'L']] as [m, label, key] (m)}
-            <button class="tool" class:on={mode === m} aria-pressed={mode === m} title={`${label} (${key})`} onclick={() => setMode(m as Mode)}>{label}</button>
-          {/each}
-        </div>
-      {/if}
       <p class="hint small" aria-live="polite" data-testid="plan-hint">{hint}</p>
 
       <div class="canvas" bind:clientWidth={size.w} bind:clientHeight={size.h}>
@@ -1086,7 +1128,6 @@
             drag = null;
             draftRoom = null;
           }}
-          onwheel={wheel}
           data-testid="plan-canvas"
         >
           {#each gridLines as g, i (i)}
@@ -1124,13 +1165,6 @@
               <line x1={g.s.x} y1={g.s.y} x2={g.e.x} y2={g.e.y} class="hitline" class:selhit={sel?.kind === 'opening' && sel.id === o.id} stroke-width={px(22)} data-hit={`opening:${o.id}`} />
             {/if}
           {/each}
-          {#each plan.rooms as r (r.id)}
-            {#if r.outline && r.label_at}
-              {@const at = drag?.kind === 'vertex' && drag.room === r.id ? labelPoint(drag.outline) : r.label_at}
-              <text x={at.x} y={at.y} font-size={px(14)} class="roomname" text-anchor="middle">{r.name}</text>
-              <text x={at.x} y={at.y + px(16)} font-size={px(12)} class="roomarea" text-anchor="middle">{r.area_text}</text>
-            {/if}
-          {/each}
           {#each plan.labels as l (l.id)}
             <text x={l.at.x} y={l.at.y} font-size={px(13)} class="label" class:sel={sel?.kind === 'label' && sel.id === l.id} text-anchor="middle" data-hit={`label:${l.id}`}>{l.text ?? 'Private label'}</text>
           {/each}
@@ -1153,6 +1187,14 @@
               <circle cx={at.x} cy={at.y} r={px(13)} />
               <text x={at.x} y={at.y + px(4.5)} font-size={px(12)} text-anchor="middle">{p.number}</text>
             </g>
+          {/each}
+          <!-- Room names above pins, with a halo, so both stay readable. -->
+          {#each plan.rooms as r (r.id)}
+            {#if r.outline && r.label_at}
+              {@const at = drag?.kind === 'vertex' && drag.room === r.id ? labelPoint(drag.outline) : r.label_at}
+              <text x={at.x} y={at.y} font-size={px(14)} class="roomname" text-anchor="middle">{r.name}</text>
+              <text x={at.x} y={at.y + px(16)} font-size={px(12)} class="roomarea" text-anchor="middle">{r.area_text}</text>
+            {/if}
           {/each}
           <!-- What is being drawn right now. -->
           {#if draftOutline.length}
@@ -1184,6 +1226,13 @@
         </div>
       </div>
 
+      {#if plan.can_edit}
+        <div class="tools" role="toolbar" aria-label="Drawing tools">
+          {#each [['move', 'Move', 'V'], ['room', 'Room', 'R'], ['wall', 'Walls', 'W'], ['door', 'Door', 'D'], ['window', 'Window', 'N'], ['pin', 'Pin', 'P'], ['label', 'Label', 'L']] as [m, label, key] (m)}
+            <button class="tool" class:on={mode === m} aria-pressed={mode === m} title={`${label} (${key})`} onclick={() => setMode(m as Mode)}>{label}</button>
+          {/each}
+        </div>
+      {/if}
       <div class="row under">
         {#if plan.can_edit}
           <button onclick={undo} disabled={!history.undo.length || busy} title="Undo (Ctrl+Z)">Undo</button>
@@ -1249,7 +1298,7 @@
           <form class="card sheet" onsubmit={saveRoom} data-testid="room-sheet">
             <h2>{selRoom.name}</h2>
             <p>{selRoom.area_text} · around it {selRoom.perimeter_text}</p>
-            <p class="small muted">{selRoom.things} {selRoom.things === 1 ? 'thing' : 'things'} in this room. {plan.can_edit ? 'Drag its corners to reshape it.' : ''}</p>
+            <p class="small muted">{selRoom.things === 0 ? 'No things in this room yet.' : `${selRoom.things} ${selRoom.things === 1 ? 'thing' : 'things'} in this room.`} {plan.can_edit ? 'Drag its corners to reshape it.' : ''}</p>
             {#if plan.can_edit}
               <label for="room-rename">Name</label>
               <div class="row">
@@ -1318,8 +1367,8 @@
               <h2>{placing ? `Put ${placing.name} here` : 'What is here?'}</h2>
             {/if}
             {#if plan.can_edit}
-              <label for="pin-search">A thing</label>
-              <input id="pin-search" bind:value={pinSearch} placeholder="Search your things" autocomplete="off" />
+              <label for="pin-search">Which thing</label>
+              <input id="pin-search" bind:value={pinSearch} placeholder="Type to search your things" autocomplete="off" />
               <select aria-label="Thing" bind:value={pinItem}>
                 <option value="">No thing: just a named spot</option>
                 {#each pinChoices as i (i.id)}<option value={i.id}>{i.name}{i.room_name ? ` (${i.room_name})` : ''}</option>{/each}
@@ -1362,7 +1411,7 @@
 
       <!-- Everything on the plan, as lists (the accessible way in). -->
       <h2>On this floor</h2>
-      <details open={plan.rooms.length > 0}>
+      <details open={plan.rooms.length > 0 || plan.spaces.length > 0}>
         <summary>Rooms ({plan.rooms.filter((r) => r.outline).length})</summary>
         <ul class="list">
           {#each plan.rooms.filter((r) => r.outline) as r (r.id)}
@@ -1374,7 +1423,7 @@
         </ul>
         {#if plan.total_area_text}<p class="small">Total: <strong>{plan.total_area_text}</strong></p>{/if}
       </details>
-      <details>
+      <details open={plan.pins.length > 0}>
         <summary>Pins ({plan.pins.length})</summary>
         <ul class="list">
           {#each plan.pins as p (p.id)}
@@ -1409,10 +1458,12 @@
           <summary>Trace over a plan</summary>
           <p class="small muted">Use a photo or screenshot of an existing plan as a faint picture behind this one, then draw over it.</p>
           {#if plan.background}
-            <form class="row" onsubmit={pictureWidth}>
-              <label for="bg-width" class="inline">How wide it is in real life</label>
-              <input id="bg-width" bind:value={bgWidth} placeholder={len(plan.background.width)} autocomplete="off" />
-              <button type="submit">Set</button>
+            <form onsubmit={pictureWidth}>
+              <label for="bg-width">How wide the drawing is in real life</label>
+              <div class="row nowrap">
+                <input id="bg-width" bind:value={bgWidth} placeholder={len(plan.background.width)} autocomplete="off" />
+                <button type="submit">Set</button>
+              </div>
             </form>
             <label for="bg-opacity">How strong</label>
             <input id="bg-opacity" type="range" min="10" max="90" value={plan.background.opacity} onchange={(e) => setPicture({ opacity: Number((e.target as HTMLInputElement).value) })} />
@@ -1465,10 +1516,17 @@
   .addfloor form {
     margin-top: 0.4rem;
   }
+  /* Under the drawing, where a thumb reaches; two rows on a phone. */
   .tools {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+  @media (max-width: 520px) {
+    .tools {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
   .tool {
     padding: 0 0.2rem;
@@ -1480,14 +1538,17 @@
     border-color: var(--accent);
     color: var(--accent-text);
   }
+  /* Two lines always, so the drawing does not jump when the hint changes. */
   .hint {
     margin: 0.3rem 0;
     color: var(--muted);
-    min-height: 1.3em;
+    height: 2.7em;
+    overflow: hidden;
+    line-height: 1.35;
   }
   .canvas {
     position: relative;
-    height: min(62vh, 560px);
+    height: min(55vh, 560px);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     overflow: hidden;
@@ -1562,14 +1623,20 @@
     stroke: var(--muted);
     stroke-width: 1;
   }
+  .roomname,
+  .roomarea {
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
   .roomname {
     fill: var(--text);
     font-weight: 650;
-    pointer-events: none;
   }
   .roomarea {
     fill: var(--muted);
-    pointer-events: none;
   }
   .label {
     fill: var(--text);
@@ -1737,8 +1804,13 @@
     display: flex;
     align-items: center;
   }
-  .inline {
-    margin: 0;
+  .nowrap {
+    flex-wrap: nowrap;
+  }
+  .nowrap input {
+    flex: 1;
+    width: auto;
+    min-width: 0;
   }
   .intro form input {
     flex: 1;

@@ -4,6 +4,7 @@
 
 | Path | What it is |
 |---|---|
+| `crates/plan` | Floor plan geometry in whole millimetres (Phase 8, D-130). Its shared test vectors (`tests/vectors.json`) are also checked by `app/src/lib/plan/geometry.test.ts`. |
 | `crates/core` | The core: model, schedule engine, reminders plan, storage, op log. |
 | `crates/api` | One JSON command surface over the core, used by every front end (D-63). |
 | `crates/media` | Photos, QR codes, the sticker PDF and on-device OCR (Phase 4). |
@@ -33,6 +34,17 @@ cargo test --workspace
 
 Do not turn on incremental compilation or set a shared `CARGO_TARGET_DIR`;
 `sccache` is the shared cache.
+
+Floor plans (Phase 8): `cargo test -p housewright-plan` (geometry, property
+tests, shared vectors), `cargo test -p housewright-core --test
+plan_convergence` (concurrent plan edits converge), `cargo test -p
+housewright-sync --test plan_sync` (two devices editing one plan through
+the real server) and `cargo test -p housewright-api --test plan` (commands,
+undo, binder pages). `HW_BINDER_OUT=dir` writes the plan PDFs; look at
+them with `pdftoppm -r 70 -png file.pdf out`. If you change a length
+format or parse rule, change `crates/plan/src/units.rs`,
+`app/src/lib/plan/geometry.ts` and `crates/plan/tests/vectors.json`
+together.
 
 Sync's tests (Phase 6) run the real server code in-process
 (`crates/sync/tests/common/mod.rs`) and over a real socket
