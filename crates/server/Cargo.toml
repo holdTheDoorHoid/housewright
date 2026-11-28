@@ -1,0 +1,27 @@
+[package]
+name = "housewright-server"
+description = "Housewright sync server: stores and relays only ciphertext"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "housewright-server"
+path = "src/main.rs"
+
+[dependencies]
+housewright-crypto = { path = "../crypto" }
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+clap.workspace = true
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "query", "tokio", "matched-path"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "time"] }
+tower-http = { version = "0.6", features = ["cors", "limit"] }
+axum-server = { version = "0.9", features = ["tls-rustls-ring"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

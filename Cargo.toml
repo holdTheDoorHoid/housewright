@@ -7,6 +7,8 @@ members = [
     "crates/media",
     "crates/binder",
     "crates/crypto",
+    "crates/server",
+    "crates/sync",
     "web",
     "web-binder",
     "tools/climate-build",
@@ -25,6 +27,8 @@ housewright-core = { path = "crates/core" }
 housewright-api = { path = "crates/api", default-features = false }
 housewright-media = { path = "crates/media" }
 housewright-binder = { path = "crates/binder", default-features = false }
+housewright-crypto = { path = "crates/crypto" }
+housewright-sync = { path = "crates/sync" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
@@ -76,3 +80,11 @@ krilla = { opt-level = 2 }
 rustybuzz = { opt-level = 2 }
 ttf-parser = { opt-level = 2 }
 comemo = { opt-level = 2 }
+# Sync's cryptography (D-89): unoptimised, signing and key agreement make
+# tests and the debug APK noticeably slow.
+curve25519-dalek = { opt-level = 3 }
+ed25519-dalek = { opt-level = 3 }
+x25519-dalek = { opt-level = 3 }
+chacha20 = { opt-level = 3 }
+poly1305 = { opt-level = 3 }
+sha2 = { opt-level = 3 }
