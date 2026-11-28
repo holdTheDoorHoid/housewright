@@ -110,6 +110,10 @@
     <a class="button" href="#/plans">Floor plans</a>
     <a class="button" href="#/binder">House binder</a>
     <a class="button" href="#/costs">Costs</a>
+    <a class="button" href="#/contractors">Contractors</a>
+    <a class="button" href="#/warranties">Warranties</a>
+    <a class="button" href="#/recalls">Recalls</a>
+    <a class="button" href="#/insurance">Insurance inventory</a>
     <a class="button" href="#/labels">Print stickers</a>
     <a class="button" href="#/scan">Scan a sticker</a>
   </p>

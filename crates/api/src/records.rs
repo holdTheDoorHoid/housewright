@@ -401,6 +401,27 @@ impl Api {
         if let Some(v) = blank_to_none(a.purchased) {
             it.purchased = v.map(date).transpose()?;
         }
+        if a.sensitive.is_some() || a.serial_sensitive.is_some() {
+            if !self.me()?.role.can_see_sensitive() {
+                return Err(ApiError::invalid(
+                    "only the household's owner can change what is private".to_string(),
+                ));
+            }
+            if let Some(v) = a.sensitive {
+                it.sensitivity = if v {
+                    Sensitivity::Sensitive
+                } else {
+                    Sensitivity::Normal
+                };
+            }
+            if let (Some(v), Some(sn)) = (a.serial_sensitive, it.serial.as_mut()) {
+                sn.sensitivity = if v {
+                    Sensitivity::Sensitive
+                } else {
+                    Sensitivity::Normal
+                };
+            }
+        }
         let currency = self.household()?.currency().to_string();
         let amount = |raw: String| -> Result<Option<Money>, ApiError> {
             let raw = raw.trim().to_string();

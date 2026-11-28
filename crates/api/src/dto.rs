@@ -352,6 +352,8 @@ pub struct ItemDetail {
     /// Every field it can have, with the current value for editing.
     pub edit: Vec<FieldEdit>,
     pub serial_sensitive: bool,
+    /// The whole thing is marked private (D-41).
+    pub sensitive: bool,
     /// Where it is on a floor plan, if it has a pin.
     pub pin: Option<ItemPinOut>,
     /// What it cost and what it is worth now (Phase 9).
@@ -574,6 +576,14 @@ pub struct UpdateItemArgs {
     /// The warranty; absent = unchanged.
     #[serde(default)]
     pub warranty: Option<crate::alerts::WarrantyIn>,
+    /// Mark the whole thing private (a safe, jewellery): kept out of the
+    /// main binder, the insurance inventory unless asked, Home Assistant,
+    /// and limited members' screens. Owner only. Absent = unchanged.
+    #[serde(default)]
+    pub sensitive: Option<bool>,
+    /// Mark the serial number private. Owner only. Absent = unchanged.
+    #[serde(default)]
+    pub serial_sensitive: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize)]

@@ -22,6 +22,29 @@ class AlarmReceiver : BroadcastReceiver() {
         val body = intent.getStringExtra("body") ?: ""
         Scheduler.ensureChannel(ctx)
         val nid = notificationId(taskId)
+        // A notice (a warranty ending, a contractor's licence lapsing) is not
+        // a task: no Done or Reschedule; tapping it opens what it is about.
+        val open = intent.getStringExtra("open").orEmpty()
+        if (intent.getStringExtra("kind") == "notice" && open.isNotEmpty()) {
+            val tap = PendingIntent.getActivity(
+                ctx, nid * 2, launch(ctx, "open_notice", open),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val n = NotificationCompat.Builder(ctx, Scheduler.CHANNEL)
+                .setSmallIcon(ctx.applicationInfo.icon)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setContentIntent(tap)
+                .setAutoCancel(true)
+                .build()
+            if (allowed(ctx)) {
+                NotificationManagerCompat.from(ctx).notify(nid, n)
+                Log.i(Scheduler.TAG, "notice shown: $taskId")
+            }
+            return
+        }
 
         val done = PendingIntent.getBroadcast(
             ctx, nid,
@@ -52,16 +75,17 @@ class AlarmReceiver : BroadcastReceiver() {
             .addAction(0, "Reschedule", reschedule)
             .build()
 
-        val allowed = Build.VERSION.SDK_INT < 33 ||
-            ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-        if (!allowed) {
+        if (!allowed(ctx)) {
             Log.w(Scheduler.TAG, "reminder for $taskId not shown: notifications not allowed")
             return
         }
         NotificationManagerCompat.from(ctx).notify(nid, n)
         Log.i(Scheduler.TAG, "reminder shown for $taskId")
     }
+
+    private fun allowed(ctx: Context): Boolean = Build.VERSION.SDK_INT < 33 ||
+        ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) ==
+        PackageManager.PERMISSION_GRANTED
 
     companion object {
         fun notificationId(taskId: String): Int = (taskId.hashCode() and 0x3fffffff)

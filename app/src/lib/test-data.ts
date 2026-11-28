@@ -36,6 +36,7 @@ export function today(over: Partial<Today> = {}): Today {
     welcome_back: null,
     active_count: 1,
     suggested_count: 0,
+    recall_matches: 0,
     ...over,
   };
 }

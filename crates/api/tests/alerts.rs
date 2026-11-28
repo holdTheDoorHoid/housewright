@@ -357,3 +357,24 @@ fn private_contractor_fields_are_left_out_for_limited_members() {
     assert!(c["private"].is_null());
     assert!(!c.to_string().contains("Late twice"));
 }
+
+#[test]
+fn only_the_owner_marks_a_thing_or_its_serial_private() {
+    let (mut a, _) = setup();
+    let safe = add(&mut a, "furnace");
+    let d = call(
+        &mut a,
+        "update_item",
+        json!({"id": safe, "serial": "SN-1", "serial_sensitive": true, "sensitive": true}),
+    );
+    assert_eq!(d["detail"]["sensitive"], true);
+    assert_eq!(d["detail"]["serial_sensitive"], true);
+    assert!(d["detail"]["serial"].is_null());
+    let me = a.store().author().unwrap();
+    let mut m: housewright_core::model::Member = a.store().fetch(&me.to_string()).unwrap();
+    m.role = housewright_core::model::Role::Member;
+    a.store_mut().put(&m).unwrap();
+    assert!(a
+        .call("update_item", json!({"id": safe, "sensitive": false}))
+        .is_err());
+}

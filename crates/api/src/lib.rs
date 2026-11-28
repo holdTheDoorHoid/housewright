@@ -998,6 +998,7 @@ impl Api {
             attachments,
             edit,
             serial_sensitive,
+            sensitive: item.sensitivity == Sensitivity::Sensitive,
             warranty,
             price: item.price,
             value: item.value,

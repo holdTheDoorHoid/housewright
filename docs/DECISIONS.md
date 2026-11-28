@@ -1187,6 +1187,168 @@ the plan and cannot change it. Lengths and areas follow a household
 setting: feet and inches (default, D-06) or metres. Phone scanning
 (LiDAR) is not built (D-25: a later stretch goal).
 
+## Phase 9 contractors and alerts (proposed by the Phase 9 build, 2026-11-28)
+
+**D-136 Contractors and their private fields (Proposed).** Implements
+D-28. A contractor has a name, company, trades (several), phone, email,
+website, the area they work in, notes (normal, or kept to the sealed
+volume), the emergency flag (D-81), a licence and an insurance
+certificate (number and end date each; the certificate itself is attached
+on their page as a file about the contractor, D-71). Three fields are the
+household's own opinion and are **private**: the rating (1 to 5), "would
+you hire them again?" and private notes. Private fields are shown to the
+owner and members, never to limited members; never printed (the binder
+drops them when it gathers its data, and its tests look for them in every
+edition); never part of the insurance inventory; never read by the Home
+Assistant bridge (a bridge test asserts that no contractor data reaches
+any of its responses); never sent to any server extra (D-16); and they
+travel between devices only inside end-to-end encrypted operations (D-14),
+like every field. The screen marks them "Just for you · Private". Saving
+from a screen that does not show a field (the binder's short "Who to
+call" form) leaves that field as it was: absent means unchanged, empty
+means cleared. A website is kept only as an http or https link with a
+real host ("example.com" becomes "https://example.com"). Call and Email
+open the phone's dialer (with the number filled in, nothing dialled) and
+mail app (D-145).
+
+**D-137 "Who did it" after Done; jobs and spend (Proposed).** Refines
+D-76. Completions are never edited (D-12), so "who did it: a contractor"
+is a field on the append-only completion detail: `contractor` names one,
+`contractor_cleared` says "not a contractor after all"; the latest detail
+that says either wins, otherwise the completion's own `contractor` (other
+programs, older data) counts. It is offered only after Done, in "Add
+details", with "A contractor not listed yet…" adding one by name (P1).
+Saving the form again without a change records nothing. A contractor's
+page lists their jobs (task, thing, room, date, cost) and the total in the
+household's currency; an undone (voided) job does not count. Removing a
+contractor keeps their jobs in the history without the name. The binder's
+history uses the same rule.
+
+**D-138 Licence and insurance reminders (Proposed).** One notice 30 days
+before a contractor's licence or insurance ends, and only for contractors
+marked "would hire again: yes" (asking someone you would not hire again
+for a renewed licence is noise; P5). It goes to the household's owners
+and says what to do: ask for the renewed licence, or for a current
+certificate before they next work on the house (P9). The contractor's
+page shows "Ends soon" or "Ended" against each.
+
+**D-139 Warranty end dates (Proposed).** Refines D-27. A warranty is
+given either as an end date or as a length ("5 years", stored as months).
+A length counts from the earlier of the install and purchase dates
+(warranties usually run from whichever came first, and an early reminder
+is better than a late one). The end date is always stored in `expires`,
+so older readers keep working, and it is worked out again whenever the
+dates change. A warranty also carries an optional registration page
+(https only, shown as a button) and, as before, who gives it, whether it
+transfers, and a reference that may be sensitive. Within 60 days of its
+end a warranty is "ending soon"; the end day itself is still covered. A
+"Warranties" view (Home) lists ending soon, covered and ended.
+
+**D-140 Notices in the reminder plan (Proposed).** Refines D-59. Dated
+notices that are not tasks (a warranty ending, D-138's licences) are
+planned by a pure function (`core::alerts`) and placed in the person's day
+exactly like task reminders: in their maintenance window, never in quiet
+hours, only in the future, within the 60-day horizon, and counted in the
+same cap of 64. A warranty gets one notice about 60 days and one about 7
+days before it ends (one is skipped if its day has passed), naming the
+thing and its room and saying "Book a check-up while it is covered",
+plus a pointer to the registration link when there is one (P9). It goes
+to whoever looks after the thing's switched-on tasks (P8), or to the
+owners when nobody does. A thing marked private is not named (notifications
+show on a locked screen). A notice has no Done or Reschedule button; tapping
+it opens the thing or the contractor. On Android the plugin shows it
+without buttons (`kind: notice`); on the web it opens the same page.
+
+**D-141 Recall checks on the device (Proposed).** Implements D-27's recall
+alerts without D-16's paid extra. Off by default, switched on per device
+from Home, Recalls: "Check my things against US product recalls. Your
+phone downloads the public recall list from the US Consumer Product
+Safety Commission; nothing about your home is sent." The source is the
+CPSC Recalls API, `https://www.saferproducts.gov/RestWebServices/Recall`
+(JSON; checked live on 2026-11-28; no key; data.gov lists it under the
+US public domain label). The only request is
+`?format=json&RecallDateStart=…&RecallDateEnd=…`: two dates, no cookies,
+no referrer, no make, model or anything else (tested in Rust, and in the
+browser by intercepting every request). The first check fetches the last
+ten years in yearly windows (about 1.3 MB of JSON each, about 13 MB in
+all), oldest first with a 1.5-second pause between requests, so an
+interrupted first check resumes; later checks start 14 days before the
+last one ended, to catch late publications. A compact copy (number, date,
+title, official link, products, models, companies, description, hazard,
+remedy) is kept in a device-only table (`recall_cache`): public data, not
+exported, not backed up, not synced; switching recall checks off deletes
+it. **The API sends `Access-Control-Allow-Origin: *`, so the web build
+calls it directly**; no proxy through our server was needed (one would
+need D-16's disclosure, so it stays a possible paid extra for automatic
+checks, not built). The Android and desktop app's content security policy
+allows exactly this one origin for fetches (`connect-src`). Checks run
+when switched on and when "Check now" is pressed; they do not run by
+themselves yet (Q-21).
+
+**D-142 How recalls are matched (Proposed).** Conservative, on the device,
+always with the evidence shown (`core::recalls`). Make and model are
+compared written without spaces, dashes or case. *Model*: the thing's
+model is named in the recall's model list, product name, title or
+description (as one to three adjacent words, so "S1 Pro" matches); it must
+be at least 4 characters with a digit when the brand also matches, 6
+otherwise. *Model series*: the recall names a series written in capitals
+or with a digit that the model starts with (NTI "FTVN" and "FTVN199"),
+and the brand matches. *Brand and kind*: the brand matches and the recall
+is about the same kind of thing (the thing's name or template, singular,
+against the product name, type or title): shown as "Same brand and kind of
+thing: check the model numbers". A thing with neither make nor model is
+never matched. Each match shows why (where the brand and model were
+found, with a short quote) and the official notice's link, hazard and
+remedy. "Not mine" is an append-only `recall_dismissal` record (synced, so
+every device stops showing it; removing it is a tombstone, "Show it
+again"). Today shows one calm card while possible matches are waiting.
+Tested against a recorded CPSC response (seven real recalls, in
+`crates/core/tests/fixtures/cpsc/`; public domain).
+
+**D-143 The insurance inventory (Proposed).** Implements D-27's export.
+Home, Insurance inventory makes one PDF (typeset by Typst like the binder,
+D-80; on the web by the same separately loaded module, not recorded as a
+binder print) and one CSV. The PDF has a cover (property, address if not
+private, date, count, estimated value and price totals), then the rooms one
+after another with a 30 mm photo per thing (shrunk to 400 pixels) and its
+make and model, serial, purchase date, price paid, estimated value,
+warranty and receipts; things with nothing recorded about them (the roof,
+the gutters) are named in one line per room instead of a box each; then
+totals by room and the list of receipts (the receipt files themselves are
+in the app and its full backup). The CSV (UTF-8 with a byte order mark,
+CRLF, RFC 4180 quoting) has one row per thing and a total row; a cell that
+starts with `=`, `+`, `-`, `@` or a tab gets an apostrophe so no
+spreadsheet reads it as a formula. **Sensitive things and fields are left
+out unless the owner ticks "Include sensitive items"**, with the warning
+that insurers do need serials of valuables but such a copy says what you
+have: a thing marked private, and a private serial, warranty reference,
+photo or receipt of a normal thing. The cover says how many were left out.
+Without that tick the binder's last check (D-83) runs over the document
+too. Members may export; limited members may not; only the owner may
+include sensitive items. Contractor details are never part of it.
+
+**D-144 Item price, value and privacy (Proposed).** Items gain `price`
+(what it cost) and `value` (the household's own estimate of what it is
+worth now), as money in the household's currency (D-76), typed like costs
+("1,299.99"). The owner can now mark a whole thing private (a safe,
+jewellery) and a serial private from the thing's edit form; before this
+only other programs could set them.
+
+**D-145 Links that leave the app on Android (Proposed).** The WebView does
+not open `tel:`, `mailto:` or web links by itself, so the reminders plugin
+gains `open_link`: `tel:` opens the dialer with the number filled in
+(`ACTION_DIAL`, no call permission, nothing dialled), `mailto:` the mail
+app (`ACTION_SENDTO`), `https:` (and `http:`) the browser (`ACTION_VIEW`);
+anything else is refused. The web uses ordinary links.
+
+**D-146 Storage schema 7, export version 7 (Proposed).** Schema 7 adds the
+`recall_dismissal` table and the device-only `recall_cache` table. Export
+version 7 adds `recall_dismissal`, item `price` and `value`, warranty
+`months` and `register_url`, contractor `company`, `website`,
+`service_area`, `would_hire_again` and `private_notes`, and completion
+detail `contractor` and `contractor_cleared`. Older files (the Phase 2 and
+Phase 3 fixtures and versions 3 to 6) import unchanged.
+
 ## Open questions for the owner
 
 - **Q-01** Formal trademark check of "Housewright" (USPTO) before any app store
@@ -1245,3 +1407,19 @@ setting: feet and inches (default, D-06) or metres. Phone scanning
   PDF renderer (pdf.js on the web is a large third-party script; a Rust
   one would be a new dependency). Proposed: photos and screenshots only
   until someone asks.
+- **Q-18** Should a strong recall match (model named in the recall) also
+  send one notification, beyond the card on Today? Proposed: yes, once per
+  new match, in the person's maintenance window; not built.
+- **Q-19** "Same brand and kind of thing" recall matches (D-142) catch
+  recalls that name no model, but some will not apply. Keep them (as
+  built, marked "check the model numbers"), or show only model matches?
+- **Q-20** Who sees a contractor's private rating and notes: the owner and
+  members (as built), or the owner only?
+- **Q-21** Once recall checks are on, should the app check by itself (for
+  example once a week when it is opened) instead of only on "Check now"?
+  Proposed: yes, weekly, on the device; not built.
+- **Q-22** The insurance inventory lists everything recorded, including
+  parts of the house (roof, gutters) in one line per room. Should it list
+  only belongings (appliances, electronics, valuables), or leave it to a
+  per-thing "include in the inventory" choice?
+

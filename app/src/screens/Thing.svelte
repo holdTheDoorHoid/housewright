@@ -4,7 +4,8 @@
   import { app, refresh, toast } from '../lib/state.svelte';
   import { errorText, markDone } from '../lib/actions';
   import { resync } from '../lib/reminders';
-  import { dueText, when } from '../lib/format';
+  import { dueText, when, shortDate } from '../lib/format';
+  import { openExternal } from '../lib/links';
   import { money } from '../lib/money';
   import TaskRow from './TaskRow.svelte';
   import Attachments from './Attachments.svelte';
@@ -72,7 +73,7 @@
 {:else if d}
   <article>
     <p><a href="#/things">← Things</a></p>
-    <h1>{d.row.name}</h1>
+    <h1>{d.row.name}{#if d.sensitive} <span class="pill">Private</span>{/if}</h1>
     <p class="muted small">Sticker code <strong data-testid="sticker-code">{d.code}</strong></p>
 
     {#if d.next}
@@ -147,6 +148,16 @@
         {/if}
         {#if d.installed}<dt>Installed</dt><dd>{d.installed}</dd>{/if}
         {#if d.purchased}<dt>Bought</dt><dd>{d.purchased}</dd>{/if}
+        {#if d.price}<dt>Price paid</dt><dd>{money(d.price.minor, d.price.currency)}</dd>{/if}
+        {#if d.value}<dt>Worth now</dt><dd>{money(d.value.minor, d.value.currency)} <span class="small muted">(your estimate)</span></dd>{/if}
+        {#if d.warranty}
+          <dt>Warranty</dt>
+          <dd data-testid="thing-warranty">
+            {d.warranty.state === 'ended' ? 'Ended' : 'Until'} {shortDate(d.warranty.ends)}{#if d.warranty.provider}, {d.warranty.provider}{/if}
+            {#if d.warranty.state === 'ending_soon'}<span class="pill attention">Ends in {d.warranty.days_left} {d.warranty.days_left === 1 ? 'day' : 'days'}</span>{/if}
+            {#if d.warranty.transferable}<span class="small muted">· transfers to a new owner</span>{/if}
+          </dd>
+        {/if}
         {#each d.fields as f (f.key)}
           <dt>{f.label}</dt>
           <dd>
@@ -156,6 +167,19 @@
           </dd>
         {/each}
       </dl>
+      {#if d.warranty?.state === 'ending_soon'}
+        <div class="card offer" data-testid="warranty-action">
+          <p>
+            The warranty ends {shortDate(d.warranty.ends)}. If anything has seemed off, book a check-up while it is
+            still covered.
+          </p>
+          {#if d.warranty.register_url}
+            <p class="small">Not registered yet? <button class="quiet" onclick={() => d?.warranty?.register_url && openExternal(d.warranty.register_url)}>Open the registration page</button></p>
+          {/if}
+        </div>
+      {:else if d.warranty?.register_url && d.warranty.state === 'active'}
+        <p class="small"><button class="quiet" onclick={() => d?.warranty?.register_url && openExternal(d.warranty.register_url)}>Register the product</button></p>
+      {/if}
       <p><button onclick={() => (editing = true)}>Edit details</button></p>
     {/if}
 

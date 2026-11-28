@@ -6,6 +6,7 @@
 //   no background reminders on the web without a server; that is Phase 11).
 // - Tests: nothing.
 import { call, currentBackend, type Reminder } from './api';
+import { noticeHash } from './state.svelte';
 
 export type Permission = 'granted' | 'denied' | 'prompt' | 'unsupported';
 
@@ -62,7 +63,8 @@ class WebReminders implements ReminderService {
     const n = new Notification(r.title, { body: r.body, tag: `task-${r.task_id}` });
     n.onclick = () => {
       window.focus();
-      location.hash = `#/task/${r.task_id}`;
+      // A notice (warranty, licence) opens what it is about; a task opens the task.
+      location.hash = r.open ? noticeHash(r.open) : `#/task/${r.task_id}`;
       n.close();
     };
   }

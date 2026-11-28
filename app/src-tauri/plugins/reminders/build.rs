@@ -4,6 +4,7 @@ const COMMANDS: &[&str] = &[
     "pending",
     "view_file",
     "share_file",
+    "open_link",
     "check_permissions",
     "request_permissions",
 ];

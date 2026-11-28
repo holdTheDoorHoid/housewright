@@ -23,6 +23,11 @@ class TestArgs {
 }
 
 @InvokeArg
+class LinkArgs {
+    lateinit var url: String
+}
+
+@InvokeArg
 class FileArgs {
     lateinit var path: String
     var mime: String = "application/octet-stream"
@@ -144,6 +149,32 @@ class RemindersPlugin(private val activity: Activity) : Plugin(activity) {
             invoke.resolve()
         } catch (e: Exception) {
             invoke.reject(e.message ?: "could not share the file")
+        }
+    }
+
+    /**
+     * Phase 9: hand a link to the phone. Only three kinds are accepted: a
+     * phone number (opens the dialer with it filled in; nothing is dialled),
+     * an email address (opens the mail app), and an https page.
+     */
+    @Command
+    fun openLink(invoke: Invoke) {
+        val args = invoke.parseArgs(LinkArgs::class.java)
+        val uri = android.net.Uri.parse(args.url)
+        val intent = when (uri.scheme?.lowercase()) {
+            "tel" -> Intent(Intent.ACTION_DIAL, uri)
+            "mailto" -> Intent(Intent.ACTION_SENDTO, uri)
+            "https", "http" -> Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)
+            else -> {
+                invoke.reject("That kind of link cannot be opened.")
+                return
+            }
+        }
+        try {
+            activity.startActivity(intent)
+            invoke.resolve()
+        } catch (e: ActivityNotFoundException) {
+            invoke.reject("No app on this phone can open that.")
         }
     }
 

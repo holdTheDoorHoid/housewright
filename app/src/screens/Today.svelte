@@ -79,6 +79,15 @@
         {/each}
       </ul>
     {/if}
+    {#if today.recall_matches > 0}
+      <a class="card recall" href="#/recalls" data-testid="recall-card">
+        <strong>Possible product {today.recall_matches === 1 ? 'recall' : 'recalls'}</strong>
+        <span class="small">
+          {today.recall_matches === 1 ? 'One of your things looks like' : `${today.recall_matches} of your things look like`}
+          something on the US recall list. See what matched and the official notice.
+        </span>
+      </a>
+    {/if}
     {#if today.suggestion}
       {#key today.suggestion.key}<SuggestionCard suggestion={today.suggestion} />{/key}
     {/if}
@@ -109,5 +118,14 @@
   }
   .suggest {
     margin-top: 1.5rem;
+  }
+  .recall {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 1rem 0;
+    color: inherit;
+    text-decoration: none;
+    border-left: 4px solid var(--accent);
   }
 </style>

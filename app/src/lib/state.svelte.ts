@@ -18,6 +18,11 @@ export type Route =
   | { name: 'labels' }
   | { name: 'scan' }
   | { name: 'binder' }
+  | { name: 'contractors' }
+  | { name: 'contractor'; id: string }
+  | { name: 'warranties' }
+  | { name: 'recalls' }
+  | { name: 'insurance' }
   | { name: 'plans'; floor: string | null; pin: string | null; place: string | null };
 
 export function parse(hash: string): Route {
@@ -61,6 +66,16 @@ export function parse(hash: string): Route {
       return { name: 'scan' };
     case 'binder':
       return { name: 'binder' };
+    case 'contractors':
+      return { name: 'contractors' };
+    case 'contractor':
+      return parts[1] ? { name: 'contractor', id: parts[1] } : { name: 'contractors' };
+    case 'warranties':
+      return { name: 'warranties' };
+    case 'recalls':
+      return { name: 'recalls' };
+    case 'insurance':
+      return { name: 'insurance' };
     case 'plans':
       // #/plans, #/plans/<floor>, #/plans/<floor>/pin/<pin>, #/plans/place/<thing>
       if (parts[1] === 'place') return { name: 'plans', floor: null, pin: null, place: parts[2] ?? null };
@@ -104,4 +119,12 @@ if (typeof window !== 'undefined') {
   window.addEventListener('hashchange', () => {
     app.route = parse(location.hash);
   });
+}
+
+/** Where a notice's `open` link (`item/<id>`, `contractor/<id>`) goes. */
+export function noticeHash(open: string): string {
+  const [kind, id] = open.split('/');
+  if (kind === 'item' && id) return `#/thing/${id}`;
+  if (kind === 'contractor' && id) return `#/contractor/${id}`;
+  return '#/';
 }

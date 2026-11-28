@@ -94,3 +94,19 @@ The add-on image (`integrations/home-assistant/addon/housewright/Dockerfile`)
 starts from Home Assistant's Debian base image (Apache-2.0) and installs
 `jq` (MIT) to read its options.
 
+## Phase 9: US product recall data
+
+- **CPSC Recalls API** (`https://www.saferproducts.gov/RestWebServices/Recall`),
+  US Consumer Product Safety Commission. A work of the US federal
+  government; data.gov lists the Recalls API under the US public domain
+  label (`http://www.usa.gov/publicdomain/label/1.0/`), checked 2026-11-28.
+  No key or registration. The app downloads it on the person's device
+  only when they switch recall checks on (D-141); nothing of it ships with
+  the app. A recorded response of seven recalls is kept as a test fixture
+  (`crates/core/tests/fixtures/cpsc/recalls-2026-10.json`), unchanged.
+  The interface credits "US Consumer Product Safety Commission (public
+  domain)" on the Recalls screen. CPSC's name and the recall notices are
+  linked, never presented as Housewright's own.
+
+No new Rust or JavaScript libraries were added in Phase 9.
+

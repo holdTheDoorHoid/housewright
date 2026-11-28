@@ -520,6 +520,52 @@ Not built: TLS for the local API (it is meant for one machine or the
 add-on network), per-route scopes for the token, rate limiting, and
 rotating the token from Home Assistant (delete `api-token` and restart).
 
+### Phase 9: recall downloads and private contractor fields (D-136, D-141)
+
+**Recall checks send nothing about the household.** When someone turns on
+recall checks (off by default, per device), the device asks the US
+Consumer Product Safety Commission's public API for recalls announced
+between two dates: `GET https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallDateStart=YYYY-MM-DD&RecallDateEnd=YYYY-MM-DD`.
+That URL is built by the core (`recalls::cpsc_url`, tested to carry only
+those three parameters); the browser's `fetch` sends it with
+`credentials: 'omit'` and `referrerPolicy: 'no-referrer'`, and the
+Playwright test intercepts every request and checks that no make, model
+or serial is in it. What the CPSC (and anyone on the path, under TLS) can
+still learn: that this IP address uses some recall-checking client, when,
+and the date ranges (which reveal roughly when recall checks were turned
+on). The User-Agent is the browser's or WebView's own; Housewright adds no
+identifier. The response is parsed as data only: records without an https
+recall link are dropped, every string is shown as text (Svelte escapes
+it), and links open through the platform (D-145), never inside the app.
+Matching against make and model runs on the device. The downloaded list is
+kept in a device-only table and never exported, backed up or synced; a
+"not mine" answer is an ordinary record and syncs end-to-end encrypted.
+Recalls are **not** proxied through the sync server: a proxy would see the
+household's address and timing at least, which D-16 allows only as a
+switched-on paid extra with a disclosure.
+
+The app's content security policy (Android, desktop) allows fetches to
+exactly one outside origin, `https://www.saferproducts.gov`, besides its
+own.
+
+**Private contractor fields.** A contractor's rating, "would hire again"
+and private notes are ordinary fields of the contractor record, so they
+are end-to-end encrypted in sync like everything else and readable by
+every device of the household. They are hidden from limited members'
+screens (the command surface does not send them), which is a screen rule,
+not cryptography (as for every limited-member rule; D-98, Q-10). The
+binder drops them before building any edition, the insurance inventory
+never includes contractors, and the Home Assistant bridge never reads
+contractors at all (`crates/bridge/tests/api.rs` checks that a
+contractor's name, phone, costs and private notes appear in no answer).
+They are in a full export or backup, which is the household's own data.
+
+**External links.** Phone numbers, email addresses, contractors' websites,
+registration pages and recall notices open outside the app: on Android
+through the reminders plugin's `open_link`, which accepts only `tel:`
+(dialer, nothing dialled), `mailto:` and `http(s):`; stored warranty
+registration links must be https with a real host.
+
 ### Known weaknesses and open questions
 
 - **The Home Assistant machine holds the keys.** A bridge is a full

@@ -14,7 +14,7 @@ assumption early. Status as of 2026-11-28.
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust, web (Playwright) and Android emulator touch checks; see below |
-| 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | |
+| 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | built on branch `phase-9-contractors` (2026-11-28): contractors with private fields and job history, warranties and notices, on-device CPSC recall checks (web included: the API allows any origin), insurance inventory PDF and CSV; Rust and web (Playwright) checks; see below |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
 | 11 | Hosted + extras | Paid hosting, opt-in disclosure extras (email/SMS reminders, recalls), AI label reading, share links for contractors and tenants | |
 | 12 | Landlord depth | Multi-property dashboards, tenant problem reports, per-property costs | |
@@ -424,4 +424,45 @@ PDF (photos and screenshots only, Q-17); a drawn plan snippet on the
 emergency page (Q-16); walls crossing in an X are not split into rooms;
 pinch zoom was not exercised by any test (adb input cannot do two
 fingers; mouse, wheel, buttons and one-finger touch were).
+
+## Phase 9 notes
+
+Built (decisions D-136 to D-146; owner questions Q-18 to Q-22; how it fits
+in [ARCHITECTURE.md](ARCHITECTURE.md#contractors-and-alerts-phase-9);
+what is sent and what stays private in [SECURITY.md](SECURITY.md); the
+stored shapes in [FILE-FORMAT.md](FILE-FORMAT.md), version 7). The binder
+editions planned here (handover, succession) were done in Phase 5.
+
+- **Contractors** (Home, Contractors): add and edit name, company, trades,
+  phone, email, website, service area, licence and insurance (number and
+  end date; the certificate attached on their page), notes, the emergency
+  flag, and the private rating, "would hire again" and private notes
+  ("Just for you · Private"). A page per contractor: Call and Email (the
+  phone's dialer and mail app), licence and insurance state, attachments,
+  jobs with thing, room, date and cost, and the total spent. After Done,
+  "Add details" asks "Who did it" (a listed contractor, or a new one by
+  name). The binder's "Who to call" form keeps working and leaves the new
+  fields alone. This closes the Phase 4 and 5 gaps (contractor attachments
+  in the interface; licence, insurance and rating editor).
+- **Warranties**: a length (years or months, from the earlier of the
+  install and purchase dates) or an end date, who gives it, whether it
+  transfers, a registration link; the thing's page shows it and, when it
+  ends within 60 days, "book a check-up while it is covered" and the
+  registration link; a Warranties view (ending soon, covered, ended).
+- **Notices**: warranties (about 60 and 7 days before) and licences and
+  insurance of contractors marked "would hire again" (30 days before) join
+  the reminder plan, in the maintenance window, out of quiet hours, within
+  the cap; no Done button; they open the thing or the contractor.
+- **Recall checks** (Home, Recalls): off by default; when switched on the
+  device downloads ten years of US recalls from the CPSC in yearly
+  windows (dates only in each request), then only what is new on "Check
+  now"; matching on the device with its evidence, the official notice,
+  hazard and remedy; "Not mine" (synced); a calm card on Today. The CPSC
+  API allows any origin, so the web build checks too.
+- **Insurance inventory** (Home, Insurance inventory): a PDF (cover, rooms
+  with a photo per thing, totals and receipts) and a CSV; sensitive things
+  and details only when the owner ticks "Include sensitive items".
+- **Things**: price paid and estimated value; the owner can mark a thing
+  or its serial private from the edit form.
+- Storage schema 7, export version 7; older exports import unchanged.
 
