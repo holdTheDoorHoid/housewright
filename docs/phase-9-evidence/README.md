@@ -30,4 +30,4 @@ title. Three pages now for this household.
 
 ## Android
 
-See `android/README.md` (or the note there on why it was skipped).
+See [android/README.md](android/README.md): Call opens the dialer, a warranty notice fires (with a test date) without Done buttons, the live CPSC list downloads on the emulator, and the inventory PDF opens.

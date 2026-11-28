@@ -14,7 +14,7 @@ assumption early. Status as of 2026-11-28.
 | 6 | Sync + encryption | Self-hosted server, end-to-end encryption, multi-device, members and roles, recovery key | built on branch `phase-6-sync` (2026-11-28): crypto, server, client, interface; Rust, web (Playwright, two browser profiles) and Android emulator checks; awaits an independent security review; see below |
 | 7 | Home Assistant | Tasks as HA to-do/calendar/sensors, HA meters and events trigger tasks, device import, server as add-on | built on branch `phase-7-home-assistant` (2026-11-28): Rust bridge, Python integration (D-117), add-on files; Rust, Python (against the real bridge, HA 2026.10.4) and browser (Playwright) checks; the add-on image is not built or run yet; see below |
 | 8 | Floor plans | Stage A: rooms on a grid, floors, item pins. Stage B: measured walls, angles, windows, area, PDF | built on branch `phase-8-floor-plans` (2026-11-28): Stage A and Stage B, binder pages, Rust, web (Playwright) and Android emulator touch checks; see below |
-| 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | built on branch `phase-9-contractors` (2026-11-28): contractors with private fields and job history, warranties and notices, on-device CPSC recall checks (web included: the API allows any origin), insurance inventory PDF and CSV; Rust and web (Playwright) checks; see below |
+| 9 | Contractors and alerts | Contractor records and job history, warranty expiry, CPSC recall checks, insurance export, binder editions (handover, succession) | built on branch `phase-9-contractors` (2026-11-28): contractors with private fields and job history, warranties and notices, on-device CPSC recall checks (web included: the API allows any origin), insurance inventory PDF and CSV; Rust, web (Playwright) and Android emulator checks; see below |
 | 10 | iOS | Apple account, Mac/cloud builds, App Store | |
 | 11 | Hosted + extras | Paid hosting, opt-in disclosure extras (email/SMS reminders, recalls), AI label reading, share links for contractors and tenants | |
 | 12 | Landlord depth | Multi-property dashboards, tenant problem reports, per-property costs | |
@@ -465,4 +465,29 @@ editions planned here (handover, succession) were done in Phase 5.
 - **Things**: price paid and estimated value; the owner can mark a thing
   or its serial private from the edit form.
 - Storage schema 7, export version 7; older exports import unchanged.
+
+Verified: Rust format, clippy (native and wasm), tests (warranty dates and
+states; notices with leads, quiet hours and the maintenance window; recall
+parsing and matching against a recorded CPSC response, the request
+carrying dates only; contractors' jobs and spend, "who did it" after Done,
+voided jobs; private contractor fields left out of every binder edition,
+of the inventory, of limited members' screens and of every Home Assistant
+bridge answer; the inventory's PDF text, laid-out pages and CSV without
+sensitive things by default and with them when the owner asks; older
+exports); cargo deny; svelte-check, vitest; Playwright on the production
+web build (`app/tests/phase9.spec.ts`, every CPSC request intercepted and
+checked) and every earlier spec; the Android emulator (Call opens the
+dialer, a warranty notice fires without Done buttons, the live CPSC list
+downloads, the inventory PDF opens; `docs/phase-9-evidence/android/`).
+The inventory PDF was looked at page by page and its layout fixed; see
+[phase-9-evidence/README.md](phase-9-evidence/README.md).
+
+Not built or not checked: a notification for a new strong recall match
+(Q-18) and automatic weekly recall checks (Q-21); recalls from outside the
+US; a per-thing "include in the inventory" choice (Q-22); attaching the
+receipt files themselves to the inventory (they are listed; the files are
+in the full backup); currency conversion (amounts in another currency are
+counted, not added); the Android check of tapping a notice from another
+screen (the app was already on that thing); the notice receiver logs
+nothing when notifications are not allowed.
 
