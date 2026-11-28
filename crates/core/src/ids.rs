@@ -79,6 +79,8 @@ define_id!(
     FactId,
     /// An answer to a weekly suggestion.
     SuggestionAnswerId,
+    /// Details (costs, values) added to a completion afterwards.
+    CompletionDetailId,
     /// An operation in the operation log.
     OpId,
 );
